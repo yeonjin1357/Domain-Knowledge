@@ -1,0 +1,48 @@
+# 클라우드 네트워크: 경로, 정책과 흐름 로그
+
+> 상태: 본문 초안 · 적용 범위: 공통 조사 모델과 AWS VPC 사례 · 출처 확인일: 2026-10-03
+
+클라우드 네트워크에서는 주소·라우팅·정책·주소 변환·서비스 endpoint의 설정을 함께 확인합니다. 설정상 허용과 실제 애플리케이션 성공은 같은 결과가 아닙니다.
+
+## 연결 경로의 모델
+
+다음은 제품의 논리 관계 모델입니다.
+
+```text
+워크로드 → 네트워크 인터페이스 → subnet/route
+         → 정책 경계 → NAT/중계/서비스 endpoint → 목적지
+```
+
+실제 배치는 직접 연결, peering, VPN, 전용 연결 등으로 달라질 수 있습니다. 그림의 모든 요소가 반드시 존재하는 것은 아닙니다. [주소와 NAT](../network/addressing-routing-dns.md), [TLS 종단](../network/tls-http.md)을 함께 읽습니다.
+
+## stateful과 stateless 정책
+
+AWS security group은 stateful입니다. 허용된 요청의 응답은 반대 방향 규칙만으로 새로 판단하는 단순 stateless 모델과 다르게 처리됩니다. [AWS Security Groups](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html)
+
+AWS network ACL은 subnet 경계의 stateless 규칙이며 응답도 관련 규칙을 통과해야 합니다. 동일한 이름의 방화벽 기능이라고 해서 두 정책을 같은 방식으로 평가하면 안 됩니다. [AWS Network ACLs](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html)
+
+가상의 클라이언트 출발지 포트가 51000이고 서버 목적지 포트가 443이면 응답은 반대 방향의 포트 조합입니다. 조사에서는 요청 방향 443 허용만 확인하지 않고 실제 응답 경로와 정책을 비교합니다. 모든 공급자의 방화벽 동작을 이 AWS 사례로 일반화하지 않습니다.
+
+## flow log가 알려 주는 범위
+
+VPC Flow Logs는 ACCEPT·REJECT 같은 흐름 결과와 로그 상태를 제공합니다. NODATA는 기록할 트래픽이 없는 구간을, SKIPDATA는 캡처하지 못한 기록이 있음을 나타낼 수 있습니다. SKIPDATA 한 기록이 여러 누락 흐름을 대표할 수도 있습니다. [AWS Flow Log Examples](https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs-records-examples.html)
+
+따라서 로그가 없다는 사실을 언제나 트래픽 0으로 바꾸지 않습니다. ACCEPT도 HTTP 성공이나 업무 완료를 의미하지 않으며 실제 상위 계층 결과를 추가 확인해야 합니다.
+
+## 가상 장애 분석
+
+특정 subnet에서만 DB 접속이 실패한다고 가정합니다. 먼저 클라이언트가 선택한 주소와 경로를 확인하고, 양쪽 정책·변환과 실제 flow 기록을 비교합니다. 연결이 성립했다면 TLS·DB 인증과 쿼리 단계로 이동합니다.
+
+“설정 변경 뒤 장애가 발생했다”는 시간 상관만으로 그 설정을 원인으로 확정하지 않습니다. 해당 트래픽이 변경된 규칙의 범위를 지나갔는지, 실패 단계와 정책 결과가 일치하는지 확인합니다.
+
+## 제품의 토폴로지 정보
+
+원천 인터페이스 ID, 계정·리전, 사설 네트워크 범위, 주소 유효 기간, 실제 관측자와 정책의 적용 범위를 저장하도록 제안합니다. NAT 전후 주소를 근거 없이 동일 대상으로 합치지 않습니다. 다른 VPC에 같은 사설 IP가 있을 수 있으므로 IP 문자열만으로 간선을 만들지 않습니다.
+
+## 이해 확인
+
+1. security group과 NACL은 모두 같은 상태 추적을 하는가? **AWS에서는 stateful과 stateless 차이가 있습니다.**
+2. ACCEPT 로그면 DB 쿼리가 성공했는가? **전송·인증·업무 결과를 더 확인해야 합니다.**
+3. SKIPDATA를 트래픽 0으로 저장해도 되는가? **관측 누락을 잘못 표현합니다.**
+
+관련: [네트워크 관측](../network/network-metrics.md) · [클라우드 목차](README.md)
