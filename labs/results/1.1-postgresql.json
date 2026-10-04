@@ -1,0 +1,134 @@
+{
+  "run_at_utc": "2026-10-04T02:10:47.334982+00:00",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "network": "private Unix socket; TCP disabled",
+  "experiments": {
+    "server_version": "PostgreSQL 18.6 (Ubuntu 18.6-1.pgdg24.04+2) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, 64-bit",
+    "server_version_num": 180006,
+    "read_committed": {
+      "status": "passed",
+      "observations": [
+        10,
+        20,
+        20
+      ]
+    },
+    "repeatable_read": {
+      "status": "passed",
+      "observations": [
+        10,
+        10,
+        20
+      ]
+    },
+    "lock_wait": {
+      "status": "passed",
+      "waiter": {
+        "state": "active",
+        "wait_event_type": "Lock",
+        "wait_event": "transactionid",
+        "blockers": "{772990}"
+      },
+      "holder": {
+        "state": "idle in transaction"
+      },
+      "final_value": 12
+    },
+    "lock_timeout": {
+      "status": "passed",
+      "first_sqlstate": "55P03",
+      "next_sqlstate": "25P02"
+    },
+    "statement_timeout": {
+      "status": "passed",
+      "first_sqlstate": "57014",
+      "next_sqlstate": "25P02"
+    },
+    "failed_transaction": {
+      "status": "passed",
+      "first_sqlstate": "23514",
+      "next_sqlstate": "25P02",
+      "after_rollback": 10
+    },
+    "savepoint": {
+      "status": "passed",
+      "retained_earlier_update": 40
+    },
+    "deadlock": {
+      "status": "passed",
+      "two_sqlstates": [
+        "40P01",
+        "00000"
+      ],
+      "victim_is_not_assumed": true
+    },
+    "statistics_privilege": {
+      "status": "passed",
+      "before": {
+        "state": null,
+        "query": "<insufficient privilege>"
+      },
+      "after": {
+        "state": "idle",
+        "query": "ROLLBACK"
+      }
+    },
+    "statistics_snapshot": {
+      "status": "passed",
+      "initial": 4,
+      "same_transaction_cached": 4,
+      "after_clear": 10
+    },
+    "collector_query": {
+      "status": "passed",
+      "role": "dk_monitor with pg_read_all_stats",
+      "result_sets": [
+        [
+          {
+            "server_version_num": "180006"
+          }
+        ],
+        [
+          {
+            "collected_at": "2026-10-04 02:10:47.752038+00",
+            "datid": "5",
+            "datname": "postgres",
+            "xact_commit": "10",
+            "xact_rollback": "2",
+            "blks_read": "87",
+            "blks_hit": "1871",
+            "stats_reset": null
+          },
+          {
+            "collected_at": "2026-10-04 02:10:47.752436+00",
+            "datid": "1",
+            "datname": "template1",
+            "xact_commit": "904",
+            "xact_rollback": "0",
+            "blks_read": "514",
+            "blks_hit": "88964",
+            "stats_reset": null
+          },
+          {
+            "collected_at": "2026-10-04 02:10:47.75244+00",
+            "datid": "4",
+            "datname": "template0",
+            "xact_commit": "0",
+            "xact_rollback": "0",
+            "blks_read": "0",
+            "blks_hit": "0",
+            "stats_reset": null
+          }
+        ]
+      ]
+    }
+  },
+  "cleanup": "private server stopped; temporary data directory removed on context exit",
+  "input_sha256": {
+    "scripts/run_postgres_lab.py": "996396c90a11898a9235cbef2014cfbed9ad1e4687c28a46e00e11756c1c2256",
+    "scripts/get_postgres_lab.py": "d447e0d0fdbbb4f60120876049f5fa9fb31cf1e5e1b2cd1370576aa971ec4fe5",
+    "labs/postgresql/packages.json": "67a5eda4b7ca5105d6157ca657f0e0c11770225fac9cf69d1a73fc1b6f9f867c",
+    "labs/postgresql/collect-database.sql": "253984bb3ade87e506892576031fa2e8c49fc5611f8ebb50868d1ffd6a7257d9"
+  }
+}

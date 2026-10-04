@@ -51,5 +51,6 @@ PostgreSQL 18의 `pg_stat_activity`는 서버 프로세스의 현재 활동을 �
 8. [문서형, 분산형, 분석형 DB의 관측](distributed-and-analytical.md)
 9. [시계열·그래프·문서·열 지향 DB를 비교하는 기준](specialized-data-models.md)
 10. [DB 수집 명세: 읽기 전용 쿼리, 단위, 권한과 통계 수명](collection-contracts.md)
+11. [PostgreSQL 실제 실습: 같은 값, 잠금 대기와 실패한 트랜잭션](postgresql-concurrency-lab.md)
 
 관련 문서: [애플리케이션](../application/README.md), [호스트](../host/README.md), [스토리지](../storage/README.md)

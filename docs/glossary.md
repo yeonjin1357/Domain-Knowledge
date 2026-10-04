@@ -143,4 +143,22 @@
 | Quota | 자원 또는 작업에 적용되는 사용 한도와 그 범위 | [클라우드](cloud/quotas-cost-and-capacity.md) |
 | Churn | 관측 대상·series가 생성·교체되는 빈도 또는 현상 | [제품 용량](product/capacity-and-loss-budgets.md) |
 
+## 측정·동시성·전송을 읽는 용어
+
+| 용어 | 쉬운 뜻과 구분 | 상세 |
+| --- | --- | --- |
+| 측정 경계 | 어디부터 어디까지, 누구의 작업을 셌는지 정한 범위 | [측정과 비교](foundations/measurement-and-comparability.md) |
+| 해상도 / 정확도 | 구분할 수 있는 눈금 / 실제 값과의 일치 정도; 소수점 자릿수와 혼동하지 않음 | [시계와 오차](foundations/measurement-and-comparability.md) |
+| RSS / PSS | 상주 페이지 계정 / 공유 페이지를 비례 배분한 계정 | [Linux 실습](host/linux-observation-lab.md) |
+| Working set | 도구의 정의에 따른 메모리 관측값; cAdvisor의 계산을 실제로 회수 불가능한 총량과 동일시하지 않음 | [메모리 계정](containers/memory-accounting-and-oom.md) |
+| SQLSTATE | SQL 처리 결과의 표준화된 코드 체계; 엔진·문맥과 함께 해석 | [PostgreSQL 실습](database/postgresql-concurrency-lab.md) |
+| SAVEPOINT | 트랜잭션 안에서 그 지점 이후 작업을 되돌릴 수 있게 둔 저장점 | [실패와 저장점](database/postgresql-concurrency-lab.md) |
+| 조회 snapshot | 한 조회·트랜잭션이 보는 기준 상태; DB 읽기·통계·스토리지 snapshot의 규약은 각각 다름 | [DB 실습](database/postgresql-concurrency-lab.md) |
+| Selector | 관측할 객체 집합을 고르는 조건; 집합 이탈과 객체 삭제는 다를 수 있음 | [Kubernetes 인벤토리](kubernetes/inventory-consistency.md) |
+| Partial success | 요청의 일부 항목은 수용하고 일부는 거절한 응답 | [전송 계약](product/telemetry-delivery-contracts.md) |
+| Head / Tail sampling | 생성 시점 정보 / 모은 span 정보로 기록 대상을 선택하는 방식 | [Sampling](application/trace-sampling-and-context.md) |
+| Negative caching | 이름 부재 등 부정 응답을 정해진 규약에 따라 보관하는 것 | [DNS와 연결](network/dns-and-connection-lifecycle.md) |
+| Backfill / 재조회 | 과거 구간의 자료를 뒤늦게 확보·보완하는 처리; 중복 집계 정책 필요 | [Cloud 재조회](cloud/late-data-and-reconciliation.md) |
+| Capability | 버전·설정·권한 등을 고려해 실제 사용할 수 있는 기능 | [필드 수용 기준](product/compatibility-and-acceptance.md) |
+
 용어의 짧은 정의는 학습을 돕는 요약입니다. 실제 판정과 계산은 연결된 원천·버전·조건을 따릅니다.

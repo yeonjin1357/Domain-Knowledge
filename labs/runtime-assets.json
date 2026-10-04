@@ -1,0 +1,23 @@
+{
+  "platform": "Linux amd64",
+  "verified_at": "2026-10-04",
+  "verification": "GitHub official release asset SHA256, verified before extraction",
+  "archives": [
+    {
+      "name": "envtest-v1.34.1-linux-amd64.tar.gz",
+      "url": "https://github.com/kubernetes-sigs/controller-tools/releases/download/envtest-v1.34.1/envtest-v1.34.1-linux-amd64.tar.gz",
+      "sha256": "c8500090806ed5ce4064eeeb2a5666476a5168c1f4ff0eadd54fe59b22c4baa7",
+      "release_api": "https://api.github.com/repos/kubernetes-sigs/controller-tools/releases/tags/envtest-v1.34.1",
+      "release_tag": "envtest-v1.34.1",
+      "size": 51872266
+    },
+    {
+      "name": "otelcol_0.137.0_linux_amd64.tar.gz",
+      "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.137.0/otelcol_0.137.0_linux_amd64.tar.gz",
+      "sha256": "1fc2891e93a26729fa5b0db64b96ac6b2a86a48928fc98236dfaf3c92b67e5da",
+      "release_api": "https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases/tags/v0.137.0",
+      "release_tag": "v0.137.0",
+      "size": 41182291
+    }
+  ]
+}

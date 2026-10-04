@@ -52,5 +52,6 @@ PSI는 CPU·메모리·I/O 자원 경합으로 작업이 멈춘 시간의 영향
 7. [GPU와 가속기: 활동, 메모리와 분할](gpu.md)
 8. [CPU와 메모리의 위치: NUMA, 캐시, 스케줄링과 압력](numa-and-pressure.md)
 9. [호스트 수집 명세: 원천 필드에서 지표까지](collection-contracts.md)
+10. [Linux 원천 관측 실습: CPU, 가상 메모리와 실제 I/O](linux-observation-lab.md)
 
 관련 문서: [공통 개념](../foundations/README.md), [컨테이너](../containers/README.md), [쿠버네티스](../kubernetes/README.md), [네트워크](../network/README.md)

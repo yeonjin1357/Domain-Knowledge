@@ -1,0 +1,80 @@
+{
+  "run_at_utc": "2026-10-04T02:15:47.933971+00:00",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "server_version": {
+    "major": "1",
+    "minor": "34",
+    "emulationMajor": "1",
+    "emulationMinor": "34",
+    "minCompatibilityMajor": "1",
+    "minCompatibilityMinor": "33",
+    "gitVersion": "v1.34.1",
+    "gitCommit": "93248f9ae092f571eb870b7664c534bfc7d00f03",
+    "gitTreeState": "clean",
+    "buildDate": "2025-09-09T19:37:20Z",
+    "goVersion": "go1.24.6",
+    "compiler": "gc",
+    "platform": "linux/amd64"
+  },
+  "etcd_version": "etcd Version: 3.6.4\nGit SHA: 5400cdc\nGo Version: go1.23.11\nGo OS/Arch: linux/amd64",
+  "scope": "isolated API server + etcd; watch cache disabled for deterministic history expiry; no scheduler, controller-manager, kubelet, CNI, or workloads",
+  "experiments": {
+    "pagination": {
+      "status": "passed",
+      "original_list_names": [
+        "cm-0",
+        "cm-1",
+        "cm-2"
+      ],
+      "collection_versions": [
+        "202",
+        "202",
+        "202"
+      ],
+      "fresh_list_count": 4
+    },
+    "list_then_watch": {
+      "status": "passed",
+      "event_type": "ADDED",
+      "name": "cm-late",
+      "watch_from": "202"
+    },
+    "name_reuse": {
+      "status": "passed",
+      "same_name": "cm-1",
+      "old_uid": "04726b1d-1692-4a20-868e-84d79014fa86",
+      "new_uid": "0af48c35-146e-4c67-a9c3-78b3e6f4e14c"
+    },
+    "optimistic_conflict": {
+      "status": "passed",
+      "http_status": 409,
+      "reason": "Conflict"
+    },
+    "rbac_scope": {
+      "status": "passed",
+      "before_grant": 403,
+      "allowed_count": 4,
+      "secrets_status": 403,
+      "other_namespace_status": 403
+    },
+    "selector_exit": {
+      "status": "passed",
+      "watch_event": "DELETED",
+      "get_after_event": 200,
+      "remaining_label": "other",
+      "meaning": "DELETED from this selected watch set; object still exists"
+    },
+    "expired_history": {
+      "status": "passed",
+      "compacted_private_etcd_revision": "209",
+      "expired_http_status": 410,
+      "fresh_list_count": 4
+    }
+  },
+  "cleanup": "all private child processes stopped; temporary certificates and data removed",
+  "input_sha256": {
+    "scripts/run_kubernetes_lab.py": "c795bdfc0beaa48d4ec9d04532b5dac66591a8e9c6ba37b70d9e674cad59537e",
+    "scripts/get_runtime_lab_assets.py": "4df31fb34b3a62bd74781ea1defe78aa4ba38e134d30b90ade52730c654eed4b",
+    "labs/runtime-assets.json": "3e800ac4de34217d7eec75e506495acf4d41b9eb9e32735bf441bc523e9abda4"
+  }
+}

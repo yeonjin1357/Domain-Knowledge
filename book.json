@@ -19,6 +19,7 @@
         "docs/foundations/performance-and-statistics.md",
         "docs/foundations/service-level-objectives.md",
         "docs/foundations/time-and-data-quality.md",
+        "docs/foundations/measurement-and-comparability.md",
         "docs/foundations/traces-logs-profiles.md",
         "docs/foundations/distributed-systems.md"
       ]
@@ -35,7 +36,8 @@
         "docs/host/virtualization.md",
         "docs/host/gpu.md",
         "docs/host/numa-and-pressure.md",
-        "docs/host/collection-contracts.md"
+        "docs/host/collection-contracts.md",
+        "docs/host/linux-observation-lab.md"
       ]
     },
     {
@@ -45,6 +47,7 @@
         "docs/network/addressing-routing-dns.md",
         "docs/network/tcp-and-udp.md",
         "docs/network/tls-http.md",
+        "docs/network/dns-and-connection-lifecycle.md",
         "docs/network/network-metrics.md",
         "docs/network/layers-and-routing.md",
         "docs/network/snmp-and-device-models.md",
@@ -56,6 +59,7 @@
       "chapters": [
         "docs/storage/README.md",
         "docs/storage/models-and-performance.md",
+        "docs/storage/write-path-and-durability.md",
         "docs/storage/capacity-and-protection.md",
         "docs/storage/raid-lvm-and-paths.md"
       ]
@@ -66,6 +70,7 @@
         "docs/containers/README.md",
         "docs/containers/isolation-and-lifecycle.md",
         "docs/containers/resource-control.md",
+        "docs/containers/memory-accounting-and-oom.md",
         "docs/containers/filesystems.md",
         "docs/containers/platform-differences.md"
       ]
@@ -78,6 +83,7 @@
         "docs/kubernetes/pod-lifecycle.md",
         "docs/kubernetes/resources-and-scheduling.md",
         "docs/kubernetes/collection.md",
+        "docs/kubernetes/inventory-consistency.md",
         "docs/kubernetes/network-and-storage.md",
         "docs/kubernetes/workloads-and-control-plane.md",
         "docs/kubernetes/cni-csi-and-data-paths.md",
@@ -94,7 +100,8 @@
         "docs/application/managed-runtimes.md",
         "docs/application/async-runtimes.md",
         "docs/application/user-experience.md",
-        "docs/application/instrumentation-and-profiling.md"
+        "docs/application/instrumentation-and-profiling.md",
+        "docs/application/trace-sampling-and-context.md"
       ]
     },
     {
@@ -110,7 +117,8 @@
         "docs/database/high-availability.md",
         "docs/database/distributed-and-analytical.md",
         "docs/database/specialized-data-models.md",
-        "docs/database/collection-contracts.md"
+        "docs/database/collection-contracts.md",
+        "docs/database/postgresql-concurrency-lab.md"
       ]
     },
     {
@@ -131,6 +139,7 @@
         "docs/cloud/README.md",
         "docs/cloud/resources-and-apis.md",
         "docs/cloud/provider-metrics.md",
+        "docs/cloud/late-data-and-reconciliation.md",
         "docs/cloud/managed-and-serverless.md",
         "docs/cloud/networking.md",
         "docs/cloud/quotas-cost-and-capacity.md"
@@ -145,7 +154,8 @@
         "docs/cross-domain/backlogs-and-retries.md",
         "docs/cross-domain/missing-observations.md",
         "docs/cross-domain/reproducible-labs.md",
-        "docs/cross-domain/capstone-investigation.md"
+        "docs/cross-domain/capstone-investigation.md",
+        "docs/cross-domain/investigation-workbook.md"
       ]
     },
     {
@@ -154,10 +164,12 @@
         "docs/product/README.md",
         "docs/product/entities-and-topology.md",
         "docs/product/collection-pipelines.md",
+        "docs/product/telemetry-delivery-contracts.md",
         "docs/product/storage-and-query.md",
         "docs/product/alerts-and-incidents.md",
         "docs/product/self-observation-and-access.md",
         "docs/product/adapter-contracts.md",
+        "docs/product/compatibility-and-acceptance.md",
         "docs/product/capacity-and-loss-budgets.md"
       ]
     },
@@ -175,6 +187,6 @@
       ]
     }
   ],
-  "edition": "1.0",
-  "detailed_chapters": 80
+  "edition": "1.1",
+  "detailed_chapters": 92
 }

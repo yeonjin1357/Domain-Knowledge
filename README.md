@@ -1,6 +1,6 @@
 # 통합 모니터링 도메인 지식서
 
-**제1.0판 · 2026-10-04 · 12개 분야 · 상세 본문 80장**
+**제1.1판 · 2026-10-04 · 12개 분야 · 상세 본문 92장**
 
 통합 모니터링 제품을 설계·구현하는 개발자를 위한 한국어 지식서입니다. 도메인을 처음 배우는 독자가 시스템의 구조부터 원천 지표, 계산, 장애 분석, 제품 설계까지 한 권으로 연결해 읽을 수 있게 구성했습니다.
 
@@ -16,24 +16,30 @@ Start-Process .\BOOK.html
 - [학습 안내](docs/reading-guide.md): 처음 읽는 순서와 목적별 경로
 - [시스템 지도](docs/foundations/system-map.md): 호스트·프로세스·컨테이너·Pod·서비스의 관계
 - [용어집](docs/glossary.md), [지표 참조표](docs/metric-catalog.md)
-- [실제 재현 실습](docs/cross-domain/reproducible-labs.md), [종합 분석 연습](docs/cross-domain/capstone-investigation.md)
+- [실제 재현 실습](docs/cross-domain/reproducible-labs.md), [종합 분석 연습](docs/cross-domain/capstone-investigation.md), [새 분석 연습과 해설](docs/cross-domain/investigation-workbook.md)
 
 ## 분야별 본문
 
 | 분야 | 상세 장 | 배우는 내용 |
 | --- | ---: | --- |
-| [공통 관측](docs/foundations/README.md) | 8 | 시스템 지도, 시계열·분포·SLO·시간·추적, 성능과 분산 시스템 |
-| [호스트](docs/host/README.md) | 9 | CPU·메모리·I/O·프로세스, Windows·VM·GPU, NUMA와 수집 계약 |
-| [네트워크](docs/network/README.md) | 7 | DNS·TCP·TLS·HTTP, 라우팅·MTU, SNMP·OSPF·EVPN·QoS |
-| [스토리지](docs/storage/README.md) | 3 | 저장 모델·성능·용량·복구, RAID·LVM·SAN·NAS |
-| [컨테이너](docs/containers/README.md) | 4 | 격리·수명·파일 계층, cgroup v1/v2와 Windows 차이 |
-| [Kubernetes](docs/kubernetes/README.md) | 8 | 객체·Pod·배치·수집·workload·etcd, CNI·CSI·Operator |
-| [애플리케이션](docs/application/README.md) | 7 | 요청·연결 풀·재시도·런타임·사용자 경험·계측 |
-| [DB](docs/database/README.md) | 10 | 트랜잭션·질의·주요 엔진·복제·HA·특수 모델·수집 SQL |
+| [공통 관측](docs/foundations/README.md) | 9 | 시스템 지도, 시계열·분포·SLO·시간·추적, 성능과 분산 시스템 |
+| [호스트](docs/host/README.md) | 10 | CPU·메모리·I/O·프로세스, Windows·VM·GPU, NUMA와 수집 계약 |
+| [네트워크](docs/network/README.md) | 8 | DNS·TCP·TLS·HTTP, 라우팅·MTU, SNMP·OSPF·EVPN·QoS |
+| [스토리지](docs/storage/README.md) | 4 | 저장 모델·성능·용량·복구, RAID·LVM·SAN·NAS |
+| [컨테이너](docs/containers/README.md) | 5 | 격리·수명·파일 계층, cgroup v1/v2와 Windows 차이 |
+| [Kubernetes](docs/kubernetes/README.md) | 9 | 객체·Pod·배치·수집·workload·etcd, CNI·CSI·Operator |
+| [애플리케이션](docs/application/README.md) | 8 | 요청·연결 풀·재시도·런타임·사용자 경험·계측 |
+| [DB](docs/database/README.md) | 11 | 트랜잭션·질의·주요 엔진·복제·HA·특수 모델·수집 SQL |
 | [미들웨어](docs/middleware/README.md) | 6 | 캐시·로그·메시지·검색·프록시·스트림 처리 |
-| [클라우드](docs/cloud/README.md) | 5 | 자원·API·지표·서버리스·네트워크·quota·비용 |
-| [도메인 간 분석](docs/cross-domain/README.md) | 6 | 장애 가설과 증거, 실제 로컬 실습, 종합 연습 |
-| [제품 설계](docs/product/README.md) | 7 | 대상·관계·수집·저장·알림·접근·어댑터·용량 |
+| [클라우드](docs/cloud/README.md) | 6 | 자원·API·지표·서버리스·네트워크·quota·비용 |
+| [도메인 간 분석](docs/cross-domain/README.md) | 7 | 장애 가설과 증거, 실제 로컬 실습, 종합 연습 |
+| [제품 설계](docs/product/README.md) | 9 | 대상·관계·수집·저장·알림·접근·어댑터·용량 |
+
+## 제1.1판에서 보강한 내용
+
+12개 장을 추가했습니다. 측정값의 비교, 컨테이너 메모리와 OOM, 쓰기 지속성, trace sampling, 클라우드 지표 재조회를 풀어 설명하고 제품의 필드 계약으로 연결했습니다. Linux·PostgreSQL·Kubernetes API·OTel Collector·HTTP/1.1에서는 **31개 실제 시나리오**를 추가 실행해 원시 결과와 재현 코드를 남겼습니다.
+
+기존 Kubernetes 설명도 1.34와 1.35의 `resourceVersion` 비교 규칙을 구분하도록 수정했습니다. 발견한 반례와 미해결 측정 차이까지 [검토 기록](docs/review.md)에 적었습니다.
 
 ## 근거와 검증
 
@@ -52,6 +58,7 @@ python scripts/build_html.py
 python scripts/check_docs.py
 python scripts/verify_examples.py
 python scripts/verify_contracts.py
+python scripts/verify_revision.py
 python scripts/build_book.py --check
 python scripts/build_html.py --check
 ```

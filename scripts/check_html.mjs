@@ -7,6 +7,7 @@ import {fileURLToPath,pathToFileURL} from 'node:url';
 import path from 'node:path';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const expectedDiagrams=(await readFile(path.join(root,'BOOK.md'),'utf8')).match(/^```mermaid\s*$/gm)?.length||0;
 const browser=process.argv[2]||'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const cache=path.join(root,'.render-cache');
 await mkdir(cache,{recursive:true});
@@ -41,10 +42,12 @@ try{
   const version=await call('Browser.getVersion');
   const result={checked_at_utc:new Date().toISOString(),browser:version.product,node:process.version,
     book_html_sha256:createHash('sha256').update(await readFile(path.join(root,'BOOK.html'))).digest('hex'),
-    network_mode:'offline via Network.emulateNetworkConditions',pages:{}};
+    network_mode:'offline via Network.emulateNetworkConditions',expected_diagrams:expectedDiagrams,pages:{}};
   const cases=[['desktop',1440,1000,''],['chapter',1440,1000,'chapter-docs-host-cpu'],
     ['diagram',1440,1000,'chapter-docs-database-transactions-and-locks--잠금-대기와-교착-상태'],
-    ['mobile',390,844,'chapter-docs-foundations-system-map']];
+    ['mobile',390,844,'chapter-docs-foundations-system-map'],
+    ['new-diagram',1440,1000,'chapter-docs-database-postgresql-concurrency-lab--실습-3-active인데-cpu를-실행하고-있지-않다'],
+    ['mobile-contract',390,844,'chapter-docs-product-compatibility-and-acceptance--linux-필드의-구체적인-계약']];
   for(const [name,width,height,fragment] of cases){
     const {targetId}=await call('Target.createTarget',{url:'about:blank'});
     const {sessionId}=await call('Target.attachToTarget',{targetId,flatten:true});
@@ -53,7 +56,7 @@ try{
     await send('Runtime.enable');
     await send('Network.enable');
     await send('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
-    await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:name==='mobile'});
+    await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:name.startsWith('mobile')});
     await send('Page.navigate',{url:pathToFileURL(path.join(root,'BOOK.html')).href+(fragment?'#'+encodeURIComponent(fragment):'')});
     let ready=false;
     for(let i=0;i<200;i++){
@@ -77,14 +80,14 @@ try{
     const f=facts.result.value;
     assert(f.width===width,`${name}: viewport ${f.width} != ${width}`);
     assert(f.document_width<=width,`${name}: page overflows horizontally`);
-    assert(f.diagrams===13&&f.errors.length===0,`${name}: diagram rendering failed`);
+    assert(expectedDiagrams>0&&f.diagrams===expectedDiagrams&&f.errors.length===0,`${name}: diagram rendering failed`);
     assert(f.missing_anchors===0&&f.target_exists,`${name}: broken navigation`);
     assert(f.external_scripts===0&&f.body_text_length>100000,`${name}: incomplete document`);
     assert(f.visible_heading,`${name}: no visible chapter heading after navigation`);
     // Exercise title search in the actual page, then reset before the screenshot.
     const search=await send('Runtime.evaluate',{expression:`(()=>{const i=document.getElementById('toc-search');i.value='CPU';i.dispatchEvent(new Event('input'));const list=[...document.querySelectorAll('nav li')].filter(x=>!x.hidden);const ok=list.length>0&&list.every(x=>x.textContent.toLowerCase().includes('cpu'));i.value='';i.dispatchEvent(new Event('input'));return ok})()`,returnByValue:true});
     assert(search.result.value,`${name}: TOC search failed`);
-    if(name==='mobile')await send('Runtime.evaluate',{expression:"document.querySelector('aside').classList.remove('open');document.activeElement?.blur()"});
+    if(name.startsWith('mobile'))await send('Runtime.evaluate',{expression:"document.querySelector('aside').classList.remove('open');document.activeElement?.blur()"});
     const screenshot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
     await writeFile(path.join(cache,`${name}.png`),Buffer.from(screenshot.data,'base64'));
     result.pages[name]={...f,title_search_passed:true,fragment};
@@ -92,7 +95,7 @@ try{
     await call('Target.closeTarget',{targetId});
   }
   await writeFile(path.join(root,'review/html-check.json'),JSON.stringify(result,null,2)+'\n');
-  process.stdout.write('PASS: offline browser rendering, four viewports/locations, TOC search, 13 diagrams, anchors\n');
+  process.stdout.write(`PASS: offline browser rendering, ${cases.length} viewports/locations, TOC search, ${expectedDiagrams} diagrams, anchors\n`);
   await call('Browser.close');
 }finally{
   if(socket)socket.close();

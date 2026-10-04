@@ -58,6 +58,7 @@ python scripts/build_html.py
 python scripts/check_docs.py
 python scripts/verify_examples.py
 python scripts/verify_contracts.py
+python scripts/verify_revision.py
 python scripts/build_book.py --check
 python scripts/build_html.py --check
 ```

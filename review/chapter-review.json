@@ -1,5 +1,5 @@
 {
-  "edition": "1.0",
+  "edition": "1.1",
   "review_date": "2026-10-04",
   "review_kind": "author self-review; not external expert certification",
   "chapters": [
@@ -75,6 +75,20 @@
         "3. 마지막 값이 화면에 보이면 최근에도 수집에 성공했는가? **조회 시각과 마지막 실제 표본 시각을 구분해야 한다.**"
       ],
       "comprehension_present": true
+    },
+    {
+      "path": "docs/foundations/measurement-and-comparability.md",
+      "content_sha256": "d911af0ce0185588b25d2550454fe143e1f1fe1f4126cdc83c6c17f1095cc5ab",
+      "scope": "상태: 검토됨 · 적용 범위: 측정·집계의 공통 원리, Prometheus·OTel·Linux의 명시된 규약 · 검토일: 2026-10-04 · 계산 입력은 별도 표시한 실제 실습 외에는 가상 예시",
+      "review_focus": "비교 대상·시간 창·경과 시계와 CPU 계정, 미해결 차이 보존",
+      "critical_checks_in_text": [
+        "1. 5초 평균 100%와 1분 평균 8.33% 중 무엇이 틀렸는가? **주어진 가상 부하에서는 둘 다 맞습니다. 시간 창이 다릅니다.**",
+        "2. 10초 주기로 설정한 수집이 12초 뒤 완료됐다면 차분의 분모는? **두 표본의 실제 경과 시간과 원천 시간 규약을 확인합니다.**",
+        "3. 값의 소수점 자릿수가 많으면 측정 정확도도 높은가? **표현 정밀도와 측정 정확도는 다릅니다.**",
+        "4. 예상 범위를 벗어난 값은 잘라 내면 되는가? **원천값을 보존하고 단위·시계·범위·계정 방식부터 조사합니다.**"
+      ],
+      "comprehension_present": true,
+      "reviewed_in_edition": "1.1"
     },
     {
       "path": "docs/foundations/traces-logs-profiles.md",
@@ -198,15 +212,30 @@
     },
     {
       "path": "docs/host/collection-contracts.md",
-      "content_sha256": "6e54a297aaf0d9c5c4d59f23401eb3e681822ade972c63c284357b5f5be2de0e",
-      "scope": "상태: 검토됨 · 적용 범위: Linux procfs·cgroup v2와 Windows API · 검토일: 2026-10-04 · Linux 명령은 문서 검토, Windows API 일부는 로컬 실험",
-      "review_focus": "procfs 필드 단위, 실행 수명, 차분과 누락, 조회 권한",
+      "content_sha256": "6e0a2559b27f2e312cfb81c8d9a1fff63cf44c30cc21d679a4bbcd166383316b",
+      "scope": "상태: 검토됨 · 적용 범위: Linux procfs·cgroup v2와 Windows API · 검토일: 2026-10-04 · 원천 규약 검토, Linux 자기 프로세스·기존 cgroup과 Windows API 일부는 로컬 실험",
+      "review_focus": "기존 원천 단위 검토 유지; 자기 프로세스·기존 cgroup의 실제 실행 범위만 추가",
       "critical_checks_in_text": [
         "1. 장치 논리 sector 크기가 4096B면 diskstats sector도 4096B인가? **해당 통계는 512B 단위이므로 별도로 해석합니다.**",
         "2. 첫 표본으로 초당 CPU 사용량을 만들 수 있는가? **이 차분 정책에서는 이전 표본이 필요합니다.**",
         "3. permission denied를 값 0으로 저장해도 되는가? **접근 실패와 0 사용량을 구분해야 합니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "reviewed_in_edition": "1.1"
+    },
+    {
+      "path": "docs/host/linux-observation-lab.md",
+      "content_sha256": "1b27706fd67c93e05a77e0c1b45619404410f5b6528172b8f55f674e9350ced1",
+      "scope": "상태: 검토됨 · 적용 범위: Ubuntu 24.04, WSL2 Linux 6.18.33.2, Python 3.12.3의 로컬 실행 · 검토일: 2026-10-04 · 실제 관측과 해석의 한계를 분리",
+      "review_focus": "실제 stat·smaps·io 결과와 문장 수치, cgroup 읽기와 제어 실험의 구분",
+      "critical_checks_in_text": [
+        "1. 32MiB를 매핑했으면 즉시 RSS가 32MiB 늘어나는가? **이번 익명 매핑에서는 쓰기 전 Rss가 0이었습니다. 주소 공간과 상주량을 구분합니다.**",
+        "2. `read_bytes` 차분 0은 파일을 읽지 않았다는 뜻인가? **캐시에서 읽은 경우처럼 논리 읽기는 있을 수 있습니다.**",
+        "3. 프로세스 CPU 비율이 예상 범위를 벗어나면 성능이 좋아졌다고 결론 내리는가? **시계·계정·표본 범위부터 확인합니다.**",
+        "4. 이번 결과가 cgroup OOM 동작을 검증했는가? **기존 필드를 읽었으며 OOM을 유발하지 않았습니다.**"
+      ],
+      "comprehension_present": true,
+      "reviewed_in_edition": "1.1"
     },
     {
       "path": "docs/network/addressing-routing-dns.md",
@@ -243,6 +272,20 @@
         "3. HTTP 요청 1,000개면 연결도 1,000개인가? **연결 재사용과 다중화 때문에 그렇지 않습니다.**"
       ],
       "comprehension_present": true
+    },
+    {
+      "path": "docs/network/dns-and-connection-lifecycle.md",
+      "content_sha256": "1b77bc4e1831be9291ae162a51fc71494ae979102521a8567fb9bfb8aa625973",
+      "scope": "상태: 검토됨 · 적용 범위: DNS·TCP·HTTP의 명시된 규약, Python 3.12.3 HTTP/1.1 로컬 실습 · 검토일: 2026-10-04",
+      "review_focus": "DNS·연결의 다른 수명, 실제 HTTP/1.1 연결 재사용과 본문 미완료",
+      "critical_checks_in_text": [
+        "1. 요청 100개면 TCP 연결도 100개인가? **연결을 재사용하거나 다중화할 수 있어 일치하지 않습니다.**",
+        "2. DNS TTL이 끝나면 열린 연결도 반드시 닫히는가? **DNS 자료와 연결 수명의 계약을 구분합니다.**",
+        "3. HTTP 200을 읽으면 본문 전송도 끝났는가? **실습에서 본문이 잘려 예외가 발생했습니다.**",
+        "4. 응답이 timeout이면 서버가 아무 작업도 하지 않았는가? **작업 완료와 응답 전달은 다른 경계입니다.**"
+      ],
+      "comprehension_present": true,
+      "reviewed_in_edition": "1.1"
     },
     {
       "path": "docs/network/network-metrics.md",
@@ -305,6 +348,20 @@
       "comprehension_present": true
     },
     {
+      "path": "docs/storage/write-path-and-durability.md",
+      "content_sha256": "db020b6364b029ed7de7cee596fdb108503183bb82d5c3ba795860f6e787f771",
+      "scope": "상태: 검토됨 · 적용 범위: Linux 파일 API와 PostgreSQL 18의 지속성 규약 · 검토일: 2026-10-04 · 전원 장애·장치 고장·복제 장애는 직접 재현하지 않음",
+      "review_focus": "write·fsync·디렉터리·WAL·commit·복제의 완료 보장과 미실행 장애 범위",
+      "critical_checks_in_text": [
+        "1. write가 요청 크기를 반환하면 전원 장애에도 보존되는가? **지속성 경계를 확인해야 합니다. write 성공만으로 충분하지 않습니다.**",
+        "2. DB commit은 모든 데이터 페이지가 제자리 파일에 기록됐다는 뜻인가? **WAL과 실제 commit 정책을 확인합니다.**",
+        "3. receive lag와 apply lag는 같은가? **복제본의 완료 단계가 다릅니다.**",
+        "4. fsync를 한 번 실행해 성공했다면 장치의 장애 복구까지 검증했는가? **정상 호출 결과이며 장애 복구 실험은 별도입니다.**"
+      ],
+      "comprehension_present": true,
+      "reviewed_in_edition": "1.1"
+    },
+    {
       "path": "docs/storage/capacity-and-protection.md",
       "content_sha256": "7639541eac18d44677601705c35d664e15f16b80e4ac3523b2c2cae8c6c500f8",
       "scope": "상태: 검토됨 · 적용 범위: 공통 용량 모델, Ceph Squid erasure coding·EBS snapshot 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
@@ -353,6 +410,20 @@
       "comprehension_present": true
     },
     {
+      "path": "docs/containers/memory-accounting-and-oom.md",
+      "content_sha256": "845443a3a70ad85b14388260cf4886cca5b4db90ba1e43e38e8c5d399b98ca9f",
+      "scope": "상태: 검토됨 · 적용 범위: Linux cgroup v2, cAdvisor 0.52.1 계산, Kubernetes의 메모리 관측 · 검토일: 2026-10-04 · OOM·eviction은 문서 검토이며 직접 유발하지 않음",
+      "review_focus": "cAdvisor 고정 코드, cgroup high/max·events 범위와 OOM/eviction 구분",
+      "critical_checks_in_text": [
+        "1. WorkingSet 400MiB이면 heap도 400MiB인가? **계산과 포함 범위가 다릅니다.**",
+        "2. high 사건이 늘면 반드시 OOM kill인가? **high 경계는 reclaim·throttling과 관련됩니다.**",
+        "3. oom_kill 하나로 cgroup limit 초과를 확정하는가? **global OOM 등 가능한 경로를 추가 증거로 구분합니다.**",
+        "4. cgroup max가 무제한이면 메모리 장애가 불가능한가? **부모 계층과 노드 전체 자원도 유한합니다.**"
+      ],
+      "comprehension_present": true,
+      "reviewed_in_edition": "1.1"
+    },
+    {
       "path": "docs/containers/filesystems.md",
       "content_sha256": "7cdfd9e855dee9e2e6aef09a66e6e169c26558a55698881f1b60cb1f81b43fee",
       "scope": "상태: 검토됨 · 적용 범위: Docker의 계층 모델과 Linux OverlayFS, 구현별 차이 명시 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
@@ -378,15 +449,16 @@
     },
     {
       "path": "docs/kubernetes/objects-and-control-loops.md",
-      "content_sha256": "f181218bbf0ef0ab4f85010b7426df18d35dbde12288f5aa469d396fa67c4730",
-      "scope": "상태: 검토됨 · 적용 범위: Kubernetes API의 공통 객체 모델과 내장 컨트롤러 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
-      "review_focus": "Kubernetes에서는 원하는 상태를 API 객체에 적고 controller가 실제 상태를 맞추려고 반복합니다. 복제 수 3을 요청했다는 것과 준비된 Pod가 3개라는 것은 다른 사실입니다. 이 반복 구조를 알아야 desired·current·ready 숫자의 차이를 바로 장애로 단정하지 않고 진행 상태로 해석할 수 있습니다.",
+      "content_sha256": "0701d7bd43966df9964bbf5c1053cacc9de76eb7877d7be33396065633188875",
+      "scope": "상태: 검토됨 · 적용 범위: Kubernetes API의 공통 객체 모델과 내장 컨트롤러 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 1.1판 resourceVersion 규약 재검토: 2026-10-04",
+      "review_focus": "1.34 opaque 규칙과 1.35 조건부 순서 비교, 값 차이를 시간으로 해석하지 않음",
       "critical_checks_in_text": [
         "1. 동일 namespace/name으로 다시 만든 Pod는 과거 Pod와 같은가? **UID가 다른 객체입니다.**",
         "2. API가 Deployment 생성을 받아들이면 모든 Pod가 준비되었는가? **제어 루프와 실행 단계를 더 관측해야 합니다.**",
         "3. 소유 관계와 Service 선택 관계를 같은 간선으로 저장해도 되는가? **의미가 달라 별도 관계로 표현해야 합니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "reviewed_in_edition": "1.1"
     },
     {
       "path": "docs/kubernetes/pod-lifecycle.md",
@@ -414,15 +486,30 @@
     },
     {
       "path": "docs/kubernetes/collection.md",
-      "content_sha256": "0bda1cd354cd8fb3a6f0931feca6f34e8f90d8c7db7b235f81dd7ea11bfd426c",
-      "scope": "상태: 검토됨 · 적용 범위: API 객체, kube-state-metrics, Resource Metrics API, 컴포넌트 지표 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
-      "review_focus": "Kubernetes의 객체 상태는 API에서, 실제 자원 사용량은 다른 계측 경로에서 얻을 수 있습니다. 같은 Pod를 설명해도 어느 원천을 읽었는지에 따라 업데이트 시점과 필드 의미가 다릅니다. 목록과 watch는 대상 발견·변경을 다루며, 모든 과거 사건의 완전한 기록을 보장하는 저장소로 사용하지 않습니다.",
+      "content_sha256": "38dcd92238ea74e4d37d13a15384945c47195fe29d0c7ca11f7fbf7f98549795",
+      "scope": "상태: 검토됨 · 적용 범위: API 객체, kube-state-metrics, Resource Metrics API, 컴포넌트 지표 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 1.1판 resourceVersion 규약 재검토: 2026-10-04",
+      "review_focus": "버전별 resourceVersion 비교·원문 문자열 유지와 인벤토리 실습 연결",
       "critical_checks_in_text": [
         "1. kube-state-metrics가 모든 CPU 사용량을 측정하는가? **주 목적은 API 객체 상태의 지표화입니다.**",
         "2. watch가 끊기면 모든 객체가 삭제된 것인가? **수집 연결의 실패와 대상의 삭제는 다릅니다.**",
         "3. working set이 앱 heap인가? **관측 범위와 계산 방식이 다릅니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "reviewed_in_edition": "1.1"
+    },
+    {
+      "path": "docs/kubernetes/inventory-consistency.md",
+      "content_sha256": "b5de75955d3a42ca755858b14e52ebd92e51f8090e7afd97d8e00497c21ac7c5",
+      "scope": "상태: 검토됨 · 적용 범위: Kubernetes 1.34·1.35 규약 구분, API server 1.34.1·etcd 3.6.4 로컬 실험 · 검토일: 2026-10-04",
+      "review_focus": "API 실행 범위, 페이지 snapshot·UID·selector 이탈·RBAC·410·1.35 규약",
+      "critical_checks_in_text": [
+        "1. 첫 페이지에 없으면 삭제된 객체인가? **다음 페이지 또는 수집 실패 여부부터 확인합니다.**",
+        "2. 이름이 같은 새 Pod를 이전 Pod와 같은 실행으로 저장하는가? **UID 등 생성 수명을 구분합니다. 실험은 ConfigMap으로 그 원리를 확인했습니다.**",
+        "3. selector watch의 DELETED 하나로 전역 삭제를 확정하는가? **선택 집합 이탈인지 원천 삭제인지 구분해야 합니다.**",
+        "4. 1.35의 비교 규칙을 1.34 서버에도 자동 적용하는가? **규약과 지원 버전을 맞춰야 합니다.**"
+      ],
+      "comprehension_present": true,
+      "reviewed_in_edition": "1.1"
     },
     {
       "path": "docs/kubernetes/network-and-storage.md",
@@ -462,15 +549,16 @@
     },
     {
       "path": "docs/kubernetes/operators-and-api-lifecycle.md",
-      "content_sha256": "c1250eaa2891797e9e0bf3feeeff86599602b2a04e2bd0c99a0b8122b1fa3173",
+      "content_sha256": "3c1979978419c5e213fbfe4f7a378c323607a8e5d51ae34c433df94d58207de9",
       "scope": "상태: 검토됨 · 적용 범위: Kubernetes 공식 API·CRD·admission·Operator 문서 · 검토일: 2026-10-04 · 구현별 필드는 별도 확인",
-      "review_focus": "CRD/controller 역할, admission과 수렴, opaque resourceVersion",
+      "review_focus": "generation과 resourceVersion 구분 유지, 비교 규칙의 서버 버전 조건 반영",
       "critical_checks_in_text": [
         "1. CRD 설치만으로 DB 장애 전환이 동작하는가? **실제 controller와 그 설정·상태가 필요합니다.**",
         "2. API 생성 성공이 workload 준비 완료인가? **비동기 수렴이 남아 있습니다.**",
-        "3. resourceVersion을 정수로 빼서 객체 나이를 계산하는가? **opaque 값이므로 그런 계산을 하지 않습니다.**"
+        "3. resourceVersion을 정수로 빼서 객체 나이를 계산하는가? **순서 비교를 지원하는 버전에서도 값의 차이가 시간 단위는 아닙니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": false,
+      "reviewed_in_edition": "1.1"
     },
     {
       "path": "docs/application/requests-and-concurrency.md",
@@ -555,6 +643,20 @@
         "3. 자동 agent 설치면 모든 프레임워크가 계측되는가? **지원 버전과 실제 출력 확인이 필요합니다.**"
       ],
       "comprehension_present": true
+    },
+    {
+      "path": "docs/application/trace-sampling-and-context.md",
+      "content_sha256": "333820a5874a22326c6266937c27d1d535238da50f2a774c7c5d878fae2443ea",
+      "scope": "상태: 검토됨 · 적용 범위: W3C Trace Context, OpenTelemetry 개념·SDK 규약, tail sampling processor 0.137.0 문서 · 검토일: 2026-10-04 · sampling 수치는 가상 예시",
+      "review_focus": "문맥과 인증, sampling 모집단의 계산·head/tail 한계와 배치 조건",
+      "critical_checks_in_text": [
+        "1. 오류 trace를 모두 보존하면 trace 화면의 오류 비율이 전체 요청 오류율인가? **정상 요청의 보존 정책이 다르면 그렇지 않습니다.**",
+        "2. sampled bit가 있으면 목적지 저장까지 보장되는가? **sampling 문맥이며 수집·전송·저장 성공을 보장하지 않습니다.**",
+        "3. tail sampling을 쓰면 모든 늦은 span까지 반드시 모이는가? **대기·용량·라우팅·늦은 데이터 정책에 한계가 있습니다.**",
+        "4. trace ID를 tenant 접근 권한으로 사용해도 되는가? **관측 연결 정보와 인증된 접근 범위를 분리합니다.**"
+      ],
+      "comprehension_present": true,
+      "reviewed_in_edition": "1.1"
     },
     {
       "path": "docs/database/transactions-and-locks.md",
@@ -666,15 +768,30 @@
     },
     {
       "path": "docs/database/collection-contracts.md",
-      "content_sha256": "bbd87d50998467abb891401dbb506a8ade6fd703ff2691e63f5034fcc1fdd817",
-      "scope": "상태: 검토됨 · 적용 범위: PostgreSQL 18·MySQL 8.4의 원천 필드와 수집 설계 · 검토일: 2026-10-04 · 이 장의 서버 SQL은 실행하지 않음",
-      "review_focus": "조회 권한·SQL 부하, 통계 수명, view field 단위, read vs physical I/O",
+      "content_sha256": "695f9bc53978c7b5adb92ea6ac810914f80f4ce849ea54f7e560e91fe2fb5933",
+      "scope": "상태: 검토됨 · 적용 범위: PostgreSQL 18·MySQL 8.4의 원천 필드와 수집 설계 · 검토일: 2026-10-04 · PostgreSQL 수집 SQL은 18.6에서 실행, MySQL SQL은 문서 검토",
+      "review_focus": "실행된 PostgreSQL SQL과 본문 일치, stats_reset NULL; MySQL 미실행 경계 유지",
       "critical_checks_in_text": [
         "1. blks_read 증가를 물리 디스크 읽기 수로 그대로 쓰는가? **OS 캐시 등 다른 층이 있으므로 DB 경계의 블록 읽기로 둡니다.**",
         "2. DB 연결에 성공하면 모든 통계가 보이는가? **필드와 view별 권한이 다릅니다.**",
         "3. SQL 오류 하나가 발생하면 모든 엔진이 전체 transaction을 자동 rollback하는가? **엔진·오류·클라이언트 동작에 따라 다르며 명시 처리해야 합니다. [SQLite 실습](../cross-domain/reproducible-labs.md)이 그 차이를 보여 줍니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "reviewed_in_edition": "1.1"
+    },
+    {
+      "path": "docs/database/postgresql-concurrency-lab.md",
+      "content_sha256": "eba8d2c054c293b7b36df8288abd37dea1271afa3b557e0088c683bced8b6dc5",
+      "scope": "상태: 검토됨 · 적용 범위: PostgreSQL 18.6, Ubuntu 24.04·WSL2의 전용 임시 인스턴스 · 검토일: 2026-10-04 · 11개 실제 시나리오",
+      "review_focus": "11개 실행 결과, snapshot·SQLSTATE·권한·stats_reset NULL과 엔진별 경계",
+      "critical_checks_in_text": [
+        "1. active 세션 수를 CPU 실행 세션 수로 표시해도 되는가? **Lock 등 대기 중인 active 세션을 구분해야 합니다.**",
+        "2. 명시적 트랜잭션에서 timeout 뒤 아무 정리 없이 다음 SQL을 보내도 되는가? **이번 실행에서는 25P02가 발생했습니다. 연결·트랜잭션 정리가 필요합니다.**",
+        "3. stats_reset이 NULL이면 통계값도 모두 0인가? **실제 결과에서 누적값이 있는 행에도 NULL이 반환되었습니다.**",
+        "4. 이 실습이 DB 장애 전환과 디스크 내구성을 검증했는가? **한 임시 인스턴스의 동시성·관측 동작을 확인했습니다. 복제·전원 장애·HA는 별도 범위입니다.**"
+      ],
+      "comprehension_present": true,
+      "reviewed_in_edition": "1.1"
     },
     {
       "path": "docs/middleware/cache-redis.md",
@@ -773,6 +890,20 @@
       "comprehension_present": true
     },
     {
+      "path": "docs/cloud/late-data-and-reconciliation.md",
+      "content_sha256": "7143cbe48ffc850f768109e5eab7e9ed24d029af9fd5714ff7cad256e4f6aaca",
+      "scope": "상태: 검토됨 · 적용 범위: CloudWatch GetMetricData·PutMetricData, Azure·Google Cloud의 연결된 집계 규약 · 검토일: 2026-10-04 · 실제 cloud 계정 호출은 하지 않음",
+      "review_focus": "결과별 상태·시간-값 대응·시간 경계와 가상 재조회 집계",
+      "critical_checks_in_text": [
+        "1. HTTP 200이면 응답 안의 모든 metric도 완전한가? **각 결과의 상태를 읽어야 합니다.**",
+        "2. 같은 1분 Sum을 두 번 받으면 더하는가? **같은 구간을 갱신한 값이라면 중복 합산하지 않습니다.**",
+        "3. 모든 원천 API의 EndTime은 제외되는가? **CloudWatch의 해당 API 규칙이며 원천마다 확인합니다.**",
+        "4. 먼저 도착한 결과가 반드시 더 오래된 원천 상태인가? **요청·처리·전송 순서와 원천 revision을 구분해야 합니다.**"
+      ],
+      "comprehension_present": true,
+      "reviewed_in_edition": "1.1"
+    },
+    {
       "path": "docs/cloud/managed-and-serverless.md",
       "content_sha256": "759314e2a93b02972b1b52e363fdc7c0bdb49df08f19d66f36fdb726947e2378",
       "scope": "상태: 검토됨 · 적용 범위: 관리형 관측 모델, AWS Lambda·Google Cloud Run 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
@@ -858,15 +989,16 @@
     },
     {
       "path": "docs/cross-domain/reproducible-labs.md",
-      "content_sha256": "492e10394a975e3758706dd64c1982a53e529df93b408692952787b8d212c9cf",
+      "content_sha256": "7b4ed2b8089ab869b4a4f879e7fbce48426db60d6ca94c2c74e5cb28355a6fc1",
       "scope": "상태: 검토됨 · 적용 범위: Windows 로컬 실행, Python 3.11.9·SQLite 3.45.1·promtool 3.5.0 · 실행일: 2026-10-04",
-      "review_focus": "원시 결과와 본문 수치·버전·입력 종류, 실제 실행의 한계",
+      "review_focus": "제1.0판 4종 결과 유지와 제1.1판 31개 시나리오의 연결·범위 구분",
       "critical_checks_in_text": [
         "1. 합성 PromQL 입력이면 실행 검증이 아닌가? **입력은 합성이지만 실제 평가기의 동작을 실행해 확인했습니다. 운영 scrape 검증과는 다릅니다.**",
         "2. SQLite 실습으로 모든 DB의 격리 수준을 확인했는가? **SQLite 해당 버전·설정의 결과입니다.**",
         "3. 모든 검사 통과가 모든 운영 환경의 보장인가? **명시한 입력·버전·경계의 증거이며 범위를 넘겨 해석하지 않습니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "reviewed_in_edition": "1.1"
     },
     {
       "path": "docs/cross-domain/capstone-investigation.md",
@@ -880,6 +1012,20 @@
         "5. 자료가 quota 가설을 지지하면 원인 분석을 끝내는가? **코드·부하 구성 등 남은 가설을 검증하고 업무 회복을 확인합니다.**"
       ],
       "comprehension_present": true
+    },
+    {
+      "path": "docs/cross-domain/investigation-workbook.md",
+      "content_sha256": "39fd5279575f528291c275dee7b97a12a464f463f04d94b2fdb953ca9063ecb1",
+      "scope": "상태: 학습용 합성 사례 · 적용 범위: 앞 장의 공식 규약과 로컬 실험을 연결한 연습 · 검토일: 2026-10-04 · 실제 고객 장애 기록이 아님",
+      "review_focus": "합성 시나리오의 가정과 증거·해석·반증·다음 조사 연결",
+      "critical_checks_in_text": [
+        "1. 상관관계가 보이면 원인을 확정해도 되는가? **다른 설명과 시간·범위의 일치를 확인해야 합니다.**",
+        "2. 동일한 이름의 값은 평균을 내서 하나로 합치면 되는가? **모집단·단위·구간·계정이 맞는지 먼저 확인합니다.**",
+        "3. 모르는 부분을 남기면 분석이 실패한 것인가? **확인 범위와 다음 증거를 명확히 하는 것이 정확한 분석의 일부입니다.**",
+        "4. 실험에서 관측한 한 버전의 결과를 모든 배포판의 보장으로 확장하는가? **적용 버전·설정·실험 경계를 유지합니다.**"
+      ],
+      "comprehension_present": true,
+      "reviewed_in_edition": "1.1"
     },
     {
       "path": "docs/product/entities-and-topology.md",
@@ -904,6 +1050,20 @@
         "3. 변환 작업자가 재시작하면 누적값의 차이를 바로 계산할 수 있는가? **이전 값과 수명 정보를 복원하지 못하면 불확실한 첫 구간을 따로 처리해야 한다.**"
       ],
       "comprehension_present": true
+    },
+    {
+      "path": "docs/product/telemetry-delivery-contracts.md",
+      "content_sha256": "f6710b52fdd65135ad0601421c16e63362d86e7b2a5f81ddd0e5c2d69823552f",
+      "scope": "상태: 검토됨 · 적용 범위: OTLP 1.11.0 문서, Collector 0.137.0의 OTLP/HTTP JSON 로컬 실험 · 검토일: 2026-10-04",
+      "review_focus": "HTTP 전송 7개 결과, 500 비재시도·부분 성공·중복 수신과 영속 저장 구분",
+      "critical_checks_in_text": [
+        "1. HTTP 500이면 OTLP/HTTP에서 언제나 재시도하는가? **열거된 재시도 코드를 따라야 하며 이번 500은 한 번만 전송됐습니다.**",
+        "2. 부분 성공의 거절 수가 1이면 어느 span인지 반드시 아는가? **개수만으로 개별 항목을 식별할 수 없습니다.**",
+        "3. 재시도에서 같은 span ID가 다시 왔다면 새 업무가 하나 더 발생했는가? **같은 관측의 중복 전송일 수 있습니다.**",
+        "4. 이 결과로 영속 큐의 무손실을 보장하는가? **큐를 끈 HTTP 전송 실험이며 영속 큐 장애 검증은 별도입니다.**"
+      ],
+      "comprehension_present": true,
+      "reviewed_in_edition": "1.1"
     },
     {
       "path": "docs/product/storage-and-query.md",
@@ -954,6 +1114,20 @@
       "comprehension_present": true
     },
     {
+      "path": "docs/product/compatibility-and-acceptance.md",
+      "content_sha256": "da51778283adf616e7112acae5232a81a597164289be75165c44bfc5ea618c90",
+      "scope": "상태: 검토됨 · 적용 범위: 이 책의 제품 설계 제안과 연결된 원천 규약·실험 · 검토일: 2026-10-04 · 사용자 제품의 지원 인증을 뜻하지 않음",
+      "review_focus": "19개 필드 계약·버전과 실제 실행 근거·의미 변경의 이력",
+      "critical_checks_in_text": [
+        "1. endpoint가 200이면 그 제품 지원을 완료했다고 할 수 있는가? **필드 의미·권한·실패·비용까지 별도의 근거가 필요합니다.**",
+        "2. 단위가 byte면 서로 다른 memory 지표를 합쳐도 되는가? **관측 범위와 의미가 같아야 합니다.**",
+        "3. 문서를 읽은 버전과 실행한 버전이 다르면 어떻게 기록하는가? **두 근거를 분리하고 검증하지 않은 차이를 남깁니다.**",
+        "4. working set을 current로 바꾸면 문서만 고치면 되는가? **시계열·쿼리·알림의 의미 변경도 다뤄야 합니다.**"
+      ],
+      "comprehension_present": true,
+      "reviewed_in_edition": "1.1"
+    },
+    {
       "path": "docs/product/capacity-and-loss-budgets.md",
       "content_sha256": "c400f3f96e9214caffb665e4459fd52f1aa066c94337651c4456d6ba9890fb0e",
       "scope": "상태: 검토됨 · 적용 범위: 용량 산정·장애 시 데이터 처리의 설계 예시 · 검토일: 2026-10-04 · 실제 서비스 벤치마크 아님",
@@ -965,5 +1139,6 @@
       ],
       "comprehension_present": true
     }
-  ]
+  ],
+  "revision_scope": "Unchanged chapter records retained from 1.0; changed/new chapters reviewed in 1.1."
 }

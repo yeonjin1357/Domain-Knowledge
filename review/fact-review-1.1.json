@@ -1,0 +1,490 @@
+{
+  "edition": "1.1",
+  "review_date": "2026-10-04",
+  "kind": "author self-review of selected new or changed claims; not external expert certification",
+  "meaning": "Primary-source reading, experiment interpretation and synthetic arithmetic are distinguished. URL availability is recorded separately. This is not an exhaustive automated truth assessment.",
+  "claims": [
+    {
+      "id": "rv-comparison",
+      "chapter": "docs/kubernetes/inventory-consistency.md",
+      "claim_checked": "1.34 동일성 비교와 1.35의 제한된 순서 비교를 구분",
+      "scope": "공식 버전 문서; 실제 서버는 1.34.1만 실행",
+      "primary_sources": [
+        "https://v1-34.docs.kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions",
+        "https://v1-35.docs.kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions"
+      ],
+      "execution_evidence": [],
+      "review_result": "기존 객체·수집·API 수명 세 장 수정; 같은 클러스터/group/type와 형식 조건 유지"
+    },
+    {
+      "id": "list-snapshot",
+      "chapter": "docs/kubernetes/inventory-consistency.md",
+      "claim_checked": "페이지 사이 새 객체가 기존 snapshot에 섞이지 않음",
+      "scope": "API server 1.34.1, ConfigMap list limit=1",
+      "primary_sources": [
+        "https://v1-34.docs.kubernetes.io/docs/reference/using-api/api-concepts/#retrieving-large-results-sets-in-chunks"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-kubernetes.json",
+          "json_pointer": "/experiments/pagination"
+        },
+        {
+          "path": "labs/results/1.1-kubernetes.json",
+          "json_pointer": "/experiments/list_then_watch"
+        }
+      ],
+      "review_result": "세 페이지 RV 202와 이후 ADDED를 보존; 202 자체는 재현 상수가 아님"
+    },
+    {
+      "id": "selector-exit",
+      "chapter": "docs/kubernetes/inventory-consistency.md",
+      "claim_checked": "선택 watch의 DELETED 뒤 원천 GET 200과 동일 UID",
+      "scope": "label selector를 바꾼 ConfigMap 한 건",
+      "primary_sources": [],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-kubernetes.json",
+          "json_pointer": "/experiments/selector_exit"
+        }
+      ],
+      "review_result": "전역 삭제와 수집 집합 이탈 구분; 동일 UID는 실행 코드의 assertion으로 확인"
+    },
+    {
+      "id": "rbac-scope",
+      "chapter": "docs/kubernetes/inventory-consistency.md",
+      "claim_checked": "한 namespace ConfigMap 허용이 Secret·다른 namespace 허용을 뜻하지 않음",
+      "scope": "임시 reader 역할의 RBAC",
+      "primary_sources": [
+        "https://kubernetes.io/docs/reference/access-authn-authz/rbac/"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-kubernetes.json",
+          "json_pointer": "/experiments/rbac_scope"
+        }
+      ],
+      "review_result": "403을 빈 목록으로 처리하지 않음"
+    },
+    {
+      "id": "history-expiry",
+      "chapter": "docs/kubernetes/inventory-consistency.md",
+      "claim_checked": "과거 Exact list의 410은 재조회가 필요한 만료",
+      "scope": "watch cache off, private etcd physical compaction",
+      "primary_sources": [
+        "https://v1-34.docs.kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-kubernetes.json",
+          "json_pointer": "/experiments/expired_history"
+        }
+      ],
+      "review_result": "예비 200 결과와 조건 차이 명시; cache의 단독 인과 효과 주장 배제"
+    },
+    {
+      "id": "pg-isolation",
+      "chapter": "docs/database/postgresql-concurrency-lab.md",
+      "claim_checked": "READ COMMITTED 10→20→20, REPEATABLE READ 10→10→20",
+      "scope": "PostgreSQL 18.6, 두 연결의 일반 SELECT",
+      "primary_sources": [
+        "https://www.postgresql.org/docs/18/transaction-iso.html"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-postgresql.json",
+          "json_pointer": "/experiments/read_committed"
+        },
+        {
+          "path": "labs/results/1.1-postgresql.json",
+          "json_pointer": "/experiments/repeatable_read"
+        }
+      ],
+      "review_result": "동일 트랜잭션이라는 이유만으로 같은 snapshot을 가정하지 않음"
+    },
+    {
+      "id": "pg-wait",
+      "chapter": "docs/database/postgresql-concurrency-lab.md",
+      "claim_checked": "active 상태와 Lock 대기를 동시에 관측",
+      "scope": "PostgreSQL 18.6 행 UPDATE 충돌",
+      "primary_sources": [
+        "https://www.postgresql.org/docs/18/monitoring-stats.html"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-postgresql.json",
+          "json_pointer": "/experiments/lock_wait"
+        }
+      ],
+      "review_result": "active와 CPU 실행을 구분"
+    },
+    {
+      "id": "pg-timeouts",
+      "chapter": "docs/database/postgresql-concurrency-lab.md",
+      "claim_checked": "55P03·57014 뒤 같은 명시적 트랜잭션에서 25P02",
+      "scope": "짧은 실습 timeout; 보편적인 권장값 아님",
+      "primary_sources": [
+        "https://www.postgresql.org/docs/18/errcodes-appendix.html"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-postgresql.json",
+          "json_pointer": "/experiments/lock_timeout"
+        },
+        {
+          "path": "labs/results/1.1-postgresql.json",
+          "json_pointer": "/experiments/statement_timeout"
+        }
+      ],
+      "review_result": "오류 후 정리와 재사용 조건 설명"
+    },
+    {
+      "id": "pg-savepoint",
+      "chapter": "docs/database/postgresql-concurrency-lab.md",
+      "claim_checked": "CHECK 위반 뒤 전체 rollback과 savepoint 복구의 결과 차이",
+      "scope": "PostgreSQL 18.6; SQLite의 기존 결과와 구분",
+      "primary_sources": [
+        "https://www.postgresql.org/docs/18/sql-rollback-to.html",
+        "https://www.postgresql.org/docs/18/errcodes-appendix.html"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-postgresql.json",
+          "json_pointer": "/experiments/failed_transaction"
+        },
+        {
+          "path": "labs/results/1.1-postgresql.json",
+          "json_pointer": "/experiments/savepoint"
+        }
+      ],
+      "review_result": "SQL 오류 하나의 처리 결과를 엔진 전체에 일반화하지 않음"
+    },
+    {
+      "id": "pg-deadlock",
+      "chapter": "docs/database/postgresql-concurrency-lab.md",
+      "claim_checked": "두 UPDATE 중 하나가 40P01, 다른 하나 진행",
+      "scope": "교차 행 갱신; 희생 세션은 고정하지 않음",
+      "primary_sources": [
+        "https://www.postgresql.org/docs/18/explicit-locking.html#LOCKING-DEADLOCKS"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-postgresql.json",
+          "json_pointer": "/experiments/deadlock"
+        }
+      ],
+      "review_result": "일반 대기와 교착 상태를 구분"
+    },
+    {
+      "id": "pg-privilege",
+      "chapter": "docs/database/postgresql-concurrency-lab.md",
+      "claim_checked": "다른 연결의 state NULL과 query 접근 제한",
+      "scope": "역할 부여 전후의 실제 관측",
+      "primary_sources": [
+        "https://www.postgresql.org/docs/18/predefined-roles.html",
+        "https://www.postgresql.org/docs/18/monitoring-stats.html"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-postgresql.json",
+          "json_pointer": "/experiments/statistics_privilege"
+        }
+      ],
+      "review_result": "NULL을 idle 또는 없음으로 변환하지 않음"
+    },
+    {
+      "id": "pg-statistics",
+      "chapter": "docs/database/postgresql-concurrency-lab.md",
+      "claim_checked": "snapshot 4→4→10과 stats_reset NULL",
+      "scope": "18.6 새 인스턴스; 고정된 수집 SQL",
+      "primary_sources": [
+        "https://www.postgresql.org/docs/18/monitoring-stats.html"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-postgresql.json",
+          "json_pointer": "/experiments/statistics_snapshot"
+        },
+        {
+          "path": "labs/results/1.1-postgresql.json",
+          "json_pointer": "/experiments/collector_query"
+        }
+      ],
+      "review_result": "차분을 업무 건수와 동일시하지 않음; stats_reset 단독 수명 키 배제"
+    },
+    {
+      "id": "otlp-retry",
+      "chapter": "docs/product/telemetry-delivery-contracts.md",
+      "claim_checked": "OTLP/HTTP의 재시도 코드는 429·502·503·504",
+      "scope": "OTLP 1.11.0 문서와 Collector 0.137.0 HTTP JSON",
+      "primary_sources": [
+        "https://opentelemetry.io/docs/specs/otlp/"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-otel.json",
+          "json_pointer": "/experiments/retry_503"
+        },
+        {
+          "path": "labs/results/1.1-otel.json",
+          "json_pointer": "/experiments/permanent_400"
+        },
+        {
+          "path": "labs/results/1.1-otel.json",
+          "json_pointer": "/experiments/permanent_500"
+        }
+      ],
+      "review_result": "실제 500은 1회; gRPC로 HTTP 코드를 복사하지 않음"
+    },
+    {
+      "id": "otlp-partial",
+      "chapter": "docs/product/telemetry-delivery-contracts.md",
+      "claim_checked": "목적지의 거절 선언이 이번 upstream 응답에 그대로 전파되지 않음",
+      "scope": "queue off; mock backend rejectedSpans=1",
+      "primary_sources": [
+        "https://opentelemetry.io/docs/specs/otlp/"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-otel.json",
+          "json_pointer": "/experiments/partial_success"
+        }
+      ],
+      "review_result": "일부 거절은 hash로 연결된 코드의 응답 fixture; 저장 성공은 측정하지 않음"
+    },
+    {
+      "id": "otlp-duplicate",
+      "chapter": "docs/product/telemetry-delivery-contracts.md",
+      "claim_checked": "응답 유실 뒤 span 2개를 두 번 수신",
+      "scope": "본문 수신 후 연결 종료, 다음 전송 성공",
+      "primary_sources": [
+        "https://opentelemetry.io/docs/specs/otlp/"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-otel.json",
+          "json_pointer": "/experiments/response_lost"
+        }
+      ],
+      "review_result": "4개 수신 항목과 고유 ID 2개 구분"
+    },
+    {
+      "id": "proc-comm",
+      "chapter": "docs/host/linux-observation-lab.md",
+      "claim_checked": "comm에 공백과 닫는 괄호가 포함될 수 있음",
+      "scope": "자기 프로세스 이름을 일시 변경 후 복원",
+      "primary_sources": [
+        "https://man7.org/linux/man-pages/man5/proc_pid_stat.5.html"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-linux.json",
+          "json_pointer": "/experiments/process_name_parsing"
+        }
+      ],
+      "review_result": "전체 문자열의 단순 공백 분할 위험 설명"
+    },
+    {
+      "id": "cpu-clock-difference",
+      "chapter": "docs/foundations/measurement-and-comparability.md",
+      "claim_checked": "1초·2초 구간에서도 약 1.06 계정 비율 관측",
+      "scope": "WSL2 커널 6.18.33.2, CLK_TCK=100",
+      "primary_sources": [
+        "https://man7.org/linux/man-pages/man2/clock_gettime.2.html",
+        "https://man7.org/linux/man-pages/man5/proc_pid_stat.5.html"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-linux.json",
+          "json_pointer": "/experiments/cpu_accounting"
+        }
+      ],
+      "review_result": "원인 미해결; 값 보정·시계 정확도 인증·물리 성능 일반화 배제"
+    },
+    {
+      "id": "virtual-resident",
+      "chapter": "docs/host/linux-observation-lab.md",
+      "claim_checked": "매핑 크기는 같고 Rss는 0에서 32768KiB로 변화",
+      "scope": "선택한 32MiB private 익명 매핑",
+      "primary_sources": [
+        "https://man7.org/linux/man-pages/man5/proc_pid_smaps.5.html"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-linux.json",
+          "json_pointer": "/experiments/virtual_vs_resident"
+        }
+      ],
+      "review_result": "전체 프로세스와 선택 매핑의 계정 구분"
+    },
+    {
+      "id": "logical-storage-io",
+      "chapter": "docs/host/linux-observation-lab.md",
+      "claim_checked": "두 번 읽기에서 rchar 증가, read_bytes 증가 0",
+      "scope": "1MiB 임시 파일; 캐시 강제 제거 없음",
+      "primary_sources": [
+        "https://man7.org/linux/man-pages/man5/proc_pid_io.5.html"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-linux.json",
+          "json_pointer": "/experiments/logical_vs_storage_io"
+        }
+      ],
+      "review_result": "관측용 proc 읽기가 rchar에 포함됨도 명시"
+    },
+    {
+      "id": "working-set",
+      "chapter": "docs/containers/memory-accounting-and-oom.md",
+      "claim_checked": "cAdvisor Usage에서 inactive file을 차감하고 0 하한 적용",
+      "scope": "cAdvisor 0.52.1 handler.go",
+      "primary_sources": [
+        "https://github.com/google/cadvisor/blob/v0.52.1/container/libcontainer/handler.go"
+      ],
+      "execution_evidence": [],
+      "review_result": "v1·v2 키 구분; 모든 도구의 정의로 확장하지 않음"
+    },
+    {
+      "id": "memory-high-max",
+      "chapter": "docs/containers/memory-accounting-and-oom.md",
+      "claim_checked": "high와 max의 제어·OOM 역할이 다름",
+      "scope": "cgroup v2 규약; 제어 동작 미실행",
+      "primary_sources": [
+        "https://docs.kernel.org/admin-guide/cgroup-v2.html#memory"
+      ],
+      "execution_evidence": [],
+      "review_result": "high 초과를 OOM kill과 동일시하지 않음"
+    },
+    {
+      "id": "memory-events",
+      "chapter": "docs/containers/memory-accounting-and-oom.md",
+      "claim_checked": "events의 계층 범위와 oom_kill의 어떤 OOM killer든 포함하는 정의",
+      "scope": "기본 계층 합산과 mount 옵션 고려",
+      "primary_sources": [
+        "https://docs.kernel.org/admin-guide/cgroup-v2.html#memory",
+        "https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/"
+      ],
+      "execution_evidence": [],
+      "review_result": "cgroup max 초과·global OOM·eviction을 추가 증거로 분리"
+    },
+    {
+      "id": "write-fsync",
+      "chapter": "docs/storage/write-path-and-durability.md",
+      "claim_checked": "write 성공과 파일·디렉터리 동기화의 보장이 다름",
+      "scope": "Linux write/fsync/fdatasync",
+      "primary_sources": [
+        "https://man7.org/linux/man-pages/man2/write.2.html",
+        "https://man7.org/linux/man-pages/man2/fsync.2.html"
+      ],
+      "execution_evidence": [],
+      "review_result": "정상 fsync 실행을 전원 장애 시험으로 표시하지 않음"
+    },
+    {
+      "id": "wal-commit",
+      "chapter": "docs/storage/write-path-and-durability.md",
+      "claim_checked": "asynchronous commit과 fsync=off의 의미가 다름",
+      "scope": "PostgreSQL 18 문서",
+      "primary_sources": [
+        "https://www.postgresql.org/docs/18/wal-async-commit.html",
+        "https://www.postgresql.org/docs/18/runtime-config-wal.html#GUC-SYNCHRONOUS-COMMIT"
+      ],
+      "execution_evidence": [],
+      "review_result": "WAL 일관성·최근 commit 유실·복제 대기 경계를 분리"
+    },
+    {
+      "id": "trace-context",
+      "chapter": "docs/application/trace-sampling-and-context.md",
+      "claim_checked": "traceparent sampled bit는 인증·저장 성공 보장이 아님",
+      "scope": "W3C Trace Context; 인증 분리는 설계 해석",
+      "primary_sources": [
+        "https://www.w3.org/TR/trace-context/"
+      ],
+      "execution_evidence": [],
+      "review_result": "관측 문맥과 인증된 tenant 범위 분리"
+    },
+    {
+      "id": "sampling-population",
+      "chapter": "docs/application/trace-sampling-and-context.md",
+      "claim_checked": "전체 10%와 선택 집합 52.63%는 다른 모집단",
+      "scope": "10,000 요청과 오류 우선 보존의 가상 입력",
+      "primary_sources": [],
+      "execution_evidence": [],
+      "review_result": "대표 계산 확인; 실제 서비스 오류율로 꾸미지 않음"
+    },
+    {
+      "id": "tail-placement",
+      "chapter": "docs/application/trace-sampling-and-context.md",
+      "claim_checked": "같은 trace의 span을 모을 배치와 늦은 자료 정책 필요",
+      "scope": "tail sampling processor 0.137.0 문서만 검토",
+      "primary_sources": [
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.137.0/processor/tailsamplingprocessor/README.md"
+      ],
+      "execution_evidence": [],
+      "review_result": "실제 sampling 용량·성능 실험 주장 없음"
+    },
+    {
+      "id": "negative-cache",
+      "chapter": "docs/network/dns-and-connection-lifecycle.md",
+      "claim_checked": "부정 DNS 응답과 열린 연결의 수명은 다른 계약",
+      "scope": "RFC 2308 및 연결 재사용의 설계 관계",
+      "primary_sources": [
+        "https://www.rfc-editor.org/rfc/rfc2308.html",
+        "https://www.rfc-editor.org/rfc/rfc9112.html"
+      ],
+      "execution_evidence": [],
+      "review_result": "실제 DNS 변경 실험과 구분"
+    },
+    {
+      "id": "http-completion",
+      "chapter": "docs/network/dns-and-connection-lifecycle.md",
+      "claim_checked": "요청 2회/연결 1개, 200 뒤 본문 미완료",
+      "scope": "Python 3.12.3 loopback HTTP/1.1",
+      "primary_sources": [
+        "https://www.rfc-editor.org/rfc/rfc9112.html"
+      ],
+      "execution_evidence": [
+        {
+          "path": "labs/results/1.1-http11.json",
+          "json_pointer": "/experiments/connection_reuse"
+        },
+        {
+          "path": "labs/results/1.1-http11.json",
+          "json_pointer": "/experiments/incomplete_body"
+        }
+      ],
+      "review_result": "헤더·본문 완료 경계 분리; HTTP/2·TLS 미검증"
+    },
+    {
+      "id": "cw-result",
+      "chapter": "docs/cloud/late-data-and-reconciliation.md",
+      "claim_checked": "상태는 결과별이며 시간과 값은 인덱스 쌍",
+      "scope": "GetMetricData의 MetricDataResult",
+      "primary_sources": [
+        "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataResult.html"
+      ],
+      "execution_evidence": [],
+      "review_result": "PartialData에서 metric math의 token 부재 조건 유지"
+    },
+    {
+      "id": "cw-time",
+      "chapter": "docs/cloud/late-data-and-reconciliation.md",
+      "claim_checked": "StartTime 포함·EndTime 제외, 지연 게시와 목록 가시성 구분",
+      "scope": "CloudWatch 문서; 실제 계정 미호출",
+      "primary_sources": [
+        "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html",
+        "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_PutMetricData.html"
+      ],
+      "execution_evidence": [],
+      "review_result": "모든 공급자의 시간 경계나 backfill 보장으로 확장하지 않음"
+    },
+    {
+      "id": "backfill-arithmetic",
+      "chapter": "docs/cloud/late-data-and-reconciliation.md",
+      "claim_checked": "갱신된 1분 Sum 두 구간은 1800, 중복 합산하면 3300",
+      "scope": "동일 구간 대체라는 가상 계약",
+      "primary_sources": [],
+      "execution_evidence": [],
+      "review_result": "delta 합산과 별개임을 명시; 2분 평균 15/초 계산 확인"
+    }
+  ]
+}

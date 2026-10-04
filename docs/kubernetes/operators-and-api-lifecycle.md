@@ -18,7 +18,9 @@ API 요청은 인증·인가·admission 등의 경계를 거칩니다. Mutating 
 
 ## generation과 resourceVersion
 
-`resourceVersion`은 클라이언트가 내부 의미를 가정하지 않는 opaque 값입니다. 숫자처럼 보여도 여러 자원 사이의 전역 시각으로 계산하지 않습니다. `generation`과 controller가 제공하는 `observedGeneration`의 관계는 해당 API 규약을 확인합니다. 원하는 변경을 아직 관측하지 않은 상태와 관측했지만 실패한 상태를 구분하는 단서가 될 수 있습니다. [Kubernetes API 규약](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md)
+`resourceVersion`의 동일성·순서 비교는 서버 버전과 API 규약에 맞춥니다. 1.34까지의 불투명 문자열 규약과 1.35의 제한된 순서 비교 규약을 구분하며, 여러 종류 자원의 전역 시각으로 계산하지 않습니다. [버전별 비교](objects-and-control-loops.md)
+
+`generation`과 controller가 제공하는 `observedGeneration`의 관계는 해당 API 규약을 확인합니다. 원하는 변경을 아직 관측하지 않은 상태와 관측했지만 실패한 상태를 구분하는 단서가 될 수 있습니다. [Kubernetes API 규약](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md)
 
 Conditions의 `True`, `False`, `Unknown`, reason, message, lastTransitionTime을 원형대로 보존합니다. `lastTransitionTime`을 마지막 수집 시각으로 덮으면 실제 상태 전환 시점을 잃습니다. 모든 custom resource가 동일한 Conditions 규약을 충실히 구현한다고 가정하지 않습니다.
 
@@ -40,6 +42,6 @@ API 상태, controller의 reconcile 성공·실패·재시도, 실제 업무 상
 
 1. CRD 설치만으로 DB 장애 전환이 동작하는가? **실제 controller와 그 설정·상태가 필요합니다.**
 2. API 생성 성공이 workload 준비 완료인가? **비동기 수렴이 남아 있습니다.**
-3. resourceVersion을 정수로 빼서 객체 나이를 계산하는가? **opaque 값이므로 그런 계산을 하지 않습니다.**
+3. resourceVersion을 정수로 빼서 객체 나이를 계산하는가? **순서 비교를 지원하는 버전에서도 값의 차이가 시간 단위는 아닙니다.**
 
 관련: [객체와 제어 루프](objects-and-control-loops.md) · [수집](collection.md)

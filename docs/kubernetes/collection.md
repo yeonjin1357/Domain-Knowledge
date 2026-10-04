@@ -1,6 +1,6 @@
 # Kubernetes 수집 경로와 데이터의 의미
 
-> 상태: 검토됨 · 적용 범위: API 객체, kube-state-metrics, Resource Metrics API, 컴포넌트 지표 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: API 객체, kube-state-metrics, Resource Metrics API, 컴포넌트 지표 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 1.1판 resourceVersion 규약 재검토: 2026-10-04
 
 ## 먼저 이해할 것
 
@@ -28,7 +28,9 @@ Resource Metrics API에서 CPU는 누적 CPU 카운터로부터 계산한 구간
 
 ## list와 watch로 현재 상태 유지하기
 
-API는 객체 목록 조회와 변경 watch를 지원합니다. 오래된 `resourceVersion`의 변경 이력이 더 이상 없으면 `410 Gone`이 반환될 수 있고, 클라이언트는 목록을 새로 가져와 watch를 다시 시작하는 복구가 필요합니다. `resourceVersion`은 일반 클라이언트가 숫자 순서를 임의로 비교하는 대상이 아닙니다. [Kubernetes API Concepts](https://kubernetes.io/docs/reference/using-api/api-concepts/)
+API는 객체 목록 조회와 변경 watch를 지원합니다. 오래된 `resourceVersion`의 변경 이력이 더 이상 없으면 `410 Gone`이 반환될 수 있고, 클라이언트는 목록을 새로 가져와 watch를 다시 시작하는 복구가 필요합니다. [Kubernetes API Concepts](https://kubernetes.io/docs/reference/using-api/api-concepts/)
+
+`resourceVersion` 비교는 [1.34와 1.35의 규약 차이](objects-and-control-loops.md)를 따릅니다. 지원 조건 없이 정수로 변환하거나 다른 resource type 사이의 대소 비교에 사용하지 않습니다. 서버에 반환할 때는 원래 문자열을 그대로 전달합니다. 실제 페이지 조회·권한·selector 이탈과 삭제의 구분은 [인벤토리 실습](inventory-consistency.md)에서 확인합니다.
 
 다음은 제품 수집기의 설계 예입니다.
 

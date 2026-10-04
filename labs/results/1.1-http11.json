@@ -1,0 +1,24 @@
+{
+  "run_at_utc": "2026-10-04T02:17:37.045285+00:00",
+  "python": "3.12.3",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "scope": "loopback HTTP/1.1 only; no DNS, TLS, HTTP/2 or real proxy experiment",
+  "experiments": {
+    "connection_reuse": {
+      "status": "passed",
+      "requests": 2,
+      "accepted_tcp_connections": 1,
+      "condition": "sequential HTTP/1.1 requests with fully consumed Content-Length bodies"
+    },
+    "incomplete_body": {
+      "status": "passed",
+      "response_status": 200,
+      "declared_bytes": 10,
+      "received_bytes": 5,
+      "missing_bytes": 5,
+      "client_error": "IncompleteRead"
+    }
+  },
+  "cleanup": "client, loopback server, and worker closed",
+  "script_sha256": "d116222a93a509ba985fdfcc40b160c23309d7cff6361792db5f18ffb07fa73d"
+}

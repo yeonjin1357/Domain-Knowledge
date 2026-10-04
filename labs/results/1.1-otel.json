@@ -1,0 +1,183 @@
+{
+  "run_at_utc": "2026-10-04T02:16:57.454158+00:00",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "collector_version": "otelcol version 0.137.0",
+  "input_kind": "two synthetic spans through the real otlp receiver and otlphttp exporter",
+  "scope": "OTLP/HTTP JSON, no sending queue, bounded retries; no gRPC or durable storage validation",
+  "experiments": {
+    "success": {
+      "status": "passed",
+      "backend_attempts": [
+        {
+          "path": "/v1/traces",
+          "span_ids": [
+            "0000000000000001",
+            "0000000000000002"
+          ],
+          "span_count": 2
+        }
+      ],
+      "receiver_http_status": 200,
+      "receiver_body": "{\"partialSuccess\":{}}",
+      "sending_queue_enabled": false
+    },
+    "retry_503": {
+      "status": "passed",
+      "backend_attempts": [
+        {
+          "path": "/v1/traces",
+          "span_ids": [
+            "0000000000000001",
+            "0000000000000002"
+          ],
+          "span_count": 2
+        },
+        {
+          "path": "/v1/traces",
+          "span_ids": [
+            "0000000000000001",
+            "0000000000000002"
+          ],
+          "span_count": 2
+        }
+      ],
+      "receiver_http_status": 200,
+      "receiver_body": "{\"partialSuccess\":{}}",
+      "sending_queue_enabled": false
+    },
+    "permanent_400": {
+      "status": "passed",
+      "backend_attempts": [
+        {
+          "path": "/v1/traces",
+          "span_ids": [
+            "0000000000000001",
+            "0000000000000002"
+          ],
+          "span_count": 2
+        }
+      ],
+      "receiver_http_status": 400,
+      "receiver_body": "{\"code\":3,\"message\":\"not retryable error: Permanent error: rpc error: code = InvalidArgument desc = error exporting items, request to http://127.0.0.1:41022/v1/traces responded with HTTP Status Code 400\"}",
+      "sending_queue_enabled": false
+    },
+    "permanent_500": {
+      "status": "passed",
+      "backend_attempts": [
+        {
+          "path": "/v1/traces",
+          "span_ids": [
+            "0000000000000001",
+            "0000000000000002"
+          ],
+          "span_count": 2
+        }
+      ],
+      "receiver_http_status": 500,
+      "receiver_body": "{\"code\":2,\"message\":\"not retryable error: Permanent error: rpc error: code = Unknown desc = error exporting items, request to http://127.0.0.1:40602/v1/traces responded with HTTP Status Code 500\"}",
+      "sending_queue_enabled": false
+    },
+    "partial_success": {
+      "status": "passed",
+      "backend_attempts": [
+        {
+          "path": "/v1/traces",
+          "span_ids": [
+            "0000000000000001",
+            "0000000000000002"
+          ],
+          "span_count": 2
+        }
+      ],
+      "receiver_http_status": 200,
+      "receiver_body": "{\"partialSuccess\":{}}",
+      "sending_queue_enabled": false
+    },
+    "response_lost": {
+      "status": "passed",
+      "backend_attempts": [
+        {
+          "path": "/v1/traces",
+          "span_ids": [
+            "0000000000000001",
+            "0000000000000002"
+          ],
+          "span_count": 2
+        },
+        {
+          "path": "/v1/traces",
+          "span_ids": [
+            "0000000000000001",
+            "0000000000000002"
+          ],
+          "span_count": 2
+        }
+      ],
+      "receiver_http_status": 200,
+      "receiver_body": "{\"partialSuccess\":{}}",
+      "sending_queue_enabled": false
+    },
+    "retry_exhausted": {
+      "status": "passed",
+      "backend_attempts": [
+        {
+          "path": "/v1/traces",
+          "span_ids": [
+            "0000000000000001",
+            "0000000000000002"
+          ],
+          "span_count": 2
+        },
+        {
+          "path": "/v1/traces",
+          "span_ids": [
+            "0000000000000001",
+            "0000000000000002"
+          ],
+          "span_count": 2
+        },
+        {
+          "path": "/v1/traces",
+          "span_ids": [
+            "0000000000000001",
+            "0000000000000002"
+          ],
+          "span_count": 2
+        },
+        {
+          "path": "/v1/traces",
+          "span_ids": [
+            "0000000000000001",
+            "0000000000000002"
+          ],
+          "span_count": 2
+        },
+        {
+          "path": "/v1/traces",
+          "span_ids": [
+            "0000000000000001",
+            "0000000000000002"
+          ],
+          "span_count": 2
+        },
+        {
+          "path": "/v1/traces",
+          "span_ids": [
+            "0000000000000001",
+            "0000000000000002"
+          ],
+          "span_count": 2
+        }
+      ],
+      "receiver_http_status": 503,
+      "receiver_body": "{\"code\":14,\"message\":\"no more retries left: rpc error: code = Unavailable desc = error exporting items, request to http://127.0.0.1:42188/v1/traces responded with HTTP Status Code 503\"}",
+      "sending_queue_enabled": false
+    }
+  },
+  "cleanup": "all temporary collectors and loopback servers stopped",
+  "input_sha256": {
+    "scripts/run_otel_lab.py": "25ecd8cf0a19843dd7b88cdd2f340a3d6e7b50ce62ece791a297a6418c5bd999",
+    "scripts/get_runtime_lab_assets.py": "4df31fb34b3a62bd74781ea1defe78aa4ba38e134d30b90ade52730c654eed4b",
+    "labs/runtime-assets.json": "3e800ac4de34217d7eec75e506495acf4d41b9eb9e32735bf441bc523e9abda4"
+  }
+}

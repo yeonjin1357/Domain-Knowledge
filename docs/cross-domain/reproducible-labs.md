@@ -4,6 +4,20 @@
 
 공식 설명을 읽는 것과 실제 프로그램에서 같은 동작을 보는 것은 서로 보완합니다. 이 장은 작성 환경에서 직접 실행한 실습입니다. 운영 서버나 사용자의 DB를 사용하지 않았고, 로컬 임시 DB와 loopback HTTP, 읽기 전용 Win32 API, 합성 PromQL 입력을 사용했습니다.
 
+## 제1.1판에서 추가한 실습
+
+이 장은 제1.0판의 네 가지 실행 기록을 유지합니다. 제1.1판에서는 WSL2의 독립된 로컬 환경을 사용해 다음 다섯 묶음의 시나리오 31개를 추가했습니다. Docker daemon에 의존하지 않으며 각 장에 실제 버전·격리 범위·재현 명령을 적었습니다.
+
+| 실습 | 시나리오 | 확인한 질문 |
+| --- | ---: | --- |
+| [Linux 원천 관측](../host/linux-observation-lab.md) | 4 | 주소 공간·상주량·I/O 계정·CPU 시계는 어떻게 다른가? |
+| [PostgreSQL 동시성](../database/postgresql-concurrency-lab.md) | 11 | 읽기 시점·잠금·오류·권한이 조회 결과를 어떻게 바꾸는가? |
+| [Kubernetes 인벤토리](../kubernetes/inventory-consistency.md) | 7 | 부분 목록·객체 수명·선택 집합과 삭제를 어떻게 구분하는가? |
+| [OTLP 전송](../product/telemetry-delivery-contracts.md) | 7 | 재시도·부분 성공·응답 유실에서 무엇이 관측되는가? |
+| [HTTP/1.1 연결](../network/dns-and-connection-lifecycle.md) | 2 | 요청 수·연결 수·본문 완료가 어떻게 다른가? |
+
+Linux의 기존 cgroup 읽기는 별도 관측으로 기록했으며 위 4개 실험 수에 추가하지 않았습니다. [검증 기록](../validation.md)은 두 판의 근거와 실행하지 않은 범위를 함께 정리합니다.
+
 ## 실행 자료와 재현
 
 실행 코드는 [run_labs.py](../../scripts/run_labs.py), 원시 결과는 [2026-10-04.json](../../labs/results/2026-10-04.json), Prometheus 입력은 [tests.yml](../../labs/prometheus/tests.yml)과 [rules.yml](../../labs/prometheus/rules.yml)에 있습니다. 결과 파일은 실행 시각, 실제 버전, 원천 값, 스크립트·입력 SHA-256을 포함합니다.

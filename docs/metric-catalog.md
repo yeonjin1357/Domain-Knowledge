@@ -67,4 +67,19 @@
 
 비율을 여러 대상으로 합칠 때는 분자·분모의 합으로 다시 계산합니다. 누적값은 같은 실행 수명에서 rate를 구한 뒤 합치고, 분포는 원천 분포의 호환성을 확인합니다. 0 분모, reset, 미지원, 누락, 늦은 도착은 모두 정상 숫자와 구분해서 처리해야 합니다.
 
-실제 필드별 명세는 [지표 템플릿](../templates/metric.md)에 원천 URL·버전·단위·수집 권한·검증 결과를 채워 작성합니다.
+## 비슷한 이름이 다른 값을 뜻하는 경우
+
+| 비교 대상 | 구분해야 하는 경계 | 상세 |
+| --- | --- | --- |
+| 5초 CPU 평균 / 1분 CPU 평균 | 같은 작업도 시간 창이 다르면 값이 다름 | [측정과 비교](foundations/measurement-and-comparability.md) |
+| rchar / read_bytes | 프로그램의 논리 읽기 / 저장 계층의 읽기 계정 | [실제 I/O 관측](host/linux-observation-lab.md) |
+| Heap / RSS / memory.current / WorkingSet | 런타임·프로세스·cgroup·도구 계산의 포함 범위 | [메모리 계정](containers/memory-accounting-and-oom.md) |
+| DB active / CPU 실행 | active인 SQL이 잠금을 기다릴 수 있음 | [실제 잠금 대기](database/postgresql-concurrency-lab.md) |
+| 요청 오류율 / 보존한 trace의 오류 비율 | sampling 전후 모집단 | [Sampling](application/trace-sampling-and-context.md) |
+| HTTP 요청 수 / TCP 연결 수 | 재사용·다중화 여부 | [연결 실습](network/dns-and-connection-lifecycle.md) |
+| HTTP 200 수 / 본문 완료 수 | 헤더 도착과 본문 전송 완료 | [불완전 응답](network/dns-and-connection-lifecycle.md) |
+| Span 전송 항목 수 / 고유 수신 항목 수 | 응답 유실 후 중복 재시도 | [OTLP 전송](product/telemetry-delivery-contracts.md) |
+| 같은 구간의 첫 Sum / 재조회 Sum | 같은 집계의 갱신인지 독립된 증가량인지 | [Cloud 재조회](cloud/late-data-and-reconciliation.md) |
+| Write 지연 / fsync 지연 / commit 지연 | 반환·동기화·트랜잭션 정책의 완료 경계 | [쓰기 지속성](storage/write-path-and-durability.md) |
+
+실제 필드별 명세는 [지표 템플릿](../templates/metric.md)에 원천 URL·버전·단위·수집 권한·검증 결과를 채워 작성합니다. [필드 계약과 수용 기준](product/compatibility-and-acceptance.md)의 19개 항목은 원천 값에서 제품 지표까지 연결하는 구체적인 예입니다.

@@ -51,5 +51,6 @@
 5. [Go, Node.js, Python의 동시성과 관측](async-runtimes.md)
 6. [브라우저, 실제 사용자 관측과 합성 검사](user-experience.md)
 7. [계측을 넣는 위치: 자동 계측, 수동 span, eBPF와 프로파일](instrumentation-and-profiling.md)
+8. [트레이스를 읽는 전제: 문맥 전파, sampling과 모집단](trace-sampling-and-context.md)
 
 관련 문서: [공통 개념](../foundations/README.md), [DB](../database/README.md), [미들웨어](../middleware/README.md), [도메인 간 분석](../cross-domain/README.md)

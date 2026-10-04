@@ -32,7 +32,8 @@ DB 쓰기가 느려졌다면 DB가 기다리는 지점, 호스트에서 관측�
 ## 상세 본문
 
 1. [블록, 파일, 객체 저장소와 성능 경계](models-and-performance.md)
-2. [저장 용량, 복제, 스냅샷과 복구 가능성](capacity-and-protection.md)
-3. [저장 경로를 따라가기: RAID, LVM, SAN과 NAS](raid-lvm-and-paths.md)
+2. [쓰기가 끝났다는 뜻: 버퍼, fsync, WAL과 복제](write-path-and-durability.md)
+3. [저장 용량, 복제, 스냅샷과 복구 가능성](capacity-and-protection.md)
+4. [저장 경로를 따라가기: RAID, LVM, SAN과 NAS](raid-lvm-and-paths.md)
 
 관련 문서: [호스트](../host/README.md), [DB](../database/README.md), [클라우드](../cloud/README.md)

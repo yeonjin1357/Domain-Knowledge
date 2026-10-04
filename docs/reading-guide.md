@@ -1,6 +1,6 @@
 # 이 지식서를 읽는 방법
 
-이 책은 통합 모니터링 제품을 만드는 개발자가 도메인 지식을 처음부터 익히도록 구성한 제1판입니다. 낯선 용어가 나와도 외부 문서를 모두 읽어야 다음으로 넘어가도록 구성하지 않았습니다. 핵심 설명은 본문에 두고 출처는 그 설명을 확인할 근거로 연결했습니다.
+이 책은 통합 모니터링 제품을 만드는 개발자가 도메인 지식을 처음부터 익히도록 구성한 제1.1판입니다. 낯선 용어가 나와도 외부 문서를 모두 읽어야 다음으로 넘어가도록 구성하지 않았습니다. 핵심 설명은 본문에 두고 출처는 그 설명을 확인할 근거로 연결했습니다.
 
 ## 한 파일로 읽기
 
@@ -23,7 +23,7 @@
 
 ## 각 장을 읽는 방법
 
-기존 58장에는 선수 개념을 풀어 쓴 “먼저 이해할 것”을 추가했습니다. 새 장도 상황과 쉬운 설명에서 시작합니다. 이어서 동작·원천·예시·한계·제품 적용·이해 확인을 읽습니다. 예시의 숫자를 한 번 직접 계산하면 어떤 분모와 시간 범위를 사용하는지 확인할 수 있습니다.
+각 장은 선수 개념이나 구체적인 상황을 먼저 설명합니다. 실제 실습 장은 작업 순서, 관측값, 해석, 그 결과만으로 알 수 없는 것의 순서로 읽습니다. 이어서 동작·원천·예시·한계·제품 적용·이해 확인을 읽습니다. 예시의 숫자를 한 번 직접 계산하면 어떤 분모와 시간 범위를 사용하는지 확인할 수 있습니다.
 
 낯선 약어는 [용어집](glossary.md)에서 짧은 정의를 보고 연결된 장으로 돌아옵니다. 표에 있는 수치가 임계값인지, 가상의 계산 입력인지, 실제 측정값인지도 확인합니다.
 
@@ -37,6 +37,19 @@
 | 대상·관계 설계 | 프로세스·Pod·cloud ID → [entity와 topology](product/entities-and-topology.md) |
 | 알림 구현 | [데이터 품질](foundations/time-and-data-quality.md) → [SLO](foundations/service-level-objectives.md) → [알림](product/alerts-and-incidents.md) → [PromQL 실습](cross-domain/reproducible-labs.md) |
 | 용량 계획 | [성능과 통계](foundations/performance-and-statistics.md) → [보존과 질의](product/storage-and-query.md) → [용량과 손실 예산](product/capacity-and-loss-budgets.md) |
+
+## 개념을 배운 뒤 실제 결과와 연결하기
+
+| 읽은 개념 | 다음에 읽을 실습·해설 | 집중할 질문 |
+| --- | --- | --- |
+| CPU·메모리·I/O | [Linux 실습](host/linux-observation-lab.md) → [측정과 비교](foundations/measurement-and-comparability.md) | 숫자의 차이가 오류인가, 다른 계정인가, 아직 모르는가? |
+| transaction·잠금 | [PostgreSQL 실습](database/postgresql-concurrency-lab.md) | 같은 연결에서 오류 이후 무엇이 달라지는가? |
+| API 객체·watch | [인벤토리 실습](kubernetes/inventory-consistency.md) | 대상이 실제로 삭제됐는가, 수집 범위에서 빠졌는가? |
+| trace·sampling·전송 | [sampling 해설](application/trace-sampling-and-context.md) → [Collector 실습](product/telemetry-delivery-contracts.md) | 보이지 않는 자료가 선택되지 않은 것인가, 거절된 것인가? |
+| 요청·연결 풀 | [HTTP/1.1 실습](network/dns-and-connection-lifecycle.md) | 성공 상태 코드와 응답 본문 완료가 같은가? |
+| 제품의 저장·집계 | [cloud 재조회](cloud/late-data-and-reconciliation.md) → [필드 수용 기준](product/compatibility-and-acceptance.md) | 같은 자료를 다시 받았을 때 더할 것인가, 대체할 것인가? |
+
+실습 프로그램을 실행하지 않아도 본문의 표와 [해설이 있는 분석 연습](cross-domain/investigation-workbook.md)으로 학습할 수 있습니다. 실행하려면 각 장의 환경 조건을 따릅니다.
 
 ## 문장의 종류
 

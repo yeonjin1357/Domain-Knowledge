@@ -1,6 +1,6 @@
 # DB 수집 명세: 읽기 전용 쿼리, 단위, 권한과 통계 수명
 
-> 상태: 검토됨 · 적용 범위: PostgreSQL 18·MySQL 8.4의 원천 필드와 수집 설계 · 검토일: 2026-10-04 · 이 장의 서버 SQL은 실행하지 않음
+> 상태: 검토됨 · 적용 범위: PostgreSQL 18·MySQL 8.4의 원천 필드와 수집 설계 · 검토일: 2026-10-04 · PostgreSQL 수집 SQL은 18.6에서 실행, MySQL SQL은 문서 검토
 
 DB 모니터링 쿼리도 DB가 실행하는 작업입니다. 작은 메타데이터 조회라도 빈도·행 수·권한을 관리해야 합니다. 문장 텍스트에 개인정보가 들어갈 수도 있습니다. 이 장의 쿼리는 수집 계약을 검토하기 위한 예시이며 사용자 환경에 적용한 배포 명세가 아닙니다.
 
@@ -21,6 +21,8 @@ FROM pg_stat_database
 WHERE datid <> 0;
 COMMIT;
 ```
+
+위 SQL은 [고정된 입력 파일](../../labs/postgresql/collect-database.sql)로 보존해 PostgreSQL 18.6의 임시 인스턴스에서 실행했습니다. 누적값이 존재해도 `stats_reset`이 NULL인 행이 반환됐습니다. 이 필드를 항상 존재하는 reset 시각으로 가정하지 않습니다. 권한·통계 snapshot·오류 후 연결 상태는 [실제 동시성 실습](postgresql-concurrency-lab.md)에서 설명합니다.
 
 한 transaction 안에서 누적 통계를 계속 조회하면 통계 snapshot 관련 설정에 따라 이전에 본 값이 유지될 수 있습니다. 주기마다 transaction을 끝내고, `stats_fetch_consistency` 등 해당 버전의 동작을 확인합니다. 쿼리가 실패하면 클라이언트에서 rollback과 연결 반환을 보장해야 합니다.
 

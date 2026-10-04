@@ -36,8 +36,9 @@ OpenTelemetry의 클라우드 규약에는 공급자, 계정, 리전, 가용 영
 
 1. [클라우드 자원 계층과 API 수집](resources-and-apis.md)
 2. [클라우드 지표의 기간, 통계와 정규화](provider-metrics.md)
-3. [관리형 서비스와 서버리스 관측](managed-and-serverless.md)
-4. [클라우드 네트워크: 경로, 정책과 흐름 로그](networking.md)
-5. [클라우드 한도, 비용과 용량: 사용량만으로 보이지 않는 제약](quotas-cost-and-capacity.md)
+3. [늦게 도착하는 클라우드 지표: 재조회, 부분 결과와 중복 집계](late-data-and-reconciliation.md)
+4. [관리형 서비스와 서버리스 관측](managed-and-serverless.md)
+5. [클라우드 네트워크: 경로, 정책과 흐름 로그](networking.md)
+6. [클라우드 한도, 비용과 용량: 사용량만으로 보이지 않는 제약](quotas-cost-and-capacity.md)
 
 관련 문서: [호스트](../host/README.md), [네트워크](../network/README.md), [DB](../database/README.md), [제품 설계 관점](../product/README.md)

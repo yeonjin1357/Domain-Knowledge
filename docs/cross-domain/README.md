@@ -73,3 +73,4 @@ flowchart LR
 4. [사례: 여러 그래프가 동시에 멈춘 경우](missing-observations.md)
 5. [재현 실습: 계산, 실제 엔진, 운영 검증의 경계](reproducible-labs.md)
 6. [종합 연습: 주문 지연을 증거로 좁혀 가기](capstone-investigation.md)
+7. [해설이 있는 분석 연습: 보이는 증거로 어디까지 말할 수 있을까](investigation-workbook.md)

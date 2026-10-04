@@ -1,8 +1,8 @@
 {
-  "checked_at_utc": "2026-10-04T01:32:49.672117+00:00",
+  "checked_at_utc": "2026-10-04T02:35:16.369301+00:00",
   "meaning": "Availability inventory only. HTTP 200 does not verify claims or anchor fragments.",
-  "url_count": 291,
-  "http_200_count": 284,
+  "url_count": 314,
+  "http_200_count": 307,
   "sources": {
     "https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/": {
       "status": 200,
@@ -10,7 +10,7 @@
       "content_type": "text/html;charset=utf-8",
       "title": "references-details-empty",
       "body_bytes_up_to_limit": 453689,
-      "body_sha256": "8c9cf9ca26e5cc07258afb88b8823aa1ed7efda59a62b7478d4ee962838c877c",
+      "body_sha256": "59798ff4038e9732339c7b937953496ddaf352598d31ddde7069417ec38f5e79",
       "cited_by": [
         "docs/cross-domain/reproducible-labs.md",
         "docs/foundations/distributed-systems.md"
@@ -56,7 +56,7 @@
       "content_type": "text/html; charset=utf-8",
       "title": "MergeTree table engine - ClickHouse Documentation",
       "body_bytes_up_to_limit": 2864931,
-      "body_sha256": "e0bbd3cba23ef0c28fb7e1108db55d8072676f542728a661ad5082ebf6925004",
+      "body_sha256": "91b0ebd7c65d8227c081ebb935557f1cbad2321e55f04eda9635b91addfe809f",
       "cited_by": [
         "docs/database/specialized-data-models.md"
       ]
@@ -67,7 +67,7 @@
       "content_type": "text/html; charset=utf-8",
       "title": "MergeTree table engine - ClickHouse Documentation",
       "body_bytes_up_to_limit": 2864931,
-      "body_sha256": "e0bbd3cba23ef0c28fb7e1108db55d8072676f542728a661ad5082ebf6925004",
+      "body_sha256": "91b0ebd7c65d8227c081ebb935557f1cbad2321e55f04eda9635b91addfe809f",
       "cited_by": [
         "docs/database/distributed-and-analytical.md"
       ]
@@ -100,7 +100,7 @@
       "content_type": "text/html; charset=utf-8",
       "title": "RFC 3022 - Traditional IP Network Address Translator (Traditional NAT)",
       "body_bytes_up_to_limit": 84555,
-      "body_sha256": "070526d6f7660e3ac05cea0efe53f2de8401a2df35cf68f27d3b22f3d686b1dd",
+      "body_sha256": "100ac1234931b9017d9f00909146ae26d80d42e86155439bca23ce58a3573ea4",
       "cited_by": [
         "docs/network/addressing-routing-dns.md"
       ]
@@ -115,7 +115,8 @@
       "separate_web_review": {
         "date": "2026-10-04",
         "result": "Official content retrieved through web browsing; direct Python HTTP request was denied.",
-        "scope": "content review, not guaranteed future reachability"
+        "scope": "content review, not guaranteed future reachability",
+        "retained_from_edition": "1.0"
       }
     },
     "https://dev.mysql.com/doc/refman/8.4/en/performance-schema-statement-summary-tables.html": {
@@ -128,7 +129,8 @@
       "separate_web_review": {
         "date": "2026-10-04",
         "result": "Official content retrieved through web browsing; direct Python HTTP request was denied.",
-        "scope": "content review, not guaranteed future reachability"
+        "scope": "content review, not guaranteed future reachability",
+        "retained_from_edition": "1.0"
       }
     },
     "https://dev.mysql.com/doc/refman/8.4/en/performance-schema-status-variable-tables.html": {
@@ -140,7 +142,8 @@
       "separate_web_review": {
         "date": "2026-10-04",
         "result": "Official content retrieved through web browsing; direct Python HTTP request was denied.",
-        "scope": "content review, not guaranteed future reachability"
+        "scope": "content review, not guaranteed future reachability",
+        "retained_from_edition": "1.0"
       }
     },
     "https://dev.mysql.com/doc/refman/8.4/en/performance-schema-timing.html": {
@@ -152,7 +155,8 @@
       "separate_web_review": {
         "date": "2026-10-04",
         "result": "Official content retrieved through web browsing; direct Python HTTP request was denied.",
-        "scope": "content review, not guaranteed future reachability"
+        "scope": "content review, not guaranteed future reachability",
+        "retained_from_edition": "1.0"
       }
     },
     "https://dev.mysql.com/doc/refman/8.4/en/server-status-variables.html": {
@@ -164,7 +168,8 @@
       "separate_web_review": {
         "date": "2026-10-04",
         "result": "Official content retrieved through web browsing; direct Python HTTP request was denied.",
-        "scope": "content review, not guaranteed future reachability"
+        "scope": "content review, not guaranteed future reachability",
+        "retained_from_edition": "1.0"
       }
     },
     "https://dev.mysql.com/doc/refman/8.4/en/show-replica-status.html": {
@@ -176,8 +181,42 @@
       "separate_web_review": {
         "date": "2026-10-04",
         "result": "Official content retrieved through web browsing; direct Python HTTP request was denied.",
-        "scope": "content review, not guaranteed future reachability"
+        "scope": "content review, not guaranteed future reachability",
+        "retained_from_edition": "1.0"
       }
+    },
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html": {
+      "status": 200,
+      "final_url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html",
+      "content_type": "text/html",
+      "title": "GetMetricData - Amazon CloudWatch",
+      "body_bytes_up_to_limit": 46046,
+      "body_sha256": "85deb7a48cb8418f6a4ca032a97bedba80cd2a9197e96325efd438720d68c65a",
+      "cited_by": [
+        "docs/cloud/late-data-and-reconciliation.md"
+      ]
+    },
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataResult.html": {
+      "status": 200,
+      "final_url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataResult.html",
+      "content_type": "text/html",
+      "title": "MetricDataResult - Amazon CloudWatch",
+      "body_bytes_up_to_limit": 16603,
+      "body_sha256": "360116262e2aa2a3aee22b7419d136698abc13a6a03bae48f10723b3322796ae",
+      "cited_by": [
+        "docs/cloud/late-data-and-reconciliation.md"
+      ]
+    },
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_PutMetricData.html": {
+      "status": 200,
+      "final_url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_PutMetricData.html",
+      "content_type": "text/html",
+      "title": "PutMetricData - Amazon CloudWatch",
+      "body_bytes_up_to_limit": 38459,
+      "body_sha256": "bf7daf45c2d0cbea86a50c79a24d45411a604e96b66023cbb67ef79fe2f6b395",
+      "cited_by": [
+        "docs/cloud/late-data-and-reconciliation.md"
+      ]
     },
     "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html": {
       "status": 200,
@@ -395,8 +434,9 @@
       "content_type": "text/html; charset=utf-8",
       "title": "Filtering and aggregation: manipulating time series | Cloud Monitoring | Google Cloud Documentation",
       "body_bytes_up_to_limit": 202434,
-      "body_sha256": "da15e87ab701acbdb957b2950ba794117ead2a232da9ade0ea2a3dbde7625e99",
+      "body_sha256": "1c5868afb74ddcffd54a3fb8cff46f103b9dea5ce3f02dc2e4c93d54ef9acd0d",
       "cited_by": [
+        "docs/cloud/late-data-and-reconciliation.md",
         "docs/cloud/provider-metrics.md"
       ]
     },
@@ -406,7 +446,7 @@
       "content_type": "text/html; charset=utf-8",
       "title": "Value types and metric kinds | Cloud Monitoring | Google Cloud Documentation",
       "body_bytes_up_to_limit": 183150,
-      "body_sha256": "9e61054172137990b18d5e55b654ef5b7e5023571ee3775cc988d2e0a5f64fad",
+      "body_sha256": "204622b46c87fd595fe1771af31bf55d6dcd67034beecf71e52dd5e32144916f",
       "cited_by": [
         "docs/cloud/provider-metrics.md"
       ]
@@ -416,8 +456,8 @@
       "final_url": "https://docs.cloud.google.com/resource-manager/docs/cloud-platform-resource-hierarchy",
       "content_type": "text/html; charset=utf-8",
       "title": "About resource hierarchy | Resource Manager | Google Cloud Documentation",
-      "body_bytes_up_to_limit": 151763,
-      "body_sha256": "a326b112301f53776dc333e38feb034baab75ce704debcf5cb2f0fb9a45ae829",
+      "body_bytes_up_to_limit": 151759,
+      "body_sha256": "d5cc7273107941b0c9877907d247739e5fb261fab8becbf95bb2a9b94f2e36df",
       "cited_by": [
         "docs/cloud/resources-and-apis.md"
       ]
@@ -427,8 +467,8 @@
       "final_url": "https://docs.cloud.google.com/run/docs/about-concurrency",
       "content_type": "text/html; charset=utf-8",
       "title": "Maximum concurrent requests for services | Cloud Run | Google Cloud Documentation",
-      "body_bytes_up_to_limit": 221945,
-      "body_sha256": "35dacf21f17409a7f1b9a3f538808ae3242321958b6ef1e5d5bda34c48eef0c8",
+      "body_bytes_up_to_limit": 221807,
+      "body_sha256": "f25e8d25eac345be936085583597549ded108dba94841e06fc0929af7b149436",
       "cited_by": [
         "docs/cloud/managed-and-serverless.md"
       ]
@@ -438,8 +478,8 @@
       "final_url": "https://docs.cloud.google.com/run/docs/configuring/request-timeout",
       "content_type": "text/html; charset=utf-8",
       "title": "Configure request timeout for services | Cloud Run | Google Cloud Documentation",
-      "body_bytes_up_to_limit": 233088,
-      "body_sha256": "07d5ae74c03ad8b32255d31d6c702f364c4b93b7ceca7451dbb264ab5c281fab",
+      "body_bytes_up_to_limit": 233084,
+      "body_sha256": "d35ac2d832a64ca03701239c60854089288926a4af0efe8de5af076ed74f5a36",
       "cited_by": [
         "docs/cloud/managed-and-serverless.md"
       ]
@@ -554,9 +594,12 @@
       "body_sha256": "6efabe7ed748f1d863859a0e5c50e770e47255c9a071bf878f6460e7e01c0563",
       "cited_by": [
         "docs/containers/README.md",
+        "docs/containers/memory-accounting-and-oom.md",
         "docs/containers/platform-differences.md",
         "docs/containers/resource-control.md",
-        "docs/host/collection-contracts.md"
+        "docs/host/collection-contracts.md",
+        "docs/host/linux-observation-lab.md",
+        "docs/product/compatibility-and-acceptance.md"
       ]
     },
     "https://docs.kernel.org/admin-guide/cputopology.html": {
@@ -816,6 +859,17 @@
         "docs/application/managed-runtimes.md"
       ]
     },
+    "https://docs.python.org/3.12/library/http.client.html": {
+      "status": 200,
+      "final_url": "https://docs.python.org/3.12/library/http.client.html",
+      "content_type": "text/html",
+      "title": "http.client — HTTP protocol client — Python 3.12.15 documentation",
+      "body_bytes_up_to_limit": 96610,
+      "body_sha256": "a534cd4bd259cc4f79fda31e13840db33642f7243ba41daa15898f287b54ccc9",
+      "cited_by": [
+        "docs/network/dns-and-connection-lifecycle.md"
+      ]
+    },
     "https://docs.python.org/3.14/howto/free-threading-python.html": {
       "status": 200,
       "final_url": "https://docs.python.org/3.14/howto/free-threading-python.html",
@@ -887,8 +941,8 @@
       "final_url": "https://github.com/brettwooldridge/HikariCP",
       "content_type": "text/html; charset=utf-8",
       "title": "GitHub - brettwooldridge/HikariCP: 光 HikariCP・A solid, high-performance, JDBC connection pool at last. · GitHub",
-      "body_bytes_up_to_limit": 456563,
-      "body_sha256": "d4b922a9b75bf5c3565ac5d473b11ece35d296d591fede4e91d4b47943036e22",
+      "body_bytes_up_to_limit": 456565,
+      "body_sha256": "e26dbad6f92eac3a709b59446e4db021da430a686c61739f79b0a22efde9cff8",
       "cited_by": [
         "docs/application/servers-and-pools.md"
       ]
@@ -898,10 +952,32 @@
       "final_url": "https://github.com/container-storage-interface/spec/blob/v1.11.0/spec.md",
       "content_type": "text/html; charset=utf-8",
       "title": "spec/spec.md at v1.11.0 · container-storage-interface/spec · GitHub",
-      "body_bytes_up_to_limit": 1630085,
-      "body_sha256": "75ea3929c1882e242ebb9aa69fe8a11e0adbc2c1936e0046c1c5a5f6eb65c4e7",
+      "body_bytes_up_to_limit": 1630087,
+      "body_sha256": "d15370eed4472db6a3e993993d4725391039a9b9ac3a29df95fbd712fb35b635",
       "cited_by": [
         "docs/kubernetes/cni-csi-and-data-paths.md"
+      ]
+    },
+    "https://github.com/google/cadvisor/blob/v0.52.1/container/libcontainer/handler.go": {
+      "status": 200,
+      "final_url": "https://github.com/google/cadvisor/blob/v0.52.1/container/libcontainer/handler.go",
+      "content_type": "text/html; charset=utf-8",
+      "title": "cadvisor/container/libcontainer/handler.go at v0.52.1 · google/cadvisor · GitHub",
+      "body_bytes_up_to_limit": 798336,
+      "body_sha256": "9acc6184ad3aca62d4d787a8d32155bd885d55800c83657e75ee58978fb15203",
+      "cited_by": [
+        "docs/containers/memory-accounting-and-oom.md"
+      ]
+    },
+    "https://github.com/kubernetes-sigs/controller-runtime/blob/v0.22.3/pkg/envtest/server.go": {
+      "status": 200,
+      "final_url": "https://github.com/kubernetes-sigs/controller-runtime/blob/v0.22.3/pkg/envtest/server.go",
+      "content_type": "text/html; charset=utf-8",
+      "title": "controller-runtime/pkg/envtest/server.go at v0.22.3 · kubernetes-sigs/controller-runtime · GitHub",
+      "body_bytes_up_to_limit": 476207,
+      "body_sha256": "e2cd5d75601215e0f6c3921c810703fb66c72eedd2f3b3c9712de3681b4d448b",
+      "cited_by": [
+        "docs/kubernetes/inventory-consistency.md"
       ]
     },
     "https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md": {
@@ -909,8 +985,8 @@
       "final_url": "https://github.com/kubernetes/community/blob/main/contributors/devel/sig-architecture/api-conventions.md",
       "content_type": "text/html; charset=utf-8",
       "title": "community/contributors/devel/sig-architecture/api-conventions.md at main · kubernetes/community · GitHub",
-      "body_bytes_up_to_limit": 917948,
-      "body_sha256": "7548bdb58a81bd2b4431f6d0130524d6e3607df90dc594e7a8a5ac195f655610",
+      "body_bytes_up_to_limit": 917950,
+      "body_sha256": "668389ba4bc47fcbeb6990d7db61671332505dfa581719c65be33bfbf0f3abda",
       "cited_by": [
         "docs/kubernetes/operators-and-api-lifecycle.md"
       ]
@@ -920,10 +996,32 @@
       "final_url": "https://github.com/kubernetes/kube-state-metrics/blob/main/README.md",
       "content_type": "text/html; charset=utf-8",
       "title": "kube-state-metrics/README.md at main · kubernetes/kube-state-metrics · GitHub",
-      "body_bytes_up_to_limit": 449760,
-      "body_sha256": "2a703f6591d073abf609cf4ae3f5e2946e76682f8779ccf5bac701b52f3f3ee6",
+      "body_bytes_up_to_limit": 449772,
+      "body_sha256": "479c739569a119e2bdeb427de05c2b4ecfc5b08ac5c21bf49a0177a423e71a1e",
       "cited_by": [
         "docs/kubernetes/collection.md"
+      ]
+    },
+    "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.137.0/processor/tailsamplingprocessor/README.md": {
+      "status": 200,
+      "final_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.137.0/processor/tailsamplingprocessor/README.md",
+      "content_type": "text/html; charset=utf-8",
+      "title": "opentelemetry-collector-contrib/processor/tailsamplingprocessor/README.md at v0.137.0 · open-telemetry/opentelemetry-collector-contrib · GitHub",
+      "body_bytes_up_to_limit": 458779,
+      "body_sha256": "744e6eb8c5ac08ca9298eb72b7f2318dd7a41f0b89bbb8ef77e9bdaf3a2ccffe",
+      "cited_by": [
+        "docs/application/trace-sampling-and-context.md"
+      ]
+    },
+    "https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/otlphttpexporter/README.md": {
+      "status": 200,
+      "final_url": "https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/otlphttpexporter/README.md",
+      "content_type": "text/html; charset=utf-8",
+      "title": "opentelemetry-collector/exporter/otlphttpexporter/README.md at v0.137.0 · open-telemetry/opentelemetry-collector · GitHub",
+      "body_bytes_up_to_limit": 266116,
+      "body_sha256": "f1f54361e60fc84b6436cf4952e6123975b226906f407d78f2c671a5a246485f",
+      "cited_by": [
+        "docs/product/telemetry-delivery-contracts.md"
       ]
     },
     "https://github.com/opencontainers/runtime-spec/blob/v1.2.1/runtime.md": {
@@ -931,8 +1029,8 @@
       "final_url": "https://github.com/opencontainers/runtime-spec/blob/v1.2.1/runtime.md",
       "content_type": "text/html; charset=utf-8",
       "title": "runtime-spec/runtime.md at v1.2.1 · opencontainers/runtime-spec · GitHub",
-      "body_bytes_up_to_limit": 319793,
-      "body_sha256": "3e71714c695306393e3c4a492a5c8d9fa120f89266cbfcd15032bc1d854c35fe",
+      "body_bytes_up_to_limit": 319779,
+      "body_sha256": "3927d5bcc277dd5019c13f6b5df4dffab78b31c605b2a157d310baef197e5ce4",
       "cited_by": [
         "docs/containers/isolation-and-lifecycle.md"
       ]
@@ -942,8 +1040,8 @@
       "final_url": "https://github.com/prometheus/prometheus/releases/tag/v3.5.0",
       "content_type": "text/html; charset=utf-8",
       "title": "Release 3.5.0 / 2025-07-14 · prometheus/prometheus · GitHub",
-      "body_bytes_up_to_limit": 240258,
-      "body_sha256": "08ac02012e30abd1d67fc49c13e08c0cd956df67045ce51a951c8e546bd1d781",
+      "body_bytes_up_to_limit": 240259,
+      "body_sha256": "545f294c5288f40c01a7d3f638e43cf16c6fe3507c916c6a1273f209e0096bab",
       "cited_by": [
         "docs/cross-domain/reproducible-labs.md"
       ]
@@ -953,8 +1051,8 @@
       "final_url": "https://github.com/torvalds/linux/blob/v6.12/kernel/sched/cputime.c",
       "content_type": "text/html; charset=utf-8",
       "title": "linux/kernel/sched/cputime.c at v6.12 · torvalds/linux · GitHub",
-      "body_bytes_up_to_limit": 753597,
-      "body_sha256": "e43be77fa72de7d53082edc68a9da146809bc5dbacd1aed5267b1de923a575d2",
+      "body_bytes_up_to_limit": 741493,
+      "body_sha256": "259e704c9e04ced8836ff814b0be93a22c10c845a18de614df6a0441dd2d8bb8",
       "cited_by": [
         "docs/host/cpu.md"
       ]
@@ -986,8 +1084,8 @@
       "final_url": "https://grafana.com/docs/k6/latest/using-k6/scenarios/concepts/open-vs-closed/",
       "content_type": "text/html",
       "title": "Open and closed models | Grafana k6 documentation",
-      "body_bytes_up_to_limit": 365896,
-      "body_sha256": "263b22120a7c43d2536827c0e095afc04c10be9fc676b07d818b2fc253b6b55e",
+      "body_bytes_up_to_limit": 365891,
+      "body_sha256": "c863a95006bd8e9339c82cec388ebae05e6f3b44582921c3d1b6568827d84e0f",
       "cited_by": [
         "docs/foundations/performance-and-statistics.md"
       ]
@@ -1111,7 +1209,8 @@
       "body_bytes_up_to_limit": 521706,
       "body_sha256": "35153e97572fe49ccde5034fd572eaf2f8debd18f0acb05e24be5f9644c83ca8",
       "cited_by": [
-        "docs/kubernetes/collection.md"
+        "docs/kubernetes/collection.md",
+        "docs/product/compatibility-and-acceptance.md"
       ]
     },
     "https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/": {
@@ -1122,6 +1221,7 @@
       "body_bytes_up_to_limit": 562923,
       "body_sha256": "f082ecd3dabf6a7f9afb36d511f709eb854e3f806e62326a23f901c1c2acbb27",
       "cited_by": [
+        "docs/containers/memory-accounting-and-oom.md",
         "docs/kubernetes/resources-and-scheduling.md"
       ]
     },
@@ -1180,6 +1280,7 @@
       "body_sha256": "586a9066ee5c59fd6d3d801a5d56f29132ab7c0221e52d2aff283f3e96685474",
       "cited_by": [
         "docs/foundations/system-map.md",
+        "docs/kubernetes/inventory-consistency.md",
         "docs/kubernetes/objects-and-control-loops.md"
       ]
     },
@@ -1202,6 +1303,7 @@
       "body_bytes_up_to_limit": 539562,
       "body_sha256": "d5016bc0eb65ebd03fdf3fe32ee1a010f86bc20d4e3445a5433a6349621ac767",
       "cited_by": [
+        "docs/containers/memory-accounting-and-oom.md",
         "docs/kubernetes/resources-and-scheduling.md"
       ]
     },
@@ -1337,6 +1439,7 @@
       "body_bytes_up_to_limit": 608899,
       "body_sha256": "ed4a9eeb5fdc86e55e97eb0e02424948d8606b39f2bc52f7b6d89f8099e6b21b",
       "cited_by": [
+        "docs/containers/memory-accounting-and-oom.md",
         "docs/kubernetes/README.md",
         "docs/kubernetes/pod-lifecycle.md"
       ]
@@ -1352,6 +1455,17 @@
         "docs/kubernetes/operators-and-api-lifecycle.md"
       ]
     },
+    "https://kubernetes.io/docs/reference/access-authn-authz/rbac/": {
+      "status": 200,
+      "final_url": "https://kubernetes.io/docs/reference/access-authn-authz/rbac/",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Using RBAC Authorization | Kubernetes",
+      "body_bytes_up_to_limit": 626239,
+      "body_sha256": "f16cb63489d9a033374de93c36fe6dead69cd439ffdc5bd2242dea3f1a328c87",
+      "cited_by": [
+        "docs/kubernetes/inventory-consistency.md"
+      ]
+    },
     "https://kubernetes.io/docs/reference/using-api/api-concepts/": {
       "status": 200,
       "final_url": "https://kubernetes.io/docs/reference/using-api/api-concepts/",
@@ -1360,8 +1474,7 @@
       "body_bytes_up_to_limit": 631546,
       "body_sha256": "2afbbda581d68307ac27b005df9810c76a845391f87c0d3a97347b026e33aa44",
       "cited_by": [
-        "docs/kubernetes/collection.md",
-        "docs/kubernetes/objects-and-control-loops.md"
+        "docs/kubernetes/collection.md"
       ]
     },
     "https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/": {
@@ -1425,8 +1538,9 @@
       "content_type": "text/html",
       "title": "Azure Monitor metrics aggregation and display explained - Azure Monitor | Microsoft Learn",
       "body_bytes_up_to_limit": 73872,
-      "body_sha256": "38780f0449e767969462234f35e09ac050fda9ba2bb4dec1bf37c7c499e6fffe",
+      "body_sha256": "12695b4e5494f878ddcc8a8d14b7e9eed31ab1f9c615329fc481a282bbecf5e1",
       "cited_by": [
+        "docs/cloud/late-data-and-reconciliation.md",
         "docs/cloud/provider-metrics.md"
       ]
     },
@@ -1436,7 +1550,7 @@
       "content_type": "text/html",
       "title": "What is Azure Resource Manager? - Azure Resource Manager | Microsoft Learn",
       "body_bytes_up_to_limit": 65076,
-      "body_sha256": "fffc20640b9df9e0c68e6a02fb5a739595bc869cf856c5ffcb9eaf96e22e3222",
+      "body_sha256": "73ca9868b8cf2aac7d6443ff64c0f9297398bfafde08f039b428069938de6b42",
       "cited_by": [
         "docs/cloud/resources-and-apis.md"
       ]
@@ -1447,7 +1561,7 @@
       "content_type": "text/html",
       "title": "Debug ThreadPool Starvation - .NET | Microsoft Learn",
       "body_bytes_up_to_limit": 82778,
-      "body_sha256": "d8bdbdae1116c40f6c0a323ebeeeb117a0f7f8e540529e00fc9a400643fa3890",
+      "body_sha256": "8e0479b41dc1560752f0ddedf75f283da83460d9893ea9634c16f3c47f26fb9d",
       "cited_by": [
         "docs/application/managed-runtimes.md"
       ]
@@ -1458,7 +1572,7 @@
       "content_type": "text/html",
       "title": "Fundamentals of garbage collection - .NET | Microsoft Learn",
       "body_bytes_up_to_limit": 72238,
-      "body_sha256": "e17640aec4bb97105955fed568c4f2b04480717334ae97d02914d5c112d0b091",
+      "body_sha256": "5f38d2eb06785237616e81811d2276b3e8ceef5c172b0420e02843a3ac05384c",
       "cited_by": [
         "docs/application/managed-runtimes.md"
       ]
@@ -1469,7 +1583,7 @@
       "content_type": "text/html",
       "title": "Monitor Performance by Using the Query Store - SQL Server | Microsoft Learn",
       "body_bytes_up_to_limit": 76565,
-      "body_sha256": "815c03a828ea037eada46b6f6127dcbad6af0adfaaf3f8ab3d542202245e351b",
+      "body_sha256": "7faffc8803ce356f5ffeaca9e4cc9a0171f03835ccbf41cbc8bb902234ac5585",
       "cited_by": [
         "docs/database/sqlserver-oracle.md"
       ]
@@ -1480,7 +1594,7 @@
       "content_type": "text/html",
       "title": "sys.dm_exec_query_stats (Transact-SQL) - SQL Server | Microsoft Learn",
       "body_bytes_up_to_limit": 79191,
-      "body_sha256": "bf51c487a18d02448ebc4a7055fcdb717e4cf143d9424a71811e0db193d28bab",
+      "body_sha256": "62066e7f6532e9fff92ba577f0e5c1c3ea5e24e1708a150179e4f6953c025006",
       "cited_by": [
         "docs/database/sqlserver-oracle.md"
       ]
@@ -1491,7 +1605,7 @@
       "content_type": "text/html",
       "title": "sys.dm_os_wait_stats (Transact-SQL) - SQL Server | Microsoft Learn",
       "body_bytes_up_to_limit": 286876,
-      "body_sha256": "e5e8b308a2980330aad44a183cc20b5ffe41811ebbbd1c7d384bb8894bd2ca2c",
+      "body_sha256": "dcbf2bc0e7c15f891560f8a58f69c5e68f1978fbeb060f3edc20db7373eb3b76",
       "cited_by": [
         "docs/database/sqlserver-oracle.md"
       ]
@@ -1502,7 +1616,7 @@
       "content_type": "text/html",
       "title": "Isolation modes | Microsoft Learn",
       "body_bytes_up_to_limit": 55068,
-      "body_sha256": "f2671c815ce4cb8f493e53d0821f046cedac34eb4b2176153bad49406f8cc0f6",
+      "body_sha256": "8e7c1f667a3cf3be254be3282cf33bc34916fb0d4a5b68d9e74e958dcd097e6c",
       "cited_by": [
         "docs/containers/platform-differences.md"
       ]
@@ -1513,7 +1627,7 @@
       "content_type": "text/html",
       "title": "Implementing resource controls | Microsoft Learn",
       "body_bytes_up_to_limit": 55538,
-      "body_sha256": "c70b4a432cdf2212b8f5f83178b016ec61e9937ff0d11b5aaf14f35b636083ae",
+      "body_sha256": "b9ab4bb9cb80d8d17728717e2890f6cf4a519e93660aad91d2c31c0ad2125a5a",
       "cited_by": [
         "docs/containers/platform-differences.md"
       ]
@@ -1571,7 +1685,7 @@
       "content_type": "text/html",
       "title": "Working Set - Win32 apps | Microsoft Learn",
       "body_bytes_up_to_limit": 51712,
-      "body_sha256": "b1bd6e922e2c98f3178ad12e4449acf4911de0058da112a14c1f94c51de98bb1",
+      "body_sha256": "f5cf436f6f73f06ee31c9a4eecdad38caa80585107fb3b4398bd6b27c3793c83",
       "cited_by": [
         "docs/host/memory.md"
       ]
@@ -1582,7 +1696,7 @@
       "content_type": "text/html",
       "title": "Using the PDH Functions to Consume Counter Data - Win32 apps | Microsoft Learn",
       "body_bytes_up_to_limit": 49332,
-      "body_sha256": "9565bc893673731c57d871410def96707ce6f49f5fbb0cc706799974fb34a2bf",
+      "body_sha256": "0abc283add72b677ca77eed1e78e6051208bded19035dca920546e3bac87b7b3",
       "cited_by": [
         "docs/host/windows.md"
       ]
@@ -1628,6 +1742,7 @@
       "body_bytes_up_to_limit": 30379,
       "body_sha256": "7d7948bcf8400a786c2795b24e8da979d6e01610f7b8ea6bf1ab97f06205fb69",
       "cited_by": [
+        "docs/foundations/measurement-and-comparability.md",
         "docs/foundations/time-and-data-quality.md"
       ]
     },
@@ -1639,7 +1754,8 @@
       "body_bytes_up_to_limit": 15152,
       "body_sha256": "f0a986d21500222ecb69580fc7a910f346c6b1ff1005ca515501fb05bb5d91f5",
       "cited_by": [
-        "docs/storage/models-and-performance.md"
+        "docs/storage/models-and-performance.md",
+        "docs/storage/write-path-and-durability.md"
       ]
     },
     "https://man7.org/linux/man-pages/man2/getrlimit.2.html": {
@@ -1662,6 +1778,17 @@
       "body_sha256": "ade816073a4c25f6d272fbf628d7bdf6d9a5b4ae76b29f1889cc01420220d523",
       "cited_by": [
         "docs/host/memory.md"
+      ]
+    },
+    "https://man7.org/linux/man-pages/man2/mmap.2.html": {
+      "status": 200,
+      "final_url": "https://man7.org/linux/man-pages/man2/mmap.2.html",
+      "content_type": "text/html",
+      "title": "mmap(2) - Linux manual page",
+      "body_bytes_up_to_limit": 48160,
+      "body_sha256": "86675e35754bc15ac0f392afa4a9fe806b7cfa0770b4df2d04092a084b7774df",
+      "cited_by": [
+        "docs/host/linux-observation-lab.md"
       ]
     },
     "https://man7.org/linux/man-pages/man2/sched_setaffinity.2.html": {
@@ -1706,6 +1833,17 @@
       "body_sha256": "fe247c4fc91a2dafd978157a46fa2a91fa48b902e643d852e8352d78c4b32fd3",
       "cited_by": [
         "docs/host/processes.md"
+      ]
+    },
+    "https://man7.org/linux/man-pages/man2/write.2.html": {
+      "status": 200,
+      "final_url": "https://man7.org/linux/man-pages/man2/write.2.html",
+      "content_type": "text/html",
+      "title": "write(2) - Linux manual page",
+      "body_bytes_up_to_limit": 23203,
+      "body_sha256": "82dd6ad3e998940915d9a9dc92d42afdb64ccb75121d350ae5ee42279d684ccc",
+      "cited_by": [
+        "docs/storage/write-path-and-durability.md"
       ]
     },
     "https://man7.org/linux/man-pages/man5/proc.5.html": {
@@ -1761,7 +1899,9 @@
       "body_bytes_up_to_limit": 10180,
       "body_sha256": "3b0a84bf780199eb2ee9a162cb65ee915aae1c61c5ac071747b70073678cab20",
       "cited_by": [
-        "docs/host/processes.md"
+        "docs/host/linux-observation-lab.md",
+        "docs/host/processes.md",
+        "docs/product/compatibility-and-acceptance.md"
       ]
     },
     "https://man7.org/linux/man-pages/man5/proc_pid_smaps.5.html": {
@@ -1772,6 +1912,8 @@
       "body_bytes_up_to_limit": 11805,
       "body_sha256": "8e52a7789183420f784abb9e935192e9ee2d126f696552b5c2b66cc97bd9d72a",
       "cited_by": [
+        "docs/containers/memory-accounting-and-oom.md",
+        "docs/host/linux-observation-lab.md",
         "docs/host/memory.md"
       ]
     },
@@ -1785,6 +1927,7 @@
       "cited_by": [
         "docs/host/collection-contracts.md",
         "docs/host/cpu.md",
+        "docs/host/linux-observation-lab.md",
         "docs/host/processes.md"
       ]
     },
@@ -1868,6 +2011,17 @@
         "docs/host/cpu.md"
       ]
     },
+    "https://man7.org/linux/man-pages/man7/tcp.7.html": {
+      "status": 200,
+      "final_url": "https://man7.org/linux/man-pages/man7/tcp.7.html",
+      "content_type": "text/html",
+      "title": "tcp(7) - Linux manual page",
+      "body_bytes_up_to_limit": 66969,
+      "body_sha256": "074bc1016ad049b3613476efed68ab08b2a26bf519886074dec4bd2b333e4c13",
+      "cited_by": [
+        "docs/network/dns-and-connection-lifecycle.md"
+      ]
+    },
     "https://man7.org/linux/man-pages/man8/lvm.8.html": {
       "status": 200,
       "final_url": "https://man7.org/linux/man-pages/man8/lvm.8.html",
@@ -1907,7 +2061,7 @@
       "content_type": "text/html",
       "title": "Metrics - Operations Manual",
       "body_bytes_up_to_limit": 108802,
-      "body_sha256": "7ea58a2303ccf235adf139a3ebade3f7bf2c9b9bc65f840f93f0c98894d48655",
+      "body_sha256": "6957cd7b147bc9ba994fa6d4263f6e9359922c701315c73de25756dd7d4b5024",
       "cited_by": [
         "docs/database/specialized-data-models.md"
       ]
@@ -2030,7 +2184,8 @@
       "body_bytes_up_to_limit": 107264,
       "body_sha256": "709bf6c7faf7c3c67b83b2d46b4d1867dc32e8bf1924c088e88c3ca7c031fd2e",
       "cited_by": [
-        "docs/product/self-observation-and-access.md"
+        "docs/product/self-observation-and-access.md",
+        "docs/product/telemetry-delivery-contracts.md"
       ]
     },
     "https://opentelemetry.io/docs/collector/resiliency/": {
@@ -2041,7 +2196,8 @@
       "body_bytes_up_to_limit": 64553,
       "body_sha256": "62c2af8992d80ed758d5ce89ce23f77b252a067bb68f05aab3ea28ce3ec5d9ad",
       "cited_by": [
-        "docs/product/collection-pipelines.md"
+        "docs/product/collection-pipelines.md",
+        "docs/product/telemetry-delivery-contracts.md"
       ]
     },
     "https://opentelemetry.io/docs/concepts/context-propagation/": {
@@ -2063,6 +2219,7 @@
       "body_bytes_up_to_limit": 415320,
       "body_sha256": "da8c8a737b1c85490e5fc3ee7b6e5e7d360f89293bd51233aa25912e652974ef",
       "cited_by": [
+        "docs/application/trace-sampling-and-context.md",
         "docs/foundations/performance-and-statistics.md",
         "docs/foundations/traces-logs-profiles.md"
       ]
@@ -2110,8 +2267,10 @@
       "body_bytes_up_to_limit": 167054,
       "body_sha256": "ad9e694a6a648b29533d42ed671e267b97180ec564fffd3483df8be9609428c7",
       "cited_by": [
+        "docs/foundations/measurement-and-comparability.md",
         "docs/foundations/time-series.md",
-        "docs/product/adapter-contracts.md"
+        "docs/product/adapter-contracts.md",
+        "docs/product/compatibility-and-acceptance.md"
       ]
     },
     "https://opentelemetry.io/docs/specs/otel/resource/sdk/": {
@@ -2133,7 +2292,19 @@
       "body_bytes_up_to_limit": 120640,
       "body_sha256": "80d0ca6faac98a62eecc4a6d1e61ed8071d13d46494a446443f89e6bb5a929c0",
       "cited_by": [
+        "docs/application/trace-sampling-and-context.md",
         "docs/foundations/traces-logs-profiles.md"
+      ]
+    },
+    "https://opentelemetry.io/docs/specs/otel/trace/sdk/": {
+      "status": 200,
+      "final_url": "https://opentelemetry.io/docs/specs/otel/trace/sdk/",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Tracing SDK | OpenTelemetry",
+      "body_bytes_up_to_limit": 155513,
+      "body_sha256": "290ea5e4fc937b3f82ae1abee4a7428ce87a33a4a252febeb9d44324995334fd",
+      "cited_by": [
+        "docs/application/trace-sampling-and-context.md"
       ]
     },
     "https://opentelemetry.io/docs/specs/otlp/": {
@@ -2145,7 +2316,8 @@
       "body_sha256": "7417ab2133f57373a5a31b7af04dc129f78cd11c0724f354392647e092c711ec",
       "cited_by": [
         "docs/product/capacity-and-loss-budgets.md",
-        "docs/product/collection-pipelines.md"
+        "docs/product/collection-pipelines.md",
+        "docs/product/telemetry-delivery-contracts.md"
       ]
     },
     "https://opentelemetry.io/docs/specs/semconv/http/http-spans/": {
@@ -2198,7 +2370,7 @@
       "content_type": "text/html",
       "title": "Definitions of the SI units: The binary prefixes",
       "body_bytes_up_to_limit": 14830,
-      "body_sha256": "7760f68902f768e4af5e826456d559387ec57952ff981b4fc23ef296837cb579",
+      "body_sha256": "02d85a6e9fd1d99e7247ef9270fe87b263ed85fc13d5ec6582a99fc8b9777936",
       "cited_by": [
         "docs/metric-catalog.md"
       ]
@@ -2256,7 +2428,7 @@
       "content_type": "text/html; charset=UTF-8",
       "title": "Security model | Prometheus",
       "body_bytes_up_to_limit": 230759,
-      "body_sha256": "ef0874650266fe2e051d16711b9b3ed2a04c24e71749bff3da7544182439d08d",
+      "body_sha256": "19985b96f89dadb1e8cd46f6a0f7ea6f5289edc4aecc55065d8ed8e270cbfb20",
       "cited_by": [
         "docs/product/self-observation-and-access.md"
       ]
@@ -2339,6 +2511,7 @@
       "body_sha256": "8389c77749694f01dd5a582a194ed51f3bcc5fefca5cf434bf95d1c877d65917",
       "cited_by": [
         "docs/foundations/distributions.md",
+        "docs/foundations/measurement-and-comparability.md",
         "docs/foundations/time-series.md",
         "docs/product/adapter-contracts.md"
       ]
@@ -2364,7 +2537,8 @@
       "separate_web_review": {
         "date": "2026-10-04",
         "result": "Official content retrieved through web browsing; direct Python HTTP request was denied.",
-        "scope": "content review, not guaranteed future reachability"
+        "scope": "content review, not guaranteed future reachability",
+        "retained_from_edition": "1.0"
       }
     },
     "https://pulsar.apache.org/docs/4.0.x/concepts-messaging/": {
@@ -2488,13 +2662,37 @@
         "docs/application/servers-and-pools.md"
       ]
     },
+    "https://v1-34.docs.kubernetes.io/docs/reference/using-api/api-concepts/": {
+      "status": 200,
+      "final_url": "https://v1-34.docs.kubernetes.io/docs/reference/using-api/api-concepts/",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Kubernetes API Concepts | Kubernetes",
+      "body_bytes_up_to_limit": 578810,
+      "body_sha256": "8cd8b9e0c2ef6804f0511a820bfcbcbcbdf842493154ce082644fbdd8d1b0555",
+      "cited_by": [
+        "docs/kubernetes/inventory-consistency.md",
+        "docs/kubernetes/objects-and-control-loops.md"
+      ]
+    },
+    "https://v1-35.docs.kubernetes.io/docs/reference/using-api/api-concepts/": {
+      "status": 200,
+      "final_url": "https://v1-35.docs.kubernetes.io/docs/reference/using-api/api-concepts/",
+      "content_type": "text/html; charset=UTF-8",
+      "title": "Kubernetes API Concepts | Kubernetes",
+      "body_bytes_up_to_limit": 597536,
+      "body_sha256": "4d4a2e67f7b896d5116ad9529e9bfd08a923cede98597a8b302472d135f91474",
+      "cited_by": [
+        "docs/kubernetes/inventory-consistency.md",
+        "docs/kubernetes/objects-and-control-loops.md"
+      ]
+    },
     "https://web.dev/articles/vitals": {
       "status": 200,
       "final_url": "https://web.dev/articles/vitals",
       "content_type": "text/html; charset=utf-8",
       "title": "Web Vitals | Articles | web.dev",
       "body_bytes_up_to_limit": 143701,
-      "body_sha256": "a7291ffd952cd7fc95ccddff3788c5248ba1402584e8e06bee21af201fa40631",
+      "body_sha256": "a8e79181f06ed919b53bd14bcd7988266f352498641496b27854fdda59272053",
       "cited_by": [
         "docs/application/user-experience.md"
       ]
@@ -2571,7 +2769,7 @@
       "content_type": "text/html; charset=utf-8",
       "title": "7.2.6.2. Percentiles",
       "body_bytes_up_to_limit": 12109,
-      "body_sha256": "7eca54379124c8ed19a454b4c9a0dcda862ec3e02e734f5b1945de3a70492b77",
+      "body_sha256": "54dd102ff723724f844d19018543523a73ac66795da1e259e4c272bcc6d99cac",
       "cited_by": [
         "docs/foundations/performance-and-statistics.md"
       ]
@@ -2653,6 +2851,17 @@
         "docs/database/replication-and-recovery.md"
       ]
     },
+    "https://www.postgresql.org/docs/18/errcodes-appendix.html": {
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/18/errcodes-appendix.html",
+      "content_type": "text/html; charset=utf-8",
+      "title": "PostgreSQL: Documentation: 18: Appendix A. PostgreSQL Error Codes",
+      "body_bytes_up_to_limit": 66308,
+      "body_sha256": "c28dbb67e01f08afb36b368b491847f52bfc1e7bf1ff87e9ebe91b269c295ecf",
+      "cited_by": [
+        "docs/database/postgresql-concurrency-lab.md"
+      ]
+    },
     "https://www.postgresql.org/docs/18/explicit-locking.html": {
       "status": 200,
       "final_url": "https://www.postgresql.org/docs/18/explicit-locking.html",
@@ -2661,6 +2870,7 @@
       "body_bytes_up_to_limit": 46832,
       "body_sha256": "925329b24d43123ec809da21555d0bc61e1daffd5114038fca6e62c1262fcc4b",
       "cited_by": [
+        "docs/database/postgresql-concurrency-lab.md",
         "docs/database/transactions-and-locks.md"
       ]
     },
@@ -2672,7 +2882,9 @@
       "body_bytes_up_to_limit": 182405,
       "body_sha256": "98b62219435d063cbfa727d58ad8be380ce289e148d3979a3687b689e646edb1",
       "cited_by": [
-        "docs/database/collection-contracts.md"
+        "docs/database/collection-contracts.md",
+        "docs/database/postgresql-concurrency-lab.md",
+        "docs/product/compatibility-and-acceptance.md"
       ]
     },
     "https://www.postgresql.org/docs/18/indexes-multicolumn.html": {
@@ -2707,9 +2919,11 @@
       "cited_by": [
         "docs/database/README.md",
         "docs/database/collection-contracts.md",
+        "docs/database/postgresql-concurrency-lab.md",
         "docs/database/postgresql.md",
         "docs/database/queries-and-indexes.md",
-        "docs/database/replication-and-recovery.md"
+        "docs/database/replication-and-recovery.md",
+        "docs/product/compatibility-and-acceptance.md"
       ]
     },
     "https://www.postgresql.org/docs/18/pgstatstatements.html": {
@@ -2732,7 +2946,8 @@
       "body_bytes_up_to_limit": 20631,
       "body_sha256": "4b37beac59cb870ae39967127a026c03c35626f9228c8c7df1814eca203ad3d9",
       "cited_by": [
-        "docs/database/collection-contracts.md"
+        "docs/database/collection-contracts.md",
+        "docs/database/postgresql-concurrency-lab.md"
       ]
     },
     "https://www.postgresql.org/docs/18/routine-vacuuming.html": {
@@ -2747,6 +2962,17 @@
         "docs/database/transactions-and-locks.md"
       ]
     },
+    "https://www.postgresql.org/docs/18/runtime-config-client.html": {
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/18/runtime-config-client.html",
+      "content_type": "text/html; charset=utf-8",
+      "title": "PostgreSQL: Documentation: 18: 19.11. Client Connection Defaults",
+      "body_bytes_up_to_limit": 80403,
+      "body_sha256": "c898282005582247c9a2fdd0aea1878cd3f95cb857e25206e1efe590ce73c0d5",
+      "cited_by": [
+        "docs/database/postgresql-concurrency-lab.md"
+      ]
+    },
     "https://www.postgresql.org/docs/18/runtime-config-wal.html": {
       "status": 200,
       "final_url": "https://www.postgresql.org/docs/18/runtime-config-wal.html",
@@ -2756,7 +2982,19 @@
       "body_sha256": "d57738d8f3b859a5996f90008f20c82f890bbd1f96dc27e03b167a95be3a4ce2",
       "cited_by": [
         "docs/database/high-availability.md",
-        "docs/database/replication-and-recovery.md"
+        "docs/database/replication-and-recovery.md",
+        "docs/storage/write-path-and-durability.md"
+      ]
+    },
+    "https://www.postgresql.org/docs/18/sql-rollback-to.html": {
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/18/sql-rollback-to.html",
+      "content_type": "text/html; charset=utf-8",
+      "title": "PostgreSQL: Documentation: 18: ROLLBACK TO SAVEPOINT",
+      "body_bytes_up_to_limit": 17888,
+      "body_sha256": "bf6f4487855135e35b7d5184b7ccf45d8c64505e914d8f47f9967bea5171bd08",
+      "cited_by": [
+        "docs/database/postgresql-concurrency-lab.md"
       ]
     },
     "https://www.postgresql.org/docs/18/transaction-iso.html": {
@@ -2767,6 +3005,7 @@
       "body_bytes_up_to_limit": 47648,
       "body_sha256": "4c16a22994318c58cecb39d30466ef181837ed071d6917b0a75748711d42a4d1",
       "cited_by": [
+        "docs/database/postgresql-concurrency-lab.md",
         "docs/database/transactions-and-locks.md"
       ]
     },
@@ -2792,6 +3031,17 @@
         "docs/database/queries-and-indexes.md"
       ]
     },
+    "https://www.postgresql.org/docs/18/wal-async-commit.html": {
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/18/wal-async-commit.html",
+      "content_type": "text/html; charset=utf-8",
+      "title": "PostgreSQL: Documentation: 18: 28.4. Asynchronous Commit",
+      "body_bytes_up_to_limit": 19540,
+      "body_sha256": "4238510d865880f6f8908406048296218c7e03f52092dae910dd35d2cef914ab",
+      "cited_by": [
+        "docs/storage/write-path-and-durability.md"
+      ]
+    },
     "https://www.postgresql.org/docs/18/wal-intro.html": {
       "status": 200,
       "final_url": "https://www.postgresql.org/docs/18/wal-intro.html",
@@ -2800,7 +3050,19 @@
       "body_bytes_up_to_limit": 16648,
       "body_sha256": "b1993f7701ce24e41e804d849367faad1719172b7e7fa73e6b4fed456823f95b",
       "cited_by": [
-        "docs/database/replication-and-recovery.md"
+        "docs/database/replication-and-recovery.md",
+        "docs/storage/write-path-and-durability.md"
+      ]
+    },
+    "https://www.postgresql.org/docs/18/wal-reliability.html": {
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/18/wal-reliability.html",
+      "content_type": "text/html; charset=utf-8",
+      "title": "PostgreSQL: Documentation: 18: 28.1. Reliability",
+      "body_bytes_up_to_limit": 24108,
+      "body_sha256": "9179970698e3f7c9a31065cb5924c47d59db3f307b10f64ffc4ade8e81e3b2c9",
+      "cited_by": [
+        "docs/storage/write-path-and-durability.md"
       ]
     },
     "https://www.postgresql.org/docs/18/warm-standby-failover.html": {
@@ -2823,6 +3085,17 @@
       "body_sha256": "2a98c532cb7ba62a7a40b1fe2735db807f7dcf50a99e99302c8cbc8d0e3ae7e7",
       "cited_by": [
         "docs/database/replication-and-recovery.md"
+      ]
+    },
+    "https://www.postgresql.org/download/linux/ubuntu/": {
+      "status": 200,
+      "final_url": "https://www.postgresql.org/download/linux/ubuntu/",
+      "content_type": "text/html; charset=utf-8",
+      "title": "PostgreSQL: Linux downloads (Ubuntu)",
+      "body_bytes_up_to_limit": 9751,
+      "body_sha256": "14cfa7462e086efc6980697ecbe7fe703a215b1832f050e043b379b353e41289",
+      "cited_by": [
+        "docs/database/postgresql-concurrency-lab.md"
       ]
     },
     "https://www.rabbitmq.com/docs/confirms": {
@@ -2888,7 +3161,8 @@
       "body_bytes_up_to_limit": 46858,
       "body_sha256": "613de9d15f9db4556f4a245dc0a1efa927cca7e02c605dcb080e778965c407ed",
       "cited_by": [
-        "docs/network/addressing-routing-dns.md"
+        "docs/network/addressing-routing-dns.md",
+        "docs/network/dns-and-connection-lifecycle.md"
       ]
     },
     "https://www.rfc-editor.org/rfc/rfc2328.html": {
@@ -3112,6 +3386,17 @@
         "docs/network/layers-and-routing.md"
       ]
     },
+    "https://www.rfc-editor.org/rfc/rfc8305.html": {
+      "status": 200,
+      "final_url": "https://www.rfc-editor.org/rfc/rfc8305.html",
+      "content_type": "text/html",
+      "title": "",
+      "body_bytes_up_to_limit": 42675,
+      "body_sha256": "991de824527ae7f7e0662e814e3b06bd5350063ae5f24db343d396451394ed14",
+      "cited_by": [
+        "docs/network/dns-and-connection-lifecycle.md"
+      ]
+    },
     "https://www.rfc-editor.org/rfc/rfc8365.html": {
       "status": 200,
       "final_url": "https://www.rfc-editor.org/rfc/rfc8365.html",
@@ -3168,6 +3453,17 @@
         "docs/application/timeouts-and-retries.md",
         "docs/foundations/system-map.md",
         "docs/network/tls-http.md"
+      ]
+    },
+    "https://www.rfc-editor.org/rfc/rfc9112.html": {
+      "status": 200,
+      "final_url": "https://www.rfc-editor.org/rfc/rfc9112.html",
+      "content_type": "text/html",
+      "title": "RFC 9112: HTTP/1.1",
+      "body_bytes_up_to_limit": 280426,
+      "body_sha256": "587ec383523df5a9713f2f4192199876af1d6d4a260ce996e0a1f9e4f19dde42",
+      "cited_by": [
+        "docs/network/dns-and-connection-lifecycle.md"
       ]
     },
     "https://www.rfc-editor.org/rfc/rfc9113.html": {
@@ -3267,6 +3563,7 @@
       "body_bytes_up_to_limit": 100612,
       "body_sha256": "9e7228d2a91c5aa4bef6e7f610366a2000274ee51699053e10c8ac3f0b8965be",
       "cited_by": [
+        "docs/application/trace-sampling-and-context.md",
         "docs/foundations/traces-logs-profiles.md"
       ]
     }

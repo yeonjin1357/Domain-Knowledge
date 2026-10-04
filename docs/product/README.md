@@ -57,10 +57,12 @@
 
 1. [관측 대상의 식별과 시간에 따른 관계](entities-and-topology.md)
 2. [수집, 변환, 전송과 유실의 경계](collection-pipelines.md)
-3. [텔레메트리 저장과 조회의 의미](storage-and-query.md)
-4. [알림 조건, 상태, 통지와 장애 사건](alerts-and-incidents.md)
-5. [모니터링 제품 자체의 관측과 접근 경계](self-observation-and-access.md)
-6. [어댑터 계약: 서로 다른 원천을 정확히 연결하는 규칙](adapter-contracts.md)
-7. [모니터링 제품의 용량과 손실 예산](capacity-and-loss-budgets.md)
+3. [관측 데이터 전송 계약: 부분 성공, 재시도와 중복](telemetry-delivery-contracts.md)
+4. [텔레메트리 저장과 조회의 의미](storage-and-query.md)
+5. [알림 조건, 상태, 통지와 장애 사건](alerts-and-incidents.md)
+6. [모니터링 제품 자체의 관측과 접근 경계](self-observation-and-access.md)
+7. [어댑터 계약: 서로 다른 원천을 정확히 연결하는 규칙](adapter-contracts.md)
+8. [어댑터를 지원한다고 말하기 전에: 필드 계약과 검증 근거](compatibility-and-acceptance.md)
+9. [모니터링 제품의 용량과 손실 예산](capacity-and-loss-budgets.md)
 
 관련 문서: [공통 개념](../foundations/README.md), [도메인 간 분석](../cross-domain/README.md), [지표 템플릿](../../templates/metric.md)

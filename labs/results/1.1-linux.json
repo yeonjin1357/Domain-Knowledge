@@ -1,0 +1,148 @@
+{
+  "run_at_utc": "2026-10-04T02:17:33.193070+00:00",
+  "kernel": "6.18.33.2-microsoft-standard-WSL2",
+  "python": "3.12.3",
+  "environment": "Linux; WSL if identified in kernel release",
+  "experiments": {
+    "process_name_parsing": {
+      "status": "passed",
+      "observed_comm": "dk ) worker",
+      "starttime_ticks": 41664266
+    },
+    "cpu_accounting": {
+      "status": "passed",
+      "clock_ticks_per_second": 100,
+      "first": {
+        "pid": 773819,
+        "comm": "python3",
+        "state": "R",
+        "utime_ticks": 2,
+        "stime_ticks": 0,
+        "starttime_ticks": 41664266,
+        "vsize_bytes": 25604096,
+        "rss_pages": 4618
+      },
+      "second": {
+        "pid": 773819,
+        "comm": "python3",
+        "state": "R",
+        "utime_ticks": 13,
+        "stime_ticks": 10,
+        "starttime_ticks": 41664266,
+        "vsize_bytes": 25604096,
+        "rss_pages": 4618
+      },
+      "delta_ticks": 21,
+      "cpu_seconds": 0.21,
+      "wall_seconds": 0.1888568119611591,
+      "process_clock_seconds": 0.200003951,
+      "mean_cpu_cores": 1.1119535367524327,
+      "interpretation": "short self-process observation, not whole Windows host or performance benchmark",
+      "additional_intervals": [
+        {
+          "target_wall_seconds": 1.0,
+          "wall_seconds": 1.00000632397132,
+          "process_clock_seconds": 1.059344544,
+          "delta_ticks": 106,
+          "accounting_ratio": 1.0599932966327927
+        },
+        {
+          "target_wall_seconds": 2.0,
+          "wall_seconds": 2.0000049769878387,
+          "process_clock_seconds": 2.118634104,
+          "delta_ticks": 212,
+          "accounting_ratio": 1.0599973622030097
+        }
+      ],
+      "clock_implementations": {
+        "monotonic": {
+          "implementation": "clock_gettime(CLOCK_MONOTONIC)",
+          "monotonic": true,
+          "adjustable": false,
+          "resolution": 1e-09
+        },
+        "process_time": {
+          "implementation": "clock_gettime(CLOCK_PROCESS_CPUTIME_ID)",
+          "monotonic": true,
+          "adjustable": false,
+          "resolution": 1e-09
+        }
+      },
+      "quality_note": "Ratios compare independently sampled clock/accounting sources; retain values, do not silently clamp or infer hardware throughput."
+    },
+    "virtual_vs_resident": {
+      "status": "passed",
+      "requested_bytes": 33554432,
+      "page_size_bytes": 4096,
+      "after_mapping_before_touch": {
+        "Size_KiB": 32768,
+        "Rss_KiB": 0,
+        "Pss_KiB": 0,
+        "Private_Dirty_KiB": 0,
+        "Anonymous_KiB": 0,
+        "AnonHugePages_KiB": 0
+      },
+      "after_touch": {
+        "Size_KiB": 32768,
+        "Rss_KiB": 32768,
+        "Pss_KiB": 32768,
+        "Private_Dirty_KiB": 32768,
+        "Anonymous_KiB": 32768,
+        "AnonHugePages_KiB": 0
+      },
+      "interpretation": "mapping can merge with adjacent mappings; not a leak or cgroup OOM experiment"
+    },
+    "logical_vs_storage_io": {
+      "status": "passed",
+      "payload_bytes": 1048576,
+      "before": {
+        "rchar": 1613795,
+        "wchar": 36,
+        "syscr": 460,
+        "syscw": 2,
+        "read_bytes": 237490,
+        "write_bytes": 4096,
+        "cancelled_write_bytes": 4096
+      },
+      "after_write_and_fsync": {
+        "rchar": 1613905,
+        "wchar": 1048612,
+        "syscr": 462,
+        "syscw": 3,
+        "read_bytes": 241586,
+        "write_bytes": 1052672,
+        "cancelled_write_bytes": 4096
+      },
+      "after_two_reads": {
+        "rchar": 3711175,
+        "wchar": 1048612,
+        "syscr": 468,
+        "syscw": 3,
+        "read_bytes": 241586,
+        "write_bytes": 1052672,
+        "cancelled_write_bytes": 4096
+      },
+      "interpretation": "own proc-file reads also contribute to rchar; no cache was dropped"
+    },
+    "cgroup_read_only": {
+      "status": "observed",
+      "membership": "0::/init.scope",
+      "fields": {
+        "cpu.stat": "usage_usec 17609116998\nuser_usec 10457959715\nsystem_usec 7151157283\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0",
+        "cpu.max": "max 100000",
+        "cpuset.cpus.effective": {
+          "unavailable": "FileNotFoundError"
+        },
+        "memory.current": "9320476672",
+        "memory.max": "max",
+        "memory.high": "max",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+        "memory.events.local": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+        "memory.swap.current": "0",
+        "memory.swap.max": "max"
+      },
+      "interpretation": "existing group may contain other processes; no isolated cgroup workload or limit experiment"
+    }
+  },
+  "script_sha256": "aaa96961e9be62b9e749c41338cd02435b0d1c1233a22d135958553961dab861"
+}

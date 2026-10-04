@@ -1,6 +1,6 @@
 # 호스트 수집 명세: 원천 필드에서 지표까지
 
-> 상태: 검토됨 · 적용 범위: Linux procfs·cgroup v2와 Windows API · 검토일: 2026-10-04 · Linux 명령은 문서 검토, Windows API 일부는 로컬 실험
+> 상태: 검토됨 · 적용 범위: Linux procfs·cgroup v2와 Windows API · 검토일: 2026-10-04 · 원천 규약 검토, Linux 자기 프로세스·기존 cgroup과 Windows API 일부는 로컬 실험
 
 수집기는 숫자를 읽는 프로그램이면서 그 숫자의 뜻을 보존하는 프로그램입니다. 예를 들어 원천에 `1024`가 있어도 단위가 kB인지 page인지 byte인지 모르면 정확한 지표를 만들 수 없습니다. 이 장은 모니터링 제품의 첫 어댑터를 구현할 때 사용할 최소 계약을 제안합니다. 표의 정규화 이름은 이 책의 설계 예시이며 특정 exporter의 공식 이름이 아닙니다.
 
@@ -18,6 +18,8 @@
 | `GetSystemTimes` | 100ns 누적 시간 | kernel에는 idle 포함; API의 CPU group 범위 | 두 표본의 차분, 총시간 0은 결측 |
 
 Linux 정의는 [proc stat](https://man7.org/linux/man-pages/man5/proc_stat.5.html), [PID stat](https://man7.org/linux/man-pages/man5/proc_pid_stat.5.html), [meminfo](https://man7.org/linux/man-pages/man5/proc_meminfo.5.html), [디스크 통계](https://docs.kernel.org/admin-guide/iostats.html), [cgroup v2](https://docs.kernel.org/admin-guide/cgroup-v2.html)에 근거합니다. Windows는 [GetSystemTimes](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getsystemtimes)를 사용합니다. 다른 API의 단위를 이 표에서 추측하지 않습니다.
+
+[Linux 실습](linux-observation-lab.md)은 자기 프로세스의 stat·smaps·io와 기존 cgroup 읽기를 확인했습니다. 이 표의 모든 호스트 필드나 제한 동작을 실행 검증한 것은 아닙니다. 실제 CPU 계정과 경과 시계의 미해결 차이도 원시값과 함께 보존했습니다.
 
 ## 읽기 한 번이 하나의 원자적 스냅샷은 아니다
 
