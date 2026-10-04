@@ -1,6 +1,6 @@
 # 모니터링 공통 개념
 
-> 상태: 초안 · 적용 범위: 도메인 공통, 일부 Prometheus 예시 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: 도메인 공통, 일부 Prometheus 예시 · 출처 확인일: 2026-10-03
 
 통합 모니터링에서 여러 도메인의 데이터를 함께 읽으려면 무엇을, 어디에서, 언제, 어떤 방식으로 관측했는지 알아야 합니다. 이 문서는 도메인별 설명에서 공통으로 사용할 출발점을 정리합니다.
 
@@ -46,10 +46,13 @@ Prometheus에서 Counter는 재시작 시 초기화될 수 있는 누적 증가�
 
 ## 상세 본문
 
-1. [시계열과 지표 데이터 모델](time-series.md): 누적·현재·구간 값, rate, 카디널리티
-2. [평균과 백분위수 및 분포 집계](distributions.md): 가중 평균, 히스토그램, 비율 계산
-3. [서비스 수준 지표와 오류 예산](service-level-objectives.md): SLI·SLO, 오류 예산, Burn rate
-4. [시간과 관측 데이터 품질](time-and-data-quality.md): 시계, 누락, 최신성, 중복과 지연
-5. [트레이스와 로그 및 프로파일](traces-logs-profiles.md): 문맥 전파, 병렬 구간, 샘플링의 편향
+1. [처음 읽는 시스템 지도: 요청 하나가 지나가는 길](system-map.md)
+2. [시계열과 지표의 데이터 모델](time-series.md)
+3. [평균과 백분위수 및 분포의 집계](distributions.md)
+4. [성능을 읽는 순서: 처리량, 대기열, 표본과 실험](performance-and-statistics.md)
+5. [서비스 수준 지표와 오류 예산](service-level-objectives.md)
+6. [시간과 관측 데이터의 품질](time-and-data-quality.md)
+7. [트레이스와 로그 및 프로파일의 연결](traces-logs-profiles.md)
+8. [분산 시스템: 복제, 합의, 시간과 불확실한 결과](distributed-systems.md)
 
 관련 문서: [지표 명세 템플릿](../../templates/metric.md), [도메인 간 장애 분석](../cross-domain/README.md)

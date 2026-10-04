@@ -1,6 +1,6 @@
 # 도메인 지식을 제품 설계에 연결하기
 
-> 상태: 초안 · 적용 범위: 통합 모니터링 제품 설계 제안 · 현재 구현 명세: 아님
+> 상태: 검토됨 · 적용 범위: 통합 모니터링 제품 설계 제안 · 현재 구현 명세: 아님
 
 이 문서는 도메인 지식을 수집·저장·조회·화면·알림 설계에 연결할 때 결정해야 할 항목을 정리합니다. 특정 기술 스택을 전제하지 않으며, 실제 결정이 생기면 근거와 적용 범위를 기록합니다.
 
@@ -55,12 +55,12 @@
 
 ## 상세 본문
 
-1. [대상 식별과 관계](entities-and-topology.md): 논리·실행 대상, 고유 ID, 과거 토폴로지
-2. [수집 파이프라인](collection-pipelines.md): 배치, 변환, OTLP, 버퍼·재시도·유실
-3. [저장과 조회](storage-and-query.md): 보존량 계산, 해상도, 집계와 신호 연결
-4. [알림과 사건](alerts-and-incidents.md): 평가·상태·통지, 무자료 처리, 그룹화
-5. [자체 관측과 접근](self-observation-and-access.md): 데이터 완전성·최신성, tenant, 연동 검증
-
-공통 모델은 제안이며 현재 제품의 확정 구현을 추정하지 않습니다. 원천별 명세 작성에는 [지표 참조표](../metric-catalog.md)를 활용합니다.
+1. [관측 대상의 식별과 시간에 따른 관계](entities-and-topology.md)
+2. [수집, 변환, 전송과 유실의 경계](collection-pipelines.md)
+3. [텔레메트리 저장과 조회의 의미](storage-and-query.md)
+4. [알림 조건, 상태, 통지와 장애 사건](alerts-and-incidents.md)
+5. [모니터링 제품 자체의 관측과 접근 경계](self-observation-and-access.md)
+6. [어댑터 계약: 서로 다른 원천을 정확히 연결하는 규칙](adapter-contracts.md)
+7. [모니터링 제품의 용량과 손실 예산](capacity-and-loss-budgets.md)
 
 관련 문서: [공통 개념](../foundations/README.md), [도메인 간 분석](../cross-domain/README.md), [지표 템플릿](../../templates/metric.md)

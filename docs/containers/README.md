@@ -1,6 +1,6 @@
 # 컨테이너 도메인
 
-> 상태: 초안 · 적용 범위: 컨테이너 공통 개요, Linux cgroup v2 예시 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: 컨테이너 공통 개요, Linux cgroup v2 예시 · 출처 확인일: 2026-10-03
 
 컨테이너 영역에서는 격리된 실행 환경과 자원 제어를 이해합니다. Kubernetes를 사용하지 않는 환경에서도 필요한 지식이므로 독립 도메인으로 다룹니다.
 
@@ -33,10 +33,9 @@ cgroup은 프로세스를 계층적으로 묶어 시스템 자원을 제어하�
 
 ## 상세 본문
 
-1. [컨테이너 격리와 실행 수명](isolation-and-lifecycle.md): namespace, 이미지, OCI 상태, 식별 범위
-2. [CPU와 메모리 자원 제어](resource-control.md): cgroup v2, quota, throttling, 메모리 경계
-3. [파일시스템과 볼륨](filesystems.md): 이미지 공유, 쓰기 계층, copy-up, 용량 계산
-
-cgroup v1의 전체 필드 대응, 런타임별 실행 검증, Windows 컨테이너의 상세 차이는 추가 범위입니다.
+1. [컨테이너의 격리와 실행 수명](isolation-and-lifecycle.md)
+2. [컨테이너 CPU와 메모리 자원 제어](resource-control.md)
+3. [컨테이너 파일시스템, 쓰기 계층과 볼륨](filesystems.md)
+4. [컨테이너 수집의 플랫폼 차이: cgroup v1·v2와 Windows](platform-differences.md)
 
 관련 문서: [호스트](../host/README.md), [쿠버네티스](../kubernetes/README.md), [애플리케이션](../application/README.md)

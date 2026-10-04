@@ -1,6 +1,10 @@
 # 로그, 지속성, 복제와 복구
 
-> 상태: 본문 초안 · 적용 범위: 공통 복구 모델과 PostgreSQL 18 사례 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: 공통 복구 모델과 PostgreSQL 18 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+
+## 먼저 이해할 것
+
+복제는 변경을 다른 사본에 전달하고, 복구는 저장된 로그와 데이터로 원하는 상태를 되찾는 과정입니다. 변경을 보낸 것, 받은 것, 저장한 것, 읽을 수 있게 적용한 것은 서로 다른 단계입니다. 데이터 손실 목표와 복구 시간 목표도 각각 정의해야 합니다.
 
 저장 성공, 복제 전송, 복제 적용, 백업 성공은 서로 다른 단계입니다. 제품은 어느 실패 범위에서 어떤 데이터를 보존하는지를 드러내야 합니다.
 
@@ -12,7 +16,7 @@ Write-Ahead Logging은 데이터 파일 변경을 영구 저장하기 전에 해
 
 ## 성공 응답의 경계
 
-PostgreSQL의 `synchronous_commit`은 성공 응답 전에 어느 WAL 처리까지 기다릴지를 설정합니다. `off`에서는 최근 성공 응답된 트랜잭션이 충돌로 유실될 수 있습니다. 동기 standby가 설정된 경우 `on`은 해당 standby의 영구 저장, `remote_apply`는 적용까지 기다리는 의미를 가집니다. 동기 standby 설정이 없으면 이름만으로 원격 보장을 얻지 않습니다. [PostgreSQL WAL Configuration](https://www.postgresql.org/docs/18/runtime-config-wal.html)
+PostgreSQL의 `synchronous_commit`은 성공 응답 전에 어느 WAL 처리까지 기다릴지를 설정합니다. `off`에서는 서버가 비정상 종료되면 최근 성공 응답된 트랜잭션이 유실될 수 있습니다. 동기 standby가 설정된 경우 `on`은 해당 standby의 영구 저장, `remote_apply`는 적용까지 기다리는 의미를 가집니다. 동기 standby 설정이 없으면 이름만으로 원격 보장을 얻지 않습니다. [PostgreSQL WAL Configuration](https://www.postgresql.org/docs/18/runtime-config-wal.html)
 
 이 예는 설정 이름이 실제 보장과 함께 읽혀야 함을 보여 줍니다. 모든 엔진에서 같은 옵션 이름이나 기본값을 사용한다고 일반화하지 않습니다.
 

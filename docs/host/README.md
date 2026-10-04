@@ -1,6 +1,6 @@
 # 호스트 도메인
 
-> 상태: 초안 · 적용 범위: 호스트 공통 개요, Linux 설명 예시 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: 호스트 공통 개요, Linux 설명 예시 · 출처 확인일: 2026-10-03
 
 호스트 영역에서는 애플리케이션과 DB가 실행되는 운영체제 및 자원의 상태를 다룹니다. 첫 번째 목표는 어떤 자원을 얼마나 쓰는지 파악하고, 두 번째 목표는 자원 때문에 작업이 지연되는지 확인하는 것입니다.
 
@@ -43,14 +43,14 @@ PSI는 CPU·메모리·I/O 자원 경합으로 작업이 멈춘 시간의 영향
 
 ## 상세 본문
 
-1. [CPU 실행 시간과 스케줄링 대기](cpu.md): 사용률 분모, load, PSI, 다중 CPU
-2. [메모리와 가상 주소 공간](memory.md): RSS·PSS, 가용량, 스왑, 메모리 약속
-3. [블록 I/O와 파일시스템 용량](disk-io.md): IOPS·처리량·지연, 장치와 마운트
-4. [프로세스와 스레드 및 FD](processes.md): 실행 수명, 상태, I/O 포함 범위
-5. [Windows 관측](windows.md): System·Process 시간, Working Set, Commit, PDH
-6. [가상화](virtualization.md): 호스트·하이퍼바이저·게스트, VM 통계와 이동 이력
-7. [GPU와 가속기](gpu.md): 활동률·메모리 사용량, MIG, DCGM·AMD SMI의 관측 경계
-
-다른 Unix 계열, 하이퍼바이저 제품별 성능 카운터 전체 대응, 가속기별 실제 수집 검증은 [추가 범위](../coverage.md)에 구분합니다.
+1. [CPU 실행 시간과 스케줄링 대기](cpu.md)
+2. [메모리와 가상 주소 공간 및 메모리 압력](memory.md)
+3. [블록 I/O와 파일시스템 용량](disk-io.md)
+4. [프로세스와 스레드 및 파일 디스크립터](processes.md)
+5. [Windows의 CPU와 메모리 관측](windows.md)
+6. [가상화: 호스트, 하이퍼바이저와 게스트](virtualization.md)
+7. [GPU와 가속기: 활동, 메모리와 분할](gpu.md)
+8. [CPU와 메모리의 위치: NUMA, 캐시, 스케줄링과 압력](numa-and-pressure.md)
+9. [호스트 수집 명세: 원천 필드에서 지표까지](collection-contracts.md)
 
 관련 문서: [공통 개념](../foundations/README.md), [컨테이너](../containers/README.md), [쿠버네티스](../kubernetes/README.md), [네트워크](../network/README.md)

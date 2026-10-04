@@ -1,0 +1,57 @@
+{
+  "run_at_utc": "2026-10-04T01:11:05.494062+00:00",
+  "python": "3.11.9",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "experiments": {
+    "sqlite_isolation": {
+      "status": "passed",
+      "sqlite_version": "3.45.1",
+      "journal_mode": "wal",
+      "reader_before": 10,
+      "reader_in_same_transaction_after_writer_commit": 10,
+      "reader_after_transaction": 20,
+      "second_writer_error": "SQLITE_BUSY",
+      "value_after_failed_statement_before_explicit_rollback": 40,
+      "value_after_explicit_rollback": 20
+    },
+    "http_timeout": {
+      "status": "passed",
+      "transport": "HTTP/1.0 on loopback",
+      "client_timeout_observed": true,
+      "first_client_elapsed_seconds": 0.05601110000861809,
+      "attempts": 2,
+      "business_effects": 1,
+      "retry_status": 200,
+      "limitation": "Demonstration uses an in-memory idempotency set, not durable deduplication."
+    },
+    "windows_cpu": {
+      "status": "passed",
+      "logical_processors_reported": 24,
+      "scope": "GetSystemTimes API processor-group scope; not a per-CPU measurement",
+      "wall_seconds": 0.40078510000603274,
+      "system_delta_100ns": {
+        "idle": 80000000,
+        "kernel_including_idle": 82031250,
+        "user": 2187500
+      },
+      "system_busy_fraction": 0.05009276437847866,
+      "process_cpu_seconds": 0.203125,
+      "process_mean_cpu_cores": 0.5068177434663677,
+      "limitation": "Short local observation; not a benchmark or hardware capacity estimate."
+    },
+    "promql": {
+      "status": "passed",
+      "version": "promtool, version 3.5.0 (branch: HEAD, revision: 8be3a9560fbdd18a94dedec4b747c35178177202)\n  build user:       root@a98875699604\n  build date:       20250714-16:18:19\n  go version:       go1.24.5\n  platform:         windows/amd64\n  tags:             builtinassets",
+      "executable_sha256": "626674d5a047f2fd862a9c8678596b890a6824c76d31c33bcd6af93c1e3429d9",
+      "output": "SUCCESS",
+      "input_kind": "synthetic fixture; real PromQL evaluation",
+      "expression_assertions": 8,
+      "alert_assertions": 5
+    }
+  },
+  "script_sha256": "30bfbb221420305e59eb00f25ffef6d08c24f05cf9d184bada43eb95cd6af5dd",
+  "fixture_sha256": {
+    "rules.yml": "73e7f917c38367cc4e98058018e1f1c887ae780a90333a2b002ba34646f4e1a2",
+    "tests.yml": "601812e7a9684b17dd7639fcc8b86e6f1adb7b6ff13704c93a808f8afae082b5"
+  }
+}

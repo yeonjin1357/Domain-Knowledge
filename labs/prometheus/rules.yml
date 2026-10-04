@@ -1,0 +1,14 @@
+groups:
+  - name: learning
+    interval: 1m
+    rules:
+      - alert: TargetDown
+        expr: up{job="demo"} == 0
+        for: 2m
+        labels:
+          severity: warning
+      - alert: ObservationMissing
+        expr: absent(up{job="demo"})
+        for: 1m
+        labels:
+          severity: warning

@@ -74,7 +74,7 @@
 | WAL | 데이터 페이지의 영속 반영보다 복구 로그를 먼저 기록하는 원리 | [복구](database/replication-and-recovery.md) |
 | Replication lag | 복제 진척의 차이; 시간·바이트·위치 등 기준을 명시해야 함 | [복구](database/replication-and-recovery.md) |
 | Quorum | 정한 합의·읽기·쓰기 규칙이 요구하는 참여 수; 의미는 시스템마다 다름 | [분산 DB](database/distributed-and-analytical.md) |
-| RPO / RTO | 허용 손실 시점의 목표 / 복구 시간의 목표 | [복구](database/replication-and-recovery.md) |
+| RPO / RTO | 허용 가능한 데이터 손실의 시간 범위 목표 / 복구 시간의 목표 | [복구](database/replication-and-recovery.md) |
 | Cache eviction | 정책이나 한도에 따라 캐시 항목을 제거하는 것 | [Redis](middleware/cache-redis.md) |
 | Offset | Kafka partition 로그의 위치 식별; 업무 완료와 같은 뜻 아님 | [Kafka](middleware/kafka.md) |
 | Acknowledgement | 정한 단계의 수신·처리 확인; 누가 무엇을 확인했는지 명시 필요 | [메시지 큐](middleware/message-queues.md) |
@@ -88,3 +88,59 @@
 | Downsampling | 시간 해상도 등을 줄이도록 원천 자료를 집계·축약하는 과정 | [저장](product/storage-and-query.md) |
 
 같은 `namespace`라도 Kubernetes namespace, Linux namespace, CloudWatch namespace는 서로 다른 개념입니다. `active`, `used`, `lag`, `commit`처럼 여러 시스템이 공유하는 단어는 이름만으로 공통 지표에 매핑하지 않습니다.
+
+## 시스템을 처음 배울 때
+
+| 용어 | 의미 | 상세 |
+| --- | --- | --- |
+| Kernel | OS에서 실행·메모리·장치 등 자원을 관리하는 핵심 부분 | [시스템 지도](foundations/system-map.md) |
+| Process / Thread | 실행 중인 프로그램의 자원 단위 / 그 안의 실행 흐름 | [프로세스](host/processes.md) |
+| Logical CPU | OS가 실행을 배치할 수 있는 CPU 단위 | [CPU](host/cpu.md) |
+| NUMA | CPU·메모리 위치에 따라 접근 특성이 달라지는 구조 | [NUMA](host/numa-and-pressure.md) |
+| Affinity | 작업이 실행될 수 있는 CPU 집합을 제한하는 설정 | [NUMA](host/numa-and-pressure.md) |
+| SMT | 한 코어에서 여러 논리 CPU 실행 문맥을 제공하는 기술 | [NUMA](host/numa-and-pressure.md) |
+| IPC, Instructions per cycle | 관측 cycles당 instructions; 프로세스 간 통신이라는 다른 약어 뜻과 구분 | [NUMA](host/numa-and-pressure.md) |
+| Cache miss | 요청 자료를 해당 캐시 계층에서 찾지 못한 사건 | [NUMA](host/numa-and-pressure.md) |
+| Heap | 관리 runtime에서 객체를 할당하는 메모리 영역의 문맥 | [런타임](application/managed-runtimes.md) |
+| Instrumentation | 실행의 의미 있는 경계에 관측 지점을 넣는 작업 | [계측](application/instrumentation-and-profiling.md) |
+| eBPF | Linux BPF를 활용한 실행·관측 기법의 문맥; 모든 업무 의미를 자동 수집한다는 뜻 아님 | [계측](application/instrumentation-and-profiling.md) |
+
+## 네트워크와 저장 계층
+
+| 용어 | 의미 | 상세 |
+| --- | --- | --- |
+| Packet / Frame | 해당 네트워크 계층에서 다루는 전달 단위; 계층별 크기 경계 확인 필요 | [링크](network/layers-and-routing.md) |
+| CIDR | 주소와 prefix 길이로 네트워크 범위를 표현하는 방식 | [주소](network/addressing-routing-dns.md) |
+| ARP / ND | IPv4 링크 주소 해석 / IPv6 이웃 발견의 문맥 | [링크](network/layers-and-routing.md) |
+| VTEP / VNI | VXLAN 터널 종단 / 가상 네트워크 식별 값 | [VXLAN](network/layers-and-routing.md) |
+| Control / Data plane | 경로·정책을 결정하는 제어 / 실제 packet 전달 | [라우팅](network/routing-convergence-and-qos.md) |
+| OSPF / BGP | 내부 링크 상태 라우팅 / 정책 기반 경로 교환 프로토콜 | [라우팅](network/routing-convergence-and-qos.md) |
+| EVPN | BGP를 사용해 가상 네트워크 도달성 정보를 교환하는 제어 평면 | [EVPN](network/routing-convergence-and-qos.md) |
+| QoS / DSCP | 트래픽 처리 정책 / DiffServ 분류에 사용하는 codepoint | [QoS](network/routing-convergence-and-qos.md) |
+| SNMP / MIB / OID | 관리 질의 프로토콜 / 정보 정의 모음 / 객체 식별자 | [SNMP](network/snmp-and-device-models.md) |
+| RAID | 여러 저장장치에 데이터를 배치·중복하는 방식 | [RAID](storage/raid-lvm-and-paths.md) |
+| LVM PV / VG / LV | 물리 볼륨 / 볼륨 그룹 / 논리 볼륨; Kubernetes PV와 구분 | [LVM](storage/raid-lvm-and-paths.md) |
+| Thin provisioning | 논리 제공량과 실제 backing 공간 할당을 분리하는 방식 | [LVM](storage/raid-lvm-and-paths.md) |
+| SAN / NAS | 네트워크 블록 저장 환경 / 네트워크 파일 제공 환경 | [저장 경로](storage/raid-lvm-and-paths.md) |
+| LUN | SCSI의 논리 장치를 구분하는 번호의 문맥 | [저장 경로](storage/raid-lvm-and-paths.md) |
+
+## 제어·복구·데이터 진행
+
+| 용어 | 의미 | 상세 |
+| --- | --- | --- |
+| CNI / IPAM | 컨테이너 네트워크 인터페이스 / IP 주소 할당 관리 | [CNI](kubernetes/cni-csi-and-data-paths.md) |
+| CSI | container orchestration과 storage plugin 사이의 인터페이스 | [CSI](kubernetes/cni-csi-and-data-paths.md) |
+| CRD / Operator | 새 API 종류의 정의 / 앱 운영 지식을 담은 controller 패턴 | [Operator](kubernetes/operators-and-api-lifecycle.md) |
+| Admission | API 요청의 허용·변경을 결정하는 처리 경계 | [API](kubernetes/operators-and-api-lifecycle.md) |
+| Fencing | 예전 writer가 더 이상 쓰지 못하게 하는 차단 경계 | [HA](database/high-availability.md) |
+| Split brain | 서로 다른 구성원이 동시에 자신을 유효 writer 등으로 여기는 상태 | [HA](database/high-availability.md) |
+| Linearizability | 연산이 실시간 순서를 존중하는 단일 순서로 설명 가능한 성질 | [분산 시스템](foundations/distributed-systems.md) |
+| Serializability | 동시 transaction 결과가 어떤 직렬 실행과 동등한 성질 | [분산 시스템](foundations/distributed-systems.md) |
+| Event / Processing time | 사건에 붙은 발생 시각 / 처리 시스템의 처리 시각 기준 | [스트림](middleware/stream-processing.md) |
+| Watermark | event time 진행을 나타내는 신호 | [스트림](middleware/stream-processing.md) |
+| Checkpoint | 복구할 상태와 진행을 정한 방식으로 보존하는 지점 | [스트림](middleware/stream-processing.md) |
+| Compaction | 저장 구조를 병합·정리하는 배경 작업; 엔진별 의미 확인 | [DB 모델](database/specialized-data-models.md) |
+| Quota | 자원 또는 작업에 적용되는 사용 한도와 그 범위 | [클라우드](cloud/quotas-cost-and-capacity.md) |
+| Churn | 관측 대상·series가 생성·교체되는 빈도 또는 현상 | [제품 용량](product/capacity-and-loss-budgets.md) |
+
+용어의 짧은 정의는 학습을 돕는 요약입니다. 실제 판정과 계산은 연결된 원천·버전·조건을 따릅니다.

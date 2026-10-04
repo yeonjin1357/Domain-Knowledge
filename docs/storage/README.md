@@ -1,6 +1,6 @@
 # 스토리지 도메인
 
-> 상태: 초안 · 적용 범위: 스토리지 공통 관점, Amazon EBS 설명 예시 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: 스토리지 공통 관점, Amazon EBS 설명 예시 · 출처 확인일: 2026-10-03
 
 스토리지 영역은 데이터가 저장되는 계층과 읽기·쓰기 성능을 다룹니다. 사용 가능한 용량, 처리할 수 있는 작업량, 개별 작업의 지연을 각각 이해하는 것이 목적입니다.
 
@@ -31,9 +31,8 @@ DB 쓰기가 느려졌다면 DB가 기다리는 지점, 호스트에서 관측�
 
 ## 상세 본문
 
-1. [저장 모델과 성능 경계](models-and-performance.md): 블록·파일·객체, IOPS·처리량, 지속성
-2. [용량·보호·복구](capacity-and-protection.md): 복제와 erasure coding, snapshot, 용량 예측
-
-호스트 관측은 [블록 I/O와 파일시스템](../host/disk-io.md), 배치는 [Kubernetes 저장소](../kubernetes/network-and-storage.md)에서 함께 다룹니다. RAID·SAN·NAS 제품별 카운터와 장애 복구 절차는 추가 범위입니다.
+1. [블록, 파일, 객체 저장소와 성능 경계](models-and-performance.md)
+2. [저장 용량, 복제, 스냅샷과 복구 가능성](capacity-and-protection.md)
+3. [저장 경로를 따라가기: RAID, LVM, SAN과 NAS](raid-lvm-and-paths.md)
 
 관련 문서: [호스트](../host/README.md), [DB](../database/README.md), [클라우드](../cloud/README.md)

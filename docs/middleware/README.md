@@ -1,6 +1,6 @@
 # 미들웨어 도메인
 
-> 상태: 초안 · 적용 범위: 캐시·메시징·검색의 관측 개요, Kafka 4.3 문서 예시 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: 캐시·메시징·검색의 관측 개요, Kafka 4.3 문서 예시 · 출처 확인일: 2026-10-03
 
 미들웨어 영역에서는 애플리케이션 사이에서 데이터를 보관·전달·검색하는 시스템을 다룹니다. 요청이 성공했는지와 함께 데이터가 어느 단계까지 처리됐는지 이해하는 것이 목적입니다.
 
@@ -36,12 +36,11 @@ Kafka 4.3 문서의 소비자 지표 `records-lag-max`는 관측 구간에서 �
 
 ## 상세 본문
 
-1. [캐시와 Redis](cache-redis.md): 적중률, 만료·퇴거, 메모리와 지속성
-2. [Kafka](kafka.md): partition·offset·lag, ack와 처리 보장
-3. [메시지 큐와 RabbitMQ](message-queues.md): publisher confirm, consumer ack, 재전달
-4. [검색 엔진](search-engines.md): Elasticsearch·OpenSearch, refresh·shard·요청 시간
-5. [프록시와 서비스 메시](proxies-and-mesh.md): NGINX·Envoy·Istio, 중계와 관측 경계
-
-Memcached·Pulsar·스트림 처리 엔진의 독립 상세 장과 각 제품의 전체 관리 API 대응은 추가 범위입니다.
+1. [캐시와 Redis: 적중, 메모리, 만료와 지속성](cache-redis.md)
+2. [Kafka: 파티션, offset, lag와 처리 보장](kafka.md)
+3. [메시지 큐: 발행 확인, 전달, 처리와 재전달](message-queues.md)
+4. [검색 엔진: 색인, 가시성, shard와 요청 지연](search-engines.md)
+5. [프록시, 로드밸런서와 서비스 메시](proxies-and-mesh.md)
+6. [스트림 처리: event time, watermark, checkpoint와 역압](stream-processing.md)
 
 관련 문서: [애플리케이션](../application/README.md), [DB](../database/README.md), [스토리지](../storage/README.md)

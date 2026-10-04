@@ -1,6 +1,6 @@
 {
-  "title": "통합 모니터링 도메인 지식",
-  "as_of": "2026-10-03",
+  "title": "통합 모니터링 도메인 지식서",
+  "as_of": "2026-10-04",
   "sections": [
     {
       "title": "시작하기",
@@ -13,11 +13,14 @@
       "title": "공통 관측",
       "chapters": [
         "docs/foundations/README.md",
+        "docs/foundations/system-map.md",
         "docs/foundations/time-series.md",
         "docs/foundations/distributions.md",
+        "docs/foundations/performance-and-statistics.md",
         "docs/foundations/service-level-objectives.md",
         "docs/foundations/time-and-data-quality.md",
-        "docs/foundations/traces-logs-profiles.md"
+        "docs/foundations/traces-logs-profiles.md",
+        "docs/foundations/distributed-systems.md"
       ]
     },
     {
@@ -30,7 +33,9 @@
         "docs/host/processes.md",
         "docs/host/windows.md",
         "docs/host/virtualization.md",
-        "docs/host/gpu.md"
+        "docs/host/gpu.md",
+        "docs/host/numa-and-pressure.md",
+        "docs/host/collection-contracts.md"
       ]
     },
     {
@@ -41,7 +46,9 @@
         "docs/network/tcp-and-udp.md",
         "docs/network/tls-http.md",
         "docs/network/network-metrics.md",
-        "docs/network/layers-and-routing.md"
+        "docs/network/layers-and-routing.md",
+        "docs/network/snmp-and-device-models.md",
+        "docs/network/routing-convergence-and-qos.md"
       ]
     },
     {
@@ -49,7 +56,8 @@
       "chapters": [
         "docs/storage/README.md",
         "docs/storage/models-and-performance.md",
-        "docs/storage/capacity-and-protection.md"
+        "docs/storage/capacity-and-protection.md",
+        "docs/storage/raid-lvm-and-paths.md"
       ]
     },
     {
@@ -58,7 +66,8 @@
         "docs/containers/README.md",
         "docs/containers/isolation-and-lifecycle.md",
         "docs/containers/resource-control.md",
-        "docs/containers/filesystems.md"
+        "docs/containers/filesystems.md",
+        "docs/containers/platform-differences.md"
       ]
     },
     {
@@ -70,7 +79,9 @@
         "docs/kubernetes/resources-and-scheduling.md",
         "docs/kubernetes/collection.md",
         "docs/kubernetes/network-and-storage.md",
-        "docs/kubernetes/workloads-and-control-plane.md"
+        "docs/kubernetes/workloads-and-control-plane.md",
+        "docs/kubernetes/cni-csi-and-data-paths.md",
+        "docs/kubernetes/operators-and-api-lifecycle.md"
       ]
     },
     {
@@ -78,10 +89,12 @@
       "chapters": [
         "docs/application/README.md",
         "docs/application/requests-and-concurrency.md",
+        "docs/application/servers-and-pools.md",
         "docs/application/timeouts-and-retries.md",
         "docs/application/managed-runtimes.md",
         "docs/application/async-runtimes.md",
-        "docs/application/user-experience.md"
+        "docs/application/user-experience.md",
+        "docs/application/instrumentation-and-profiling.md"
       ]
     },
     {
@@ -94,7 +107,10 @@
         "docs/database/mysql-mariadb.md",
         "docs/database/sqlserver-oracle.md",
         "docs/database/replication-and-recovery.md",
-        "docs/database/distributed-and-analytical.md"
+        "docs/database/high-availability.md",
+        "docs/database/distributed-and-analytical.md",
+        "docs/database/specialized-data-models.md",
+        "docs/database/collection-contracts.md"
       ]
     },
     {
@@ -105,7 +121,8 @@
         "docs/middleware/kafka.md",
         "docs/middleware/message-queues.md",
         "docs/middleware/search-engines.md",
-        "docs/middleware/proxies-and-mesh.md"
+        "docs/middleware/proxies-and-mesh.md",
+        "docs/middleware/stream-processing.md"
       ]
     },
     {
@@ -115,7 +132,8 @@
         "docs/cloud/resources-and-apis.md",
         "docs/cloud/provider-metrics.md",
         "docs/cloud/managed-and-serverless.md",
-        "docs/cloud/networking.md"
+        "docs/cloud/networking.md",
+        "docs/cloud/quotas-cost-and-capacity.md"
       ]
     },
     {
@@ -125,7 +143,9 @@
         "docs/cross-domain/slow-requests.md",
         "docs/cross-domain/resource-failures.md",
         "docs/cross-domain/backlogs-and-retries.md",
-        "docs/cross-domain/missing-observations.md"
+        "docs/cross-domain/missing-observations.md",
+        "docs/cross-domain/reproducible-labs.md",
+        "docs/cross-domain/capstone-investigation.md"
       ]
     },
     {
@@ -136,7 +156,9 @@
         "docs/product/collection-pipelines.md",
         "docs/product/storage-and-query.md",
         "docs/product/alerts-and-incidents.md",
-        "docs/product/self-observation-and-access.md"
+        "docs/product/self-observation-and-access.md",
+        "docs/product/adapter-contracts.md",
+        "docs/product/capacity-and-loss-budgets.md"
       ]
     },
     {
@@ -146,10 +168,13 @@
         "docs/metric-catalog.md",
         "docs/coverage.md",
         "docs/validation.md",
+        "docs/review.md",
         "CONTRIBUTING.md",
         "templates/topic.md",
         "templates/metric.md"
       ]
     }
-  ]
+  ],
+  "edition": "1.0",
+  "detailed_chapters": 80
 }

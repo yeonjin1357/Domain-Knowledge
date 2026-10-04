@@ -1,6 +1,6 @@
 # 애플리케이션 도메인
 
-> 상태: 초안 · 적용 범위: 언어·런타임 공통 관점 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: 언어·런타임 공통 관점 · 출처 확인일: 2026-10-03
 
 애플리케이션 영역은 사용자 요청과 업무가 어떤 경로로 처리되고, 어디서 실패하거나 지연되는지 다룹니다. 런타임 내부 상태와 호스트·DB·외부 서비스의 영향을 연결해서 이해하는 것이 목적입니다.
 
@@ -44,12 +44,12 @@
 
 ## 상세 본문
 
-1. [요청·동시성·풀](requests-and-concurrency.md): 도착·완료·진행 중, Little의 법칙
-2. [시간 제한과 재시도](timeouts-and-retries.md): deadline·취소·중복·과부하
-3. [JVM과 .NET](managed-runtimes.md): heap·commit·RSS, GC와 실행 자원
-4. [Go·Node.js·Python](async-runtimes.md): goroutine·event loop·GIL과 관측 경계
-5. [사용자 경험](user-experience.md): 브라우저 시간, RUM·합성 검사, Core Web Vitals
-
-분산 추적은 [공통 추적 장](../foundations/traces-logs-profiles.md)에서 함께 읽습니다. 모바일 네이티브, 개별 WAS·프레임워크, 네이티브 메모리 진단의 상세 수집은 추가 범위입니다.
+1. [요청, 동시성, 대기열과 연결 풀](requests-and-concurrency.md)
+2. [웹 서버와 연결 풀: 요청이 기다리는 여러 장소](servers-and-pools.md)
+3. [시간 제한, 취소, 재시도와 과부하](timeouts-and-retries.md)
+4. [JVM과 .NET: 메모리, GC, 실행 자원](managed-runtimes.md)
+5. [Go, Node.js, Python의 동시성과 관측](async-runtimes.md)
+6. [브라우저, 실제 사용자 관측과 합성 검사](user-experience.md)
+7. [계측을 넣는 위치: 자동 계측, 수동 span, eBPF와 프로파일](instrumentation-and-profiling.md)
 
 관련 문서: [공통 개념](../foundations/README.md), [DB](../database/README.md), [미들웨어](../middleware/README.md), [도메인 간 분석](../cross-domain/README.md)

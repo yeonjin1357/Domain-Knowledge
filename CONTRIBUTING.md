@@ -54,9 +54,16 @@
 
 ```powershell
 python scripts/build_book.py
+python scripts/build_html.py
 python scripts/check_docs.py
 python scripts/verify_examples.py
+python scripts/verify_contracts.py
 python scripts/build_book.py --check
+python scripts/build_html.py --check
 ```
 
 계산을 변경하면 `verify_examples.py`의 해당 입력·기대 결과를 원문과 대조합니다. 자동 산술 검사가 실제 원천 API의 동작이나 모든 문장의 사실성을 보장하지는 않습니다. 검증 결과와 수행하지 않은 범위는 `docs/validation.md`에 기록하고 통합본을 다시 생성합니다.
+
+HTML 생성은 `requirements-docs.txt`의 고정 의존성과 `assets/`의 고정 Mermaid bundle을 사용합니다. bundle의 출처·해시·license를 보존하며 인터넷 연결 없이 본문과 그림을 읽을 수 있는지 확인합니다. Markdown 생성·구조·산술 검사는 표준 라이브러리만 사용합니다.
+
+출판 실습 결과를 바꿀 때는 실제 실습을 다시 실행하고 스크립트·입력 hash를 갱신합니다. `review/chapter-review.json`은 검토를 마친 원고의 hash를 보존합니다. hash 일치만으로 사실 검토를 수행한 것으로 표시하지 않으며, 내용이 바뀌면 검토 초점과 수정 이유를 확인한 뒤 갱신합니다.

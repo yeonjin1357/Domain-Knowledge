@@ -1,6 +1,6 @@
 # 도메인 간 장애 분석
 
-> 상태: 초안 · 적용 범위: 가상의 서비스 구성과 분석 흐름 제안 · 실환경 검증: 수행하지 않음
+> 상태: 검토됨 · 적용 범위: 가상의 서비스 구성과 분석 흐름 제안 · 실환경 검증: 수행하지 않음
 
 통합 모니터링에서는 서비스의 증상을 실행 환경과 외부 의존성으로 연결해 조사해야 합니다. 이 문서는 도메인 문서를 함께 사용하는 방법과 제품이 제공할 탐색 흐름을 제안합니다.
 
@@ -64,3 +64,12 @@ flowchart LR
 사례의 모든 수치는 원리를 설명하는 가상 입력입니다. 원인 확정에 필요한 증거와 현재 자료로 알 수 없는 부분을 구분합니다.
 
 관련 문서: [애플리케이션](../application/README.md), [쿠버네티스](../kubernetes/README.md), [호스트](../host/README.md), [DB](../database/README.md), [네트워크](../network/README.md)
+
+## 상세 본문
+
+1. [사례: 느린 주문 요청과 DB 연결 대기](slow-requests.md)
+2. [사례: 재시작, 메모리 한도와 볼륨 부족](resource-failures.md)
+3. [사례: 캐시 미스, 재시도와 처리 적체](backlogs-and-retries.md)
+4. [사례: 여러 그래프가 동시에 멈춘 경우](missing-observations.md)
+5. [재현 실습: 계산, 실제 엔진, 운영 검증의 경계](reproducible-labs.md)
+6. [종합 연습: 주문 지연을 증거로 좁혀 가기](capstone-investigation.md)

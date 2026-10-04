@@ -1,0 +1,969 @@
+{
+  "edition": "1.0",
+  "review_date": "2026-10-04",
+  "review_kind": "author self-review; not external expert certification",
+  "chapters": [
+    {
+      "path": "docs/foundations/system-map.md",
+      "content_sha256": "1aa96a7c4c0cc2ab822b7f3eeb94643d662b55d9a24ac4fdedd666ff4204bbda",
+      "scope": "상태: 검토됨 · 적용 범위: 입문용 구조 설명, Linux 프로세스와 Kubernetes 개념 · 검토일: 2026-10-04 · 수치는 학습용 예시",
+      "review_focus": "프로세스·컨테이너·Pod·서비스와 포함/호출 관계, 요청 완료 경계",
+      "critical_checks_in_text": [
+        "5. **관측이 성공했는가?** 값이 없다는 사실을 사용량 0으로 바꾸지 않습니다.",
+        "1. DB CPU가 낮으면 주문 지연이 DB와 무관한가? **아닙니다. 잠금이나 I/O 대기처럼 CPU를 많이 쓰지 않는 지연이 있습니다.**",
+        "2. 컨테이너와 서비스는 같은 개수인가? **하나의 서비스가 여러 컨테이너 인스턴스로 실행될 수 있어 고정 관계가 아닙니다.**",
+        "3. 주문 API가 200을 반환하면 배송까지 완료되었는가? **API가 약속한 완료 경계를 먼저 확인해야 합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/foundations/time-series.md",
+      "content_sha256": "000aaf8b6b54c8a920eb66494b584ce983993a75cd4cca1d555401f76829e74a",
+      "scope": "상태: 검토됨 · 범위: 공통 원리, Prometheus 및 OpenTelemetry 데이터 모델 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "온도계의 현재 온도와 자동차의 누적 주행거리는 읽는 방법이 다릅니다. 현재 온도는 그대로 비교할 수 있지만 최근 이동 속도는 주행거리 증가량과 경과 시간을 알아야 합니다. 지표의 gauge와 counter도 이 차이에서 시작합니다. 이 비유는 값의 유형을 설명하며, 실제 카운터의 재시작과 단위는 아래 정의를 따릅니다.",
+      "critical_checks_in_text": [
+        "1. 누적 요청 수가 10초 동안 300 증가했다면 무엇을 알 수 있는가? **그 구간 평균 요청률은 30건/초이다. 순간 최대 요청률은 알 수 없다.**",
+        "2. 연결 수 Gauge가 8에서 3으로 감소했다면 신규 연결이 없었다고 볼 수 있는가? **아니다. 생성과 종료의 순변화만 알 수 있다.**",
+        "3. 재시작 후 같은 이름의 대상에 이전 누적값을 이어 붙여도 되는가? **실행 수명과 초기화 의미를 확인해야 한다. 이름만으로 연속성을 보장할 수 없다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/foundations/distributions.md",
+      "content_sha256": "1a469836b638f095f1612ab613dca9c3ddc57399a242373f883802dff9a52176",
+      "scope": "상태: 검토됨 · 범위: 기초 통계, Prometheus 히스토그램 예시 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "평균 100ms라는 값만으로 모든 사용자가 100ms를 기다렸다고 알 수는 없습니다. 대부분은 10ms, 일부는 매우 오래 기다렸을 수도 있습니다. 평균은 전체 비용을 요약하고, 백분위수는 정렬된 집단의 어느 위치까지가 얼마나 걸렸는지를 설명합니다. 둘 다 표본 수와 계산 정의가 있어야 해석할 수 있습니다.",
+      "critical_checks_in_text": [
+        "1. 하루 평균을 시간별 평균 24개의 평균으로 구해도 되는가? **각 시간의 표본 수가 같거나 그 집계 정의를 의도한 경우를 제외하면, 합계와 개수로 계산해야 한다.**",
+        "2. p99가 낮으면 모든 요청이 빨랐는가? **아니다. 백분위수 위의 요청과 측정에서 제외된 요청을 추가로 봐야 한다.**",
+        "3. 히스토그램에서 100 ms와 300 ms 버킷만 있으면 200 ms 이하 건수를 정확히 아는가? **아니다. 구간 안의 원본 분포가 필요하다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/foundations/performance-and-statistics.md",
+      "content_sha256": "9fc3f265cc83cb29e7ab6c733b8a2f50a8efd32eb5d00ca129332bb0202277e6",
+      "scope": "상태: 검토됨 · 적용 범위: 성능 분석의 기초와 통제 실험 설계 · 검토일: 2026-10-04 · 식의 수치는 가상 예시",
+      "review_focus": "도착과 완료·적체, Little 법칙 조건, 표본·부하 모델",
+      "critical_checks_in_text": [
+        "1. p99가 좋아졌는데 타임아웃이 늘었다면? **성공 응답만 지연 통계에 포함했는지 확인합니다. 실패한 긴 요청이 빠졌을 수 있습니다.**",
+        "2. 처리량과 유입률이 다르면 무엇을 보는가? **관측 경계·취소·거절과 적체 변화를 함께 봅니다.**",
+        "3. 한 번의 벤치마크로 모든 환경의 임계값을 정할 수 있는가? **실험 조건 밖으로 일반화할 근거가 없습니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/foundations/service-level-objectives.md",
+      "content_sha256": "f998897ac3d8a15e1432412000475c3fb56c709843df15a3d4f74070c2da9f2f",
+      "scope": "상태: 검토됨 · 범위: SLI·SLO와 알림 계산 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "오류가 한 건도 없어야 한다고만 정하면 어떤 개선이 우선인지 판단하기 어렵습니다. SLI는 실제로 잰 서비스 품질, SLO는 그 품질의 목표입니다. 오류 예산은 정한 범위에서 목표를 충족하면서 허용할 수 있는 실패량을 수치로 표현합니다. 업무의 성공 정의부터 정해야 CPU 사용률과 사용자 만족도를 혼동하지 않습니다.",
+      "critical_checks_in_text": [
+        "1. 목표가 99.5%이고 유효 요청 10만 건이면 허용된 나쁜 요청 수는? **500건이다.**",
+        "2. 오류 비율이 1%이면 Burn rate는? **2이다.**",
+        "3. 요청 지표가 수집되지 않은 시간을 성공으로 채워도 되는가? **성공 여부를 모르는 상태이므로 명시적인 데이터 품질 정책이 필요하다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/foundations/time-and-data-quality.md",
+      "content_sha256": "7aab5a4cec0f52b9fe9996096022ff28b9eb0b4bf31861f263c5c14a917a55ad",
+      "scope": "상태: 검토됨 · 범위: 수집 시각, 지연, 누락, 중복, 시계 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "사진을 찍은 시각과 사진을 받은 시각은 다를 수 있습니다. 모니터링 데이터도 발생·관측·수신·조회 시각이 다를 수 있습니다. 늦게 도착한 과거 값을 지금의 상태처럼 보여 주거나, 기록이 없는 구간을 0으로 채우면 장애 분석이 달라집니다. 이 장은 숫자 자체보다 먼저 확인해야 할 시간과 품질을 설명합니다.",
+      "critical_checks_in_text": [
+        "1. 전송 지연을 계산했더니 음수이면 데이터가 시간을 거슬러 이동했는가? **서로 다른 시계의 오차와 timestamp의 의미를 먼저 확인해야 한다.**",
+        "2. 60초 동안 600건이면 매초 10건씩 처리했는가? **구간 평균은 10건/초지만 내부의 발생 분포는 알 수 없다.**",
+        "3. 마지막 값이 화면에 보이면 최근에도 수집에 성공했는가? **조회 시각과 마지막 실제 표본 시각을 구분해야 한다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/foundations/traces-logs-profiles.md",
+      "content_sha256": "5e30daab873246fe7e667b3862ca06ec01ba70dc8f21b539c6e03d785026848f",
+      "scope": "상태: 검토됨 · 범위: OpenTelemetry 개념·명세, W3C Trace Context · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "메트릭은 여러 요청의 요약, trace는 한 요청이 지나간 작업의 연결, log는 기록된 사건, profile은 코드가 사용한 자원 분포를 살펴보는 자료입니다. 여행의 통계·동선·메모가 서로 다른 정보를 주는 것과 비슷합니다. 한 자료에서 없는 정보를 다른 자료가 자동으로 복원한다고 가정하지 않고 측정 경계를 함께 봅니다.",
+      "critical_checks_in_text": [
+        "- 자식 Span 시간 합계가 부모보다 크면 데이터 오류인가? **병렬 구간이면 정상일 수 있다.**",
+        "- 저장된 Trace 중 실패가 50%이면 서비스 실패율도 50%인가? **표본 선택 조건을 알아야 한다.**",
+        "- Heap 프로파일과 Allocation 프로파일은 같은 질문인가? **현재 보유량과 할당 활동은 다른 관점이다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/foundations/distributed-systems.md",
+      "content_sha256": "9725615932aa1c7ed8e96b9203ff22d58224d762d6eff4a9b7e10beba045bce6",
+      "scope": "상태: 검토됨 · 적용 범위: 분산 시스템의 개념, Raft 논문과 제품 연결 · 검토일: 2026-10-04",
+      "review_focus": "timeout 뒤 불확실한 결과, 합의·CAP·일관성의 범위",
+      "critical_checks_in_text": [
+        "1. 클라이언트 타임아웃은 DB 롤백을 뜻하는가? **아닙니다. 결과가 불확실할 수 있습니다.**",
+        "2. 5개 프로세스가 살아 있으면 합의 클러스터는 정상인가? **멤버 간 연결과 커밋 진행을 확인해야 합니다.**",
+        "3. 읽기 지연 0초이면 모든 복제본이 최신인가? **어떤 위치와 정의로 측정한 지연인지부터 확인합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/host/cpu.md",
+      "content_sha256": "fe17c09f8e0219a1babdb9812bae0204096683a4a9072528da4c2b64ba965327",
+      "scope": "상태: 검토됨 · 범위: Linux CPU 관측, man-pages 6.19 및 Linux 6.12 회계 코드 확인 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "CPU 사용 시간은 프로그램이 실제로 실행 기회를 사용한 시간입니다. 응답을 기다린 경과 시간 전체와는 다릅니다. 여러 스레드가 동시에 실행되면 1초 동안 CPU 시간 합계가 1초보다 커질 수 있습니다. 따라서 CPU 100%를 읽을 때는 한 논리 CPU 기준인지 호스트 전체 기준인지부터 확인합니다.",
+      "critical_checks_in_text": [
+        "- CPU 8개 중 1개만 계속 실행 중이면 호스트 평균은 얼마인가? **동일한 시간 기준에서는 12.5%이다. 해당 CPU의 병목 가능성은 남는다.**",
+        "- iowait 20%면 디스크 장치가 20% 사용됐는가? **그렇게 해석할 수 없다. 장치 통계와 다른 회계 항목이다.**",
+        "- 프로세스 250%는 잘못된 값인가? **한 논리 CPU 기준이고 여러 스레드를 합쳤다면 가능한 값이다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/host/memory.md",
+      "content_sha256": "7c1d84c43fd032fb14cf934f2041d10fd9ce3ad113266ee6065675f4fec6f840",
+      "scope": "상태: 검토됨 · 범위: Linux 호스트·프로세스, Windows 비교의 기초 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "메모리는 실행 중인 코드와 데이터, 파일 캐시 등을 보관합니다. 파일 캐시는 다시 쓸 자료를 가까이 두는 용도라서, 남는 메모리가 적어 보이는 상황이 곧 부족을 뜻하지는 않습니다. 반대로 프로세스가 잡은 가상 주소 전체를 실제 RAM 사용량으로 더하면 과장됩니다. 예약·상주·공유·회수 가능 범위를 구분하는 것이 시작입니다.",
+      "critical_checks_in_text": [
+        "- RSS 합계가 호스트 물리 사용량보다 커질 수 있는가? **공유 페이지를 여러 번 더할 수 있으므로 가능하다.**",
+        "- 가용량이 6 GiB이면 어떤 작업도 그 크기까지 반드시 성공하는가? **추정량이며 정책·범위·변화가 있으므로 보장이 아니다.**",
+        "- 스왑 사용량이 높으면 현재도 스왑 I/O가 많은가? **현재 활동의 증가량을 별도로 봐야 한다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/host/disk-io.md",
+      "content_sha256": "4764701986bf8edf84d9b47f8370cc1cca39488e041512b068a3e96b58d0a096",
+      "scope": "상태: 검토됨 · 범위: Linux 블록 계층과 statvfs, sysstat iostat · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "저장장치에서는 남은 공간과 처리 속도를 따로 봅니다. 창고가 넓어도 출입구가 막힐 수 있듯이 공간이 충분한데 읽기·쓰기가 느릴 수 있습니다. 작은 파일을 많이 읽는 작업과 큰 파일 하나를 읽는 작업은 총 byte가 같아도 I/O 횟수가 다릅니다. IOPS·처리량·지연·용량을 함께 보는 이유입니다.",
+      "critical_checks_in_text": [
+        "- 초당 100회 I/O가 항상 초당 1,000회보다 적은 바이트를 처리하는가? **작업 크기가 달라 알 수 없다.**",
+        "- `%util=100%`면 모든 SSD가 최대 성능인가? **병렬 장치의 성능 한도를 그 값만으로 확정할 수 없다.**",
+        "- 평균 지연이 3 ms면 모든 요청이 3 ms 이내인가? **평균은 지연 분포의 상한을 보장하지 않는다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/host/processes.md",
+      "content_sha256": "4823396885025549d0ee8d0bdcd2567ef236cca40aa23cfc807d37122dcce660",
+      "scope": "상태: 검토됨 · 범위: Linux procfs와 프로세스 인터페이스 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "프로세스는 실행 중인 프로그램을 관측하는 기본 단위입니다. 프로세스가 존재한다고 계속 CPU에서 실행되는 것은 아니며, 스레드가 I/O나 다른 자원을 기다릴 수 있습니다. PID는 재사용될 수 있으므로 이름과 번호만으로 장기간 같은 실행이라고 판단하지 않습니다. 열린 파일과 소켓도 프로세스가 사용하는 자원입니다.",
+      "critical_checks_in_text": [
+        "- `FDSize=1024`면 현재 1,024개 FD가 열려 있는가? **할당 슬롯 크기이므로 그렇지 않다.**",
+        "- 프로세스 이름이 같으면 재시작 전후의 누적값을 이어 붙여도 되는가? **실행 수명을 확인해야 한다.**",
+        "- 부모와 자식의 I/O를 모두 더하면 항상 전체인가? **원천의 자식 포함 조건을 확인해야 한다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/host/windows.md",
+      "content_sha256": "dd9dab5fc0add30c68f7860c3dc38e2f310a4a4dfac6294fd269c2e416eb92e7",
+      "scope": "상태: 검토됨 · 범위: Windows Win32 성능 API와 PDH · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "Windows와 Linux는 CPU·메모리를 관측할 수 있지만 원천 이름과 계정이 다릅니다. 같은 CPU 50%라도 API가 어느 CPU 집합을 합쳤는지, idle을 어디에 포함했는지 알아야 합니다. Windows의 working set과 commit도 서로 다른 질문에 답합니다. 이 장은 Linux 필드명을 그대로 치환하지 않고 API 정의에서 계산을 시작합니다.",
+      "critical_checks_in_text": [
+        "- GetSystemTimes의 Kernel+User+Idle을 총량으로 쓰는가? **Idle이 Kernel에 포함되므로 중복이다.**",
+        "- PrivateUsage가 1 GiB면 페이지 파일에 1 GiB가 쓰여 있는가? **Commit Charge이므로 그렇게 해석할 수 없다.**",
+        "- 프로세서 128개 시스템에서 한 번 호출한 GetSystemTimes가 전체를 대표하는가? **문서의 Processor Group 범위를 먼저 확인해야 한다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/host/virtualization.md",
+      "content_sha256": "75141971b69c3ff4ab69fd69b4fc6690a577a7cc19ae53d17c812991af940be6",
+      "scope": "상태: 검토됨 · 적용 범위: 가상화 관측 모델, libvirt 통계 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "가상 머신은 물리 호스트 위에 별도의 운영체제 실행 환경을 제공합니다. VM 안에서 보이는 vCPU는 물리 CPU 사용 기회와 연결되지만 같은 식별자는 아닙니다. 게스트의 사용량과 하이퍼바이저가 기록한 실행·대기를 함께 보면 두 계층 중 어디에서 지연이 생기는지 조사할 수 있습니다.",
+      "critical_checks_in_text": [
+        "1. VM 4 vCPU는 항상 물리 코어 4개를 전용 사용한다는 뜻인가? **배정과 스케줄링 정책을 확인해야 합니다.**",
+        "2. 게스트 메모리 사용량과 호스트 VM 프로세스 RSS는 같은가? **측정 계층이 다릅니다.**",
+        "3. 이동 전후 호스트 관계를 현재 값만 남겨도 되는가? **과거 장애 분석에는 당시 관계가 필요합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/host/gpu.md",
+      "content_sha256": "d7411acde113dd1bd23b3fb2005dec1271400773be0230d4bcb8fc0174f9c4a9",
+      "scope": "상태: 검토됨 · 적용 범위: NVML R550의 활용률 정의, NVIDIA MIG·DCGM, AMD SMI API · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "GPU는 많은 연산을 병렬로 처리하도록 구성된 장치입니다. GPU가 활동한 시간, 장치 메모리 용량, 메모리 전송 활동은 다른 값입니다. 가득 찬 책상이 항상 바쁜 작업자를 뜻하지 않듯이 VRAM 점유율이 높다고 GPU 계산량도 높다고 알 수 없습니다. 장치·분할 방식과 원천 지표의 정의를 먼저 확인합니다.",
+      "critical_checks_in_text": [
+        "1. GPU 활동 100%는 최대 FLOPS 달성인가? **그 지표만으로는 알 수 없습니다.**",
+        "2. memory activity는 VRAM 용량 사용률인가? **NVML의 해당 필드에서는 다른 의미입니다.**",
+        "3. 미지원 지표를 0으로 채워도 되는가? **관측 불가를 유휴 상태로 잘못 표현합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/host/numa-and-pressure.md",
+      "content_sha256": "6418cdb613f9f6e9dcd01f26342a6471a63c4029b943d9a9d26aa35b3d97f97a",
+      "scope": "상태: 검토됨 · 적용 범위: Linux NUMA·CPU affinity·PSI 인터페이스 · 검토일: 2026-10-04 · 명령은 이 환경에서 실행하지 않음",
+      "review_focus": "NUMA 배치와 cpuset, IPC·PSI의 분모, 지원 조건",
+      "critical_checks_in_text": [
+        "1. 캐시 miss가 늘면 디스크가 느려진 것인가? **해당 캐시 계층과 다음 접근 대상을 확인해야 합니다.**",
+        "2. 메모리 여유 합계가 많으면 배치 문제를 배제할 수 있는가? **NUMA 정책과 허용 노드 제한을 봐야 합니다.**",
+        "3. PSI 20%와 메모리 사용률 20%는 같은가? **시간 비중과 용량 비중으로 서로 다릅니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/host/collection-contracts.md",
+      "content_sha256": "6e54a297aaf0d9c5c4d59f23401eb3e681822ade972c63c284357b5f5be2de0e",
+      "scope": "상태: 검토됨 · 적용 범위: Linux procfs·cgroup v2와 Windows API · 검토일: 2026-10-04 · Linux 명령은 문서 검토, Windows API 일부는 로컬 실험",
+      "review_focus": "procfs 필드 단위, 실행 수명, 차분과 누락, 조회 권한",
+      "critical_checks_in_text": [
+        "1. 장치 논리 sector 크기가 4096B면 diskstats sector도 4096B인가? **해당 통계는 512B 단위이므로 별도로 해석합니다.**",
+        "2. 첫 표본으로 초당 CPU 사용량을 만들 수 있는가? **이 차분 정책에서는 이전 표본이 필요합니다.**",
+        "3. permission denied를 값 0으로 저장해도 되는가? **접근 실패와 0 사용량을 구분해야 합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/network/addressing-routing-dns.md",
+      "content_sha256": "30b211e45952d5d71a23665706e8b3a27393a1417ab81be93cb4a9ea757022b1",
+      "scope": "상태: 검토됨 · 적용 범위: IP와 DNS의 공통 원리 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "DNS는 이름을 주소 정보로 찾고, IP 주소와 라우팅은 패킷이 목적지 쪽으로 이동하는 데 사용됩니다. 주소를 알아냈다는 사실만으로 목적지까지 연결되는 것은 아닙니다. 이름 조회 실패와 경로 실패를 분리하면 어느 계층부터 조사해야 하는지 좁힐 수 있습니다.",
+      "critical_checks_in_text": [
+        "1. DNS에 IPv6 주소가 있으면 클라이언트가 IPv6로 질의했음을 알 수 있는가? **아니요. 질의 전송과 레코드 주소 계열은 독립적입니다.**",
+        "2. 같은 IP 주소면 같은 장비인가? **네트워크 범위와 유효 시각을 확인해야 합니다.**",
+        "3. DNS 시간 초과로 이름이 없다고 결론 낼 수 있는가? **아니요. 응답을 받지 못한 상태입니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/network/tcp-and-udp.md",
+      "content_sha256": "a6d9e3e7c31d0e2cd556df4d249365f5ee128323852aa171d2262ccce53801eb",
+      "scope": "상태: 검토됨 · 적용 범위: TCP RFC 9293, UDP, QUIC의 기본 차이 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "앱이 보낸 데이터는 네트워크를 지나 상대에게 전달됩니다. TCP는 순서 있는 byte 흐름을 제공하고 UDP는 datagram 경계를 제공합니다. TCP 연결이 살아 있어도 상대 앱이 처리를 끝냈다는 뜻은 아닙니다. 손실 복구, 흐름 제어, 혼잡 제어가 전송 속도와 지연에 어떤 역할을 하는지 살펴봅니다.",
+      "critical_checks_in_text": [
+        "1. `write()` 두 번이면 상대의 읽기도 두 번인가? **TCP는 바이트 스트림이므로 그렇지 않습니다.**",
+        "2. 연결 수립 성공으로 결제 성공을 판정할 수 있는가? **업무 결과를 추가 확인해야 합니다.**",
+        "3. 윈도 1 MiB, RTT 0.1초의 이상화된 경계는? **10 MiB/s이며 실측 보장값이 아닙니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/network/tls-http.md",
+      "content_sha256": "701330f20acb76689cea5842bbb0c1460bfda63297282bf280ed841e77f78ccd",
+      "scope": "상태: 검토됨 · 적용 범위: TLS 1.3, HTTP 의미론·HTTP/2·HTTP/3, curl 시간 필드 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "HTTPS를 이해할 때는 보호된 연결을 만드는 TLS와 요청·응답의 뜻을 정하는 HTTP를 나눠 봅니다. 인증서 검증에 실패하는 문제와 서버가 HTTP 500을 응답하는 문제는 조사 위치가 다릅니다. 프록시가 여러 개이면 연결마다 TLS 종단과 측정 시간이 달라질 수 있습니다.",
+      "critical_checks_in_text": [
+        "1. 인증서 만료가 멀면 TLS 검증은 성공하는가? **이름, 신뢰 체인 등 다른 조건도 필요합니다.**",
+        "2. TTFB에서 TLS 완료 시간을 빼면 서버 CPU 시간인가? **아니요. 그 구간에 여러 대기·전송·실행이 포함됩니다.**",
+        "3. HTTP 요청 1,000개면 연결도 1,000개인가? **연결 재사용과 다중화 때문에 그렇지 않습니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/network/network-metrics.md",
+      "content_sha256": "4c17151ed544f12f6c799eb5c0a4aa19f35a739e636020cb8f5504433732e8c0",
+      "scope": "상태: 검토됨 · 적용 범위: Linux 링크 통계, IF-MIB, IPFIX와 관측 설계 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "네트워크의 byte 수는 어느 인터페이스에서 어느 방향으로 셌는지가 중요합니다. 같은 패킷을 물리 NIC와 가상 인터페이스에서 각각 관측할 수도 있습니다. 오류·drop·재전송도 같은 사건의 다른 이름이 아닙니다. 수집 경계와 카운터 수명을 보존해야 여러 도메인의 숫자를 정확히 비교할 수 있습니다.",
+      "critical_checks_in_text": [
+        "1. 물리 NIC와 터널의 바이트를 더하면 고유 업무 전송량인가? **같은 전송을 중복해서 셀 수 있습니다.**",
+        "2. 32비트 카운터가 한 번 감소하면 정확히 한 번 순환했다고 알 수 있는가? **초기화나 여러 번의 순환 가능성도 있습니다.**",
+        "3. 흐름 데이터에서 exporter 식별이 필요한 이유는? **도메인과 템플릿 식별자가 전역적으로 유일하다고 볼 수 없기 때문입니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/network/layers-and-routing.md",
+      "content_sha256": "12e8b9525a780d602bdeb24a23e0758315cba8950e5450aed192902af5cf1b13",
+      "scope": "상태: 검토됨 · 범위: Ethernet의 주소 해석, IPv6 ND·PMTUD, VXLAN, 기본 BGP 관측 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "같은 망의 다음 장치에 전달하는 문제와 멀리 있는 목적지까지 경로를 찾는 문제는 다릅니다. ARP·ND는 가까운 링크의 이웃 정보를, 라우팅은 다음 경로를 다룹니다. 터널은 원래 패킷에 바깥 포장을 추가하므로 보낼 수 있는 내부 크기도 달라집니다.",
+      "critical_checks_in_text": [
+        "1. 원격 서버 IP의 ARP 항목이 없으면 통신할 수 없는가? **Ethernet의 로컬 다음 홉 주소가 필요한 경로일 수 있다.**",
+        "2. BGP 연결이 정상이면 모든 prefix가 정상인가? **수신·선택·설치·실제 전달은 따로 확인해야 한다.**",
+        "3. 내부 IP MTU 1,450 B를 업무 payload 1,450 B로 사용해도 되는가? **내부 전송·IP 헤더 크기를 추가로 고려해야 한다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/network/snmp-and-device-models.md",
+      "content_sha256": "e25a25681d8de72d34d5e13d9256533e4df020c65d45d9c013e6b84fbe6c4c20",
+      "scope": "상태: 검토됨 · 적용 범위: SNMPv3·IF-MIB·SNMPv2-MIB 표준, 수집기 설계 · 검토일: 2026-10-04 · 실제 장비 질의는 실행하지 않음",
+      "review_focus": "OID·Counter64·ifIndex 범위, sysUpTime과 wrap, SNMP 보안 수준",
+      "critical_checks_in_text": [
+        "1. sysUpTime 감소는 항상 호스트 재부팅인가? **관리 프로세스 초기화나 wrap 등을 구분해야 합니다.**",
+        "2. ifIndex=7은 모든 장비의 같은 포트인가? **장비와 관리 범위가 필요한 지역 식별자입니다.**",
+        "3. SNMP 응답 timeout이면 포트가 down인가? **관리 경로·자격 증명·부하를 먼저 구분합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/network/routing-convergence-and-qos.md",
+      "content_sha256": "806c60e68e503e2e2d220ab7202953ff4804c75f04ba074adee39ac86ece0c80",
+      "scope": "상태: 검토됨 · 적용 범위: OSPFv2, BGP 기반 EVPN, DiffServ 표준 개념 · 검토일: 2026-10-04 · 장비별 구현 실험 없음",
+      "review_focus": "OSPF 2-Way/Full의 조건, 제어/데이터 경로, burst·큐 관측",
+      "critical_checks_in_text": [
+        "1. OSPF 이웃이 2-Way면 항상 장애인가? **네트워크 종류와 기대 adjacency를 확인합니다.**",
+        "2. EVPN 세션이 정상인 것은 실제 패킷 전달의 충분조건인가? **route 설치와 데이터 경로 검증이 남습니다.**",
+        "3. 평균 포트 사용률 10%면 큐 혼잡이 없는가? **짧은 편중과 큐별 상태를 확인해야 합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/storage/models-and-performance.md",
+      "content_sha256": "70a0f4d386c6397a182129ee5e4be7ad55e9477701d081f4a42ae1b87e02c9ff",
+      "scope": "상태: 검토됨 · 적용 범위: 저장 인터페이스의 공통 모델, NFS·S3·EBS 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "앱이 저장소를 사용하는 방식에는 블록 주소, 파일 경로, 객체 key 등이 있습니다. 저장 위치가 원격이라고 모두 같은 파일시스템 동작을 제공하는 것은 아닙니다. 사용하는 API의 완료·일관성·지속성 의미를 이해한 뒤 그 경계의 요청 수와 지연을 관측해야 합니다.",
+      "critical_checks_in_text": [
+        "1. IOPS가 높으면 bytes/s도 반드시 높은가? **작업 크기가 필요합니다.**",
+        "2. 애플리케이션 write 반환은 항상 영구 저장 완료인가? **캐시와 동기화 경계를 확인해야 합니다.**",
+        "3. 파일 서버의 bytes/s가 낮으면 여유로운가? **메타데이터와 작은 작업 병목이 있을 수 있습니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/storage/capacity-and-protection.md",
+      "content_sha256": "7639541eac18d44677601705c35d664e15f16b80e4ac3523b2c2cae8c6c500f8",
+      "scope": "상태: 검토됨 · 적용 범위: 공통 용량 모델, Ceph Squid erasure coding·EBS snapshot 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "데이터를 여러 사본으로 보관하면 물리 사용량이 늘 수 있고, snapshot은 원본과 블록을 공유할 수 있습니다. 사용자가 보는 논리 크기와 실제 저장 소비량을 따로 계산해야 하는 이유입니다. 보호 기능의 존재와 실제로 원하는 시점으로 복구할 수 있다는 증거도 구분합니다.",
+      "critical_checks_in_text": [
+        "1. k=4, m=2의 이상화된 보호 공간 비율은? **1.5배입니다.**",
+        "2. snapshot 10개가 논리 볼륨 10배의 실제 저장량인가? **증분·중복 구조를 확인해야 합니다.**",
+        "3. 저장 성공과 복구 시험 성공은 같은가? **복구 가능성은 별도 검증 대상입니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/storage/raid-lvm-and-paths.md",
+      "content_sha256": "f1ef4546804ec447e4eb8fee063a8f2b623cbca2663ce70f8af6388aa8ae4811",
+      "scope": "상태: 검토됨 · 적용 범위: Linux MD·device mapper, iSCSI·NFS 개념 · 검토일: 2026-10-04 · 장치 변경 명령과 장애 주입은 실행하지 않음",
+      "review_focus": "RAID 용량 가정과 고장 범위, thin pool 계정, 중복 경로",
+      "critical_checks_in_text": [
+        "1. RAID가 있으니 백업이 불필요한가? **잘못된 변경의 복구와 장치 고장 대응은 다릅니다.**",
+        "2. 24TiB를 논리 제공했으니 물리 디스크도 24TiB 사용 중인가? **thin 할당과 실제 소비를 확인합니다.**",
+        "3. 같은 LUN으로 가는 경로 2개를 용량 2배로 합산하는가? **하나의 대상과 두 경로를 구분해야 합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/containers/isolation-and-lifecycle.md",
+      "content_sha256": "01bf00a1c4969c7897fb9303d2908cc74619e19a2b174199122a90fff37054cd",
+      "scope": "상태: 검토됨 · 범위: Linux namespaces, OCI Runtime Specification 1.2.1 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "컨테이너는 프로그램이 보는 실행 환경을 격리하고 자원을 제어하는 단위입니다. 업무 서비스 이름이 유지되어도 내부 실행은 종료·재생성될 수 있습니다. 지금 실행 중인 것과 사용자가 접근할 준비가 된 것은 다르며, 수집 주기 사이에 끝나는 짧은 실행은 주기 조회만으로 놓칠 수 있습니다.",
+      "critical_checks_in_text": [
+        "- 같은 Pod의 두 컨테이너가 같은 IP를 가지면 중복 데이터인가? **일반적인 Pod 네트워크 모델에서는 공유가 정상이다. 관측 경계를 확인한다.**",
+        "- 같은 이미지 태그면 코드가 항상 같은가? **태그만으로는 콘텐츠 동일성을 보장하지 않는다.**",
+        "- OCI ID만으로 모든 호스트의 컨테이너를 구분할 수 있는가? **명세가 요구하는 고유성 범위는 호스트 내부이다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/containers/resource-control.md",
+      "content_sha256": "22413cab4ca321e1fa01597fe4a116cd7693ec673aeeaa4ce6653dbecf05a050",
+      "scope": "상태: 검토됨 · 범위: Linux cgroup v2, 일반적인 fair 계열 CPU 제어 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "호스트에 남는 CPU와 메모리가 많아도 컨테이너에 정한 한도에 걸릴 수 있습니다. 건물에 빈 공간이 있어도 특정 방의 사용 제한은 따로 있는 것과 비슷합니다. CPU quota는 실행 시간을 제한하고 메모리 제어는 다른 방식으로 작동하므로, 두 자원의 한도를 동일한 실패 규칙으로 설명하지 않습니다.",
+      "critical_checks_in_text": [
+        "- 1.5 CPU 한도는 전용 물리 코어를 예약하는가? **시간 대역폭과 독점 코어는 다른 설정이다.**",
+        "- throttling 발생 비율 30%가 요청 실패율인가? **아니다. 각 지표의 관측 단위가 다르다.**",
+        "- memory.high 초과와 OOM kill은 같은 사건인가? **아니다. 회수·제한과 종료 사건을 구분해야 한다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/containers/filesystems.md",
+      "content_sha256": "7cdfd9e855dee9e2e6aef09a66e6e169c26558a55698881f1b60cb1f81b43fee",
+      "scope": "상태: 검토됨 · 적용 범위: Docker의 계층 모델과 Linux OverlayFS, 구현별 차이 명시 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "이미지는 실행의 바탕이 되는 파일 계층을 제공하고, 컨테이너의 쓰기 계층과 외부 볼륨은 다른 수명을 가질 수 있습니다. 같은 이미지 계층을 여러 컨테이너가 공유하면 크기를 단순 합산해 실제 디스크 사용량을 과장할 수 있습니다. 파일이 어느 계층에 있는지부터 확인합니다.",
+      "critical_checks_in_text": [
+        "1. 컨테이너 내부 디렉터리 크기를 모두 더하면 호스트 물리 사용량인가? **공유 계층을 중복 계산할 수 있습니다.**",
+        "2. 모든 Docker 설치는 overlay2를 사용하는가? **버전과 image store 설정에 따라 다릅니다.**",
+        "3. 컨테이너 삭제는 연결된 모든 데이터의 삭제인가? **볼륨 등 다른 수명의 저장소가 있습니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/containers/platform-differences.md",
+      "content_sha256": "37b0b4de2a5754f80923f191f1c45b38f99770c7d4c5da1be5578fcdc7228e2a",
+      "scope": "상태: 검토됨 · 적용 범위: Linux cgroup 인터페이스, Windows 격리 모드의 공식 정의 · 검토일: 2026-10-04 · 플랫폼 간 실행 비교 없음",
+      "review_focus": "cgroup v1 ns/v2 us 단위, memory 계정, Windows 격리 모드",
+      "critical_checks_in_text": [
+        "1. cpuacct.usage를 10⁶으로 나누면 초인가? **v1 해당 필드는 ns이므로 10⁹으로 나눕니다.**",
+        "2. 컨테이너 메모리는 프로세스 RSS 합계와 같은가? **계정 범위가 달라질 수 있습니다.**",
+        "3. Windows Hyper-V isolation도 호스트 커널을 그대로 공유하는가? **별도 VM 격리 경계를 사용합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/kubernetes/objects-and-control-loops.md",
+      "content_sha256": "f181218bbf0ef0ab4f85010b7426df18d35dbde12288f5aa469d396fa67c4730",
+      "scope": "상태: 검토됨 · 적용 범위: Kubernetes API의 공통 객체 모델과 내장 컨트롤러 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "Kubernetes에서는 원하는 상태를 API 객체에 적고 controller가 실제 상태를 맞추려고 반복합니다. 복제 수 3을 요청했다는 것과 준비된 Pod가 3개라는 것은 다른 사실입니다. 이 반복 구조를 알아야 desired·current·ready 숫자의 차이를 바로 장애로 단정하지 않고 진행 상태로 해석할 수 있습니다.",
+      "critical_checks_in_text": [
+        "1. 동일 namespace/name으로 다시 만든 Pod는 과거 Pod와 같은가? **UID가 다른 객체입니다.**",
+        "2. API가 Deployment 생성을 받아들이면 모든 Pod가 준비되었는가? **제어 루프와 실행 단계를 더 관측해야 합니다.**",
+        "3. 소유 관계와 Service 선택 관계를 같은 간선으로 저장해도 되는가? **의미가 달라 별도 관계로 표현해야 합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/kubernetes/pod-lifecycle.md",
+      "content_sha256": "431d1d5bf361d291798f9a2130f9ce19a4d5f4095776275fefedb92a9d696ef3",
+      "scope": "상태: 검토됨 · 적용 범위: 일반 Pod와 컨테이너의 상태 해석 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "Pod에는 전체를 요약하는 phase, 내부 컨테이너 상태, 준비 여부 등의 여러 상태가 있습니다. 사람이 보는 짧은 상태 문자열 하나로 모두를 대신하면 중요한 차이를 잃습니다. 프로세스가 시작된 것과 요청을 받을 준비가 된 것을 구분하는 것이 이 장의 출발점입니다.",
+      "critical_checks_in_text": [
+        "1. Running이면 Ready인가? **아닙니다. 서로 다른 필드입니다.**",
+        "2. readiness 실패는 바로 컨테이너 재시작인가? **readiness 자체의 의미는 준비 상태입니다.**",
+        "3. 시작 시간 중 설명되지 않은 3초를 이미지 다운로드로 분류해도 되는가? **해당 단계의 증거가 필요합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/kubernetes/resources-and-scheduling.md",
+      "content_sha256": "1a889a9192ec09480c3b8ec0ca7bcd741f652a3af133d780e439963cd071456f",
+      "scope": "상태: 검토됨 · 적용 범위: 일반 CPU·메모리 요청/제한과 HPA 원리 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "request는 배치와 자원 판단에 쓰이는 요구량이고 limit은 실행 중 제어와 연결되는 한도입니다. 실제 사용량은 또 다른 값입니다. 이 셋을 구분하면 사용량이 낮은 Node에 Pod가 배치되지 않는 경우나, request보다 많이 쓰지만 정상인 경우를 이해할 수 있습니다.",
+      "critical_checks_in_text": [
+        "1. request 대비 150%는 CPU limit 초과인가? **아닙니다. 분모가 다릅니다.**",
+        "2. 실사용 여유가 충분하면 반드시 새 Pod를 배치할 수 있는가? **요청량과 다른 배치 제약도 확인해야 합니다.**",
+        "3. HPA 기본 계산의 5는 반드시 즉시 생성되는 Pod 수인가? **추가 제어 조건이 적용됩니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/kubernetes/collection.md",
+      "content_sha256": "0bda1cd354cd8fb3a6f0931feca6f34e8f90d8c7db7b235f81dd7ea11bfd426c",
+      "scope": "상태: 검토됨 · 적용 범위: API 객체, kube-state-metrics, Resource Metrics API, 컴포넌트 지표 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "Kubernetes의 객체 상태는 API에서, 실제 자원 사용량은 다른 계측 경로에서 얻을 수 있습니다. 같은 Pod를 설명해도 어느 원천을 읽었는지에 따라 업데이트 시점과 필드 의미가 다릅니다. 목록과 watch는 대상 발견·변경을 다루며, 모든 과거 사건의 완전한 기록을 보장하는 저장소로 사용하지 않습니다.",
+      "critical_checks_in_text": [
+        "1. kube-state-metrics가 모든 CPU 사용량을 측정하는가? **주 목적은 API 객체 상태의 지표화입니다.**",
+        "2. watch가 끊기면 모든 객체가 삭제된 것인가? **수집 연결의 실패와 대상의 삭제는 다릅니다.**",
+        "3. working set이 앱 heap인가? **관측 범위와 계산 방식이 다릅니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/kubernetes/network-and-storage.md",
+      "content_sha256": "ea2fbd957d812c501efb6cca581f2446349a40b975fd890161e856977b9d5af2",
+      "scope": "상태: 검토됨 · 적용 범위: Service·EndpointSlice·NetworkPolicy·PV/PVC 공통 원리 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "Service는 바뀌는 Pod 집합에 접근하는 방법을 제공하고, 볼륨 자원은 데이터 제공과 수명을 관리합니다. 논리 주소가 존재한다는 것과 실제 endpoint가 준비된 것은 다릅니다. 저장 요청이 연결되었다는 상태도 앱이 파일을 성공적으로 썼다는 뜻은 아닙니다.",
+      "critical_checks_in_text": [
+        "1. Service에는 항상 selector가 있는가? **selector 없는 Service도 있습니다.**",
+        "2. ReadWriteOnce는 정확히 한 Pod만 쓴다는 뜻인가? **한 노드 기준이며 ReadWriteOncePod와 다릅니다.**",
+        "3. PVC Bound면 앱의 파일 쓰기가 성공하는가? **마운트, 권한, 파일시스템과 실제 I/O를 더 확인해야 합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/kubernetes/workloads-and-control-plane.md",
+      "content_sha256": "e13bc5948e02818a495647264da459198222a33f1fabc27583382b37844ab117",
+      "scope": "상태: 검토됨 · 범위: Kubernetes workload controllers, etcd 3.6 문서 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "Deployment·StatefulSet·DaemonSet·Job은 서로 다른 실행 요구를 표현합니다. 같은 Pod 수를 세더라도 모든 Node에 하나씩 필요한 작업과 정해진 완료 수가 필요한 작업의 정상 기준은 다릅니다. 제어 평면의 저장·합의 상태와 실제 업무 성공도 별도로 관측해야 합니다.",
+      "critical_checks_in_text": [
+        "1. `db-0` 이름이 같으면 이전 CPU Counter와 이어도 되는가? **실행 UID·시작 수명은 바뀔 수 있다.**",
+        "2. CronJob의 실행 시간이 짧으면 일정도 지켰는가? **예정·생성·시작·완료 시각을 따로 비교해야 한다.**",
+        "3. etcd 3대 중 2대가 켜져 있으면 항상 상태 변경이 가능한가? **서로 통신하며 합의를 수행할 수 있는 등 추가 조건이 필요하다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/kubernetes/cni-csi-and-data-paths.md",
+      "content_sha256": "ec28eb2549e5819386b9266b83f866982fa064b162928ae610197aff1cac58b4",
+      "scope": "상태: 검토됨 · 적용 범위: CNI 1.1.0, CSI 1.11.0과 Kubernetes 개념 · 검토일: 2026-10-04 · 클러스터 실행 검증 없음",
+      "review_focus": "규약과 구현 버전, CNI 작업/통신 성공, CSI capability와 mount",
+      "critical_checks_in_text": [
+        "1. CNI 1.1.0이면 모든 plugin의 기능이 같은가? **규약 버전과 구현·지원 기능은 다릅니다.**",
+        "2. 모든 CSI 드라이버가 staging 단계를 수행하는가? **capability에 따라 다릅니다.**",
+        "3. PVC Bound면 mount도 성공했는가? **바인딩과 Node의 실제 준비 단계는 구분합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/kubernetes/operators-and-api-lifecycle.md",
+      "content_sha256": "c1250eaa2891797e9e0bf3feeeff86599602b2a04e2bd0c99a0b8122b1fa3173",
+      "scope": "상태: 검토됨 · 적용 범위: Kubernetes 공식 API·CRD·admission·Operator 문서 · 검토일: 2026-10-04 · 구현별 필드는 별도 확인",
+      "review_focus": "CRD/controller 역할, admission과 수렴, opaque resourceVersion",
+      "critical_checks_in_text": [
+        "1. CRD 설치만으로 DB 장애 전환이 동작하는가? **실제 controller와 그 설정·상태가 필요합니다.**",
+        "2. API 생성 성공이 workload 준비 완료인가? **비동기 수렴이 남아 있습니다.**",
+        "3. resourceVersion을 정수로 빼서 객체 나이를 계산하는가? **opaque 값이므로 그런 계산을 하지 않습니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/application/requests-and-concurrency.md",
+      "content_sha256": "82ef7342e6e8bbcedc36ce52b2573257189f26d9895fe46e0c68fad5042e4f38",
+      "scope": "상태: 검토됨 · 적용 범위: 서버 애플리케이션의 공통 성능 모델 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "동시 요청 수는 지금 끝나지 않은 일의 수이고 처리량은 시간 동안 끝낸 일의 수입니다. 주방에 주문서 20장이 쌓여 있다는 것과 초당 20장을 처리한다는 것은 다릅니다. 요청은 CPU에서 실행되거나 연결·잠금·외부 응답을 기다릴 수 있어 스레드 수와도 일대일로 같지 않습니다.",
+      "critical_checks_in_text": [
+        "1. 평균 100 requests/s, 평균 지연 0.4초의 안정된 시스템 내 요청 수는? **평균 40개입니다.**",
+        "2. 도착률과 완료율이 항상 같은가? **쌓이거나 비워지는 구간에는 다를 수 있습니다.**",
+        "3. DB 연결을 대여한 시간이 곧 DB CPU 시간인가? **네트워크와 대기, 결과 처리까지 포함할 수 있습니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/application/servers-and-pools.md",
+      "content_sha256": "896304030e074c1425ee739a950370b7ac1e7d2f64e1687677c7c9742f1f5ee9",
+      "scope": "상태: 검토됨 · 적용 범위: Tomcat 10.1, HikariCP·Spring Boot 공식 문서의 개념 · 검토일: 2026-10-04 · 실제 JVM 서버 실험 없음",
+      "review_focus": "연결 수/실행 수/대기, timeout 경계, 인스턴스별 pool 합계",
+      "critical_checks_in_text": [
+        "1. pool active 30이면 SQL 30개가 실행 중인가? **빌려 간 연결과 현재 실행 중인 문장은 다릅니다.**",
+        "2. connectionTimeout은 쿼리 timeout인가? **연결 획득 대기 한도입니다.**",
+        "3. 앱 인스턴스만 늘리면 DB 연결 부담도 그대로인가? **인스턴스별 pool 한도가 합쳐질 수 있습니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/application/timeouts-and-retries.md",
+      "content_sha256": "7e230e3f698f332df2f374d902a98f0812698ff3542004af3f697a0161ee479a",
+      "scope": "상태: 검토됨 · 적용 범위: 분산 호출의 공통 원리, gRPC deadline 예시 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "timeout은 기다리는 쪽이 더 기다리지 않겠다고 판단하는 경계입니다. 상대가 작업을 하지 않았다는 증거는 아닙니다. 재시도는 성공 가능성을 높일 수 있지만 부하와 중복 업무를 늘릴 수도 있습니다. 전체 요청의 시간 예산과 한 업무를 여러 번 시도했을 때의 결과를 함께 설계합니다.",
+      "critical_checks_in_text": [
+        "1. 시간 초과면 서버 작업은 실행되지 않았는가? **실행 또는 완료됐을 수 있습니다.**",
+        "2. 두 계층이 각각 총 4회 시도하면 마지막 계층의 최대 시도 수는? **이 단순 모델에서는 16회입니다.**",
+        "3. 거부가 늘고 성공 요청 지연이 줄면 서비스가 정상화됐는가? **전체 결과와 수용률을 함께 확인해야 합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/application/managed-runtimes.md",
+      "content_sha256": "0c31d1bc2cfcf1fa3497c2ffeb61de6a90e8d6b62de7c9df6451093f552a25c4",
+      "scope": "상태: 검토됨 · 적용 범위: JDK 25 API·HotSpot/G1 사례, .NET 공식 진단 원리 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "JVM과 .NET runtime은 코드 실행과 메모리 관리를 지원합니다. 객체를 만드는 영역인 heap은 프로세스 메모리의 일부이며, 사용하지 않게 된 객체를 회수하는 GC도 자원을 씁니다. heap 크기·프로세스 메모리·GC 정지 시간은 서로 다른 값이므로 각각의 경계를 확인합니다.",
+      "critical_checks_in_text": [
+        "1. JVM committed가 OS RSS와 같은가? **관측 범위와 의미가 다릅니다.**",
+        "2. 정지 시간 목표 100 ms는 모든 정지의 보장 상한인가? **G1에서는 목표이며 절대 보장이 아닙니다.**",
+        "3. CPU가 낮으면 ThreadPool 대기가 없는가? **블로킹으로 대기가 늘 수 있습니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/application/async-runtimes.md",
+      "content_sha256": "72859919a058b9bfac36199913fa35ffd17ba3dcc8e9980592779144c34030dc",
+      "scope": "상태: 검토됨 · 적용 범위: Go 런타임 API, Node.js 이벤트 루프, CPython 3.14 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "비동기 처리는 응답을 기다리는 동안 다른 일을 진행할 수 있게 만드는 방식입니다. 모든 작업이 동시에 CPU에서 실행된다는 뜻은 아닙니다. event loop에서 오래 계산하거나 동기 호출로 막히면 다른 작업의 시작도 늦어질 수 있습니다. Go·Node.js·Python은 실행 모델과 관측 원천을 따로 확인합니다.",
+      "critical_checks_in_text": [
+        "1. goroutine 10,000개는 요청 10,000개인가? **일대일 관계가 보장되지 않습니다.**",
+        "2. 이벤트 루프 지연과 요청 지연은 같은 분포인가? **표본 대상이 다릅니다.**",
+        "3. CPython 버전만으로 GIL 상태를 확정할 수 있는가? **빌드와 실제 실행 상태를 확인해야 합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/application/user-experience.md",
+      "content_sha256": "3621cfb1f88cff4c5448ef418628b56b40c94a870c242c04287e48ee96494064",
+      "scope": "상태: 검토됨 · 적용 범위: 웹 성능과 Resource Timing, Core Web Vitals · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "서버가 응답을 끝내도 브라우저가 내용을 내려받고 화면을 그리며 사용자 입력에 반응하는 시간이 남습니다. 그래서 서버 요청 지연과 사용자 체감 지연은 다릅니다. 실제 사용자 관측과 정해진 환경의 probe는 보는 집단이 다르므로 각각의 범위와 편향을 함께 해석합니다.",
+      "critical_checks_in_text": [
+        "1. CLS의 단위는 ms인가? **단위 없는 시각적 이동 점수입니다.**",
+        "2. 리소스 타이밍 0은 언제나 즉시 완료인가? **노출 제한 등 다른 의미일 수 있습니다.**",
+        "3. 합성 검사의 p75와 RUM p75를 평균내면 전체 p75인가? **백분위는 그런 방식으로 합쳐지지 않습니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/application/instrumentation-and-profiling.md",
+      "content_sha256": "93889bf9b01f3aecfd1e92f342a5949d922fb0a54a547642b4ba086afe22915a",
+      "scope": "상태: 검토됨 · 적용 범위: OpenTelemetry·Linux BPF·런타임 프로파일의 개념 · 검토일: 2026-10-04",
+      "review_focus": "자동 계측 지원 범위, span 경계, CPU와 wall profile 구분",
+      "critical_checks_in_text": [
+        "1. span이 100개면 사용자 요청도 100개인가? **한 요청이 여러 span과 재시도를 포함할 수 있습니다.**",
+        "2. CPU flame graph가 전체 지연 원인을 보여 주는가? **CPU를 사용하지 않은 대기가 빠질 수 있습니다.**",
+        "3. 자동 agent 설치면 모든 프레임워크가 계측되는가? **지원 버전과 실제 출력 확인이 필요합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/database/transactions-and-locks.md",
+      "content_sha256": "2bec22b1855e48e18ad226a54bc81c88a190a9285751d26f58d1de643dcb01b8",
+      "scope": "상태: 검토됨 · 적용 범위: 관계형 DB 공통 개념, PostgreSQL 18과 MySQL 8.4 InnoDB 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "송금에서 한 계좌를 줄이고 다른 계좌를 늘리는 변경은 함께 성공하거나 취소되어야 합니다. transaction은 이런 작업 묶음과 동시 접근의 규칙을 다룹니다. 다른 세션의 변경을 언제 볼 수 있는지, 어떤 작업을 기다려야 하는지는 엔진과 격리 수준에 따라 달라집니다.",
+      "critical_checks_in_text": [
+        "1. 같은 트랜잭션이면 두 SELECT가 항상 같은 결과인가? **격리 수준과 엔진에 따라 다릅니다.**",
+        "2. 대기자가 많으면 교착 상태인가? **순환 대기 여부가 필요합니다.**",
+        "3. 현재 쿼리 나이가 트랜잭션 나이인가? **시작 경계가 다릅니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/database/queries-and-indexes.md",
+      "content_sha256": "a19106f13b3409e939c6751cfbac1fa4b4be18b6e6773b03b96a9f39c2ce5b83",
+      "scope": "상태: 검토됨 · 적용 범위: 관계형 DB 실행 분석, PostgreSQL 18 계획 예시 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "index는 책의 색인처럼 원하는 자료를 찾는 경로를 제공하지만 유지 비용과 저장 공간이 필요합니다. DB는 질의를 수행할 방법을 계획으로 선택합니다. 계획의 추정과 실제 실행의 결과를 구분하고, 조회 1회의 느림뿐 아니라 호출 횟수까지 합친 총비용을 봅니다.",
+      "critical_checks_in_text": [
+        "1. EXPLAIN cost 100은 100 ms인가? **아닙니다. 계획자의 비용 단위입니다.**",
+        "2. 인덱스가 있으면 항상 더 빠른가? **조건과 데이터 분포, 읽는 비율에 따라 다릅니다.**",
+        "3. 가장 느린 평균 쿼리가 항상 전체 시간의 최대 기여자인가? **실행 횟수도 필요합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/database/postgresql.md",
+      "content_sha256": "835d5f08196d289743e874ffd358abfb277f4042081e07da2375c45a6b7533c7",
+      "scope": "상태: 검토됨 · 적용 범위: PostgreSQL 18 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "PostgreSQL에서는 지금 무엇을 기다리는지 보여 주는 활동 정보와 과거부터 누적한 통계가 서로 다릅니다. 한 시점에 연결 100개가 보였다는 사실로 최근 1분 동안 쿼리 100개가 실행되었다고 계산할 수 없습니다. 상태·누적량·통계가 시작된 시각을 함께 이해해야 합니다.",
+      "critical_checks_in_text": [
+        "1. active 세션이면 CPU 실행 중인가? **대기 이벤트가 있을 수 있습니다.**",
+        "2. 일반 VACUUM 뒤 파일이 작아져야만 성공인가? **재사용 가능한 공간 확보와 파일 축소는 다릅니다.**",
+        "3. 누적 mean 차분은 구간 mean인가? **시간 합의 차분을 호출 수 차분으로 나눠야 합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/database/mysql-mariadb.md",
+      "content_sha256": "fc6315ea0d18eeec0c6fc0b562439fa03d007da4903d22083cb8ee9463c85099",
+      "scope": "상태: 검토됨 · 적용 범위: MySQL 8.4 InnoDB·Performance Schema, MariaDB 진단 명령의 차이 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "MySQL과 MariaDB는 공통된 배경이 있지만 모든 기능·view·필드가 같은 제품은 아닙니다. 엔진이 실제로 기록한 실행 시간과 문장 수를 확인하고, 계측 설정과 통계 제한을 함께 봅니다. 이름이 비슷한 replication 지연 값도 어떤 진행 단계와 시간을 뜻하는지 구분합니다.",
+      "critical_checks_in_text": [
+        "1. TIMER_WAIT 1,000,000,000 ps는 몇 ms인가? **1 ms입니다.**",
+        "2. digest NULL 행을 지우면 전체 쿼리를 분석한 것인가? **상세 분류되지 않은 실행을 감출 수 있습니다.**",
+        "3. 복제 지연 0이면 receiver도 원본과 동일 위치인가? **그 지표만으로 보장하지 못합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/database/sqlserver-oracle.md",
+      "content_sha256": "bb5af9ec69c7f85f4500a252df2c89e16676c95559de5713438f0e6c3382a33d",
+      "scope": "상태: 검토됨 · 적용 범위: SQL Server DMV·Query Store의 공통 의미, Oracle Database 19c · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "각 DB는 세션·대기·실행 계획을 관측하는 고유한 관리 view를 제공합니다. 공통 화면을 만들 때도 원천의 ms·µs 단위, 실행 중 작업과 완료 통계, cache 수명을 보존해야 합니다. 여러 병렬 작업의 시간이 합쳐진 값을 사용자가 기다린 경과 시간으로 오해하지 않는 것이 핵심입니다.",
+      "critical_checks_in_text": [
+        "1. 전체 wait에 signal wait를 더해야 하는가? **이미 포함되므로 중복됩니다.**",
+        "2. 캐시에서 사라진 쿼리는 과거에도 없었는가? **캐시 수명과 실행 이력은 다릅니다.**",
+        "3. Oracle 병렬 elapsed time은 사용자 벽시계 시간인가? **여러 실행 주체의 누적 시간을 포함할 수 있습니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/database/replication-and-recovery.md",
+      "content_sha256": "cea36eed24c9dfef0c57d398c4806c06f3d936d6d9ba3e870cb431c37ba1a712",
+      "scope": "상태: 검토됨 · 적용 범위: 공통 복구 모델과 PostgreSQL 18 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "복제는 변경을 다른 사본에 전달하고, 복구는 저장된 로그와 데이터로 원하는 상태를 되찾는 과정입니다. 변경을 보낸 것, 받은 것, 저장한 것, 읽을 수 있게 적용한 것은 서로 다른 단계입니다. 데이터 손실 목표와 복구 시간 목표도 각각 정의해야 합니다.",
+      "critical_checks_in_text": [
+        "1. 복제 수신 완료가 적용 완료인가? **단계가 다릅니다.**",
+        "2. lag 시간은 따라잡기 예상 시간인가? **원천 정의가 그와 다를 수 있습니다.**",
+        "3. 백업 성공은 복원 검증 성공인가? **실제 복원 자료를 따로 확인해야 합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/database/high-availability.md",
+      "content_sha256": "5f65d07ff1d66c8fba3d6dc0e081f907185d9798973708ff5f07f08841ea9bee",
+      "scope": "상태: 검토됨 · 적용 범위: PostgreSQL 18 사례와 DB HA 설계의 공통 질문 · 검토일: 2026-10-04 · 실제 장애 전환 실행 없음",
+      "review_focus": "복제와 HA, fencing, client 복구, 보호 수준 회복",
+      "critical_checks_in_text": [
+        "1. 복제본만 있으면 HA가 완성되는가? **판단·차단·경로·클라이언트 회복이 남습니다.**",
+        "2. 승격 8초이면 서비스 RTO도 8초인가? **업무 복구 경계를 따로 측정합니다.**",
+        "3. 업무가 정상화되면 내고장성도 원래대로인가? **남은 복제본과 재동기화를 확인합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/database/distributed-and-analytical.md",
+      "content_sha256": "2e14b1cd5cf9a57a9c71b2435d426d928c2de52b77d951b692fb8cd95a362bf5",
+      "scope": "상태: 검토됨 · 적용 범위: MongoDB 8.0, Cassandra 공식 구조, DynamoDB 읽기, ClickHouse MergeTree · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "분산 DB는 데이터를 여러 노드에 나누거나 복제하고, 분석 DB는 많은 데이터를 읽어 집계하는 작업에 맞춘 구조를 사용할 수 있습니다. 한 노드가 정상이어도 특정 shard나 replica에 문제가 있을 수 있습니다. 클러스터 합계와 각 데이터 분할의 진행을 함께 보는 이유입니다.",
+      "critical_checks_in_text": [
+        "1. RF=3, QUORUM이면 데이터를 정확히 2곳에만 보내는가? **성공에 필요한 응답 수와 전송 대상 수는 다릅니다.**",
+        "2. 삭제 성공이면 즉시 저장 공간이 줄어드는가? **정리·병합 등의 후속 작업이 있을 수 있습니다.**",
+        "3. MergeTree primary key는 일반적인 유일성 제약인가? **같은 의미가 아닙니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/database/specialized-data-models.md",
+      "content_sha256": "9db9f1fa2dbf9b093d162ab6f3176dbbf36c2c8d989f64f7a524d8190c94d33e",
+      "scope": "상태: 검토됨 · 적용 범위: 데이터 모델의 비교, InfluxDB OSS 2·Neo4j 문서 사례 · 검토일: 2026-10-04 · 엔진 간 성능 비교 실험 없음",
+      "review_focus": "모델과 질의 패턴, series 조합, 그래프 확장량과 실제 작업 구분",
+      "critical_checks_in_text": [
+        "1. SQL을 쓰면 모두 행 지향 저장인가? **질의 언어와 저장 모델은 다릅니다.**",
+        "2. 시계열에 label 하나를 추가해도 비용은 일정한가? **값의 종류와 조합 수가 중요합니다.**",
+        "3. 그래프 시작점이 1개이면 읽는 관계도 1개인가? **확장 깊이와 분기에 따라 커질 수 있습니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/database/collection-contracts.md",
+      "content_sha256": "bbd87d50998467abb891401dbb506a8ade6fd703ff2691e63f5034fcc1fdd817",
+      "scope": "상태: 검토됨 · 적용 범위: PostgreSQL 18·MySQL 8.4의 원천 필드와 수집 설계 · 검토일: 2026-10-04 · 이 장의 서버 SQL은 실행하지 않음",
+      "review_focus": "조회 권한·SQL 부하, 통계 수명, view field 단위, read vs physical I/O",
+      "critical_checks_in_text": [
+        "1. blks_read 증가를 물리 디스크 읽기 수로 그대로 쓰는가? **OS 캐시 등 다른 층이 있으므로 DB 경계의 블록 읽기로 둡니다.**",
+        "2. DB 연결에 성공하면 모든 통계가 보이는가? **필드와 view별 권한이 다릅니다.**",
+        "3. SQL 오류 하나가 발생하면 모든 엔진이 전체 transaction을 자동 rollback하는가? **엔진·오류·클라이언트 동작에 따라 다르며 명시 처리해야 합니다. [SQLite 실습](../cross-domain/reproducible-labs.md)이 그 차이를 보여 줍니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/middleware/cache-redis.md",
+      "content_sha256": "ea9ce5cf940de8ad15ac33a442eb6c8e010d31726f2f8999a40559436a98040d",
+      "scope": "상태: 검토됨 · 적용 범위: 캐시의 공통 모델과 Redis 공식 지표 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "캐시는 자주 필요한 자료를 빠르게 다시 쓰도록 저장합니다. 캐시에서 찾지 못하면 원본 DB로 요청이 넘어가므로 작은 hit 비율 변화가 원본 부하를 크게 바꿀 수 있습니다. 만료·메모리 한도에 따른 제거·영속화는 서로 다른 동작으로 관측해야 합니다.",
+      "critical_checks_in_text": [
+        "1. 키 적중률 90%가 업무 요청 성공률 90%인가? **측정 단위가 다릅니다.**",
+        "2. 만료와 퇴거는 같은 원인인가? **시간 정책과 메모리 정책을 구분합니다.**",
+        "3. SLOWLOG가 조용하면 네트워크 지연도 없는가? **통신 시간은 포함하지 않습니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/middleware/kafka.md",
+      "content_sha256": "e6eaa5d56079076ed20b5b6d2d3737d66feb2d77bdaa4213d6594f14c394ac46",
+      "scope": "상태: 검토됨 · 적용 범위: Apache Kafka 4.3, 일반 consumer group · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "Kafka에서는 topic을 partition으로 나누고 그 안의 로그 위치로 처리 진행을 설명합니다. 소비자가 읽은 위치와 다시 시작할 때 사용할 commit 위치는 다를 수 있습니다. offset 차이가 언제나 남은 업무 개수와 같지는 않으므로 데이터 보존·압축·transaction과 소비 규칙을 함께 확인합니다.",
+      "critical_checks_in_text": [
+        "1. position 기준 lag와 commit 기준 lag는 같은가? **참조 위치가 다릅니다.**",
+        "2. 최대 lag를 더하면 모든 partition의 합계인가? **집계 의미가 다릅니다.**",
+        "3. broker 기록 성공이면 후속 업무가 완료됐는가? **소비와 업무 결과를 따로 확인해야 합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/middleware/message-queues.md",
+      "content_sha256": "f04ceb5940f1648b3052191af06192a282e2cbaec06aef60f9c535882c2cfc4f",
+      "scope": "상태: 검토됨 · 적용 범위: RabbitMQ 4.3, AMQP 0-9-1의 주요 관측 개념 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "메시지 broker가 발송을 수용한 것과 소비자가 업무를 끝낸 것은 별개의 확인입니다. 큐 안에서 전달을 기다리는 메시지와 이미 전달했지만 확인받지 못한 메시지를 나누어 봅니다. 재전달은 같은 업무를 다시 시도하는 것일 수 있어 전달 수를 고유 업무 수로 바꾸지 않습니다.",
+      "critical_checks_in_text": [
+        "1. publisher confirm은 소비자 업무 완료인가? **broker와의 확인입니다.**",
+        "2. ready 0이면 모든 메시지 처리가 끝났는가? **unacknowledged와 업무 상태를 추가 확인합니다.**",
+        "3. prefetch 100이면 100개를 병렬 실행하는가? **전달 제한과 실제 병렬 처리는 다릅니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/middleware/search-engines.md",
+      "content_sha256": "efcda2820549d628d7aeb5c82686df65260a98b706a20e146d063ad025853b67",
+      "scope": "상태: 검토됨 · 적용 범위: Elasticsearch·OpenSearch 공식 API의 주요 의미 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "검색 엔진은 문서를 빠르게 찾도록 index를 만들고 shard 단위로 나누어 보관할 수 있습니다. 쓰기 성공 뒤 검색에 보일 때까지의 경계와 장애 시 데이터 보존은 다릅니다. 클러스터 색상은 shard 상태 요약이므로 실제 검색 지연과 정확한 결과까지 함께 확인합니다.",
+      "critical_checks_in_text": [
+        "1. 쓰기 응답 성공과 검색 가시성은 같은 시점인가? **refresh 등 별도 단계가 있습니다.**",
+        "2. green이면 모든 검색이 빠른가? **배치 상태와 성능은 다릅니다.**",
+        "3. took 밖의 시간은 모두 네트워크 시간인가? **클라이언트와 중계의 여러 단계가 포함될 수 있습니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/middleware/proxies-and-mesh.md",
+      "content_sha256": "84d6ba16688e9f471384962cadf8a079c3f33d098d0203529d8b83f6a93b5c99",
+      "scope": "상태: 검토됨 · 적용 범위: NGINX·Envoy·Istio의 관측 경계 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "프록시는 요청을 받아 다른 서버로 전달하고, mesh는 서비스 간 통신에 공통 기능을 제공할 수 있습니다. 한 사용자 요청이 여러 프록시를 지날 때 같은 요청을 여러 번 관측할 수 있습니다. 연결 수·요청 수·재시도 수와 각각의 측정 위치를 구분해야 이중 집계를 피할 수 있습니다.",
+      "critical_checks_in_text": [
+        "1. Active connections가 업무 동시 요청 수인가? **유휴 연결 등이 포함될 수 있습니다.**",
+        "2. keepalive 값이 전체 upstream 연결 상한인가? **NGINX의 해당 설정은 그런 의미가 아닙니다.**",
+        "3. 프록시와 앱이 각각 요청 1건을 세면 사용자 요청 2건인가? **같은 요청의 다른 관측일 수 있습니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/middleware/stream-processing.md",
+      "content_sha256": "5120b85442e2ed83054881a814240c261afee9aac3807bf71680e2d9aa8f24e5",
+      "scope": "상태: 검토됨 · 적용 범위: Flink 1.20, Spark Structured Streaming 문서, Pulsar 4.0 사례 · 검토일: 2026-10-04 · 실제 분산 작업 실행 없음",
+      "review_focus": "event/processing time, watermark·backpressure, checkpoint와 sink 보장",
+      "critical_checks_in_text": [
+        "1. CPU가 낮으면 stream 결과가 늦을 수 없는가? **watermark·입력 유휴·외부 대기를 봐야 합니다.**",
+        "2. checkpoint 성공이면 외부 결제도 정확히 한 번인가? **sink와 업무 멱등성의 보장 경계가 필요합니다.**",
+        "3. broker backlog와 사용자 화면의 최신성은 같은가? **소비 이후 계산·저장·조회 경계도 있습니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/cloud/resources-and-apis.md",
+      "content_sha256": "78b5465eb2e1b20616970566334f85273672c2211e1a0417ebd516bb17b459e8",
+      "scope": "상태: 검토됨 · 적용 범위: AWS·Azure·Google Cloud 자원 모델과 읽기 수집 설계 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "클라우드 자원은 이름 외에 계정·프로젝트·리전 등의 관리 범위 안에서 식별됩니다. API 목록 한 페이지를 읽은 것은 전체 목록 조회가 아닐 수 있습니다. 수집기는 인증·권한·pagination·호출 제한을 처리하면서 실제 자원 변경과 수집 실패를 구분해야 합니다.",
+      "critical_checks_in_text": [
+        "1. 이름이 같은 VM은 같은 자원인가? **원천 ID와 범위·수명이 필요합니다.**",
+        "2. 목록 API 한 번 성공이면 전체 조회 완료인가? **다음 페이지와 수집 범위를 확인해야 합니다.**",
+        "3. 권한 거부로 안 보이는 자원을 삭제 처리해도 되는가? **관측 실패와 부재는 다릅니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/cloud/provider-metrics.md",
+      "content_sha256": "be94c8f288df3750bb78977b30abc4299505710510f20451e274ebc79c62aa2a",
+      "scope": "상태: 검토됨 · 적용 범위: CloudWatch·Azure Monitor·Cloud Monitoring · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "클라우드가 제공하는 지표는 이미 정해진 시간 구간으로 집계된 값일 수 있습니다. 1분간 byte 합계는 서버 시작 이후의 누적 byte counter와 다릅니다. 원천의 통계 종류·시간 간격·차원을 확인한 뒤 초당 값이나 전체 평균으로 변환합니다.",
+      "critical_checks_in_text": [
+        "1. 분당 Sum을 다음 분 Sum과 차분하면 요청률인가? **각 구간 건수라면 기간으로 나눠야 합니다.**",
+        "2. 표본 수가 다른 평균을 같은 가중치로 합쳐도 되는가? **표본 수가 필요합니다.**",
+        "3. 공급자 지표와 에이전트 지표는 자동으로 동일한가? **범위·구간·정의를 비교해야 합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/cloud/managed-and-serverless.md",
+      "content_sha256": "759314e2a93b02972b1b52e363fdc7c0bdb49df08f19d66f36fdb726947e2378",
+      "scope": "상태: 검토됨 · 적용 범위: 관리형 관측 모델, AWS Lambda·Google Cloud Run 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "관리형 서비스는 내부 운영의 일부를 공급자가 맡지만 사용자 요청의 의미와 관측 책임은 남습니다. 서버리스에서는 실행 준비, 실제 실행, 동시성 제한, 대기하는 사건을 구분해야 합니다. 보이지 않는 호스트 내부를 추측해 채우기보다 제공되는 경계와 업무 성공을 연결합니다.",
+      "critical_checks_in_text": [
+        "1. Errors/Invocations가 모든 진입 요청의 실패율인가? **throttle 등 빠지는 범주가 있습니다.**",
+        "2. Lambda Duration에 cold start가 포함되는가? **해당 지표의 정의에서는 포함하지 않습니다.**",
+        "3. Cloud Run 504면 코드 실행도 종료됐는가? **그렇다고 보장되지 않습니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/cloud/networking.md",
+      "content_sha256": "9e71186cf50c7c1b05e017d99d1bc2949392dbbbf21ef409eaff02b0b099a3a6",
+      "scope": "상태: 검토됨 · 적용 범위: 공통 조사 모델과 AWS VPC 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "클라우드 네트워크에는 주소·경로 외에 보안 정책과 주소 변환 같은 경계가 있습니다. 방화벽에서 허용한 패킷이 앱까지 성공적으로 처리되었다는 뜻은 아닙니다. flow log의 허용·거절과 실제 사용자 요청 결과를 서로 다른 증거로 읽습니다.",
+      "critical_checks_in_text": [
+        "1. security group과 NACL은 모두 같은 상태 추적을 하는가? **AWS에서는 stateful과 stateless 차이가 있습니다.**",
+        "2. ACCEPT 로그면 DB 쿼리가 성공했는가? **전송·인증·업무 결과를 더 확인해야 합니다.**",
+        "3. SKIPDATA를 트래픽 0으로 저장해도 되는가? **관측 누락을 잘못 표현합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/cloud/quotas-cost-and-capacity.md",
+      "content_sha256": "0e13e9b1ef935f47b9986552b04b89406c01c44256f6b5c15c9e5a11b0ba765d",
+      "scope": "상태: 검토됨 · 적용 범위: 클라우드 공통 설계 질문과 AWS 공식 원천 사례 · 검토일: 2026-10-04 · 실제 계정 조회·과금 작업 없음",
+      "review_focus": "quota 범위, allocation vs utilization, API burst와 비용 가정",
+      "critical_checks_in_text": [
+        "1. quota 80%는 CPU가 80% 바쁘다는 뜻인가? **할당 또는 사용 한도의 정의를 확인해야 합니다.**",
+        "2. 평균 API 20/초면 burst 제한도 통과하는가? **호출 분포와 API별 한도에 따라 다릅니다.**",
+        "3. 자원 지표 합계로 청구액을 정확히 알 수 있는가? **요율·계약·청구 항목 등의 근거가 추가로 필요합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/cross-domain/slow-requests.md",
+      "content_sha256": "e42ff817a1256ae77336e5991ea53e179af73372db6059d6d82da5d7415edd3f",
+      "scope": "상태: 학습용 분석 사례 · 모든 수치·시간·대상은 가상 · 실환경 장애를 재현하거나 명령을 실행하지 않음 · 편집 검토일: 2026-10-04",
+      "review_focus": "느린 요청은 여러 도메인에 동시에 증상을 만들 수 있습니다. DB 잠금을 기다리느라 앱이 연결을 오래 보유하면 연결 풀도 가득 차고 후속 요청도 기다립니다. 여러 경고를 각각 독립된 원인으로 취급하기 전에 시간 순서와 대기 관계를 연결하는 연습입니다.",
+      "critical_checks_in_text": [
+        "1. 느린 요청의 700 ms 풀 대기를 DB 내부 실행 시간으로 표시해도 되는가? **연결 획득 전의 대기이므로 경계가 다르다.**",
+        "2. blocker 해제 후 회복했으면 최초 원인도 전부 파악했는가? **blocker가 오래 지속된 이유는 별도 조사 대상이다.**",
+        "3. 연결을 두 배로 늘리면 처리량도 두 배인가? **잠금·DB 용량·부하 변화 때문에 보장할 수 없다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/cross-domain/resource-failures.md",
+      "content_sha256": "1d51c064ba37cf3ee0f6c9ff6364e5b6cc7876652c3d74ab5989358d3e8f76b9",
+      "scope": "상태: 학습용 분석 사례 · 모든 수치·시간·대상은 가상 · 실제 시스템 조치 없음 · 편집 검토일: 2026-10-04",
+      "review_focus": "메모리 종료와 저장 공간 부족은 겉으로 앱 중단처럼 보일 수 있지만 실패 경계가 다릅니다. 호스트 전체 여유만 보거나 화면에 나타난 종료 코드만 보면 원인을 잘못 분류할 수 있습니다. 자원 계정·한도·실제 사건을 연결해 가설을 좁힙니다.",
+      "critical_checks_in_text": [
+        "1. 호스트 여유가 충분하면 컨테이너 OOM은 불가능한가? **cgroup 한도에 의해 별도로 발생할 수 있다.**",
+        "2. heap과 컨테이너 사용량의 차이가 곧 누수인가? **계수 범위·시각·구성 항목이 다르므로 단정할 수 없다.**",
+        "3. 남은 공간 20시간 예측은 보장된 장애 시각인가? **순증가가 유지된다는 가정의 결과다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/cross-domain/backlogs-and-retries.md",
+      "content_sha256": "a4e2dc60dc3cf0811e157265a4272a1fc6b68de2ebc8e606b1a44bb47960ce18",
+      "scope": "상태: 학습용 분석 사례 · 모든 수치는 가상 입력과 산술 결과 · 실측 성능 또는 권장 용량이 아님 · 편집 검토일: 2026-10-04",
+      "review_focus": "캐시 적중이 줄어 원본 요청이 늘고, 느려진 요청을 재시도하면 부하가 다시 커질 수 있습니다. 대기열의 변화는 들어오는 일과 끝내는 일의 차이입니다. 재시도 횟수·도착률·처리율을 같은 경계로 정의해야 악순환을 수치로 설명할 수 있습니다.",
+      "critical_checks_in_text": [
+        "1. 논리 요청 1,200개가 최대 세 번 시도하면 반드시 같은 초에 3,600번 호출되는가? **시도 총수와 발생 시간 분포는 다른 정보다.**",
+        "2. 큐 길이가 줄면 모든 오래된 작업도 처리되었는가? **일부 작업이 재실패하거나 다른 경로로 이동했을 수 있다.**",
+        "3. 캐시 miss가 늘면 원인이 TTL인가? **eviction·key 변경·cold cache 등 다른 가설을 비교해야 한다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/cross-domain/missing-observations.md",
+      "content_sha256": "8763a43a9992686596ab7fae49ea2fefb0ca1f274aede142aa8020deb6f49728",
+      "scope": "상태: 학습용 분석 사례 · 가상의 수집 구성과 관측 기록 · 실환경 검증 아님 · 편집 검토일: 2026-10-04",
+      "review_focus": "여러 그래프가 동시에 끊기면 여러 서버가 동시에 멈췄을 수도 있고 공통 수집 경로가 실패했을 수도 있습니다. 값이 없는 순간에는 대상 상태와 관측 상태를 분리해야 합니다. 이 사례는 마지막 성공 시각과 독립된 확인 경로로 두 가설을 비교합니다.",
+      "critical_checks_in_text": [
+        "1. 모든 그래프가 비면 모든 대상이 내려간 것인가? **공통 관측 경로의 장애도 같은 증상을 만들 수 있다.**",
+        "2. 재전송이 끝나면 과거 알림도 자동으로 정확해지는가? **과거 재평가 정책과 늦은 자료 처리 규칙을 확인해야 한다.**",
+        "3. 합성 검사 하나의 성공이 전체 업무 정상의 증거인가? **해당 검사 범위만 확인한다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/cross-domain/reproducible-labs.md",
+      "content_sha256": "492e10394a975e3758706dd64c1982a53e529df93b408692952787b8d212c9cf",
+      "scope": "상태: 검토됨 · 적용 범위: Windows 로컬 실행, Python 3.11.9·SQLite 3.45.1·promtool 3.5.0 · 실행일: 2026-10-04",
+      "review_focus": "원시 결과와 본문 수치·버전·입력 종류, 실제 실행의 한계",
+      "critical_checks_in_text": [
+        "1. 합성 PromQL 입력이면 실행 검증이 아닌가? **입력은 합성이지만 실제 평가기의 동작을 실행해 확인했습니다. 운영 scrape 검증과는 다릅니다.**",
+        "2. SQLite 실습으로 모든 DB의 격리 수준을 확인했는가? **SQLite 해당 버전·설정의 결과입니다.**",
+        "3. 모든 검사 통과가 모든 운영 환경의 보장인가? **명시한 입력·버전·경계의 증거이며 범위를 넘겨 해석하지 않습니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/cross-domain/capstone-investigation.md",
+      "content_sha256": "2ff736288ae94390f019ad98e35641867cb49a33faf13a6978882493be55e14a",
+      "scope": "상태: 검토됨 · 적용 범위: 학습용으로 구성한 가상 사례 · 검토일: 2026-10-04 · 실제 고객 장애나 실행 결과가 아님",
+      "review_focus": "오류율·CPU 분모, 상관/원인, 경쟁 가설과 추가 검증",
+      "critical_checks_in_text": [
+        "2. 4.8 CPU초/10초는 CPU 4.8개인가? **평균 0.48 CPU입니다.**",
+        "3. 0.48/0.5=96%면 Node CPU도 96%인가? **다른 분모이며, 8 CPU Node 기준은 6%입니다.**",
+        "4. throttle period 40%라면 요청 40%가 실패한 것인가? **기간의 한도 적용과 요청 결과는 다른 지표입니다.**",
+        "5. 자료가 quota 가설을 지지하면 원인 분석을 끝내는가? **코드·부하 구성 등 남은 가설을 검증하고 업무 회복을 확인합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/product/entities-and-topology.md",
+      "content_sha256": "236e45615921e32c241d536b67caeef04c821feae7ae1e2ce7c25e44ae60c742",
+      "scope": "상태: 검토됨 · 범위: OpenTelemetry 규약과 이를 참고한 제품 모델 제안 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "entity는 제품이 구분해 관리할 대상이고 topology는 대상들 사이의 관계입니다. 같은 이름으로 다시 생성된 Pod와 장기간 유지되는 업무 서비스를 구분해야 과거 장애가 올바른 실행에 연결됩니다. 포함 관계, 실행 관계, 호출 관계를 서로 다른 종류로 저장하는 것부터 시작합니다.",
+      "critical_checks_in_text": [
+        "1. 같은 IP로 관측한 두 DB는 같은 DB인가? **네트워크 범위·시간·원천 ID를 확인하기 전에는 알 수 없다.**",
+        "2. 현재 서비스 지도가 지난주 장애 경로를 설명하는가? **지난주의 관계 이력이 없으면 보장할 수 없다.**",
+        "3. 관계가 직접 관측되었다면 장애 원인도 확정되는가? **호출이나 배치의 존재와 장애의 인과관계는 다른 주장이다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/product/collection-pipelines.md",
+      "content_sha256": "e0bb05ebe1b2414ba2ec59237692725f3e29d7bef34d18c3b2d4190d9291e862",
+      "scope": "상태: 검토됨 · 범위: 공통 수집 구조, OpenTelemetry Collector·OTLP · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "관측 자료는 원천에서 읽힌 뒤 변환·대기·전송·저장 단계를 지납니다. 택배를 접수한 것과 최종 목적지에 도착한 것이 다르듯이 수신 성공과 조회 가능은 다른 완료 경계입니다. 각 단계의 실패·재시도·중복·버퍼 상태를 관측해야 수집 제품 자체의 문제를 설명할 수 있습니다.",
+      "critical_checks_in_text": [
+        "1. HTTP 200을 받았으면 모든 OTLP 항목이 저장되었는가? **부분 성공 본문과 수신 서버의 계약을 확인해야 한다.**",
+        "2. 영속 큐가 있으면 무한 장애 시간을 견디는가? **용량·디스크·재시도 조건에 한계가 있다.**",
+        "3. 변환 작업자가 재시작하면 누적값의 차이를 바로 계산할 수 있는가? **이전 값과 수명 정보를 복원하지 못하면 불확실한 첫 구간을 따로 처리해야 한다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/product/storage-and-query.md",
+      "content_sha256": "423ff7f4354777d25a3e538155dec2088ef5904b9189157d78ef679f433e5ee7",
+      "scope": "상태: 검토됨 · 범위: 저장·조회 모델 제안, Prometheus 동작 참고 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "저장 설계는 어떤 질문에 답할지에서 출발합니다. 최근의 상세 요청 조사와 1년간 추세 비교는 필요한 해상도와 데이터 종류가 다릅니다. 평균이나 p95만 남기면 나중에 원래 분포를 복원할 수 없으므로 보존 비용과 가능한 질의를 함께 정의해야 합니다.",
+      "critical_checks_in_text": [
+        "1. 원천 주기 60초인데 화면 step이 1초면 1초 해상도 수집인가? **아니다. 평가 시각과 실제 관측 시각은 다르다.**",
+        "2. 30일 본문 저장량이 138.24 GB면 디스크 140 GB로 충분한가? **인덱스·WAL·복제·여유 공간 등이 빠진 가정이므로 판단할 수 없다.**",
+        "3. 장기 평균만으로 짧은 최고 부하를 복원할 수 있는가? **집계 과정에서 잃은 정보는 복원할 수 없다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/product/alerts-and-incidents.md",
+      "content_sha256": "0b872768da0251153f898c4c91bce6508b48924f8bde10174d753f5428425483",
+      "scope": "상태: 검토됨 · 범위: Prometheus·Alertmanager 개념과 제품 설계 제안 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "알림 규칙은 관측값을 판단해 상태를 만들고, 통지는 그 상태를 사람이나 다른 시스템에 전달합니다. incident는 관련 사건과 영향에 대한 관리 단위입니다. 경고가 조용해졌다고 실제 문제가 해결된 것은 아닐 수 있어 rule·통지·업무 회복을 따로 관측합니다.",
+      "critical_checks_in_text": [
+        "1. 5분 평균을 2분 동안 평가하면 7분 평균인가? **아니다. 5분 window의 계산 결과가 각 평가에서 2분 동안 조건을 유지하는 것이다.**",
+        "2. Silence 상태면 장애가 해결되었는가? **통지가 억제된 상태일 뿐이다.**",
+        "3. 동일 호스트에서 알림이 동시에 발생하면 원인이 호스트인가? **가설의 근거가 될 수 있지만 인과관계 검증은 추가로 필요하다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/product/self-observation-and-access.md",
+      "content_sha256": "d4f9f3b9014ea28710a7f4a759d87327a4ed33e49e88527e63e2fb77be8c5980",
+      "scope": "상태: 검토됨 · 범위: Collector 자체 관측 참고, 제품 신뢰성·접근 모델 제안 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
+      "review_focus": "모니터링 제품이 실패하면 대상의 장애와 수집기의 장애가 비슷하게 보일 수 있습니다. 자신의 수집·저장·조회 성공을 관측하고 일부는 독립된 경로에서 확인해야 합니다. 여러 고객의 자료를 다룰 때는 화면뿐 아니라 수집·저장·질의 전 과정에서 접근 범위를 유지해야 합니다.",
+      "critical_checks_in_text": [
+        "1. 수집 완전성 97%이면 업무 가용성도 97%인가? **모집단과 성공 조건이 다른 지표다.**",
+        "2. 제품 health endpoint가 응답하면 데이터 조회도 정상인가? **그 endpoint가 실제로 검사한 경로를 확인해야 한다.**",
+        "3. tenant 라벨만 추가하면 고객 간 격리가 완성되는가? **인증·저장·조회·캐시·내보내기까지 접근 통제가 이어져야 한다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/product/adapter-contracts.md",
+      "content_sha256": "ede992d5f4db60273f6cbd6c2cfa7dc6bef8470f6d848eeebc5aa7f95aa5e1c1",
+      "scope": "상태: 검토됨 · 적용 범위: 이 책의 제품 설계 제안과 실행 가능한 참조 예제 · 검토일: 2026-10-04 · 사용자 제품에 구현된 기능을 뜻하지 않음",
+      "review_focus": "원천 semantics 보존, 정수 차분, 누락/리셋/중복, 좁은 참조 계약",
+      "critical_checks_in_text": [
+        "1. 수집 실패 뒤 rate=0을 내보내는가? **0과 관측 불가를 구분합니다.**",
+        "2. timestamp와 값이 같으면 업무 중복도 없다고 입증되는가? **이 표본의 중복 판단일 뿐 업무 사건의 멱등성 증명은 아닙니다.**",
+        "3. 원천에 없는 histogram을 p95 하나로 생성할 수 있는가? **원래 분포 정보가 부족합니다.**"
+      ],
+      "comprehension_present": true
+    },
+    {
+      "path": "docs/product/capacity-and-loss-budgets.md",
+      "content_sha256": "c400f3f96e9214caffb665e4459fd52f1aa066c94337651c4456d6ba9890fb0e",
+      "scope": "상태: 검토됨 · 적용 범위: 용량 산정·장애 시 데이터 처리의 설계 예시 · 검토일: 2026-10-04 · 실제 서비스 벤치마크 아님",
+      "review_focus": "sample·series·payload 가정, 버퍼 증가/복구, 수용/영속/조회",
+      "critical_checks_in_text": [
+        "1. 400 sample/초라는 숫자로 저장 용량을 확정하는가? **평균 크기·metadata·보존·복제 등을 알아야 합니다.**",
+        "2. 버퍼가 있으면 무손실인가? **용량·지속 시간·프로세스 실패·저장 보장을 확인해야 합니다.**",
+        "3. 입력을 수용했으면 바로 검색되는가? **각 단계의 완료 경계를 따로 측정합니다.**"
+      ],
+      "comprehension_present": true
+    }
+  ]
+}

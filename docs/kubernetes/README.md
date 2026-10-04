@@ -1,6 +1,6 @@
 # 쿠버네티스 도메인
 
-> 상태: 초안 · 적용 범위: Kubernetes 공통 개념 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: Kubernetes 공통 개념 · 출처 확인일: 2026-10-03
 
 쿠버네티스 영역에서는 클러스터의 구성, 워크로드 실행 상태, 자원 사용 및 변경 이력을 연결합니다. 원하는 상태가 실제로 실현되고 있는지, 문제가 어느 계층에서 시작됐는지 이해하는 것이 목적입니다.
 
@@ -41,13 +41,13 @@ API에서 얻는 리소스 상태, 런타임에서 얻는 사용량, 애플리�
 
 ## 상세 본문
 
-1. [객체와 제어 루프](objects-and-control-loops.md): desired·observed 상태, UID, owner, 삭제
-2. [Pod 수명과 건강 검사](pod-lifecycle.md): phase·reason·condition, probe, 재시작
-3. [자원·배치·확장](resources-and-scheduling.md): requests·limits, 스케줄링, HPA, eviction
-4. [수집 경로](collection.md): API·kube-state-metrics·Resource Metrics의 차이
-5. [네트워크와 저장소](network-and-storage.md): Service·EndpointSlice·NetworkPolicy·PV/PVC
-6. [워크로드와 제어 평면](workloads-and-control-plane.md): StatefulSet·DaemonSet·Job·CronJob, etcd
-
-버전별 feature gate, CNI·CSI별 세부 구현과 operator별 제어 로직은 실제 기술을 정해 추가 검증할 범위입니다.
+1. [Kubernetes 객체와 제어 루프](objects-and-control-loops.md)
+2. [Pod 수명, 컨테이너 상태와 건강 검사](pod-lifecycle.md)
+3. [자원 요청, 제한, 배치와 확장](resources-and-scheduling.md)
+4. [Kubernetes 수집 경로와 데이터의 의미](collection.md)
+5. [Kubernetes 네트워크와 저장소의 연결 관계](network-and-storage.md)
+6. [워크로드 종류와 제어 평면의 가용성](workloads-and-control-plane.md)
+7. [CNI와 CSI: Pod 연결과 볼륨 준비가 실패하는 위치](cni-csi-and-data-paths.md)
+8. [API 변경, CRD와 Operator를 관측하는 방법](operators-and-api-lifecycle.md)
 
 관련 문서: [호스트](../host/README.md), [애플리케이션](../application/README.md), [도메인 간 분석](../cross-domain/README.md)

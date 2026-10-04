@@ -1,6 +1,6 @@
 # 데이터베이스 도메인
 
-> 상태: 초안 · 적용 범위: DB 공통 관점, PostgreSQL 18 설명 예시 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: DB 공통 관점, PostgreSQL 18 설명 예시 · 출처 확인일: 2026-10-03
 
 데이터베이스 영역에서는 요청이 연결·쿼리 실행·트랜잭션·저장·복제를 거치며 처리되는 과정을 이해합니다. 공통 질문을 먼저 정리하고, 엔진마다 다른 구조와 통계의 의미를 상세 문서로 확장합니다.
 
@@ -41,14 +41,15 @@ PostgreSQL 18의 `pg_stat_activity`는 서버 프로세스의 현재 활동을 �
 
 ## 상세 본문
 
-1. [트랜잭션·MVCC·잠금](transactions-and-locks.md): 격리와 대기, 엔진별 기본값 차이
-2. [쿼리와 실행 계획](queries-and-indexes.md): 인덱스, 실행 비용, 누적 영향
-3. [PostgreSQL](postgresql.md): 활동·통계·VACUUM, pg_stat_statements
-4. [MySQL·MariaDB](mysql-mariadb.md): Performance Schema 단위, digest, 복제 지연
-5. [SQL Server·Oracle](sqlserver-oracle.md): 대기·캐시 통계, Query Store, 병렬 실행
-6. [로그·복제·복구](replication-and-recovery.md): WAL, 지속성, log position, PITR
-7. [분산·분석형 DB](distributed-and-analytical.md): MongoDB·Cassandra·DynamoDB·ClickHouse
-
-여러 엔진의 주요 차이를 설명하지만 모든 관리 뷰나 배포 형태를 열거하지는 않습니다. 추가 엔진과 실제 연동 검증 범위는 [집필 현황](../coverage.md)에 기록합니다.
+1. [트랜잭션, 격리, MVCC와 잠금](transactions-and-locks.md)
+2. [쿼리, 인덱스, 실행 계획과 비용](queries-and-indexes.md)
+3. [PostgreSQL 관측: 활동, 누적 통계와 정리 작업](postgresql.md)
+4. [MySQL과 MariaDB 관측](mysql-mariadb.md)
+5. [SQL Server와 Oracle: 대기와 실행 통계](sqlserver-oracle.md)
+6. [로그, 지속성, 복제와 복구](replication-and-recovery.md)
+7. [DB 고가용성: 장애 전환, fencing과 복구 완료의 의미](high-availability.md)
+8. [문서형, 분산형, 분석형 DB의 관측](distributed-and-analytical.md)
+9. [시계열·그래프·문서·열 지향 DB를 비교하는 기준](specialized-data-models.md)
+10. [DB 수집 명세: 읽기 전용 쿼리, 단위, 권한과 통계 수명](collection-contracts.md)
 
 관련 문서: [애플리케이션](../application/README.md), [호스트](../host/README.md), [스토리지](../storage/README.md)

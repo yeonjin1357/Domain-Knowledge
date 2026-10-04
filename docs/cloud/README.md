@@ -1,6 +1,6 @@
 # 클라우드 도메인
 
-> 상태: 초안 · 적용 범위: 공급자 공통 관점, OpenTelemetry 속성 예시 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: 공급자 공통 관점, OpenTelemetry 속성 예시 · 출처 확인일: 2026-10-03
 
 클라우드 영역에서는 자원의 소속과 위치, 관리형 서비스의 관측 범위, 공급자 API를 통한 수집을 정리합니다. 온프레미스와 클라우드에 걸친 대상을 하나의 제품에서 식별하고 탐색할 수 있도록 하는 것이 목적입니다.
 
@@ -34,11 +34,10 @@ OpenTelemetry의 클라우드 규약에는 공급자, 계정, 리전, 가용 영
 
 ## 상세 본문
 
-1. [자원과 API](resources-and-apis.md): AWS·Azure·Google Cloud 계층, 식별, pagination
-2. [공급자 지표](provider-metrics.md): period·statistic·temporality와 정규화
-3. [관리형·서버리스](managed-and-serverless.md): Lambda·Cloud Run, 동시성, 보이지 않는 계층
-4. [클라우드 네트워크](networking.md): VPC 경로·정책·흐름 로그와 관측 범위
-
-공급자의 모든 서비스·SKU·할당량을 지원표로 확정하지 않습니다. 서비스별 실제 수집 검증과 비용 명세는 추가 범위입니다.
+1. [클라우드 자원 계층과 API 수집](resources-and-apis.md)
+2. [클라우드 지표의 기간, 통계와 정규화](provider-metrics.md)
+3. [관리형 서비스와 서버리스 관측](managed-and-serverless.md)
+4. [클라우드 네트워크: 경로, 정책과 흐름 로그](networking.md)
+5. [클라우드 한도, 비용과 용량: 사용량만으로 보이지 않는 제약](quotas-cost-and-capacity.md)
 
 관련 문서: [호스트](../host/README.md), [네트워크](../network/README.md), [DB](../database/README.md), [제품 설계 관점](../product/README.md)

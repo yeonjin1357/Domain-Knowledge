@@ -1,0 +1,6 @@
+* text=auto eol=lf
+# Preserve upstream JavaScript, including whitespace inside template literals.
+assets/mermaid-*.min.js -text -whitespace
+# This generated document embeds the same upstream JavaScript byte for byte.
+BOOK.html text eol=lf -whitespace
+*.png -text

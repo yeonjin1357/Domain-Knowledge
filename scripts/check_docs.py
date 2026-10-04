@@ -1,6 +1,8 @@
 """Check Markdown structure, local targets, anchors, and book coverage."""
 
 from collections import Counter
+import hashlib
+import json
 import re
 
 from doc_utils import ROOT, EXPLICIT_ID, content_lines, headings, links, local_target, manifest
@@ -8,7 +10,7 @@ from doc_utils import ROOT, EXPLICIT_ID, content_lines, headings, links, local_t
 
 def main():
     errors, documents, anchors = [], {}, {}
-    files = sorted(p for p in ROOT.rglob("*.md") if ".git" not in p.parts)
+    files = sorted([*ROOT.glob("*.md"), *(ROOT / "docs").rglob("*.md"), *(ROOT / "templates").rglob("*.md")])
     for path in files:
         name = path.relative_to(ROOT).as_posix()
         try:
@@ -71,8 +73,15 @@ def main():
         index_text = (path.parent / "README.md").read_text(encoding="utf-8")
         if f"]({path.name})" not in index_text:
             errors.append(f"{path}: missing domain index link")
-    if len(detailed) != 58:
-        errors.append(f"Expected 58 detailed chapters, found {len(detailed)}; update count claims")
+    if len(detailed) != config["detailed_chapters"]:
+        errors.append(f"Expected {config['detailed_chapters']} detailed chapters, found {len(detailed)}; update count claims")
+    review = json.loads((ROOT / "review/chapter-review.json").read_text(encoding="utf-8"))
+    reviewed = {entry["path"]: entry for entry in review["chapters"]}
+    if set(reviewed) != {p.relative_to(ROOT).as_posix() for p in detailed}:
+        errors.append("Chapter review ledger does not cover the detailed chapters")
+    for name, entry in reviewed.items():
+        if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != entry["content_sha256"]:
+            errors.append(f"{name}: content changed after recorded review; review and update ledger")
     if errors:
         print("\n".join(errors))
         raise SystemExit(f"FAIL: {len(errors)} documentation issues")

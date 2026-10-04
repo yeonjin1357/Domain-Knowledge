@@ -1,6 +1,6 @@
 # 네트워크 도메인
 
-> 상태: 초안 · 적용 범위: 통신 관측의 공통 개요, TCP 예시 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: 통신 관측의 공통 개요, TCP 예시 · 출처 확인일: 2026-10-03
 
 네트워크 영역은 통신이 시작되고 목적지에 도달하며 데이터를 주고받는 과정을 다룹니다. 요청 실패나 지연을 조사할 때 어느 지점에서 무엇을 관측했는지 구분하는 것이 출발점입니다.
 
@@ -41,12 +41,12 @@ TCP에는 연결 상태, 확인 응답 ACK, 연결 초기화 RST, 재전송 같�
 
 ## 상세 본문
 
-1. [주소·경로·DNS](addressing-routing-dns.md): CIDR, NAT, 이름 해석과 실패 종류
-2. [TCP·UDP·QUIC](tcp-and-udp.md): 연결, 흐름·혼잡 제어, RTT와 재전송
-3. [TLS·HTTP](tls-http.md): 인증, 요청 의미론, 단계별 시간
-4. [인터페이스와 흐름 지표](network-metrics.md): Linux·IF-MIB·IPFIX, 단위와 관측 지점
-5. [링크·터널·MTU·BGP](layers-and-routing.md): 다음 홉, VXLAN, 크기 제한, 경로 제어
-
-서비스 중계는 [프록시·메시](../middleware/proxies-and-mesh.md), 가상 네트워크는 [클라우드 네트워크](../cloud/networking.md)와 연결합니다. 장비 OS별 MIB와 라우팅 정책 전체 대응은 추가 범위입니다.
+1. [주소, 경로, 이름 해석](addressing-routing-dns.md)
+2. [TCP, UDP, 연결과 전송 속도](tcp-and-udp.md)
+3. [TLS, HTTP와 요청 단계별 시간](tls-http.md)
+4. [인터페이스, 장비, 흐름과 능동 검사](network-metrics.md)
+5. [링크, 오버레이, MTU와 경로 제어](layers-and-routing.md)
+6. [네트워크 장비 수집: SNMP, MIB와 인터페이스 수명](snmp-and-device-models.md)
+7. [경로 수렴과 QoS: 연결은 살아 있는데 통신이 느린 이유](routing-convergence-and-qos.md)
 
 관련 문서: [호스트](../host/README.md), [애플리케이션](../application/README.md), [쿠버네티스](../kubernetes/README.md)
