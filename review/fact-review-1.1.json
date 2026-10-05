@@ -7,14 +7,14 @@
     {
       "id": "rv-comparison",
       "chapter": "docs/kubernetes/inventory-consistency.md",
-      "claim_checked": "1.34 동일성 비교와 1.35의 제한된 순서 비교를 구분",
-      "scope": "공식 버전 문서; 실제 서버는 1.34.1만 실행",
+      "claim_checked": "1.35 이상과 1.34 이하·규약 미확인 확장 API의 비교 경계",
+      "scope": "현재 1.37 공식 문서까지 대조; 실행 서버는 1.34.1만",
       "primary_sources": [
         "https://v1-34.docs.kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions",
-        "https://v1-35.docs.kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions"
+        "https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions"
       ],
       "execution_evidence": [],
-      "review_result": "기존 객체·수집·API 수명 세 장 수정; 같은 클러스터/group/type와 형식 조건 유지"
+      "review_result": "같은 cluster/group/type와 숫자 형식·임의 정밀도 조건; 지원 일정과 API 규약 구분"
     },
     {
       "id": "list-snapshot",
@@ -40,15 +40,18 @@
       "id": "selector-exit",
       "chapter": "docs/kubernetes/inventory-consistency.md",
       "claim_checked": "선택 watch의 DELETED 뒤 원천 GET 200과 동일 UID",
-      "scope": "label selector를 바꾼 ConfigMap 한 건",
-      "primary_sources": [],
+      "scope": "API server 1.34.1, 모든 7개 시나리오 watch cache off; label selector를 바꾼 ConfigMap 한 건",
+      "primary_sources": [
+        "https://github.com/kubernetes/kubernetes/blob/v1.34.1/staging/src/k8s.io/apiserver/pkg/storage/etcd3/watcher.go#L617-L634",
+        "https://github.com/kubernetes/kubernetes/blob/v1.34.1/staging/src/k8s.io/apiserver/pkg/storage/cacher/cache_watcher.go#L374-L397"
+      ],
       "execution_evidence": [
         {
           "path": "labs/results/1.1-kubernetes.json",
           "json_pointer": "/experiments/selector_exit"
         }
       ],
-      "review_result": "전역 삭제와 수집 집합 이탈 구분; 동일 UID는 실행 코드의 assertion으로 확인"
+      "review_result": "etcd 직접 watcher와 cache watcher 모두 이전 selector만 만족하면 Deleted를 구성. 실행 증거는 cache off만; code 확인을 cache on 실행으로 확장하지 않음"
     },
     {
       "id": "rbac-scope",
@@ -80,7 +83,7 @@
           "json_pointer": "/experiments/expired_history"
         }
       ],
-      "review_result": "예비 200 결과와 조건 차이 명시; cache의 단독 인과 효과 주장 배제"
+      "review_result": "저장된 410 결과만 실행 근거로 사용. 보존되지 않은 예비 200은 검증 결과에서 제외; ListFromCacheSnapshot 인과 설명은 미확인"
     },
     {
       "id": "pg-isolation",
@@ -240,7 +243,7 @@
       "id": "otlp-partial",
       "chapter": "docs/product/telemetry-delivery-contracts.md",
       "claim_checked": "목적지의 거절 선언이 이번 upstream 응답에 그대로 전파되지 않음",
-      "scope": "queue off; mock backend rejectedSpans=1",
+      "scope": "Collector 0.137.0; queue off, logs error, internal metrics none; mock backend rejectedSpans=1",
       "primary_sources": [
         "https://opentelemetry.io/docs/specs/otlp/"
       ],
@@ -250,7 +253,7 @@
           "json_pointer": "/experiments/partial_success"
         }
       ],
-      "review_result": "일부 거절은 hash로 연결된 코드의 응답 fixture; 저장 성공은 측정하지 않음"
+      "review_result": "목적지 요청·receiver 응답만 관측. Collector 내부 거절 인지·계수·목적지 저장 성공을 확인한 실험은 아님"
     },
     {
       "id": "otlp-duplicate",
@@ -287,19 +290,82 @@
     {
       "id": "cpu-clock-difference",
       "chapter": "docs/foundations/measurement-and-comparability.md",
-      "claim_checked": "1초·2초 구간에서도 약 1.06 계정 비율 관측",
-      "scope": "WSL2 커널 6.18.33.2, CLK_TCK=100",
+      "claim_checked": "추가 실행의 CPU/MONOTONIC > 1과 분모의 주파수 조정; 과거 1.06 표본과 구분",
+      "scope": "WSL2 Linux 6.18.33.2, Python 3.12.3, CLK_TCK=100; Claude execution with preserved raw output, Codex arithmetic/provenance review",
       "primary_sources": [
         "https://man7.org/linux/man-pages/man2/clock_gettime.2.html",
-        "https://man7.org/linux/man-pages/man5/proc_pid_stat.5.html"
+        "https://man7.org/linux/man-pages/man5/proc_pid_stat.5.html",
+        "https://man7.org/linux/man-pages/man2/adjtimex.2.html",
+        "https://github.com/torvalds/linux/blob/v6.12/kernel/time/ntp.c"
       ],
       "execution_evidence": [
         {
           "path": "labs/results/1.1-linux.json",
           "json_pointer": "/experiments/cpu_accounting"
+        },
+        {
+          "path": "labs/results/1.1-linux-clock-r1.json",
+          "json_pointer": "/experiments/cpu_accounting/intervals"
+        },
+        {
+          "path": "labs/results/1.1-linux-clock-r1.json",
+          "json_pointer": "/experiments/cpu_accounting/idle_clock_series"
         }
       ],
-      "review_result": "원인 미해결; 값 보정·시계 정확도 인증·물리 성능 일반화 배제"
+      "review_result": "보존한 재실행 JSON에서 단일 스레드 busy의 프로세스 CPU clock/RAW는 약 0.99992–0.99995, MONOTONIC/RAW는 약 0.937. sleep·idle의 시계 차이와 adjtimex 값도 부합하므로 이 재실행의 CPU/MONOTONIC > 1은 분모의 주파수 조정으로 설명된다. RAW·tick이 없는 과거 1.06 표본의 원인, 조정 주체와 RAW의 외부 정확도는 확정하지 않는다. 기존 passed·independently sampled는 경과 시간 교정의 독립성 근거가 아니다.",
+      "historical_input": "labs/archive/run_linux_lab_1_1.py",
+      "review_status": "clock_rate_difference_reproduced; historical_cause_not_retroactively_confirmed",
+      "observed_summary": {
+        "busy_process_over_raw": [
+          0.9999163645633722,
+          0.9999249502659497,
+          0.9999548050582799
+        ],
+        "interval_monotonic_over_raw": [
+          0.9373362217474518,
+          0.9372216045991909,
+          0.937139771906701,
+          0.9371401492689044
+        ],
+        "thread_counts": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "idle": {
+          "sample_count": 61,
+          "adjtimex_available_count": 61,
+          "monotonic_seconds": 60.011948727,
+          "raw_seconds": 64.089720449,
+          "monotonic_over_raw": 0.9363740129706928,
+          "tick_min": 9353,
+          "tick_max": 9371,
+          "tick_distinct_count": 7,
+          "tick_sample_mean_us": 9363.754098360656,
+          "freq_ppm_min": -49.82659912109375,
+          "freq_ppm_max": 40.45188903808594,
+          "status_bits": [
+            8192
+          ],
+          "nominal_tick_us_for_this_environment": 10000,
+          "tick_sample_mean_ratio": 0.9363754098360656
+        }
+      },
+      "inference_limit": "Arithmetic mean of sampled tick values is not a time-weighted integral; freq also contributes, reads are sequential, and between-sample changes are unobserved.",
+      "provenance": "review/evidence-provenance.json#/published/0"
     },
     {
       "id": "virtual-resident",
@@ -337,12 +403,14 @@
       "id": "working-set",
       "chapter": "docs/containers/memory-accounting-and-oom.md",
       "claim_checked": "cAdvisor Usage에서 inactive file을 차감하고 0 하한 적용",
-      "scope": "cAdvisor 0.52.1 handler.go",
+      "scope": "cAdvisor 0.52.1 and lib/v0.60.5 handler.go; Kubernetes 1.37.1 go.mod",
       "primary_sources": [
-        "https://github.com/google/cadvisor/blob/v0.52.1/container/libcontainer/handler.go"
+        "https://github.com/google/cadvisor/blob/v0.52.1/container/libcontainer/handler.go",
+        "https://github.com/kubernetes/kubernetes/blob/v1.37.1/go.mod",
+        "https://github.com/google/cadvisor/blob/lib/v0.60.5/lib/container/libcontainer/handler.go"
       ],
       "execution_evidence": [],
-      "review_result": "v1·v2 키 구분; 모든 도구의 정의로 확장하지 않음"
+      "review_result": "v1·v2 키와 0 하한 식이 새 의존성에도 유지됨을 코드로 대조; 새 버전 실행이나 모든 도구 정의로 확장하지 않음"
     },
     {
       "id": "memory-high-max",
@@ -457,13 +525,14 @@
     {
       "id": "cw-result",
       "chapter": "docs/cloud/late-data-and-reconciliation.md",
-      "claim_checked": "상태는 결과별이며 시간과 값은 인덱스 쌍",
+      "claim_checked": "StatusCode는 결과별, NextToken은 응답 최상위; Forbidden의 구체적 의미는 이 API 문서에 정의되지 않음",
       "scope": "GetMetricData의 MetricDataResult",
       "primary_sources": [
-        "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataResult.html"
+        "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataResult.html",
+        "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html"
       ],
       "execution_evidence": [],
-      "review_result": "PartialData에서 metric math의 token 부재 조건 유지"
+      "review_result": "요청 단위 pagination과 결과별 상태를 분리. Forbidden의 권한 원인은 가설로 남기고 Messages 보존. metric math token 부재 조건 유지"
     },
     {
       "id": "cw-time",
@@ -486,5 +555,6 @@
       "execution_evidence": [],
       "review_result": "delta 합산과 별개임을 명시; 2분 평균 15/초 계산 확인"
     }
-  ]
+  ],
+  "cross_review_round": "Claude-Codex round 1; detailed dispositions in review/claude-codex-r1.md; edition unchanged"
 }

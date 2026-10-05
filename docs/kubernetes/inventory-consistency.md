@@ -1,12 +1,12 @@
 # Kubernetes 인벤토리의 정확성: 목록, watch와 삭제의 의미
 
-> 상태: 검토됨 · 적용 범위: Kubernetes 1.34·1.35 규약 구분, API server 1.34.1·etcd 3.6.4 로컬 실험 · 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: Kubernetes 1.35 이상과 이전 버전의 규약 구분, API server 1.34.1·etcd 3.6.4, 모든 7개 시나리오에서 watch cache 비활성화 · 검토일: 2026-10-04
 
 ## 먼저 이해할 것
 
 인벤토리는 “현재 어떤 대상이 존재하는가”를 정리한 목록입니다. 큰 사진을 여러 조각으로 받아 오는 list와 그 뒤 바뀐 부분을 받는 watch를 결합한다고 생각하면 됩니다. 사진 몇 조각을 받지 못했다는 이유로 그 부분의 대상이 없어졌다고 판단하면 안 됩니다.
 
-이 장의 실험은 실제 kube-apiserver와 etcd를 사용합니다. scheduler·controller-manager·kubelet·CNI·업무 Pod는 실행하지 않습니다. 따라서 **API의 관측·권한·수명 실험**이며 컨테이너 실행이나 클러스터 네트워크 검증은 아닙니다. [envtest 구성의 범위](https://github.com/kubernetes-sigs/controller-runtime/blob/v0.22.3/pkg/envtest/server.go)
+이 장의 실험은 실제 kube-apiserver와 etcd를 사용합니다. **7개 시나리오 모두 `--watch-cache=false`인 비기본 구성**이며 410 실험에만 적용한 설정이 아닙니다. cache를 켠 경로의 실행 검증은 이번 기록에 포함되지 않습니다. scheduler·controller-manager·kubelet·CNI·업무 Pod는 실행하지 않습니다. 따라서 **API의 관측·권한·수명 실험**이며 컨테이너 실행이나 클러스터 네트워크 검증은 아닙니다. [envtest 구성의 범위](https://github.com/kubernetes-sigs/controller-runtime/blob/v0.22.3/pkg/envtest/server.go)
 
 ## 첫 목록은 언제 완성되는가
 
@@ -48,7 +48,7 @@ Kubernetes list를 `limit`으로 나누면 응답의 `continue` 값을 다음 �
 
 ## DELETED가 반드시 원천 삭제인 것은 아니다
 
-이번 실험에서 watch는 `suite=domain-book`인 객체만 보도록 설정했습니다. `cm-0`의 label을 `suite=other`로 바꾸자 `DELETED` 이벤트가 왔습니다. 그러나 같은 객체를 직접 GET하면 **HTTP 200**이었고 UID도 같았습니다. 객체가 선택된 집합에서 빠진 것입니다.
+이번 실험에서 watch는 `suite=domain-book`인 객체만 보도록 설정했습니다. `cm-0`의 label을 `suite=other`로 바꾸자 `DELETED` 이벤트가 왔습니다. 그러나 같은 객체를 직접 GET하면 **HTTP 200**이었고 UID도 같았습니다. 객체가 선택된 집합에서 빠진 것입니다. 실행 경로는 watch cache를 끈 etcd 직접 watch입니다. Kubernetes 1.34.1의 `watchChan.transform()`은 이전 객체만 selector를 만족하면 Deleted를 구성하며, cache 경로의 `cacheWatcher.convertToWatchEvent()`에도 같은 분기가 있습니다. 후자는 코드 대조 결과이며 cache 활성화 상태로 재실행했다는 뜻은 아닙니다. [etcd watcher 코드](https://github.com/kubernetes/kubernetes/blob/v1.34.1/staging/src/k8s.io/apiserver/pkg/storage/etcd3/watcher.go#L617-L634), [cache watcher 코드](https://github.com/kubernetes/kubernetes/blob/v1.34.1/staging/src/k8s.io/apiserver/pkg/storage/cacher/cache_watcher.go#L374-L397)
 
 이는 [실행 코드](../../scripts/run_kubernetes_lab.py)와 [결과 기록](../../labs/results/1.1-kubernetes.json)의 `selector_exit`에 있는 실제 관측입니다. 이 결과를 모든 watch의 DELETED가 단순 label 변경이라는 뜻으로 뒤집어 해석하지 않습니다.
 
@@ -64,17 +64,17 @@ Kubernetes list를 `limit`으로 나누면 응답의 `continue` 값을 다음 �
 
 실험에서 reader 역할에는 한 namespace의 ConfigMap get/list/watch만 부여했습니다. 해당 목록은 성공했지만 Secret 목록과 다른 namespace 조회는 계속 403이었습니다. [Kubernetes RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
 
-410 실험은 **전용 etcd만 압축하고 API server watch cache를 꺼서** 과거 버전의 만료를 명확히 재현했습니다. 초기 예비 시도에서는 watch cache를 켜고 다른 compaction 조건을 사용했으며, 오래된 버전 조회가 200을 반환했습니다. 최종 실험은 watch cache를 끄고 physical compaction 완료를 요청했습니다. 두 설정을 함께 바꿨으므로 차이의 원인을 cache 하나로 분리해 입증한 것은 아닙니다. etcd 압축 직후 모든 API 조회가 반드시 410이 된다고 일반화하지 않습니다. 응답은 요청 조건과 서버가 보유한 이력에 따라 확인합니다.
+410 실험은 **전용 etcd만 압축하고 API server watch cache를 꺼서** 과거 버전의 만료를 명확히 재현했습니다. 저장된 증거는 watch cache 비활성화와 physical compaction 완료 요청을 함께 적용한 최종 실행입니다. 이전 원고의 “예비 시도에서 200” 설명은 재검토 가능한 원시 결과가 보존되지 않아 검증 근거에서 제외했습니다. `ListFromCacheSnapshot`이 그 예비 응답의 원인이었다고도 판정하지 않습니다. etcd 압축 직후 모든 API 조회가 반드시 410이 된다고 일반화하지 않습니다. 응답은 요청 조건과 서버가 보유한 이력에 따라 확인합니다.
 
-## resourceVersion: 1.34와 1.35의 차이
+## resourceVersion: 1.35 이상과 이전 버전의 경계
 
-1.34 규약에서는 opaque 문자열의 동일성만 비교합니다. 1.35 규약은 같은 클러스터의 같은 API group·resource type에서 정해진 십진수 형식의 버전을 순서 비교할 수 있게 합니다. 고정 64bit 크기나 벽시계로 해석하지 않습니다. 확장 API server의 값도 해당 규약과 형식을 확인합니다. [1.34](https://v1-34.docs.kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions), [1.35](https://v1-35.docs.kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions)
+Kubernetes 1.35 이상에서는 같은 클러스터의 같은 API group·resource type에서 규약을 만족하는 resourceVersion을 순서 비교할 수 있습니다. 검토 시점의 최신 3개 브랜치인 1.35–1.37에 해당하며, 1.37 문서에도 이 규약이 유지됩니다. 첫 글자는 1–9, 나머지는 0–9인 십진수 문자열이어야 하고 임의 정밀도 정수로 비교합니다. 고정 64bit 크기나 벽시계로 해석하지 않습니다. 1.34 이하의 규약을 대상으로 하는 클라이언트와 이 순서 규약을 보장하지 않는 확장 API server는 동일성 비교만 사용합니다. 서버 버전 숫자만 보고 모든 확장 API에 순서 보장이 있다고 추정하지 않습니다. [현재 API 규약](https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions), [이전 1.34 규약](https://v1-34.docs.kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions)
 
 순서 비교의 형식 조건은 첫 글자가 `1`~`9`이고 나머지가 `0`~`9`인 문자열입니다. 조건을 만족한다면 임의 정밀도 정수로 비교하거나 **길이를 먼저 비교하고 같은 길이일 때 사전식으로 비교**할 수 있습니다. 예를 들어 `"10"`은 `"9"`보다 큽니다. 길이를 무시한 단순 문자열 비교는 이 순서를 잘못 판단할 수 있습니다. 이 예시의 숫자는 형식 설명용입니다.
 
 조회 매개변수의 `resourceVersion="0"`은 별도의 조회 의미가 있는 값입니다. 위의 객체 버전 순서 비교와 혼동하지 않습니다. 같은 resource type이면 namespace가 다르더라도 규약에 따라 비교할 수 있지만, 다른 클러스터의 값을 연결하는 전역 순서로 사용하지 않습니다.
 
-이 책의 실행 실험은 1.34.1입니다. 1.35 비교 규약은 공식 문서 대조이며 1.35 서버를 실행한 결과가 아닙니다. 버전별 지원 표에서 문서 확인과 실행 확인을 구분하는 사례입니다.
+이 책의 실행 실험은 1.34.1로 고정했습니다. 1.35 이상 비교 규약은 공식 문서 대조이며 1.35–1.37 서버를 실행한 결과가 아닙니다. 1.34 계열은 최신 3개 브랜치에서는 빠졌지만 2026-10-27까지 유지보수 기간이며, 1.34.1 자체가 최신 패치는 아닙니다. [릴리스·종료 일정](https://kubernetes.io/releases/patch-releases/), [고정·최신 버전 표](../coverage.md#교차-검토-시점의-버전-상태)
 
 ## watch를 사건의 완전한 기록으로 사용하지 않기
 
@@ -98,4 +98,4 @@ python3 scripts/run_kubernetes_lab.py
 1. 첫 페이지에 없으면 삭제된 객체인가? **다음 페이지 또는 수집 실패 여부부터 확인합니다.**
 2. 이름이 같은 새 Pod를 이전 Pod와 같은 실행으로 저장하는가? **UID 등 생성 수명을 구분합니다. 실험은 ConfigMap으로 그 원리를 확인했습니다.**
 3. selector watch의 DELETED 하나로 전역 삭제를 확정하는가? **선택 집합 이탈인지 원천 삭제인지 구분해야 합니다.**
-4. 1.35의 비교 규칙을 1.34 서버에도 자동 적용하는가? **규약과 지원 버전을 맞춰야 합니다.**
+4. 1.35 이상의 비교 규칙을 1.34 서버나 규약 미확인 확장 API에도 자동 적용하는가? **규약과 지원 버전을 맞춰야 합니다.**

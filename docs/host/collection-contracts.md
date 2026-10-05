@@ -12,14 +12,14 @@
 | `/proc/PID/stat` utime, stime | clock ticks 누적 | 해당 프로세스의 CPU 초, 자식 시간은 별도 | PID와 starttime으로 실행 수명 구분 |
 | `/proc/meminfo` MemTotal, MemAvailable | 표시된 kB, 현재량 | 해당 인터페이스에서 1kB=1024B로 변환 | 없는 필드는 지원 불가; MemFree로 몰래 대체하지 않음 |
 | `/proc/diskstats` sectors read/written | 512B 섹터 누적 수 | 완료된 장치 I/O byte 수 | 장치 재생성·리셋을 구분; 계층 합산 금지 |
-| `/proc/diskstats` read/write milliseconds | 누적 ms | 완료 작업 증가량으로 나누면 해당 평균 시간 | 완료 수 증가가 0이면 평균 없음 |
+| `/proc/diskstats` read/write milliseconds | 32bit unsigned 누적 ms | wrap 조건을 판정한 차분을 완료 작업 증가량으로 나누면 평균 시간 | 64bit 커널에서도 wrap 가능; 완료 수 증가 0이면 평균 없음 |
 | `cpu.stat` usage_usec | 누적 µs | cgroup CPU 초로 변환 | cgroup 재생성과 counter 감소 확인 |
 | `memory.current` | byte 현재량 | cgroup과 자식의 현재 계정 | 프로세스 RSS와 동일시하지 않음 |
 | `GetSystemTimes` | 100ns 누적 시간 | kernel에는 idle 포함; API의 CPU group 범위 | 두 표본의 차분, 총시간 0은 결측 |
 
 Linux 정의는 [proc stat](https://man7.org/linux/man-pages/man5/proc_stat.5.html), [PID stat](https://man7.org/linux/man-pages/man5/proc_pid_stat.5.html), [meminfo](https://man7.org/linux/man-pages/man5/proc_meminfo.5.html), [디스크 통계](https://docs.kernel.org/admin-guide/iostats.html), [cgroup v2](https://docs.kernel.org/admin-guide/cgroup-v2.html)에 근거합니다. Windows는 [GetSystemTimes](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getsystemtimes)를 사용합니다. 다른 API의 단위를 이 표에서 추측하지 않습니다.
 
-[Linux 실습](linux-observation-lab.md)은 자기 프로세스의 stat·smaps·io와 기존 cgroup 읽기를 확인했습니다. 이 표의 모든 호스트 필드나 제한 동작을 실행 검증한 것은 아닙니다. 실제 CPU 계정과 경과 시계의 미해결 차이도 원시값과 함께 보존했습니다.
+[Linux 실습](linux-observation-lab.md)은 자기 프로세스의 stat·smaps·io와 기존 cgroup 읽기를 확인했습니다. 이 표의 모든 호스트 필드나 제한 동작을 실행 검증한 것은 아닙니다. 최초 CPU 표본과 별도로 [시계 진단 재실행](../../labs/results/1.1-linux-clock-r1.json)을 보존했습니다. 단일 스레드 busy 구간의 프로세스 CPU clock은 RAW와 거의 같은 증가량을 보였지만 MONOTONIC보다 빨랐고, sleep·idle의 시계 차이와 adjtimex 값도 분모의 주파수 조정 설명에 부합했습니다. 수집기는 CPU/MONOTONIC > 1을 100%로 자르기보다 분모 시계·RAW 비교·조정 상태·스레드 수를 품질 정보로 남기도록 제안합니다. 이 재실행으로 RAW·tick이 없는 과거 1.06 표본의 원인이나 시계 조정 주체까지 확정하지 않습니다.
 
 ## 읽기 한 번이 하나의 원자적 스냅샷은 아니다
 
@@ -36,11 +36,12 @@ Linux 정의는 [proc stat](https://man7.org/linux/man-pages/man5/proc_stat.5.ht
 같은 수명 + 시각 증가 + 값 증가 → (현재값 - 이전값) / 경과시간
 같은 시각                   → 중복 판단; 분모 0으로 나누지 않음
 역순 도착                   → 시계열 순서 정책으로 처리; 음수 경과시간 금지
-값 감소 / 리셋 표식 변경     → 불연속 기록, 기준 재설정
+값 감소, 원인 미상          → decrease 기록, rate 보류; wrap·reset 증거 확인
+실행·리셋 표식 변경         → 확인한 수명 변경 기록, 기준 재설정
 수집 실패                   → 실패 사건 기록, 값 0을 합성하지 않음
 ```
 
-가상 입력 `100→160`을 15초 간격으로 읽으면 4/초입니다. 다음 표본이 같은 시각에 다시 오면 0/초를 추가하지 않습니다. 새 실행 수명의 첫 값이 12라면 `12−160`을 음수 처리량으로 저장하지 않습니다. 32bit wrap이 가능한 원천은 wrap을 확정할 추가 정보와 최대 증가량 조건이 있을 때에만 별도 복원 정책을 사용합니다.
+가상 입력 `100→160`을 15초 간격으로 읽으면 4/초입니다. 다음 표본이 같은 시각에 다시 오면 0/초를 추가하지 않습니다. 새 실행 수명의 첫 값이 12라면 `12−160`을 음수 처리량으로 저장하지 않습니다. 특히 diskstats의 시간 필드 4·8·10·11·15·17은 64bit 커널에서도 32bit unsigned 값으로 노출됩니다. `2^32 ms`는 약 49.71일분의 **누적 계정 시간**이며, 병렬 I/O를 합하는 필드는 그보다 짧은 실제 경과 시간에도 wrap할 수 있습니다. 값 감소만으로 장치 재시작을 확정하지 않습니다. 같은 장치 수명과 구간 최대 증가량이 `2^32` 미만임을 별도 근거로 보장할 때에만 `(현재−이전) mod 2^32`를 복원 후보로 사용합니다. 그 조건을 모르면 wrap 횟수와 reset을 구분할 수 없어 rate를 보류합니다. [필드 유형](https://docs.kernel.org/admin-guide/iostats.html), [Linux 6.12 출력 코드](https://github.com/torvalds/linux/blob/v6.12/block/genhd.c#L1239-L1300)
 
 ## 평균과 비율의 입력을 보존하기
 

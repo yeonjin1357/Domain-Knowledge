@@ -24,7 +24,7 @@
 
 ## 표본과 모집단을 구분하기
 
-모집단은 알고 싶은 전체 집단이고, 표본은 실제로 관측한 일부입니다. “실패 요청은 전부, 성공 요청은 1%”를 저장한 트레이스에서 단순 실패 비율을 구하면 전체 서비스 오류율이 아닙니다. 각 선택 확률을 알고 가중할 수 있는지 확인하거나 전체 카운터를 사용합니다. [OpenTelemetry 샘플링](https://opentelemetry.io/docs/concepts/sampling/)
+모집단은 알고 싶은 전체 집단이고, 표본은 실제로 관측한 일부입니다. “실패 요청은 전부, 성공 요청은 1%”를 저장한 트레이스에서 단순 실패 비율을 구하면 전체 서비스 오류율이 아닙니다. 각 선택 확률을 알고 가중할 수 있는지 확인하거나 전체 카운터를 사용합니다. [OpenTelemetry 샘플링](https://opentelemetry.io/docs/concepts/sampling/) 확률을 역수 가중치로 사용하는 구체적인 규약은 [OTel TraceState Probability Sampling](https://opentelemetry.io/docs/specs/otel/trace/tracestate-probability-sampling/)의 adjusted count를 참고합니다. 이 명세는 검토 시점 Development이며, 알려진 포함 확률·적용 조건이 없는 편향 표본을 자동 복원하는 보장이 아닙니다.
 
 또한 적은 요청에서 계산한 p99는 흔들리기 쉽습니다. 이 책의 nearest-rank 정의라면 20개 요청의 p99는 정렬 후 `ceil(0.99 × 20) = 20`번째, 즉 최댓값입니다. 구현별 보간 정의에 따라 다른 수치가 나올 수 있으므로 “p99”라는 이름만으로 계산을 재현할 수는 없습니다. [NIST 백분위수 정의](https://www.itl.nist.gov/div898/handbook/prc/section2/prc262.htm)
 

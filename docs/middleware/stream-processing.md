@@ -28,7 +28,7 @@ Flink의 `backPressuredTimeMsPerSecond`, `idleTimeMsPerSecond`, `busyTimeMsPerSe
 
 checkpoint는 복구할 처리 상태와 진행 위치 등을 일관된 방식으로 저장하는 메커니즘입니다. checkpoint 완료율·소요 시간·실패·마지막 성공 나이와 실제 복구 성공을 구분합니다. state 크기가 늘면 저장·복구 비용이 달라질 수 있습니다. [Flink checkpoints](https://nightlies.apache.org/flink/flink-docs-release-1.20/docs/ops/state/checkpoints/)
 
-정확히 한 번이라는 표현은 source 재생, 상태 복구, sink의 commit 또는 멱등성 등의 전제를 포함합니다. 모든 외부 HTTP 호출까지 자동으로 한 번만 실행된다고 확대하지 않습니다. Spark Structured Streaming도 source·sink와 처리 모드의 보장 범위를 설명하므로 해당 조합을 확인해야 합니다. [Spark Structured Streaming](https://spark.apache.org/docs/latest/streaming/apis-on-dataframes-and-datasets.html)
+정확히 한 번이라는 표현은 source 재생, 상태 복구, sink의 commit 또는 멱등성 등의 전제를 포함합니다. 모든 외부 HTTP 호출까지 자동으로 한 번만 실행된다고 확대하지 않습니다. Spark Structured Streaming도 source·sink와 처리 모드의 보장 범위를 설명하므로 해당 조합을 확인해야 합니다. [Spark Structured Streaming](https://spark.apache.org/docs/latest/streaming/getting-started.html#fault-tolerance-semantics)
 
 예시로 마지막 checkpoint가 3분 전이고 그 이후 외부 API 호출이 100건 성공했다면, 복구 뒤 동일 입력이 재처리될 때 외부 효과를 어떻게 다룰지 별도 설계가 필요합니다. checkpoint의 존재만으로 외부 중복을 배제할 수 없습니다.
 
@@ -36,7 +36,7 @@ checkpoint는 복구할 처리 상태와 진행 위치 등을 일관된 방식�
 
 Pulsar는 subscription 유형에 따라 메시지 전달과 공유 방식이 달라집니다. topic의 backlog와 특정 subscription의 미처리 상태를 구분하고, acknowledgment·redelivery·retention의 경계를 보존합니다. broker 하나의 건강 상태만으로 모든 subscription 처리를 설명하지 않습니다. [Pulsar 4.0 messaging](https://pulsar.apache.org/docs/4.0.x/concepts-messaging/)
 
-파이프라인이 Memcached 같은 캐시를 사용하는 경우에는 hits/misses, eviction, 연결, 저장 여유를 함께 확인합니다. item이 없어지는 것은 앱이 명시적으로 삭제한 경우 외에도 만료·메모리 관리 등과 연결될 수 있습니다. 캐시 hit 비율은 실제 요청 구성과 함께 읽습니다. [Memcached 성능 관측](https://docs.memcached.org/serverguide/performance/)
+파이프라인이 Memcached 같은 캐시를 사용하는 경우에는 hits/misses, eviction, 연결, 저장 여유를 함께 확인합니다. item이 없어지는 것은 앱이 명시적으로 삭제한 경우 외에도 만료·메모리 관리 등과 연결될 수 있습니다. 캐시 hit 비율은 실제 요청 구성과 함께 읽습니다. [Memcached protocol의 stats 필드](https://github.com/memcached/memcached/blob/master/doc/protocol.txt)
 
 ## 제품 적용 제안과 이해 확인
 

@@ -33,6 +33,8 @@ ack와 업무 저장의 순서는 애플리케이션 설계에 달려 있습니�
 
 prefetch는 미확인 메시지 수를 제한하는 데 사용됩니다. RabbitMQ에서는 일반적인 per-consumer 설정과 channel 단위 제한을 구별하며, 0은 제한 없음을 의미합니다. [RabbitMQ Consumer Prefetch](https://www.rabbitmq.com/docs/consumer-prefetch)
 
+quorum queue는 channel 전체에 하나의 제한을 거는 global QoS prefetch를 지원하지 않습니다. 그 설정을 활성화한 channel로 consume하면 channel error가 반환되므로 per-consumer prefetch를 사용합니다. 앞의 일반 설명을 모든 queue 종류의 지원 목록으로 읽지 않습니다. [Quorum queue의 Global QoS 제한](https://www.rabbitmq.com/docs/quorum-queues#global-qos)
+
 가상의 소비자 4개에 각 50개의 독립 제한이 있고 추가 공통 제한이 없다면 미확인 전달의 설정상 규모는 총 200개입니다. 실제 업무 동시성은 소비자의 내부 처리 방식에 따라 다릅니다. 소비자 한 개가 50개를 받아도 직렬 처리할 수 있으므로 prefetch를 실행 스레드 수로 해석하지 않습니다.
 
 ## 재전달과 dead letter

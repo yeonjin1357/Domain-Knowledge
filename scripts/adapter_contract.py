@@ -43,7 +43,8 @@ def transform(previous, current, max_gap_seconds=120):
     if elapsed > max_gap_seconds:
         return result("gap")
     if value < previous["value"]:
-        return result("reset")
+        # A decrease alone cannot distinguish wrap, reset or a bad sample.
+        return result("decrease")
     # Difference is computed as an integer BEFORE conversion, preserving small
     # increments of counters larger than 2**53.
     rate = Fraction(value - previous["value"]) * SCALE[current["unit"]] / Fraction(str(elapsed))

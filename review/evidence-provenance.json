@@ -1,0 +1,28 @@
+{
+  "meaning": "Preserve the exact input used for historical evidence when the current runner is corrected. This does not endorse historical interpretation or rerun the evidence.",
+  "archives": [
+    {
+      "evidence": "labs/results/1.1-linux.json",
+      "original_path": "scripts/run_linux_lab.py",
+      "archived_path": "labs/archive/run_linux_lab_1_1.py",
+      "sha256": "aaa96961e9be62b9e749c41338cd02435b0d1c1233a22d135958553961dab861",
+      "reason": "Round 1 A1: historical CPU/accounting agreement did not validate elapsed-time calibration; corrected runner adds RAW, read-only adjtimex and thread-count observations."
+    }
+  ],
+  "published": [
+    {
+      "id": "linux-clock-r1",
+      "evidence": "labs/results/1.1-linux-clock-r1.json",
+      "sha256": "86bd2e990411d6c1db179a59df52000c8fc4bc6768542b6be52d3d8205cd4f58",
+      "runner": "scripts/run_linux_lab.py",
+      "runner_sha256": "4ab9ded21e6fa371cda4453b2e837864d4195b9b9334636d2a5045794ae38f2b",
+      "run_at_utc": "2026-10-04T04:10:49.909618+00:00",
+      "execution_attribution": "Claude executed the repository runner and supplied the raw output in user-approved round 1b; Codex checked the file, input hash and calculations.",
+      "publication_method": "Byte-identical copy from .lab-runs/linux-clock-r1.json; no raw values or status fields rewritten.",
+      "command": "wsl -d Ubuntu --cd /mnt/c/project/Domain-Knowledge -- python3 -B scripts/run_linux_lab.py --clock-observation-seconds 60 --output .lab-runs/linux-clock-r1.json",
+      "scope": "3 busy intervals, 1 sleep interval, 61 idle clock/adjtimex samples. CPU clock observation is not external clock calibration.",
+      "historical_evidence_preserved": "labs/results/1.1-linux.json",
+      "validator": "scripts/verify_review_r1.py; also called by scripts/verify_revision.py"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "round_1a_attempts": {
+    "recorded_at_utc": "2026-10-04T04:06:56.833260+00:00",
+    "status": "incomplete",
+    "attempts": 2,
+    "command": "python -X utf8 -B scripts/check_html.py",
+    "failure": "Chrome DevTools Timeout: Page.enable; both attempts exited 1 before viewport verification",
+    "node": "22.17.1",
+    "attempted_book_html_sha256": "e47db40286be684a17e5ca2be7fd9da665d130986b5c6e7b09f4c5efd396af9c",
+    "meaning": "The old review/html-check.json is historical and does not certify this revision. BOOK.html is regenerated after documenting this limit.",
+    "next_action": "Run python -X utf8 -B scripts/check_html.py in the working repository and return the result; no sandbox bypass was attempted."
+  },
+  "status": "incoming_round_1_book_passed; round_1b_visual_check_incomplete",
+  "resolution": {
+    "executor": "Claude",
+    "report": "review/html-check-r1b-incoming.json",
+    "book_html_sha256": "43802ecc2efc6d828d9222f78045e068ac4653c4ed8f4d8f94e791c2d9ed94fa",
+    "meaning": "Matched BOOK.html when round 1b began; the later rebuild requires its own report."
+  },
+  "round_1b": {
+    "recorded_at_utc": "2026-10-04T04:25:15.593486+00:00",
+    "status": "incomplete",
+    "attempts": 1,
+    "command": "python -X utf8 -B scripts/check_html.py",
+    "exit_code": 1,
+    "output": "file:///C:/project/Domain-Knowledge/scripts/check_html.mjs:26\n    const timer=setTimeout(()=>{pending.delete(id);reject(new Error(`Timeout: ${method}`))},20000);\n                                                          ^\n\nError: Timeout: Page.enable\n    at Timeout._onTimeout (file:///C:/project/Domain-Knowledge/scripts/check_html.mjs:26:59)\n    at listOnTimeout (node:internal/timers:588:17)\n    at process.processTimers (node:internal/timers:523:7)\n\nNode.js v22.17.1\nTraceback (most recent call last):\n  File \"C:\\project\\Domain-Knowledge\\scripts\\check_html.py\", line 18, in <module>\n    main()\n  File \"C:\\project\\Domain-Knowledge\\scripts\\check_html.py\", line 14, in main\n    subprocess.run([\"node\", str(ROOT / \"scripts/check_html.mjs\"), str(args.browser)], check=True, timeout=180)\n  File \"C:\\Users\\최연진\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\subprocess.py\", line 571, in run\n    raise CalledProcessError(retcode, process.args,\nsubprocess.CalledProcessError: Command '['node', 'C:\\\\project\\\\Domain-Knowledge\\\\scripts\\\\check_html.mjs', 'C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe']' returned non-zero exit status 1.\n",
+    "attempted_book_html_sha256": "9cbbe23d9a55397b9e7c734e20fd24164f735d0ecccf5923c366eccc2231c08f",
+    "final_book_html_sha256": "c3772207ff1a7e6b6f53617bb8980bb62cc2841079607ba37f14e19ece74b28a",
+    "meaning": "Attempt timed out before viewport verification. The final book was then regenerated to record this limit; neither round-1b artifact is visually certified.",
+    "next_action": "Claude: python -X utf8 -B scripts/check_html.py in C:/project/Domain-Knowledge. No further Linux run is required."
+  }
+}

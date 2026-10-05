@@ -1,7 +1,7 @@
 {
   "edition": "1.1",
   "review_date": "2026-10-04",
-  "review_kind": "author self-review; not external expert certification",
+  "review_kind": "author review and Claude-Codex AI cross-review; not external expert certification",
   "chapters": [
     {
       "path": "docs/foundations/system-map.md",
@@ -42,15 +42,22 @@
     },
     {
       "path": "docs/foundations/performance-and-statistics.md",
-      "content_sha256": "9fc3f265cc83cb29e7ab6c733b8a2f50a8efd32eb5d00ca129332bb0202277e6",
+      "content_sha256": "bc5b2d5052ea9af40b2184c7330c335963901936400d4eadac04fc741852f70b",
       "scope": "상태: 검토됨 · 적용 범위: 성능 분석의 기초와 통제 실험 설계 · 검토일: 2026-10-04 · 식의 수치는 가상 예시",
-      "review_focus": "도착과 완료·적체, Little 법칙 조건, 표본·부하 모델",
+      "review_focus": "교차 검토 1차: B19: 가중 추정·learner·Memcached stats·Spark fault tolerance·Hikari 설정을 직접 뒷받침하는 원천으로 연결. OTel 확률 명세는 Development 상태 표시.",
       "critical_checks_in_text": [
         "1. p99가 좋아졌는데 타임아웃이 늘었다면? **성공 응답만 지연 통계에 포함했는지 확인합니다. 실패한 긴 요청이 빠졌을 수 있습니다.**",
         "2. 처리량과 유입률이 다르면 무엇을 보는가? **관측 경계·취소·거절과 적체 변화를 함께 봅니다.**",
         "3. 한 번의 벤치마크로 모든 환경의 임계값을 정할 수 있는가? **실험 조건 밖으로 일반화할 근거가 없습니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B19"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/foundations/service-level-objectives.md",
@@ -66,21 +73,36 @@
     },
     {
       "path": "docs/foundations/time-and-data-quality.md",
-      "content_sha256": "7aab5a4cec0f52b9fe9996096022ff28b9eb0b4bf31861f263c5c14a917a55ad",
+      "content_sha256": "5745ebff4b36b710694a9201a828f1843ddff53eb0ad15a867cf6c6e701977b5",
       "scope": "상태: 검토됨 · 범위: 수집 시각, 지연, 누락, 중복, 시계 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
-      "review_focus": "사진을 찍은 시각과 사진을 받은 시각은 다를 수 있습니다. 모니터링 데이터도 발생·관측·수신·조회 시각이 다를 수 있습니다. 늦게 도착한 과거 값을 지금의 상태처럼 보여 주거나, 기록이 없는 구간을 0으로 채우면 장애 분석이 달라집니다. 이 장은 숫자 자체보다 먼저 확인해야 할 시간과 품질을 설명합니다.",
+      "review_focus": "교차 검토 1차: A1: 보존한 재실행 JSON에서 단일 스레드 busy의 프로세스 CPU clock/RAW는 약 0.99992–0.99995, MONOTONIC/RAW는 약 0.937. sleep·idle의 시계 차이와 adjtimex 값도 부합하므로 이 재실행의 CPU/MONOTONIC > 1은 분모의 주파수 조정으로 설명된다. RAW·tick이 없는 과거 1.06 표본의 원인, 조정 주체와 RAW의 외부 정확도는 확정하지 않는다.",
       "critical_checks_in_text": [
         "1. 전송 지연을 계산했더니 음수이면 데이터가 시간을 거슬러 이동했는가? **서로 다른 시계의 오차와 timestamp의 의미를 먼저 확인해야 한다.**",
         "2. 60초 동안 600건이면 매초 10건씩 처리했는가? **구간 평균은 10건/초지만 내부의 발생 분포는 알 수 없다.**",
         "3. 마지막 값이 화면에 보이면 최근에도 수집에 성공했는가? **조회 시각과 마지막 실제 표본 시각을 구분해야 한다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "A1"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      },
+      "cross_review_round_1b": {
+        "item_ids": [
+          "A1"
+        ],
+        "evidence": "labs/results/1.1-linux-clock-r1.json",
+        "review_scope": "Rechecked published raw clock arithmetic, semantic inference, retrospective limits and the changed prose; no other server rerun.",
+        "idle_summary_corrections": "mean tick/10000=0.9363754098360656; freq_ppm max=40.45188903808594"
+      }
     },
     {
       "path": "docs/foundations/measurement-and-comparability.md",
-      "content_sha256": "d911af0ce0185588b25d2550454fe143e1f1fe1f4126cdc83c6c17f1095cc5ab",
+      "content_sha256": "7cec4e06aa7e75ef931bd26dfe95917771955c3380bdbf81e673a911ddce4818",
       "scope": "상태: 검토됨 · 적용 범위: 측정·집계의 공통 원리, Prometheus·OTel·Linux의 명시된 규약 · 검토일: 2026-10-04 · 계산 입력은 별도 표시한 실제 실습 외에는 가상 예시",
-      "review_focus": "비교 대상·시간 창·경과 시계와 CPU 계정, 미해결 차이 보존",
+      "review_focus": "교차 검토 1차: A1: 보존한 재실행 JSON에서 단일 스레드 busy의 프로세스 CPU clock/RAW는 약 0.99992–0.99995, MONOTONIC/RAW는 약 0.937. sleep·idle의 시계 차이와 adjtimex 값도 부합하므로 이 재실행의 CPU/MONOTONIC > 1은 분모의 주파수 조정으로 설명된다. RAW·tick이 없는 과거 1.06 표본의 원인, 조정 주체와 RAW의 외부 정확도는 확정하지 않는다.",
       "critical_checks_in_text": [
         "1. 5초 평균 100%와 1분 평균 8.33% 중 무엇이 틀렸는가? **주어진 가상 부하에서는 둘 다 맞습니다. 시간 창이 다릅니다.**",
         "2. 10초 주기로 설정한 수집이 12초 뒤 완료됐다면 차분의 분모는? **두 표본의 실제 경과 시간과 원천 시간 규약을 확인합니다.**",
@@ -88,67 +110,117 @@
         "4. 예상 범위를 벗어난 값은 잘라 내면 되는가? **원천값을 보존하고 단위·시계·범위·계정 방식부터 조사합니다.**"
       ],
       "comprehension_present": true,
-      "reviewed_in_edition": "1.1"
+      "reviewed_in_edition": "1.1",
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "A1"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      },
+      "cross_review_round_1b": {
+        "item_ids": [
+          "A1"
+        ],
+        "evidence": "labs/results/1.1-linux-clock-r1.json",
+        "review_scope": "Rechecked published raw clock arithmetic, semantic inference, retrospective limits and the changed prose; no other server rerun.",
+        "idle_summary_corrections": "mean tick/10000=0.9363754098360656; freq_ppm max=40.45188903808594"
+      }
     },
     {
       "path": "docs/foundations/traces-logs-profiles.md",
-      "content_sha256": "5e30daab873246fe7e667b3862ca06ec01ba70dc8f21b539c6e03d785026848f",
+      "content_sha256": "a4147d2e61bcd5e86356698dbfb12b28ec3d5750cec46da87514b6d742cc4a12",
       "scope": "상태: 검토됨 · 범위: OpenTelemetry 개념·명세, W3C Trace Context · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
-      "review_focus": "메트릭은 여러 요청의 요약, trace는 한 요청이 지나간 작업의 연결, log는 기록된 사건, profile은 코드가 사용한 자원 분포를 살펴보는 자료입니다. 여행의 통계·동선·메모가 서로 다른 정보를 주는 것과 비슷합니다. 한 자료에서 없는 정보를 다른 자료가 자동으로 복원한다고 가정하지 않고 측정 경계를 함께 봅니다.",
+      "review_focus": "교차 검토 1차: B19: 가중 추정·learner·Memcached stats·Spark fault tolerance·Hikari 설정을 직접 뒷받침하는 원천으로 연결. OTel 확률 명세는 Development 상태 표시.",
       "critical_checks_in_text": [
         "- 자식 Span 시간 합계가 부모보다 크면 데이터 오류인가? **병렬 구간이면 정상일 수 있다.**",
         "- 저장된 Trace 중 실패가 50%이면 서비스 실패율도 50%인가? **표본 선택 조건을 알아야 한다.**",
         "- Heap 프로파일과 Allocation 프로파일은 같은 질문인가? **현재 보유량과 할당 활동은 다른 관점이다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B19"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/foundations/distributed-systems.md",
-      "content_sha256": "9725615932aa1c7ed8e96b9203ff22d58224d762d6eff4a9b7e10beba045bce6",
+      "content_sha256": "1199daa6c2a4975041d72853b1e7aac8a787a04e6fe88f8036ab90abf9f928bf",
       "scope": "상태: 검토됨 · 적용 범위: 분산 시스템의 개념, Raft 논문과 제품 연결 · 검토일: 2026-10-04",
-      "review_focus": "timeout 뒤 불확실한 결과, 합의·CAP·일관성의 범위",
+      "review_focus": "교차 검토 1차: B13: Brewer2.pdf는 2012 회고. 2002 원 논문으로 연결하고 non-failing node의 모든 요청이라는 가용성 정의, Theorem 1·2 모델을 구분.",
       "critical_checks_in_text": [
         "1. 클라이언트 타임아웃은 DB 롤백을 뜻하는가? **아닙니다. 결과가 불확실할 수 있습니다.**",
         "2. 5개 프로세스가 살아 있으면 합의 클러스터는 정상인가? **멤버 간 연결과 커밋 진행을 확인해야 합니다.**",
         "3. 읽기 지연 0초이면 모든 복제본이 최신인가? **어떤 위치와 정의로 측정한 지연인지부터 확인합니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B13"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/host/cpu.md",
-      "content_sha256": "fe17c09f8e0219a1babdb9812bae0204096683a4a9072528da4c2b64ba965327",
+      "content_sha256": "2eb1b994e9a80a809d36fe8d7cea78ead3472c1ec0dd0112dce0751645ab7d3e",
       "scope": "상태: 검토됨 · 범위: Linux CPU 관측, man-pages 6.19 및 Linux 6.12 회계 코드 확인 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
-      "review_focus": "CPU 사용 시간은 프로그램이 실제로 실행 기회를 사용한 시간입니다. 응답을 기다린 경과 시간 전체와는 다릅니다. 여러 스레드가 동시에 실행되면 1초 동안 CPU 시간 합계가 1초보다 커질 수 있습니다. 따라서 CPU 100%를 읽을 때는 한 논리 CPU 기준인지 호스트 전체 기준인지부터 확인합니다.",
+      "review_focus": "교차 검토 1차: B8: account_user_time의 task_nice(p)>0 분기가 nice, 그 외 user. 음수 nice도 user.",
       "critical_checks_in_text": [
         "- CPU 8개 중 1개만 계속 실행 중이면 호스트 평균은 얼마인가? **동일한 시간 기준에서는 12.5%이다. 해당 CPU의 병목 가능성은 남는다.**",
         "- iowait 20%면 디스크 장치가 20% 사용됐는가? **그렇게 해석할 수 없다. 장치 통계와 다른 회계 항목이다.**",
         "- 프로세스 250%는 잘못된 값인가? **한 논리 CPU 기준이고 여러 스레드를 합쳤다면 가능한 값이다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B8"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/host/memory.md",
-      "content_sha256": "7c1d84c43fd032fb14cf934f2041d10fd9ce3ad113266ee6065675f4fec6f840",
+      "content_sha256": "bfc30ea31ea5c4c6cd2359a20d7b22f0196e7e5cbb1f65ccc355ebb388b5517b",
       "scope": "상태: 검토됨 · 범위: Linux 호스트·프로세스, Windows 비교의 기초 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
-      "review_focus": "메모리는 실행 중인 코드와 데이터, 파일 캐시 등을 보관합니다. 파일 캐시는 다시 쓸 자료를 가까이 두는 용도라서, 남는 메모리가 적어 보이는 상황이 곧 부족을 뜻하지는 않습니다. 반대로 프로세스가 잡은 가상 주소 전체를 실제 RAM 사용량으로 더하면 과장됩니다. 예약·상주·공유·회수 가능 범위를 구분하는 것이 시작입니다.",
+      "review_focus": "교차 검토 1차: B9: Cached에 tmpfs/shmem 포함, SwapCached 제외. Shmem 별도 수집과 중복 주의. 살아 있는 내용은 깨끗한 파일 캐시처럼 그냥 버릴 수 없음.",
       "critical_checks_in_text": [
         "- RSS 합계가 호스트 물리 사용량보다 커질 수 있는가? **공유 페이지를 여러 번 더할 수 있으므로 가능하다.**",
         "- 가용량이 6 GiB이면 어떤 작업도 그 크기까지 반드시 성공하는가? **추정량이며 정책·범위·변화가 있으므로 보장이 아니다.**",
         "- 스왑 사용량이 높으면 현재도 스왑 I/O가 많은가? **현재 활동의 증가량을 별도로 봐야 한다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B9"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/host/disk-io.md",
-      "content_sha256": "4764701986bf8edf84d9b47f8370cc1cca39488e041512b068a3e96b58d0a096",
+      "content_sha256": "a765a29ee5c3d445dddc0bf934f7697cc49d03f243aff7fc31c1adfbd68bf817",
       "scope": "상태: 검토됨 · 범위: Linux 블록 계층과 statvfs, sysstat iostat · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
-      "review_focus": "저장장치에서는 남은 공간과 처리 속도를 따로 봅니다. 창고가 넓어도 출입구가 막힐 수 있듯이 공간이 충분한데 읽기·쓰기가 느릴 수 있습니다. 작은 파일을 많이 읽는 작업과 큰 파일 하나를 읽는 작업은 총 byte가 같아도 I/O 횟수가 다릅니다. IOPS·처리량·지연·용량을 함께 보는 이유입니다.",
+      "review_focus": "교차 검토 1차: B3: 6.12 diskstats_show의 4·8·10·11·15·17은 32bit unsigned ms. 2^32 ms≈49.71 누적 일이며 병렬 합계는 실제 시간이 더 짧을 수 있음. 감소를 reset이 아닌 decrease로 분리; 증거 없는 modulo 복원은 구현하지 않음.",
       "critical_checks_in_text": [
         "- 초당 100회 I/O가 항상 초당 1,000회보다 적은 바이트를 처리하는가? **작업 크기가 달라 알 수 없다.**",
         "- `%util=100%`면 모든 SSD가 최대 성능인가? **병렬 장치의 성능 한도를 그 값만으로 확정할 수 없다.**",
         "- 평균 지연이 3 ms면 모든 요청이 3 ms 이내인가? **평균은 지연 분포의 상한을 보장하지 않는다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B3"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/host/processes.md",
@@ -188,15 +260,22 @@
     },
     {
       "path": "docs/host/gpu.md",
-      "content_sha256": "d7411acde113dd1bd23b3fb2005dec1271400773be0230d4bcb8fc0174f9c4a9",
+      "content_sha256": "ad70ab1bc24fdce52854d2d010383998e6047078abe2b4c11c0694e737be49a8",
       "scope": "상태: 검토됨 · 적용 범위: NVML R550의 활용률 정의, NVIDIA MIG·DCGM, AMD SMI API · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
-      "review_focus": "GPU는 많은 연산을 병렬로 처리하도록 구성된 장치입니다. GPU가 활동한 시간, 장치 메모리 용량, 메모리 전송 활동은 다른 값입니다. 가득 찬 책상이 항상 바쁜 작업자를 뜻하지 않듯이 VRAM 점유율이 높다고 GPU 계산량도 높다고 알 수 없습니다. 장치·분할 방식과 원천 지표의 정의를 먼저 확인합니다.",
+      "review_focus": "교차 검토 1차: B17: amdsmi_get_gpu_activity 문서에 VM guest 미지원 명시. 함수 heading의 실제 하이픈 anchor도 수정.",
       "critical_checks_in_text": [
         "1. GPU 활동 100%는 최대 FLOPS 달성인가? **그 지표만으로는 알 수 없습니다.**",
         "2. memory activity는 VRAM 용량 사용률인가? **NVML의 해당 필드에서는 다른 의미입니다.**",
         "3. 미지원 지표를 0으로 채워도 되는가? **관측 불가를 유휴 상태로 잘못 표현합니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B17"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/host/numa-and-pressure.md",
@@ -212,22 +291,38 @@
     },
     {
       "path": "docs/host/collection-contracts.md",
-      "content_sha256": "6e0a2559b27f2e312cfb81c8d9a1fff63cf44c30cc21d679a4bbcd166383316b",
+      "content_sha256": "c410d427cea3ad8e1da6fc97c73ce7bd9418988b4ce087aec5a6b64875b464f6",
       "scope": "상태: 검토됨 · 적용 범위: Linux procfs·cgroup v2와 Windows API · 검토일: 2026-10-04 · 원천 규약 검토, Linux 자기 프로세스·기존 cgroup과 Windows API 일부는 로컬 실험",
-      "review_focus": "기존 원천 단위 검토 유지; 자기 프로세스·기존 cgroup의 실제 실행 범위만 추가",
+      "review_focus": "교차 검토 1차: A1: 보존한 재실행 JSON에서 단일 스레드 busy의 프로세스 CPU clock/RAW는 약 0.99992–0.99995, MONOTONIC/RAW는 약 0.937. sleep·idle의 시계 차이와 adjtimex 값도 부합하므로 이 재실행의 CPU/MONOTONIC > 1은 분모의 주파수 조정으로 설명된다. RAW·tick이 없는 과거 1.06 표본의 원인, 조정 주체와 RAW의 외부 정확도는 확정하지 않는다.; B3: 6.12 diskstats_show의 4·8·10·11·15·17은 32bit unsigned ms. 2^32 ms≈49.71 누적 일이며 병렬 합계는 실제 시간이 더 짧을 수 있음. 감소를 reset이 아닌 decrease로 분리; 증거 없는 modulo 복원은 구현하지 않음.",
       "critical_checks_in_text": [
         "1. 장치 논리 sector 크기가 4096B면 diskstats sector도 4096B인가? **해당 통계는 512B 단위이므로 별도로 해석합니다.**",
         "2. 첫 표본으로 초당 CPU 사용량을 만들 수 있는가? **이 차분 정책에서는 이전 표본이 필요합니다.**",
         "3. permission denied를 값 0으로 저장해도 되는가? **접근 실패와 0 사용량을 구분해야 합니다.**"
       ],
       "comprehension_present": true,
-      "reviewed_in_edition": "1.1"
+      "reviewed_in_edition": "1.1",
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "A1",
+          "B3"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      },
+      "cross_review_round_1b": {
+        "item_ids": [
+          "A1"
+        ],
+        "evidence": "labs/results/1.1-linux-clock-r1.json",
+        "review_scope": "Rechecked published raw clock arithmetic, semantic inference, retrospective limits and the changed prose; no other server rerun.",
+        "idle_summary_corrections": "mean tick/10000=0.9363754098360656; freq_ppm max=40.45188903808594"
+      }
     },
     {
       "path": "docs/host/linux-observation-lab.md",
-      "content_sha256": "1b27706fd67c93e05a77e0c1b45619404410f5b6528172b8f55f674e9350ced1",
+      "content_sha256": "652d17db3091def4f45240c4f25c3f542df718ff444fa19d1e2b4d50fd4586ab",
       "scope": "상태: 검토됨 · 적용 범위: Ubuntu 24.04, WSL2 Linux 6.18.33.2, Python 3.12.3의 로컬 실행 · 검토일: 2026-10-04 · 실제 관측과 해석의 한계를 분리",
-      "review_focus": "실제 stat·smaps·io 결과와 문장 수치, cgroup 읽기와 제어 실험의 구분",
+      "review_focus": "교차 검토 1차: A1: 보존한 재실행 JSON에서 단일 스레드 busy의 프로세스 CPU clock/RAW는 약 0.99992–0.99995, MONOTONIC/RAW는 약 0.937. sleep·idle의 시계 차이와 adjtimex 값도 부합하므로 이 재실행의 CPU/MONOTONIC > 1은 분모의 주파수 조정으로 설명된다. RAW·tick이 없는 과거 1.06 표본의 원인, 조정 주체와 RAW의 외부 정확도는 확정하지 않는다.",
       "critical_checks_in_text": [
         "1. 32MiB를 매핑했으면 즉시 RSS가 32MiB 늘어나는가? **이번 익명 매핑에서는 쓰기 전 Rss가 0이었습니다. 주소 공간과 상주량을 구분합니다.**",
         "2. `read_bytes` 차분 0은 파일을 읽지 않았다는 뜻인가? **캐시에서 읽은 경우처럼 논리 읽기는 있을 수 있습니다.**",
@@ -235,19 +330,41 @@
         "4. 이번 결과가 cgroup OOM 동작을 검증했는가? **기존 필드를 읽었으며 OOM을 유발하지 않았습니다.**"
       ],
       "comprehension_present": true,
-      "reviewed_in_edition": "1.1"
+      "reviewed_in_edition": "1.1",
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "A1"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      },
+      "cross_review_round_1b": {
+        "item_ids": [
+          "A1"
+        ],
+        "evidence": "labs/results/1.1-linux-clock-r1.json",
+        "review_scope": "Rechecked published raw clock arithmetic, semantic inference, retrospective limits and the changed prose; no other server rerun.",
+        "idle_summary_corrections": "mean tick/10000=0.9363754098360656; freq_ppm max=40.45188903808594"
+      }
     },
     {
       "path": "docs/network/addressing-routing-dns.md",
-      "content_sha256": "30b211e45952d5d71a23665706e8b3a27393a1417ab81be93cb4a9ea757022b1",
+      "content_sha256": "34180ea396abbb6412d92d589c1690e961948049a99f619e1cdf2a20dc745880",
       "scope": "상태: 검토됨 · 적용 범위: IP와 DNS의 공통 원리 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
-      "review_focus": "DNS는 이름을 주소 정보로 찾고, IP 주소와 라우팅은 패킷이 목적지 쪽으로 이동하는 데 사용됩니다. 주소를 알아냈다는 사실만으로 목적지까지 연결되는 것은 아닙니다. 이름 조회 실패와 경로 실패를 분리하면 어느 계층부터 조사해야 하는지 좁힐 수 있습니다.",
+      "review_focus": "교차 검토 1차: B7: xNAME 체인의 RCODE는 최종 query cycle 기준. 최초 이름·체인·최종 이름을 함께 보존.",
       "critical_checks_in_text": [
         "1. DNS에 IPv6 주소가 있으면 클라이언트가 IPv6로 질의했음을 알 수 있는가? **아니요. 질의 전송과 레코드 주소 계열은 독립적입니다.**",
         "2. 같은 IP 주소면 같은 장비인가? **네트워크 범위와 유효 시각을 확인해야 합니다.**",
         "3. DNS 시간 초과로 이름이 없다고 결론 낼 수 있는가? **아니요. 응답을 받지 못한 상태입니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B7"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/network/tcp-and-udp.md",
@@ -275,9 +392,9 @@
     },
     {
       "path": "docs/network/dns-and-connection-lifecycle.md",
-      "content_sha256": "1b77bc4e1831be9291ae162a51fc71494ae979102521a8567fb9bfb8aa625973",
+      "content_sha256": "51499e4a79236befca1e2d8332853cccf657b0041fbd8969abd79d32a2d8a0df",
       "scope": "상태: 검토됨 · 적용 범위: DNS·TCP·HTTP의 명시된 규약, Python 3.12.3 HTTP/1.1 로컬 실습 · 검토일: 2026-10-04",
-      "review_focus": "DNS·연결의 다른 수명, 실제 HTTP/1.1 연결 재사용과 본문 미완료",
+      "review_focus": "교차 검토 1차: B7: xNAME 체인의 RCODE는 최종 query cycle 기준. 최초 이름·체인·최종 이름을 함께 보존.",
       "critical_checks_in_text": [
         "1. 요청 100개면 TCP 연결도 100개인가? **연결을 재사용하거나 다중화할 수 있어 일치하지 않습니다.**",
         "2. DNS TTL이 끝나면 열린 연결도 반드시 닫히는가? **DNS 자료와 연결 수명의 계약을 구분합니다.**",
@@ -285,7 +402,14 @@
         "4. 응답이 timeout이면 서버가 아무 작업도 하지 않았는가? **작업 완료와 응답 전달은 다른 경계입니다.**"
       ],
       "comprehension_present": true,
-      "reviewed_in_edition": "1.1"
+      "reviewed_in_edition": "1.1",
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B7"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/network/network-metrics.md",
@@ -313,15 +437,22 @@
     },
     {
       "path": "docs/network/snmp-and-device-models.md",
-      "content_sha256": "e25a25681d8de72d34d5e13d9256533e4df020c65d45d9c013e6b84fbe6c4c20",
+      "content_sha256": "599d48fcdd81ef4053f08ca90d6cba237f2804e6f620d896dd19a06668904b8b",
       "scope": "상태: 검토됨 · 적용 범위: SNMPv3·IF-MIB·SNMPv2-MIB 표준, 수집기 설계 · 검토일: 2026-10-04 · 실제 장비 질의는 실행하지 않음",
-      "review_focus": "OID·Counter64·ifIndex 범위, sysUpTime과 wrap, SNMP 보안 수준",
+      "review_focus": "교차 검토 1차: B15: 제조사 이름 자체가 아니라 제조사가 부여한 관리 하위 시스템·장비 종류 OID로 명확화. 물리 모델과 반드시 일대일 대응하는 식별자로 단정하지 않음.",
       "critical_checks_in_text": [
         "1. sysUpTime 감소는 항상 호스트 재부팅인가? **관리 프로세스 초기화나 wrap 등을 구분해야 합니다.**",
         "2. ifIndex=7은 모든 장비의 같은 포트인가? **장비와 관리 범위가 필요한 지역 식별자입니다.**",
         "3. SNMP 응답 timeout이면 포트가 down인가? **관리 경로·자격 증명·부하를 먼저 구분합니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B15"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/network/routing-convergence-and-qos.md",
@@ -363,15 +494,22 @@
     },
     {
       "path": "docs/storage/capacity-and-protection.md",
-      "content_sha256": "7639541eac18d44677601705c35d664e15f16b80e4ac3523b2c2cae8c6c500f8",
+      "content_sha256": "11686f19935dfb3251d4475aad59a95e006275fc9cd9a53bea899a73c101bcd8",
       "scope": "상태: 검토됨 · 적용 범위: 공통 용량 모델, Ceph Squid erasure coding·EBS snapshot 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
-      "review_focus": "데이터를 여러 사본으로 보관하면 물리 사용량이 늘 수 있고, snapshot은 원본과 블록을 공유할 수 있습니다. 사용자가 보는 논리 크기와 실제 저장 소비량을 따로 계산해야 하는 이유입니다. 보호 기능의 존재와 실제로 원하는 시점으로 복구할 수 있다는 증거도 구분합니다.",
+      "review_focus": "교차 검토 1차: C-Ceph: 공식 표는 Squid 2026-10-31을 estimated EOL로 표시. 현재 Tentacle 20.2.4, Squid 19.2.6. 확정 보증일로 쓰지 않음.",
       "critical_checks_in_text": [
         "1. k=4, m=2의 이상화된 보호 공간 비율은? **1.5배입니다.**",
         "2. snapshot 10개가 논리 볼륨 10배의 실제 저장량인가? **증분·중복 구조를 확인해야 합니다.**",
         "3. 저장 성공과 복구 시험 성공은 같은가? **복구 가능성은 별도 검증 대상입니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "C-Ceph"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/storage/raid-lvm-and-paths.md",
@@ -411,9 +549,9 @@
     },
     {
       "path": "docs/containers/memory-accounting-and-oom.md",
-      "content_sha256": "845443a3a70ad85b14388260cf4886cca5b4db90ba1e43e38e8c5d399b98ca9f",
+      "content_sha256": "4526b8fe9dff058039f8defb3631de1c358795beebe544365fbc251e32db80e2",
       "scope": "상태: 검토됨 · 적용 범위: Linux cgroup v2, cAdvisor 0.52.1 계산, Kubernetes의 메모리 관측 · 검토일: 2026-10-04 · OOM·eviction은 문서 검토이며 직접 유발하지 않음",
-      "review_focus": "cAdvisor 고정 코드, cgroup high/max·events 범위와 OOM/eviction 구분",
+      "review_focus": "교차 검토 1차: C-cAdvisor: Kubernetes 1.37.1 go.mod의 github.com/google/cadvisor/lib v0.60.5 확인. lib/v0.60.5 handler.go에서도 Usage−inactive_file, 0 하한 식 확인.",
       "critical_checks_in_text": [
         "1. WorkingSet 400MiB이면 heap도 400MiB인가? **계산과 포함 범위가 다릅니다.**",
         "2. high 사건이 늘면 반드시 OOM kill인가? **high 경계는 reclaim·throttling과 관련됩니다.**",
@@ -421,7 +559,14 @@
         "4. cgroup max가 무제한이면 메모리 장애가 불가능한가? **부모 계층과 노드 전체 자원도 유한합니다.**"
       ],
       "comprehension_present": true,
-      "reviewed_in_edition": "1.1"
+      "reviewed_in_edition": "1.1",
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "C-cAdvisor"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/containers/filesystems.md",
@@ -449,16 +594,23 @@
     },
     {
       "path": "docs/kubernetes/objects-and-control-loops.md",
-      "content_sha256": "0701d7bd43966df9964bbf5c1053cacc9de76eb7877d7be33396065633188875",
+      "content_sha256": "a8f2ea85ce03ddf17f6f9a43c0cee9d78b818bd4180e3ba55c85c31507d7d112",
       "scope": "상태: 검토됨 · 적용 범위: Kubernetes API의 공통 객체 모델과 내장 컨트롤러 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 1.1판 resourceVersion 규약 재검토: 2026-10-04",
-      "review_focus": "1.34 opaque 규칙과 1.35 조건부 순서 비교, 값 차이를 시간으로 해석하지 않음",
+      "review_focus": "교차 검토 1차: C-Kubernetes: 최신 1.37.1 및 1.35+ 비교 규약 수용. 최신 3개 브랜치는 1.35–1.37이나 1.34는 10월 27일까지 유지보수 중. 1.34.1 고정 실습과 1.34.12 패치 구분.",
       "critical_checks_in_text": [
         "1. 동일 namespace/name으로 다시 만든 Pod는 과거 Pod와 같은가? **UID가 다른 객체입니다.**",
         "2. API가 Deployment 생성을 받아들이면 모든 Pod가 준비되었는가? **제어 루프와 실행 단계를 더 관측해야 합니다.**",
         "3. 소유 관계와 Service 선택 관계를 같은 간선으로 저장해도 되는가? **의미가 달라 별도 관계로 표현해야 합니다.**"
       ],
       "comprehension_present": true,
-      "reviewed_in_edition": "1.1"
+      "reviewed_in_edition": "1.1",
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "C-Kubernetes"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/kubernetes/pod-lifecycle.md",
@@ -486,30 +638,45 @@
     },
     {
       "path": "docs/kubernetes/collection.md",
-      "content_sha256": "38dcd92238ea74e4d37d13a15384945c47195fe29d0c7ca11f7fbf7f98549795",
+      "content_sha256": "b5d5c174011a6267b010adb9bc922267d09693e46eb741bdc5dac76fcd776548",
       "scope": "상태: 검토됨 · 적용 범위: API 객체, kube-state-metrics, Resource Metrics API, 컴포넌트 지표 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 1.1판 resourceVersion 규약 재검토: 2026-10-04",
-      "review_focus": "버전별 resourceVersion 비교·원문 문자열 유지와 인벤토리 실습 연결",
+      "review_focus": "교차 검토 1차: C-Kubernetes: 최신 1.37.1 및 1.35+ 비교 규약 수용. 최신 3개 브랜치는 1.35–1.37이나 1.34는 10월 27일까지 유지보수 중. 1.34.1 고정 실습과 1.34.12 패치 구분.",
       "critical_checks_in_text": [
         "1. kube-state-metrics가 모든 CPU 사용량을 측정하는가? **주 목적은 API 객체 상태의 지표화입니다.**",
         "2. watch가 끊기면 모든 객체가 삭제된 것인가? **수집 연결의 실패와 대상의 삭제는 다릅니다.**",
         "3. working set이 앱 heap인가? **관측 범위와 계산 방식이 다릅니다.**"
       ],
       "comprehension_present": true,
-      "reviewed_in_edition": "1.1"
+      "reviewed_in_edition": "1.1",
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "C-Kubernetes"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/kubernetes/inventory-consistency.md",
-      "content_sha256": "b5de75955d3a42ca755858b14e52ebd92e51f8090e7afd97d8e00497c21ac7c5",
-      "scope": "상태: 검토됨 · 적용 범위: Kubernetes 1.34·1.35 규약 구분, API server 1.34.1·etcd 3.6.4 로컬 실험 · 검토일: 2026-10-04",
-      "review_focus": "API 실행 범위, 페이지 snapshot·UID·selector 이탈·RBAC·410·1.35 규약",
+      "content_sha256": "10bb3cce3b276c896aa5940e67419e124d6350d69f205283187de5aae3bd032b",
+      "scope": "상태: 검토됨 · 적용 범위: Kubernetes 1.35 이상과 이전 버전의 규약 구분, API server 1.34.1·etcd 3.6.4, 모든 7개 시나리오에서 watch cache 비활성화 · 검토일: 2026-10-04",
+      "review_focus": "교차 검토 1차: A2: 7개 시나리오 전체 watch cache off를 명시. selector 이탈은 etcd와 cache 경로 둘 다 Deleted 분기가 있음. cache on은 코드 대조만 했으며 미보존 예비 200·ListFromCacheSnapshot 인과는 근거에서 제외.; C-Kubernetes: 최신 1.37.1 및 1.35+ 비교 규약 수용. 최신 3개 브랜치는 1.35–1.37이나 1.34는 10월 27일까지 유지보수 중. 1.34.1 고정 실습과 1.34.12 패치 구분.",
       "critical_checks_in_text": [
         "1. 첫 페이지에 없으면 삭제된 객체인가? **다음 페이지 또는 수집 실패 여부부터 확인합니다.**",
         "2. 이름이 같은 새 Pod를 이전 Pod와 같은 실행으로 저장하는가? **UID 등 생성 수명을 구분합니다. 실험은 ConfigMap으로 그 원리를 확인했습니다.**",
         "3. selector watch의 DELETED 하나로 전역 삭제를 확정하는가? **선택 집합 이탈인지 원천 삭제인지 구분해야 합니다.**",
-        "4. 1.35의 비교 규칙을 1.34 서버에도 자동 적용하는가? **규약과 지원 버전을 맞춰야 합니다.**"
+        "4. 1.35 이상의 비교 규칙을 1.34 서버나 규약 미확인 확장 API에도 자동 적용하는가? **규약과 지원 버전을 맞춰야 합니다.**"
       ],
       "comprehension_present": true,
-      "reviewed_in_edition": "1.1"
+      "reviewed_in_edition": "1.1",
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "A2",
+          "C-Kubernetes"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/kubernetes/network-and-storage.md",
@@ -525,15 +692,23 @@
     },
     {
       "path": "docs/kubernetes/workloads-and-control-plane.md",
-      "content_sha256": "e13bc5948e02818a495647264da459198222a33f1fabc27583382b37844ab117",
+      "content_sha256": "abe7da391c00ae6c9f7d044e7634f3320f7f4acd7ca60b7637431581b1ac4b9e",
       "scope": "상태: 검토됨 · 범위: Kubernetes workload controllers, etcd 3.6 문서 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04",
-      "review_focus": "Deployment·StatefulSet·DaemonSet·Job은 서로 다른 실행 요구를 표현합니다. 같은 Pod 수를 세더라도 모든 Node에 하나씩 필요한 작업과 정해진 완료 수가 필요한 작업의 정상 기준은 다릅니다. 제어 평면의 저장·합의 상태와 실제 업무 성공도 별도로 관측해야 합니다.",
+      "review_focus": "교차 검토 1차: B1: db-0에는 앞 Pod가 없음. 기본 OrderedReady의 다음 신규 Pod는 앞 Pod Running·Ready까지 미생성. Pending과 구분.; B19: 가중 추정·learner·Memcached stats·Spark fault tolerance·Hikari 설정을 직접 뒷받침하는 원천으로 연결. OTel 확률 명세는 Development 상태 표시.",
       "critical_checks_in_text": [
         "1. `db-0` 이름이 같으면 이전 CPU Counter와 이어도 되는가? **실행 UID·시작 수명은 바뀔 수 있다.**",
         "2. CronJob의 실행 시간이 짧으면 일정도 지켰는가? **예정·생성·시작·완료 시각을 따로 비교해야 한다.**",
         "3. etcd 3대 중 2대가 켜져 있으면 항상 상태 변경이 가능한가? **서로 통신하며 합의를 수행할 수 있는 등 추가 조건이 필요하다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B1",
+          "B19"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/kubernetes/cni-csi-and-data-paths.md",
@@ -549,16 +724,23 @@
     },
     {
       "path": "docs/kubernetes/operators-and-api-lifecycle.md",
-      "content_sha256": "3c1979978419c5e213fbfe4f7a378c323607a8e5d51ae34c433df94d58207de9",
+      "content_sha256": "87443506c50d1e713561f9e9b2b8b0c932de5d8f27011907e438d473545e7582",
       "scope": "상태: 검토됨 · 적용 범위: Kubernetes 공식 API·CRD·admission·Operator 문서 · 검토일: 2026-10-04 · 구현별 필드는 별도 확인",
-      "review_focus": "generation과 resourceVersion 구분 유지, 비교 규칙의 서버 버전 조건 반영",
+      "review_focus": "교차 검토 1차: C-Kubernetes: 최신 1.37.1 및 1.35+ 비교 규약 수용. 최신 3개 브랜치는 1.35–1.37이나 1.34는 10월 27일까지 유지보수 중. 1.34.1 고정 실습과 1.34.12 패치 구분.",
       "critical_checks_in_text": [
         "1. CRD 설치만으로 DB 장애 전환이 동작하는가? **실제 controller와 그 설정·상태가 필요합니다.**",
         "2. API 생성 성공이 workload 준비 완료인가? **비동기 수렴이 남아 있습니다.**",
         "3. resourceVersion을 정수로 빼서 객체 나이를 계산하는가? **순서 비교를 지원하는 버전에서도 값의 차이가 시간 단위는 아닙니다.**"
       ],
       "comprehension_present": false,
-      "reviewed_in_edition": "1.1"
+      "reviewed_in_edition": "1.1",
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "C-Kubernetes"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/application/requests-and-concurrency.md",
@@ -574,15 +756,23 @@
     },
     {
       "path": "docs/application/servers-and-pools.md",
-      "content_sha256": "896304030e074c1425ee739a950370b7ac1e7d2f64e1687677c7c9742f1f5ee9",
+      "content_sha256": "0c8c11800adfc3cbfcd8957112952d9df442cb30e5afe8a5931f38040c4a4bcd",
       "scope": "상태: 검토됨 · 적용 범위: Tomcat 10.1, HikariCP·Spring Boot 공식 문서의 개념 · 검토일: 2026-10-04 · 실제 JVM 서버 실험 없음",
-      "review_focus": "연결 수/실행 수/대기, timeout 경계, 인스턴스별 pool 합계",
+      "review_focus": "교차 검토 1차: B10: Executor가 연결된 connector의 maxThreads는 무시되고 JMX 등에 -1로 보고.; B19: 가중 추정·learner·Memcached stats·Spark fault tolerance·Hikari 설정을 직접 뒷받침하는 원천으로 연결. OTel 확률 명세는 Development 상태 표시.",
       "critical_checks_in_text": [
         "1. pool active 30이면 SQL 30개가 실행 중인가? **빌려 간 연결과 현재 실행 중인 문장은 다릅니다.**",
         "2. connectionTimeout은 쿼리 timeout인가? **연결 획득 대기 한도입니다.**",
         "3. 앱 인스턴스만 늘리면 DB 연결 부담도 그대로인가? **인스턴스별 pool 한도가 합쳐질 수 있습니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B10",
+          "B19"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/application/timeouts-and-retries.md",
@@ -646,9 +836,9 @@
     },
     {
       "path": "docs/application/trace-sampling-and-context.md",
-      "content_sha256": "333820a5874a22326c6266937c27d1d535238da50f2a774c7c5d878fae2443ea",
+      "content_sha256": "32bfb8278cf1d2eed10f297cd987a7a07dca62aa598b192ea70bdcdd1d29e48b",
       "scope": "상태: 검토됨 · 적용 범위: W3C Trace Context, OpenTelemetry 개념·SDK 규약, tail sampling processor 0.137.0 문서 · 검토일: 2026-10-04 · sampling 수치는 가상 예시",
-      "review_focus": "문맥과 인증, sampling 모집단의 계산·head/tail 한계와 배치 조건",
+      "review_focus": "교차 검토 1차: C-Collector: 현재 0.162.0. core published_at=2026-09-28T14:09:31Z, 배포판=2026-09-29T12:34:07Z. 9월 29일은 배포판 기준으로 맞음. 0.137.0 실행 기록 유지.",
       "critical_checks_in_text": [
         "1. 오류 trace를 모두 보존하면 trace 화면의 오류 비율이 전체 요청 오류율인가? **정상 요청의 보존 정책이 다르면 그렇지 않습니다.**",
         "2. sampled bit가 있으면 목적지 저장까지 보장되는가? **sampling 문맥이며 수집·전송·저장 성공을 보장하지 않습니다.**",
@@ -656,19 +846,34 @@
         "4. trace ID를 tenant 접근 권한으로 사용해도 되는가? **관측 연결 정보와 인증된 접근 범위를 분리합니다.**"
       ],
       "comprehension_present": true,
-      "reviewed_in_edition": "1.1"
+      "reviewed_in_edition": "1.1",
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "C-Collector"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/database/transactions-and-locks.md",
-      "content_sha256": "2bec22b1855e48e18ad226a54bc81c88a190a9285751d26f58d1de643dcb01b8",
+      "content_sha256": "44a1b5422d690ab8aff54268d0aa8e122fcae11839f3ef091d68f9fa7154b46b",
       "scope": "상태: 검토됨 · 적용 범위: 관계형 DB 공통 개념, PostgreSQL 18과 MySQL 8.4 InnoDB 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
-      "review_focus": "송금에서 한 계좌를 줄이고 다른 계좌를 늘리는 변경은 함께 성공하거나 취소되어야 합니다. transaction은 이런 작업 묶음과 동시 접근의 규칙을 다룹니다. 다른 세션의 변경을 언제 볼 수 있는지, 어떤 작업을 기다려야 하는지는 엔진과 격리 수준에 따라 달라집니다.",
+      "review_focus": "교차 검토 1차: B4: 회수 horizon에 일반 세션 외 prepared transaction, slot xmin/catalog_xmin, hot_standby_feedback을 포함. catalog_xmin의 catalog 범위 구분.; C-MySQL: 9.7 LTS·YY.M 체계 수용. 9.7.3은 Docker image 전용 보안 패치로 범위 제한. 8.4 LTS 문서 기준을 유지하며 새 LTS 출시를 8.4 EOL로 해석하지 않음.",
       "critical_checks_in_text": [
         "1. 같은 트랜잭션이면 두 SELECT가 항상 같은 결과인가? **격리 수준과 엔진에 따라 다릅니다.**",
         "2. 대기자가 많으면 교착 상태인가? **순환 대기 여부가 필요합니다.**",
         "3. 현재 쿼리 나이가 트랜잭션 나이인가? **시작 경계가 다릅니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B4",
+          "C-MySQL"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/database/queries-and-indexes.md",
@@ -684,27 +889,41 @@
     },
     {
       "path": "docs/database/postgresql.md",
-      "content_sha256": "835d5f08196d289743e874ffd358abfb277f4042081e07da2375c45a6b7533c7",
+      "content_sha256": "bc0ca15eac6ffb70e226b4f04c441c76f3236edc4091964ca7993c38d3c9fce4",
       "scope": "상태: 검토됨 · 적용 범위: PostgreSQL 18 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
-      "review_focus": "PostgreSQL에서는 지금 무엇을 기다리는지 보여 주는 활동 정보와 과거부터 누적한 통계가 서로 다릅니다. 한 시점에 연결 100개가 보였다는 사실로 최근 1분 동안 쿼리 100개가 실행되었다고 계산할 수 없습니다. 상태·누적량·통계가 시작된 시각을 함께 이해해야 합니다.",
+      "review_focus": "교차 검토 1차: B4: 회수 horizon에 일반 세션 외 prepared transaction, slot xmin/catalog_xmin, hot_standby_feedback을 포함. catalog_xmin의 catalog 범위 구분.",
       "critical_checks_in_text": [
         "1. active 세션이면 CPU 실행 중인가? **대기 이벤트가 있을 수 있습니다.**",
         "2. 일반 VACUUM 뒤 파일이 작아져야만 성공인가? **재사용 가능한 공간 확보와 파일 축소는 다릅니다.**",
         "3. 누적 mean 차분은 구간 mean인가? **시간 합의 차분을 호출 수 차분으로 나눠야 합니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B4"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/database/mysql-mariadb.md",
-      "content_sha256": "fc6315ea0d18eeec0c6fc0b562439fa03d007da4903d22083cb8ee9463c85099",
+      "content_sha256": "c07ae5c14780e90126a5c4074250f7d22fc43a376b423be908bf522b15ac8bd4",
       "scope": "상태: 검토됨 · 적용 범위: MySQL 8.4 InnoDB·Performance Schema, MariaDB 진단 명령의 차이 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
-      "review_focus": "MySQL과 MariaDB는 공통된 배경이 있지만 모든 기능·view·필드가 같은 제품은 아닙니다. 엔진이 실제로 기록한 실행 시간과 문장 수를 확인하고, 계측 설정과 통계 제한을 함께 봅니다. 이름이 비슷한 replication 지연 값도 어떤 진행 단계와 시간을 뜻하는지 구분합니다.",
+      "review_focus": "교차 검토 1차: C-MySQL: 9.7 LTS·YY.M 체계 수용. 9.7.3은 Docker image 전용 보안 패치로 범위 제한. 8.4 LTS 문서 기준을 유지하며 새 LTS 출시를 8.4 EOL로 해석하지 않음.",
       "critical_checks_in_text": [
         "1. TIMER_WAIT 1,000,000,000 ps는 몇 ms인가? **1 ms입니다.**",
         "2. digest NULL 행을 지우면 전체 쿼리를 분석한 것인가? **상세 분류되지 않은 실행을 감출 수 있습니다.**",
         "3. 복제 지연 0이면 receiver도 원본과 동일 위치인가? **그 지표만으로 보장하지 못합니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "C-MySQL"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/database/sqlserver-oracle.md",
@@ -756,28 +975,43 @@
     },
     {
       "path": "docs/database/specialized-data-models.md",
-      "content_sha256": "9db9f1fa2dbf9b093d162ab6f3176dbbf36c2c8d989f64f7a524d8190c94d33e",
+      "content_sha256": "ae3bb69d8f2a4902ab869d37e49c57f9bbe330b2089448fb21f9213ae21fdb04",
       "scope": "상태: 검토됨 · 적용 범위: 데이터 모델의 비교, InfluxDB OSS 2·Neo4j 문서 사례 · 검토일: 2026-10-04 · 엔진 간 성능 비교 실험 없음",
-      "review_focus": "모델과 질의 패턴, series 조합, 그래프 확장량과 실제 작업 구분",
+      "review_focus": "교차 검토 1차: B16: 연결한 Neo4j Operations Manual의 metrics 기능은 Enterprise Edition 전용.",
       "critical_checks_in_text": [
         "1. SQL을 쓰면 모두 행 지향 저장인가? **질의 언어와 저장 모델은 다릅니다.**",
         "2. 시계열에 label 하나를 추가해도 비용은 일정한가? **값의 종류와 조합 수가 중요합니다.**",
         "3. 그래프 시작점이 1개이면 읽는 관계도 1개인가? **확장 깊이와 분기에 따라 커질 수 있습니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B16"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/database/collection-contracts.md",
-      "content_sha256": "695f9bc53978c7b5adb92ea6ac810914f80f4ce849ea54f7e560e91fe2fb5933",
+      "content_sha256": "311ed86a0593da9cabc26a8d386715c9f00da7f06269f9369f2046f497c8bbe2",
       "scope": "상태: 검토됨 · 적용 범위: PostgreSQL 18·MySQL 8.4의 원천 필드와 수집 설계 · 검토일: 2026-10-04 · PostgreSQL 수집 SQL은 18.6에서 실행, MySQL SQL은 문서 검토",
-      "review_focus": "실행된 PostgreSQL SQL과 본문 일치, stats_reset NULL; MySQL 미실행 경계 유지",
+      "review_focus": "교차 검토 1차: B12: clock_timestamp는 문장 내에서도 달라지며 기존 결과 3행 시각도 다름. SQL·실행 hash는 유지하고 collected_at을 행별 평가 시각으로 명세. 문장 공통 시작 시각이 목적이면 statement_timestamp.; C-MySQL: 9.7 LTS·YY.M 체계 수용. 9.7.3은 Docker image 전용 보안 패치로 범위 제한. 8.4 LTS 문서 기준을 유지하며 새 LTS 출시를 8.4 EOL로 해석하지 않음.",
       "critical_checks_in_text": [
         "1. blks_read 증가를 물리 디스크 읽기 수로 그대로 쓰는가? **OS 캐시 등 다른 층이 있으므로 DB 경계의 블록 읽기로 둡니다.**",
         "2. DB 연결에 성공하면 모든 통계가 보이는가? **필드와 view별 권한이 다릅니다.**",
         "3. SQL 오류 하나가 발생하면 모든 엔진이 전체 transaction을 자동 rollback하는가? **엔진·오류·클라이언트 동작에 따라 다르며 명시 처리해야 합니다. [SQLite 실습](../cross-domain/reproducible-labs.md)이 그 차이를 보여 줍니다.**"
       ],
       "comprehension_present": true,
-      "reviewed_in_edition": "1.1"
+      "reviewed_in_edition": "1.1",
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B12",
+          "C-MySQL"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/database/postgresql-concurrency-lab.md",
@@ -819,27 +1053,41 @@
     },
     {
       "path": "docs/middleware/message-queues.md",
-      "content_sha256": "f04ceb5940f1648b3052191af06192a282e2cbaec06aef60f9c535882c2cfc4f",
+      "content_sha256": "c6fac655740aeb39d209a382a450b737bbdd5d2ae45cf6233182ee7cc692d063",
       "scope": "상태: 검토됨 · 적용 범위: RabbitMQ 4.3, AMQP 0-9-1의 주요 관측 개념 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
-      "review_focus": "메시지 broker가 발송을 수용한 것과 소비자가 업무를 끝낸 것은 별개의 확인입니다. 큐 안에서 전달을 기다리는 메시지와 이미 전달했지만 확인받지 못한 메시지를 나누어 봅니다. 재전달은 같은 업무를 다시 시도하는 것일 수 있어 전달 수를 고유 업무 수로 바꾸지 않습니다.",
+      "review_focus": "교차 검토 1차: B11: quorum queue는 global QoS prefetch 미지원. 해당 channel의 consume은 channel error.",
       "critical_checks_in_text": [
         "1. publisher confirm은 소비자 업무 완료인가? **broker와의 확인입니다.**",
         "2. ready 0이면 모든 메시지 처리가 끝났는가? **unacknowledged와 업무 상태를 추가 확인합니다.**",
         "3. prefetch 100이면 100개를 병렬 실행하는가? **전달 제한과 실제 병렬 처리는 다릅니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B11"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/middleware/search-engines.md",
-      "content_sha256": "efcda2820549d628d7aeb5c82686df65260a98b706a20e146d063ad025853b67",
+      "content_sha256": "61e1204da270682b94b4a138a7ef1f15b9d6d731439c4bab6308e6a92b48cd6e",
       "scope": "상태: 검토됨 · 적용 범위: Elasticsearch·OpenSearch 공식 API의 주요 의미 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
-      "review_focus": "검색 엔진은 문서를 빠르게 찾도록 index를 만들고 shard 단위로 나누어 보관할 수 있습니다. 쓰기 성공 뒤 검색에 보일 때까지의 경계와 장애 시 데이터 보존은 다릅니다. 클러스터 색상은 shard 상태 요약이므로 실제 검색 지연과 정확한 결과까지 함께 확인합니다.",
+      "review_focus": "교차 검토 1차: B18: primary 6 + replica 6 = shard 사본 총 12; replica 수는 6. 직접 재계산.",
       "critical_checks_in_text": [
         "1. 쓰기 응답 성공과 검색 가시성은 같은 시점인가? **refresh 등 별도 단계가 있습니다.**",
         "2. green이면 모든 검색이 빠른가? **배치 상태와 성능은 다릅니다.**",
         "3. took 밖의 시간은 모두 네트워크 시간인가? **클라이언트와 중계의 여러 단계가 포함될 수 있습니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B18"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/middleware/proxies-and-mesh.md",
@@ -855,15 +1103,22 @@
     },
     {
       "path": "docs/middleware/stream-processing.md",
-      "content_sha256": "5120b85442e2ed83054881a814240c261afee9aac3807bf71680e2d9aa8f24e5",
+      "content_sha256": "f354665507e740cb9e359afc3ef9bc382bfdcb95c5ba3373ac649b690deb4a95",
       "scope": "상태: 검토됨 · 적용 범위: Flink 1.20, Spark Structured Streaming 문서, Pulsar 4.0 사례 · 검토일: 2026-10-04 · 실제 분산 작업 실행 없음",
-      "review_focus": "event/processing time, watermark·backpressure, checkpoint와 sink 보장",
+      "review_focus": "교차 검토 1차: B19: 가중 추정·learner·Memcached stats·Spark fault tolerance·Hikari 설정을 직접 뒷받침하는 원천으로 연결. OTel 확률 명세는 Development 상태 표시.",
       "critical_checks_in_text": [
         "1. CPU가 낮으면 stream 결과가 늦을 수 없는가? **watermark·입력 유휴·외부 대기를 봐야 합니다.**",
         "2. checkpoint 성공이면 외부 결제도 정확히 한 번인가? **sink와 업무 멱등성의 보장 경계가 필요합니다.**",
         "3. broker backlog와 사용자 화면의 최신성은 같은가? **소비 이후 계산·저장·조회 경계도 있습니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B19"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/cloud/resources-and-apis.md",
@@ -891,9 +1146,9 @@
     },
     {
       "path": "docs/cloud/late-data-and-reconciliation.md",
-      "content_sha256": "7143cbe48ffc850f768109e5eab7e9ed24d029af9fd5714ff7cad256e4f6aaca",
+      "content_sha256": "17388975333aa2a4f7b4b6562f2251d15aea26282602b034841406139f6d921d",
       "scope": "상태: 검토됨 · 적용 범위: CloudWatch GetMetricData·PutMetricData, Azure·Google Cloud의 연결된 집계 규약 · 검토일: 2026-10-04 · 실제 cloud 계정 호출은 하지 않음",
-      "review_focus": "결과별 상태·시간-값 대응·시간 경계와 가상 재조회 집계",
+      "review_focus": "교차 검토 1차: B5: NextToken은 MetricDataResult가 아닌 GetMetricData 응답 최상위. 결과별 완전성과 요청 pagination을 분리.; B20: MetricDataResult 문서는 Forbidden을 유효 값으로 열거하지만 원인을 정의하지 않음. 권한은 조사 가설로 표시하고 Messages 보존.",
       "critical_checks_in_text": [
         "1. HTTP 200이면 응답 안의 모든 metric도 완전한가? **각 결과의 상태를 읽어야 합니다.**",
         "2. 같은 1분 Sum을 두 번 받으면 더하는가? **같은 구간을 갱신한 값이라면 중복 합산하지 않습니다.**",
@@ -901,19 +1156,34 @@
         "4. 먼저 도착한 결과가 반드시 더 오래된 원천 상태인가? **요청·처리·전송 순서와 원천 revision을 구분해야 합니다.**"
       ],
       "comprehension_present": true,
-      "reviewed_in_edition": "1.1"
+      "reviewed_in_edition": "1.1",
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B5",
+          "B20"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/cloud/managed-and-serverless.md",
-      "content_sha256": "759314e2a93b02972b1b52e363fdc7c0bdb49df08f19d66f36fdb726947e2378",
+      "content_sha256": "15eeee6f69fe94e6674fcaa02f5147b67e5df946f6e88443722de89b58ffe86b",
       "scope": "상태: 검토됨 · 적용 범위: 관리형 관측 모델, AWS Lambda·Google Cloud Run 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04",
-      "review_focus": "관리형 서비스는 내부 운영의 일부를 공급자가 맡지만 사용자 요청의 의미와 관측 책임은 남습니다. 서버리스에서는 실행 준비, 실제 실행, 동시성 제한, 대기하는 사건을 구분해야 합니다. 보이지 않는 호스트 내부를 추측해 채우기보다 제공되는 경계와 업무 성공을 연결합니다.",
+      "review_focus": "교차 검토 1차: B6: 동시성 모델의 평균 시간은 요청의 환경 점유 시간. 요청에 귀속되는 Init 포함, 미리 준비된 환경의 유휴 시간을 요청마다 더하지 않음.",
       "critical_checks_in_text": [
         "1. Errors/Invocations가 모든 진입 요청의 실패율인가? **throttle 등 빠지는 범주가 있습니다.**",
         "2. Lambda Duration에 cold start가 포함되는가? **해당 지표의 정의에서는 포함하지 않습니다.**",
         "3. Cloud Run 504면 코드 실행도 종료됐는가? **그렇다고 보장되지 않습니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B6"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/cloud/networking.md",
@@ -941,15 +1211,22 @@
     },
     {
       "path": "docs/cross-domain/slow-requests.md",
-      "content_sha256": "e42ff817a1256ae77336e5991ea53e179af73372db6059d6d82da5d7415edd3f",
+      "content_sha256": "de837efc249929399c831396024c9472a94632dcc2447be6c21a2ebed8cac753",
       "scope": "상태: 학습용 분석 사례 · 모든 수치·시간·대상은 가상 · 실환경 장애를 재현하거나 명령을 실행하지 않음 · 편집 검토일: 2026-10-04",
-      "review_focus": "느린 요청은 여러 도메인에 동시에 증상을 만들 수 있습니다. DB 잠금을 기다리느라 앱이 연결을 오래 보유하면 연결 풀도 가득 차고 후속 요청도 기다립니다. 여러 경고를 각각 독립된 원인으로 취급하기 전에 시간 순서와 대기 관계를 연결하는 연습입니다.",
+      "review_focus": "교차 검토 1차: B14: 가정은 Pod당 20, 세 Pod 전체 60. 0.1초 점유에서 각각 200/초·600/초, 1초이면 20/초·60/초. 직접 재계산.",
       "critical_checks_in_text": [
         "1. 느린 요청의 700 ms 풀 대기를 DB 내부 실행 시간으로 표시해도 되는가? **연결 획득 전의 대기이므로 경계가 다르다.**",
         "2. blocker 해제 후 회복했으면 최초 원인도 전부 파악했는가? **blocker가 오래 지속된 이유는 별도 조사 대상이다.**",
         "3. 연결을 두 배로 늘리면 처리량도 두 배인가? **잠금·DB 용량·부하 변화 때문에 보장할 수 없다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B14"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/cross-domain/resource-failures.md",
@@ -989,16 +1266,23 @@
     },
     {
       "path": "docs/cross-domain/reproducible-labs.md",
-      "content_sha256": "7b4ed2b8089ab869b4a4f879e7fbce48426db60d6ca94c2c74e5cb28355a6fc1",
+      "content_sha256": "165ab887ebbf512026165a5c64fbf59aed4213eb707e05a6baec0cf50d4dde91",
       "scope": "상태: 검토됨 · 적용 범위: Windows 로컬 실행, Python 3.11.9·SQLite 3.45.1·promtool 3.5.0 · 실행일: 2026-10-04",
-      "review_focus": "제1.0판 4종 결과 유지와 제1.1판 31개 시나리오의 연결·범위 구분",
+      "review_focus": "교차 검토 1차: C-Prometheus: 3.5 LTS 종료 2026-07-31, 현재 LTS 3.13.4·최신 3.15.0. 과거 promtool 3.5.0 결과는 그대로 둠. 3.5 계열 최종 patch 번호는 이 표에서 주장하지 않음.",
       "critical_checks_in_text": [
         "1. 합성 PromQL 입력이면 실행 검증이 아닌가? **입력은 합성이지만 실제 평가기의 동작을 실행해 확인했습니다. 운영 scrape 검증과는 다릅니다.**",
         "2. SQLite 실습으로 모든 DB의 격리 수준을 확인했는가? **SQLite 해당 버전·설정의 결과입니다.**",
         "3. 모든 검사 통과가 모든 운영 환경의 보장인가? **명시한 입력·버전·경계의 증거이며 범위를 넘겨 해석하지 않습니다.**"
       ],
       "comprehension_present": true,
-      "reviewed_in_edition": "1.1"
+      "reviewed_in_edition": "1.1",
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "C-Prometheus"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/cross-domain/capstone-investigation.md",
@@ -1053,9 +1337,9 @@
     },
     {
       "path": "docs/product/telemetry-delivery-contracts.md",
-      "content_sha256": "f6710b52fdd65135ad0601421c16e63362d86e7b2a5f81ddd0e5c2d69823552f",
+      "content_sha256": "69b129dc031e42aca28b81f68b7b28f67c6ef7730301b32976687a0e0298d8d1",
       "scope": "상태: 검토됨 · 적용 범위: OTLP 1.11.0 문서, Collector 0.137.0의 OTLP/HTTP JSON 로컬 실험 · 검토일: 2026-10-04",
-      "review_focus": "HTTP 전송 7개 결과, 500 비재시도·부분 성공·중복 수신과 영속 저장 구분",
+      "review_focus": "교차 검토 1차: A3: run_otel_lab.py의 logs:error·metrics:none 확인. 목적지 요청·receiver 응답만 근거이며 내부 거절 인지·계수는 관측되지 않음.; B2: 0.137.0 base_exporter L66–102: queue→obs→retry→timeout→pusher. obs Send/endOp L86–138은 내부 retry 반환 뒤 failed 항목 수 계수. 같은 retry의 중간 실패 횟수가 아님. 일반 안내의 의도를 상류 재전송 하나로 한정하지 않음.; C-Collector: 현재 0.162.0. core published_at=2026-09-28T14:09:31Z, 배포판=2026-09-29T12:34:07Z. 9월 29일은 배포판 기준으로 맞음. 0.137.0 실행 기록 유지.; C-OTLP: 공식 웹 규약의 제목은 1.11.0이 맞다. 반면 원천 저장소 latest release는 1.11.1(2026-09-29T08:46:40Z). 문서 판 표시와 소스 릴리스의 최신성을 분리.",
       "critical_checks_in_text": [
         "1. HTTP 500이면 OTLP/HTTP에서 언제나 재시도하는가? **열거된 재시도 코드를 따라야 하며 이번 500은 한 번만 전송됐습니다.**",
         "2. 부분 성공의 거절 수가 1이면 어느 span인지 반드시 아는가? **개수만으로 개별 항목을 식별할 수 없습니다.**",
@@ -1063,7 +1347,17 @@
         "4. 이 결과로 영속 큐의 무손실을 보장하는가? **큐를 끈 HTTP 전송 실험이며 영속 큐 장애 검증은 별도입니다.**"
       ],
       "comprehension_present": true,
-      "reviewed_in_edition": "1.1"
+      "reviewed_in_edition": "1.1",
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "A3",
+          "B2",
+          "C-Collector",
+          "C-OTLP"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/product/storage-and-query.md",
@@ -1103,21 +1397,28 @@
     },
     {
       "path": "docs/product/adapter-contracts.md",
-      "content_sha256": "ede992d5f4db60273f6cbd6c2cfa7dc6bef8470f6d848eeebc5aa7f95aa5e1c1",
+      "content_sha256": "4b999fbe526017c2ae8d5e0a31029fe7674870ee3a0af92a5d7c34a3261241c8",
       "scope": "상태: 검토됨 · 적용 범위: 이 책의 제품 설계 제안과 실행 가능한 참조 예제 · 검토일: 2026-10-04 · 사용자 제품에 구현된 기능을 뜻하지 않음",
-      "review_focus": "원천 semantics 보존, 정수 차분, 누락/리셋/중복, 좁은 참조 계약",
+      "review_focus": "교차 검토 1차: B3: 6.12 diskstats_show의 4·8·10·11·15·17은 32bit unsigned ms. 2^32 ms≈49.71 누적 일이며 병렬 합계는 실제 시간이 더 짧을 수 있음. 감소를 reset이 아닌 decrease로 분리; 증거 없는 modulo 복원은 구현하지 않음.",
       "critical_checks_in_text": [
         "1. 수집 실패 뒤 rate=0을 내보내는가? **0과 관측 불가를 구분합니다.**",
         "2. timestamp와 값이 같으면 업무 중복도 없다고 입증되는가? **이 표본의 중복 판단일 뿐 업무 사건의 멱등성 증명은 아닙니다.**",
         "3. 원천에 없는 histogram을 p95 하나로 생성할 수 있는가? **원래 분포 정보가 부족합니다.**"
       ],
-      "comprehension_present": true
+      "comprehension_present": true,
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "B3"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/product/compatibility-and-acceptance.md",
-      "content_sha256": "da51778283adf616e7112acae5232a81a597164289be75165c44bfc5ea618c90",
+      "content_sha256": "f8f1399ab9ef9f49cc885403b2812e1de7503219159d8f1d6662eae2e8a76bbc",
       "scope": "상태: 검토됨 · 적용 범위: 이 책의 제품 설계 제안과 연결된 원천 규약·실험 · 검토일: 2026-10-04 · 사용자 제품의 지원 인증을 뜻하지 않음",
-      "review_focus": "19개 필드 계약·버전과 실제 실행 근거·의미 변경의 이력",
+      "review_focus": "교차 검토 1차: C-Kubernetes: 최신 1.37.1 및 1.35+ 비교 규약 수용. 최신 3개 브랜치는 1.35–1.37이나 1.34는 10월 27일까지 유지보수 중. 1.34.1 고정 실습과 1.34.12 패치 구분.; C-Collector: 현재 0.162.0. core published_at=2026-09-28T14:09:31Z, 배포판=2026-09-29T12:34:07Z. 9월 29일은 배포판 기준으로 맞음. 0.137.0 실행 기록 유지.; C-OTLP: 공식 웹 규약의 제목은 1.11.0이 맞다. 반면 원천 저장소 latest release는 1.11.1(2026-09-29T08:46:40Z). 문서 판 표시와 소스 릴리스의 최신성을 분리.",
       "critical_checks_in_text": [
         "1. endpoint가 200이면 그 제품 지원을 완료했다고 할 수 있는가? **필드 의미·권한·실패·비용까지 별도의 근거가 필요합니다.**",
         "2. 단위가 byte면 서로 다른 memory 지표를 합쳐도 되는가? **관측 범위와 의미가 같아야 합니다.**",
@@ -1125,7 +1426,16 @@
         "4. working set을 current로 바꾸면 문서만 고치면 되는가? **시계열·쿼리·알림의 의미 변경도 다뤄야 합니다.**"
       ],
       "comprehension_present": true,
-      "reviewed_in_edition": "1.1"
+      "reviewed_in_edition": "1.1",
+      "cross_review_round_1": {
+        "record": "review/claude-codex-r1.json",
+        "item_ids": [
+          "C-Kubernetes",
+          "C-Collector",
+          "C-OTLP"
+        ],
+        "execution_limit": "Primary-source/code review. Historical evidence is preserved. Linux clock rerun supplied by Claude is published separately; latest-version server reruns remain deferred to round 2."
+      }
     },
     {
       "path": "docs/product/capacity-and-loss-budgets.md",

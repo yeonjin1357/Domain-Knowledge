@@ -15,11 +15,13 @@ CloudWatch GetMetricData 응답에는 여러 `MetricDataResult`가 들어갈 수
 | 원천 결과 | 수집기가 보존할 정보 | 하지 않을 변환 |
 | --- | --- | --- |
 | Complete | 요청 범위와 시점, 반환된 표본 | 미래의 늦은 게시까지 영원히 완료됐다고 단정 |
-| PartialData | 받은 구간, 미완료 상태, 다음 token | 누락 구간을 0으로 채움 |
+| PartialData | 결과별 미완료 상태와 받은 구간, 응답 최상위 NextToken | 누락 구간을 0으로 채움 |
 | InternalError | 오류·재시도 상태 | 이미 받은 값 전체를 실제 0으로 덮음 |
-| Forbidden | 접근 범위·권한 실패 | 지표 미사용 또는 대상 없음으로 표시 |
+| Forbidden | 원천 상태값·Messages·요청 문맥; 권한 원인은 추가 확인 | 지표 미사용 또는 대상 없음으로 표시 |
 
-PartialData에서 NextToken으로 이어 받을 수 있지만 metric math 표현식 등에서는 token이 없는 경우도 있습니다. “token이 없으면 모든 결과가 완전하다”는 단일 규칙을 만들지 않습니다.
+`NextToken`은 개별 `MetricDataResult`의 필드가 아니라 **GetMetricData 응답 최상위의 요청 단위 token**입니다. 원래 요청의 다음 결과 묶음을 받는 데 사용하며 특정 metric만의 token으로 저장하지 않습니다. `Forbidden`은 이 API 문서에 유효 값으로 열거되어 있지만 구체적인 발생 원인이 정의되어 있지 않습니다. 권한 문제는 조사할 가설로 남기고 상태·Messages를 보존합니다. [GetMetricData 응답 구조](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html)
+
+PartialData에서 응답 최상위 NextToken으로 이어 받을 수 있지만 metric math 표현식 등에서는 token이 없는 경우도 있습니다. “token이 없으면 모든 결과가 완전하다”는 단일 규칙을 만들지 않습니다.
 
 ## Timestamps와 Values는 쌍이다
 

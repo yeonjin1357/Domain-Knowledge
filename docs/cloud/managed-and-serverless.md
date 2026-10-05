@@ -31,7 +31,9 @@ Lambda Invocations는 함수 코드가 호출된 횟수이며 throttled 요청 �
 
 Lambda의 동시성은 동시에 실행되는 요청 규모와 관련되며 요청률과 실행 시간의 영향을 받습니다. 예약 동시성과 provisioned concurrency는 각각 용량 할당·제한과 준비된 실행 환경에 관한 다른 설정입니다. [AWS Lambda Concurrency](https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html)
 
-합성 안정 상태에서 100호출/s, 평균 실행 0.2초라면 평균 동시 실행 규모는 20입니다. 평균이 1초로 늘면 같은 호출률에 100 규모가 됩니다. 이 계산은 burst와 확장 속도, quota를 생략한 평균 모델입니다.
+다음 평균 모델의 시간은 요청이 실행 환경을 점유하는 기간입니다. 요청 때문에 Init을 수행한다면 그 시간도 포함하며, 미리 준비된 환경의 유휴 시간을 요청마다 더하지 않습니다. cold start를 제외하는 `Duration` 지표를 그대로 점유 시간으로 대입하면 초기화 영향을 놓칠 수 있습니다. [Init·Invoke 동안의 점유](https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html)
+
+합성 안정 상태에서 100호출/s, 평균 점유 시간이 0.2초라면 평균 동시 실행 규모는 20입니다. 평균이 1초로 늘면 같은 호출률에 100 규모가 됩니다. 이 계산은 burst와 확장 속도, quota를 생략한 평균 모델입니다.
 
 Cloud Run은 한 인스턴스가 여러 동시 요청을 처리하도록 설정할 수 있습니다. 따라서 인스턴스 수와 동시 요청 수를 일대일 매핑하지 않습니다. 실제 concurrency 설정과 앱의 병렬 처리 능력을 확인합니다. [Cloud Run Concurrency](https://docs.cloud.google.com/run/docs/about-concurrency)
 

@@ -9,6 +9,8 @@ import math
 from pathlib import Path
 import re
 
+from verify_review_r1 import verify_published_linux
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -22,6 +24,9 @@ def digest(name):
 
 def main():
     records = {}
+    provenance = json.loads(read('review/evidence-provenance.json'))['archives']
+    archives = {(a['evidence'], a['original_path']): a for a in provenance}
+    assert len(archives) == len(provenance), 'duplicate archive mapping'
     expected = {"linux": 4, "postgresql": 11, "kubernetes": 7, "otel": 7, "http11": 2}
     for name, count in expected.items():
         record = json.loads(read(f"labs/results/1.1-{name}.json"))
@@ -32,6 +37,10 @@ def main():
             inputs = {f"scripts/run_{script}_lab.py": record["script_sha256"]}
         assert inputs, name
         for filename, sha in inputs.items():
+            archive = archives.get((f'labs/results/1.1-{name}.json', filename))
+            if archive:
+                assert archive['sha256'] == sha, (name, 'archive hash differs from execution record')
+                filename = archive['archived_path']
             assert digest(filename) == sha, (name, "evidence input changed", filename)
         experiments = {k: v for k, v in record["experiments"].items() if isinstance(v, dict)}
         assert sum(v["status"] == "passed" for v in experiments.values()) == count, name
@@ -137,7 +146,9 @@ def main():
         assert math.isclose(actual, result, rel_tol=1e-12), chapter
     pairs = sorted(zip(["10:02", "10:00", "10:01"], [30, 10, 20]))
     assert pairs == [("10:00", 10), ("10:01", 20), ("10:02", 30)]
+    verify_published_linux()
     print(f"PASS: {sum(expected.values())} recorded scenarios in 5 suites; all evidence input hashes; SQL excerpt; {len(examples)} calculations and timestamp-value pairing")
+    print("Historical inputs include the byte-identical archived Linux runner. Its CPU passed flag did not validate wall-clock calibration.")
     print("Saved execution evidence was checked; servers and source facts were not re-executed by this command")
 
 

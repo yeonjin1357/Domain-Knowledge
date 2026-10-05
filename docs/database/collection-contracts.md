@@ -2,6 +2,8 @@
 
 > 상태: 검토됨 · 적용 범위: PostgreSQL 18·MySQL 8.4의 원천 필드와 수집 설계 · 검토일: 2026-10-04 · PostgreSQL 수집 SQL은 18.6에서 실행, MySQL SQL은 문서 검토
 
+버전 상태: MySQL 사례는 8.4 LTS 문서에 고정했습니다. 9.7 LTS와 이후 YY.M 번호 체계가 존재하며, 새 계열의 모든 동작을 검증한 설명은 아닙니다. 9.7.3은 Docker image 전용 보안 패치입니다. [버전별 기준과 지원 상태](../coverage.md#교차-검토-시점의-버전-상태)
+
 DB 모니터링 쿼리도 DB가 실행하는 작업입니다. 작은 메타데이터 조회라도 빈도·행 수·권한을 관리해야 합니다. 문장 텍스트에 개인정보가 들어갈 수도 있습니다. 이 장의 쿼리는 수집 계약을 검토하기 위한 예시이며 사용자 환경에 적용한 배포 명세가 아닙니다.
 
 ## PostgreSQL에서 먼저 확인할 것
@@ -21,6 +23,8 @@ FROM pg_stat_database
 WHERE datid <> 0;
 COMMIT;
 ```
+
+`collected_at`은 이 예시에서 **각 행의 표현식을 평가할 때 읽은 시각**입니다. `clock_timestamp()`는 같은 문장 안에서도 달라질 수 있고 실제 결과의 행들에서도 달랐습니다. 한 문장에 공통인 시작 시각이 목적이면 `statement_timestamp()`를 선택합니다. 어느 쪽도 DB 전체의 원자적 수집 완료 시각이라는 뜻은 아닙니다. 이번에는 실행 입력·hash를 유지하고 행별 시각이라는 계약을 명시했습니다. [PostgreSQL 현재 시각 함수](https://www.postgresql.org/docs/18/functions-datetime.html#FUNCTIONS-DATETIME-CURRENT)
 
 위 SQL은 [고정된 입력 파일](../../labs/postgresql/collect-database.sql)로 보존해 PostgreSQL 18.6의 임시 인스턴스에서 실행했습니다. 누적값이 존재해도 `stats_reset`이 NULL인 행이 반환됐습니다. 이 필드를 항상 존재하는 reset 시각으로 가정하지 않습니다. 권한·통계 snapshot·오류 후 연결 상태는 [실제 동시성 실습](postgresql-concurrency-lab.md)에서 설명합니다.
 

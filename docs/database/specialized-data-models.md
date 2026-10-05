@@ -29,7 +29,7 @@ InfluxDB OSS 2는 measurement, tag set, field, timestamp 등의 데이터 요소
 
 그래프는 정점과 관계를 중심으로 연결을 표현합니다. 시작 정점 하나를 빠르게 찾더라도 이후 관계를 몇 단계 확장하는지가 작업량을 크게 바꿀 수 있습니다. 예시로 매 단계 새 이웃 10개를 만나고 중복이 없다고 가정하면 3단계 확장 후보는 `10+100+1,000=1,110`개입니다. 실제 planner의 비용이나 결과 행 수와 같다는 뜻은 아닙니다.
 
-Neo4j의 관측에서는 transaction, query, page cache, store, clustering 등 지원되는 metric 범위를 확인합니다. edition·설정·버전에 따라 가용 항목이 달라질 수 있어 문서에 이름이 있다는 것만으로 대상에서 수집된다고 가정하지 않습니다. [Neo4j metrics](https://neo4j.com/docs/operations-manual/current/monitoring/metrics/)
+연결한 Neo4j Operations Manual의 metrics 기능은 **Enterprise Edition 전용**입니다. 그 안에서도 transaction, query, page cache, store, clustering 등의 가용 항목은 설정·버전에 따라 확인해야 하므로 문서에 이름이 있다는 것만으로 대상에서 수집된다고 가정하지 않습니다. [Neo4j metrics](https://neo4j.com/docs/operations-manual/current/monitoring/metrics/)
 
 그래프 DB가 느리다는 보고에는 요청 개수뿐 아니라 출발점 선택, 확장 깊이·분기, 실제 결과 크기, 캐시, transaction 메모리 등의 가설을 세웁니다. 관계 수 증가와 지연이 함께 나타나도 동일한 질의 구성이었는지 확인해야 합니다.
 

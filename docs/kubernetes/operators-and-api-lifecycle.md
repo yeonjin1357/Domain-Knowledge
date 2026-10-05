@@ -18,7 +18,7 @@ API 요청은 인증·인가·admission 등의 경계를 거칩니다. Mutating 
 
 ## generation과 resourceVersion
 
-`resourceVersion`의 동일성·순서 비교는 서버 버전과 API 규약에 맞춥니다. 1.34까지의 불투명 문자열 규약과 1.35의 제한된 순서 비교 규약을 구분하며, 여러 종류 자원의 전역 시각으로 계산하지 않습니다. [버전별 비교](objects-and-control-loops.md)
+`resourceVersion`의 동일성·순서 비교는 서버 버전과 API 규약에 맞춥니다. 1.34 이하의 불투명 문자열 규약과 1.35 이상의 제한된 순서 비교 규약을 구분하며, 순서 규약이 확인되지 않은 확장 API server에는 동일성 비교만 사용합니다. resourceVersion을 여러 종류 자원의 전역 시각으로 계산하지 않습니다. [버전별 비교](objects-and-control-loops.md)
 
 `generation`과 controller가 제공하는 `observedGeneration`의 관계는 해당 API 규약을 확인합니다. 원하는 변경을 아직 관측하지 않은 상태와 관측했지만 실패한 상태를 구분하는 단서가 될 수 있습니다. [Kubernetes API 규약](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md)
 

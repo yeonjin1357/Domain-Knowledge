@@ -6,7 +6,7 @@
 
 운영체제가 보여 주는 메모리와 I/O는 한 가지 숫자가 아닙니다. 주소 공간을 확보한 양, 실제 RAM에 올라온 양, 프로그램이 읽은 양, 저장 계층에서 가져온 양은 서로 다른 질문입니다. 이 장은 작고 통제된 작업을 실행하면서 그 차이를 직접 확인합니다.
 
-실행기는 [run_linux_lab.py](../../scripts/run_linux_lab.py), 원시 결과는 [Linux 실습 기록](../../labs/results/1.1-linux.json)입니다. 이 결과를 Windows 전체 호스트나 모든 Linux 배포판의 성능 측정으로 일반화하지 않습니다.
+제1.1판 최초 실행 입력은 [보존한 실행기](../../labs/archive/run_linux_lab_1_1.py), 원시 결과는 [기존 Linux 실습 기록](../../labs/results/1.1-linux.json)입니다. 시계 진단을 추가한 [현재 실행기](../../scripts/run_linux_lab.py)로 Claude가 2026-10-04 04:10:49 UTC에 재실행한 결과는 [Linux 시계 진단 기록](../../labs/results/1.1-linux-clock-r1.json)에 별도로 보존했습니다. Codex는 전달받은 JSON의 실행기 hash·계산·품질 표시를 확인했습니다. 원본과 복사본의 SHA256은 같으며 [근거 보존 기록](../../review/evidence-provenance.json)에서 연결합니다. CPU 절은 두 실행을 구분해서 설명하고, 나머지 실습 표는 최초 기록을 유지합니다. 이 결과를 Windows 전체 호스트나 모든 Linux 배포판의 성능 측정으로 일반화하지 않습니다.
 
 ## 실행 범위와 준비
 
@@ -15,10 +15,10 @@
 저장소 루트에 대응하는 Linux 디렉터리에서 실행합니다. WSL에서는 저장소의 실제 Linux 경로로 이동한 뒤 같은 명령을 사용합니다.
 
 ```bash
-python3 scripts/run_linux_lab.py
+python3 -B scripts/run_linux_lab.py --clock-observation-seconds 60 --output .lab-runs/linux-clock-r1.json
 ```
 
-기본 결과는 `.lab-runs/linux.json`이며 출판 기록을 덮지 않습니다. 이 장은 procfs가 존재하는 Linux용입니다.
+위 명령은 `.lab-runs/linux-clock-r1.json`에 결과를 저장합니다. 기본 출력도 `.lab-runs/linux.json`이며 출판 기록을 덮지 않습니다. 임시 I/O 파일도 `.lab-runs/`에 만듭니다. 이 장은 procfs가 존재하는 Linux용이며, `adjtimex` 구조체 호출은 확인한 glibc x86_64 ABI에서만 수행합니다. 다른 ABI에서는 미지원 사유를 기록합니다.
 
 ## 실습 1: 프로세스 이름에도 공백과 괄호가 있다
 
@@ -39,16 +39,39 @@ python3 scripts/run_linux_lab.py
 `sysconf(_SC_CLK_TCK)`에서 이 환경의 값 100을 읽었습니다. 원천의 utime와 stime 증가를 합하고 이 값으로 나누어 CPU초를 계산했습니다. `CLK_TCK=100`을 모든 플랫폼의 고정 상수로 구현하지 않습니다.
 
 ```text
-2초 목표 구간의 관측:
+제1.1판 최초 실행의 2초 목표 구간:
 누적 CPU 계정 증가 = 212 ticks
 CPU 시간 = 212 / 100 = 2.12초
 monotonic wall 시간 ≈ 2.000005초
 계산 비율 ≈ 1.06 CPU초/초
 ```
 
-**추가 확인:** 짧은 첫 표본의 비율이 예상보다 커서 1초·2초 구간을 추가했습니다. 이 구간에도 약 1.06이 나타났습니다. 프로세스 CPU clock과 monotonic clock의 구현 이름도 기록했습니다.
+**최초 실행의 추가 확인:** 짧은 첫 표본의 비율이 예상보다 커서 1초·2초 구간을 추가했습니다. 이 구간에도 약 1.06이 나타났습니다. 프로세스 CPU clock과 monotonic clock의 구현 이름도 기록했습니다.
 
-이 검사는 원천 파싱·단위·산술을 확인했습니다. 시계와 CPU 계정 사이 차이의 근본 원인은 규명하지 못했습니다. 따라서 장비 성능 인증이나 정확한 사용 용량의 기준값으로 사용하지 않습니다. 원천값을 임의로 100%로 잘라 저장하지 않는 이유는 [측정과 비교](../foundations/measurement-and-comparability.md)에 있습니다.
+**교차 검토에서 확인한 설명:** Linux의 `CLOCK_MONOTONIC`은 역행하지 않는 성질과 별개로 주파수 조정을 받습니다. `CLOCK_MONOTONIC_RAW`는 그 조정을 받지 않습니다. 분모 시계가 CPU 계정에 비해 느리게 흐르면 단일 스레드에서도 CPU초/MONOTONIC초가 1을 넘을 수 있습니다. 이 비율을 물리적인 106% 처리 능력으로 읽으면 안 됩니다. [clock_gettime](https://man7.org/linux/man-pages/man2/clock_gettime.2.html)
+
+**저장소 실행기로 재현한 관측:** 같은 WSL 환경(Linux 6.18.33.2-microsoft-standard-WSL2, Python 3.12.3)에서 busy 3개 구간과 sleep 1개 구간을 기록했습니다. 아래 시간은 같은 관측 구간에서 읽은 각 시계의 증가량이며, 소수 여섯 자리로 반올림했습니다. CPU는 프로세스 CPU clock입니다. 모든 구간의 시작·끝 스레드 수는 `[1, 1]`입니다.
+
+| 작업·MONOTONIC 목표 | MONOTONIC(초) | RAW(초) | 프로세스 CPU(초) | CPU/MONOTONIC | CPU/RAW | MONOTONIC/RAW |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| busy 0.2초 | 0.200007 | 0.213378 | 0.213361 | 1.06676 | 0.99992 | 0.93734 |
+| busy 1초 | 1.000002 | 1.066986 | 1.066906 | 1.06690 | 0.99992 | 0.93722 |
+| busy 2초 | 2.000001 | 2.134155 | 2.134058 | 1.06703 | 0.99995 | 0.93714 |
+| sleep 2초 | 2.000107 | 2.134267 | 0.000057 | 0.00003 | 0.00003 | 0.93714 |
+
+CPU를 거의 쓰지 않은 sleep에서도 MONOTONIC/RAW가 약 0.937이었습니다. 따라서 두 시계의 차이는 이 실험에서 CPU 부하를 주는 동안에만 생긴 현상이 아닙니다. busy 구간에는 `single_thread_cpu_over_monotonic`, `monotonic_raw_rate_difference`, `clock_slew_suspected`가 기록됐고, sleep 구간에는 시계 비율 차이 표시만 남았습니다.
+
+이어 MONOTONIC 기준 60초를 목표로 idle 시계열 61개 표본을 수집했습니다. 두 끝점의 증가량은 MONOTONIC **60.011948727초**, RAW **64.089720449초**이며 비율은 **0.93637401**입니다. 같은 표본에서 읽기 전용 `adjtimex(modes=0)`의 tick은 9,353–9,371µs 사이의 서로 다른 7개 값이었습니다. 이 환경의 명목 tick 10,000µs를 기준으로 61개 tick의 단순 산술평균을 나눈 값은 **0.93637541**입니다. `freq_ppm` 범위는 **-49.82660~+40.45189ppm**, `status` 비트 값은 모두 8192였습니다. 이 값들은 JSON에서 다시 계산할 수 있습니다.
+
+두 비율의 근접성은 시계 조정 설명과 부합합니다. 다만 tick의 단순 표본 평균은 연속 시간에 대한 정확한 적분이 아닙니다. 시계와 adjtimex는 순차로 읽었고 표본 사이의 변경 시점은 알 수 없으며, freq도 시계 속도에 기여합니다. tick/10,000 하나를 MONOTONIC/RAW와 항상 같은 공식으로 사용하지 않습니다. `tick`의 단위와 freq 조정의 의미는 [adjtimex 규약](https://man7.org/linux/man-pages/man2/adjtimex.2.html), 명목 tick과 조정값의 결합은 [Linux 6.12 코드](https://github.com/torvalds/linux/blob/v6.12/kernel/time/ntp.c)에서 확인했습니다. 이 코드 대조가 실행한 WSL 6.18 커널 전체를 감사했다는 뜻은 아닙니다.
+
+**이 재실행의 결론:** 같은 WSL 환경의 재실행에서 단일 스레드 busy 구간의 프로세스 CPU clock/RAW는 약 0.99992–0.99995였고, MONOTONIC/RAW는 약 0.937로 MONOTONIC이 RAW보다 약 6.3% 느리게 진행했습니다. sleep·idle 구간에서도 같은 방향의 시계 속도 차이가 관측되었고 adjtimex 조정값과 부합하므로, 이 재실행에서 CPU/MONOTONIC이 1을 넘은 현상은 분모 시계의 주파수 조정으로 설명됩니다. 원래 제1.1판의 약 1.06 표본은 같은 환경에서 재현된 동일 패턴으로만 연결하며, RAW·tick 기록이 없어 그 표본의 원인을 소급 확정하지 않습니다. tick을 설정한 주체와 RAW의 외부 정확도는 확인하지 않았습니다.
+
+기존 `passed`는 `/proc` CPU ticks와 process CPU clock의 근접성을 검사한 결과입니다. 두 값은 같은 커널 CPU 계정을 반영할 수 있으므로 독립적인 경과 시간 교정 검사가 아닙니다. 원시 JSON의 `independently sampled` 표현도 이 의미에서는 부정확하며, 역사 기록을 바꾸는 대신 여기서 정정합니다.
+
+수정 실행기는 busy·sleep 각각에서 MONOTONIC·RAW·process CPU 시간, 읽기 시각의 폭, 시작·끝 스레드 수, 읽기 전용 `adjtimex(modes=0)`의 tick·freq·status를 기록합니다. 단일 스레드의 CPU/MONOTONIC > 1은 품질 표시로 남기고, RAW와의 차이가 함께 나타나면 `clock_slew_suspected`를 표시합니다. 1%는 이 실습의 진단 구분값이며 보편적인 허용 오차가 아닙니다. RAW 역시 가상화·하드웨어 시계의 정확도를 자동 보증하지 않습니다. `adjtimex`의 freq는 65536으로 나누어 ppm으로 해석하며, 반환 상태 `TIME_ERROR`와 호출 실패 -1을 구분합니다. [adjtimex](https://man7.org/linux/man-pages/man2/adjtimex.2.html), [Linux 6.12 NTP 시간 조정 코드](https://github.com/torvalds/linux/blob/v6.12/kernel/time/ntp.c)
+
+**근거 검증:** `verify_review_r1.py`와 `verify_revision.py`는 출판한 새 JSON의 SHA256, 실행기 SHA256, 구간별 원시 시계 증가량·CPU 계정·품질 표시, idle 표본과 위 본문 수치를 대조합니다. 실제 Linux 실행은 Claude가 수행했고 이 검증 명령은 저장된 결과를 검사합니다. 원천값을 임의로 100%로 잘라 저장하지 않는 이유는 [측정과 비교](../foundations/measurement-and-comparability.md)에 있습니다.
 
 ## 실습 3: 주소 공간 확보와 물리 페이지 사용
 

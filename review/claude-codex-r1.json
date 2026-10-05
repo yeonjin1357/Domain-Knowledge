@@ -1,0 +1,856 @@
+{
+  "review_date": "2026-10-04",
+  "round": 1,
+  "base_commit": "6aea2ed1a7bd53496bfb539bf13f688aa8e7a1d0",
+  "branch": "review/claude-codex-r1",
+  "edition_changed": false,
+  "limits": [
+    "No commit, push, branch switch or edition/as_of change.",
+    "Historical execution JSON, archived runner, current Linux runner and PostgreSQL SQL unchanged in round 1b.",
+    "Claude executed Linux; Codex validated the supplied raw artifact, hashes and calculations without a new WSL invocation.",
+    "Original 1.06 sample lacks RAW/tick. No retrospective causal proof, identification of the clock adjuster or external RAW calibration.",
+    "Latest-version reruns deferred to round 2.",
+    "Incoming Claude HTML report passed and matched the incoming book; one round-1b visual check timed out at Page.enable. The final rebuilt book is not visually certified."
+  ],
+  "items": [
+    {
+      "id": "A1",
+      "verdict": "부분 수용",
+      "finding": "보존한 재실행 JSON에서 단일 스레드 busy의 프로세스 CPU clock/RAW는 약 0.99992–0.99995, MONOTONIC/RAW는 약 0.937. sleep·idle의 시계 차이와 adjtimex 값도 부합하므로 이 재실행의 CPU/MONOTONIC > 1은 분모의 주파수 조정으로 설명된다. RAW·tick이 없는 과거 1.06 표본의 원인, 조정 주체와 RAW의 외부 정확도는 확정하지 않는다.",
+      "changed_files": [
+        "scripts/run_linux_lab.py",
+        "labs/archive/run_linux_lab_1_1.py",
+        "scripts/verify_revision.py",
+        "scripts/verify_review_r1.py",
+        "review/evidence-provenance.json",
+        "docs/host/linux-observation-lab.md",
+        "docs/host/collection-contracts.md",
+        "docs/foundations/time-and-data-quality.md",
+        "docs/foundations/measurement-and-comparability.md",
+        "docs/review.md",
+        "docs/validation.md",
+        "review/fact-review-1.1.json",
+        "README.md",
+        "labs/results/1.1-linux-clock-r1.json"
+      ],
+      "primary_sources": [
+        {
+          "label": "시계 규약",
+          "url": "https://man7.org/linux/man-pages/man2/clock_gettime.2.html"
+        },
+        {
+          "label": "adjtimex modes=0",
+          "url": "https://man7.org/linux/man-pages/man2/adjtimex.2.html"
+        },
+        {
+          "label": "Linux 6.12 ntp_update_frequency·ADJ_TICK",
+          "url": "https://github.com/torvalds/linux/blob/v6.12/kernel/time/ntp.c"
+        },
+        {
+          "label": "glibc x86_64 timex ABI",
+          "url": "https://github.com/bminor/glibc/blob/glibc-2.39/sysdeps/unix/sysv/linux/bits/timex.h"
+        }
+      ],
+      "execution_evidence": "labs/results/1.1-linux-clock-r1.json"
+    },
+    {
+      "id": "A2",
+      "verdict": "수용",
+      "finding": "7개 시나리오 전체 watch cache off를 명시. selector 이탈은 etcd와 cache 경로 둘 다 Deleted 분기가 있음. cache on은 코드 대조만 했으며 미보존 예비 200·ListFromCacheSnapshot 인과는 근거에서 제외.",
+      "changed_files": [
+        "docs/kubernetes/inventory-consistency.md",
+        "docs/review.md",
+        "docs/validation.md",
+        "review/fact-review-1.1.json"
+      ],
+      "primary_sources": [
+        {
+          "label": "etcd watcher L617–634",
+          "url": "https://github.com/kubernetes/kubernetes/blob/v1.34.1/staging/src/k8s.io/apiserver/pkg/storage/etcd3/watcher.go#L617-L634"
+        },
+        {
+          "label": "cache watcher L374–397",
+          "url": "https://github.com/kubernetes/kubernetes/blob/v1.34.1/staging/src/k8s.io/apiserver/pkg/storage/cacher/cache_watcher.go#L374-L397"
+        }
+      ]
+    },
+    {
+      "id": "A3",
+      "verdict": "수용",
+      "finding": "run_otel_lab.py의 logs:error·metrics:none 확인. 목적지 요청·receiver 응답만 근거이며 내부 거절 인지·계수는 관측되지 않음.",
+      "changed_files": [
+        "docs/product/telemetry-delivery-contracts.md",
+        "docs/validation.md",
+        "review/fact-review-1.1.json"
+      ],
+      "primary_sources": []
+    },
+    {
+      "id": "B1",
+      "verdict": "수용",
+      "finding": "db-0에는 앞 Pod가 없음. 기본 OrderedReady의 다음 신규 Pod는 앞 Pod Running·Ready까지 미생성. Pending과 구분.",
+      "changed_files": [
+        "docs/kubernetes/workloads-and-control-plane.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "StatefulSet 보장",
+          "url": "https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#deployment-and-scaling-guarantees"
+        }
+      ]
+    },
+    {
+      "id": "B2",
+      "verdict": "수용",
+      "finding": "0.137.0 base_exporter L66–102: queue→obs→retry→timeout→pusher. obs Send/endOp L86–138은 내부 retry 반환 뒤 failed 항목 수 계수. 같은 retry의 중간 실패 횟수가 아님. 일반 안내의 의도를 상류 재전송 하나로 한정하지 않음.",
+      "changed_files": [
+        "docs/product/telemetry-delivery-contracts.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "base_exporter",
+          "url": "https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/exporterhelper/internal/base_exporter.go#L66-L102"
+        },
+        {
+          "label": "obs_report_sender",
+          "url": "https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/exporterhelper/internal/obs_report_sender.go#L86-L138"
+        },
+        {
+          "label": "queue_sender L42",
+          "url": "https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/exporterhelper/internal/queue_sender.go#L38-L49"
+        }
+      ]
+    },
+    {
+      "id": "B3",
+      "verdict": "수용",
+      "finding": "6.12 diskstats_show의 4·8·10·11·15·17은 32bit unsigned ms. 2^32 ms≈49.71 누적 일이며 병렬 합계는 실제 시간이 더 짧을 수 있음. 감소를 reset이 아닌 decrease로 분리; 증거 없는 modulo 복원은 구현하지 않음.",
+      "changed_files": [
+        "docs/host/collection-contracts.md",
+        "docs/host/disk-io.md",
+        "docs/product/adapter-contracts.md",
+        "scripts/adapter_contract.py",
+        "scripts/verify_contracts.py",
+        "scripts/verify_review_r1.py"
+      ],
+      "primary_sources": [
+        {
+          "label": "필드 유형",
+          "url": "https://docs.kernel.org/admin-guide/iostats.html"
+        },
+        {
+          "label": "diskstats_show L1239–1300",
+          "url": "https://github.com/torvalds/linux/blob/v6.12/block/genhd.c#L1239-L1300"
+        }
+      ]
+    },
+    {
+      "id": "B4",
+      "verdict": "수용",
+      "finding": "회수 horizon에 일반 세션 외 prepared transaction, slot xmin/catalog_xmin, hot_standby_feedback을 포함. catalog_xmin의 catalog 범위 구분.",
+      "changed_files": [
+        "docs/database/transactions-and-locks.md",
+        "docs/database/postgresql.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "PostgreSQL 18 VACUUM",
+          "url": "https://www.postgresql.org/docs/18/routine-vacuuming.html#VACUUM-FOR-WRAPAROUND"
+        },
+        {
+          "label": "feedback",
+          "url": "https://www.postgresql.org/docs/18/runtime-config-replication.html#GUC-HOT-STANDBY-FEEDBACK"
+        }
+      ]
+    },
+    {
+      "id": "B5",
+      "verdict": "수용",
+      "finding": "NextToken은 MetricDataResult가 아닌 GetMetricData 응답 최상위. 결과별 완전성과 요청 pagination을 분리.",
+      "changed_files": [
+        "docs/cloud/late-data-and-reconciliation.md",
+        "review/fact-review-1.1.json"
+      ],
+      "primary_sources": [
+        {
+          "label": "GetMetricData",
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html"
+        },
+        {
+          "label": "MetricDataResult",
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataResult.html"
+        }
+      ]
+    },
+    {
+      "id": "B6",
+      "verdict": "수용",
+      "finding": "동시성 모델의 평균 시간은 요청의 환경 점유 시간. 요청에 귀속되는 Init 포함, 미리 준비된 환경의 유휴 시간을 요청마다 더하지 않음.",
+      "changed_files": [
+        "docs/cloud/managed-and-serverless.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "Lambda concurrency",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html"
+        }
+      ]
+    },
+    {
+      "id": "B7",
+      "verdict": "수용",
+      "finding": "xNAME 체인의 RCODE는 최종 query cycle 기준. 최초 이름·체인·최종 이름을 함께 보존.",
+      "changed_files": [
+        "docs/network/addressing-routing-dns.md",
+        "docs/network/dns-and-connection-lifecycle.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "RFC 6604 §3",
+          "url": "https://www.rfc-editor.org/rfc/rfc6604.html#section-3"
+        }
+      ]
+    },
+    {
+      "id": "B8",
+      "verdict": "수용",
+      "finding": "account_user_time의 task_nice(p)>0 분기가 nice, 그 외 user. 음수 nice도 user.",
+      "changed_files": [
+        "docs/host/cpu.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "Linux 6.12 account_user_time",
+          "url": "https://github.com/torvalds/linux/blob/v6.12/kernel/sched/cputime.c#L119-L133"
+        }
+      ]
+    },
+    {
+      "id": "B9",
+      "verdict": "수용",
+      "finding": "Cached에 tmpfs/shmem 포함, SwapCached 제외. Shmem 별도 수집과 중복 주의. 살아 있는 내용은 깨끗한 파일 캐시처럼 그냥 버릴 수 없음.",
+      "changed_files": [
+        "docs/host/memory.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "Linux meminfo",
+          "url": "https://docs.kernel.org/filesystems/proc.html#meminfo"
+        }
+      ]
+    },
+    {
+      "id": "B10",
+      "verdict": "수용",
+      "finding": "Executor가 연결된 connector의 maxThreads는 무시되고 JMX 등에 -1로 보고.",
+      "changed_files": [
+        "docs/application/servers-and-pools.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "Tomcat 10.1 maxThreads",
+          "url": "https://tomcat.apache.org/tomcat-10.1-doc/config/http.html"
+        }
+      ]
+    },
+    {
+      "id": "B11",
+      "verdict": "수용",
+      "finding": "quorum queue는 global QoS prefetch 미지원. 해당 channel의 consume은 channel error.",
+      "changed_files": [
+        "docs/middleware/message-queues.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "RabbitMQ global QoS",
+          "url": "https://www.rabbitmq.com/docs/quorum-queues#global-qos"
+        }
+      ]
+    },
+    {
+      "id": "B12",
+      "verdict": "부분 수용",
+      "finding": "clock_timestamp는 문장 내에서도 달라지며 기존 결과 3행 시각도 다름. SQL·실행 hash는 유지하고 collected_at을 행별 평가 시각으로 명세. 문장 공통 시작 시각이 목적이면 statement_timestamp.",
+      "changed_files": [
+        "docs/database/collection-contracts.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "PostgreSQL 18 시각 함수",
+          "url": "https://www.postgresql.org/docs/18/functions-datetime.html#FUNCTIONS-DATETIME-CURRENT"
+        }
+      ]
+    },
+    {
+      "id": "B13",
+      "verdict": "수용",
+      "finding": "Brewer2.pdf는 2012 회고. 2002 원 논문으로 연결하고 non-failing node의 모든 요청이라는 가용성 정의, Theorem 1·2 모델을 구분.",
+      "changed_files": [
+        "docs/foundations/distributed-systems.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "2002 원 논문 §2·Theorem 1–2",
+          "url": "https://sites.cs.ucsb.edu/~rich/class/cs293b-cloud/papers/cap-proof.pdf"
+        },
+        {
+          "label": "2012 회고",
+          "url": "https://groups.csail.mit.edu/tds/papers/Gilbert/Brewer2.pdf"
+        }
+      ]
+    },
+    {
+      "id": "B14",
+      "verdict": "수용",
+      "finding": "가정은 Pod당 20, 세 Pod 전체 60. 0.1초 점유에서 각각 200/초·600/초, 1초이면 20/초·60/초. 직접 재계산.",
+      "changed_files": [
+        "docs/cross-domain/slow-requests.md"
+      ],
+      "primary_sources": []
+    },
+    {
+      "id": "B15",
+      "verdict": "부분 수용",
+      "finding": "제조사 이름 자체가 아니라 제조사가 부여한 관리 하위 시스템·장비 종류 OID로 명확화. 물리 모델과 반드시 일대일 대응하는 식별자로 단정하지 않음.",
+      "changed_files": [
+        "docs/network/snmp-and-device-models.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "RFC 3418 sysObjectID",
+          "url": "https://www.rfc-editor.org/rfc/rfc3418.html"
+        }
+      ]
+    },
+    {
+      "id": "B16",
+      "verdict": "수용",
+      "finding": "연결한 Neo4j Operations Manual의 metrics 기능은 Enterprise Edition 전용.",
+      "changed_files": [
+        "docs/database/specialized-data-models.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "Neo4j metrics",
+          "url": "https://neo4j.com/docs/operations-manual/current/monitoring/metrics/"
+        }
+      ]
+    },
+    {
+      "id": "B17",
+      "verdict": "수용",
+      "finding": "amdsmi_get_gpu_activity 문서에 VM guest 미지원 명시. 함수 heading의 실제 하이픈 anchor도 수정.",
+      "changed_files": [
+        "docs/host/gpu.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "AMD SMI 함수",
+          "url": "https://rocm.docs.amd.com/projects/amdsmi/en/latest/reference/amdsmi-py-api.html#amdsmi-get-gpu-activity"
+        }
+      ]
+    },
+    {
+      "id": "B18",
+      "verdict": "수용",
+      "finding": "primary 6 + replica 6 = shard 사본 총 12; replica 수는 6. 직접 재계산.",
+      "changed_files": [
+        "docs/middleware/search-engines.md"
+      ],
+      "primary_sources": []
+    },
+    {
+      "id": "B19",
+      "verdict": "수용",
+      "finding": "가중 추정·learner·Memcached stats·Spark fault tolerance·Hikari 설정을 직접 뒷받침하는 원천으로 연결. OTel 확률 명세는 Development 상태 표시.",
+      "changed_files": [
+        "docs/foundations/performance-and-statistics.md",
+        "docs/foundations/traces-logs-profiles.md",
+        "docs/kubernetes/workloads-and-control-plane.md",
+        "docs/middleware/stream-processing.md",
+        "docs/application/servers-and-pools.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "OTel adjusted count",
+          "url": "https://opentelemetry.io/docs/specs/otel/trace/tracestate-probability-sampling/"
+        },
+        {
+          "label": "etcd learner",
+          "url": "https://etcd.io/docs/v3.6/learning/design-learner/"
+        },
+        {
+          "label": "Memcached stats",
+          "url": "https://github.com/memcached/memcached/blob/master/doc/protocol.txt"
+        },
+        {
+          "label": "Spark 보장",
+          "url": "https://spark.apache.org/docs/latest/streaming/getting-started.html#fault-tolerance-semantics"
+        },
+        {
+          "label": "Hikari 설정",
+          "url": "https://github.com/brettwooldridge/HikariCP#gear-configuration-knobs-baby"
+        }
+      ]
+    },
+    {
+      "id": "B20",
+      "verdict": "수용",
+      "finding": "MetricDataResult 문서는 Forbidden을 유효 값으로 열거하지만 원인을 정의하지 않음. 권한은 조사 가설로 표시하고 Messages 보존.",
+      "changed_files": [
+        "docs/cloud/late-data-and-reconciliation.md",
+        "review/fact-review-1.1.json"
+      ],
+      "primary_sources": [
+        {
+          "label": "MetricDataResult",
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataResult.html"
+        }
+      ]
+    },
+    {
+      "id": "C-Kubernetes",
+      "verdict": "부분 수용",
+      "finding": "최신 1.37.1 및 1.35+ 비교 규약 수용. 최신 3개 브랜치는 1.35–1.37이나 1.34는 10월 27일까지 유지보수 중. 1.34.1 고정 실습과 1.34.12 패치 구분.",
+      "changed_files": [
+        "docs/coverage.md",
+        "docs/kubernetes/inventory-consistency.md",
+        "docs/kubernetes/objects-and-control-loops.md",
+        "docs/kubernetes/operators-and-api-lifecycle.md",
+        "docs/kubernetes/collection.md",
+        "docs/product/compatibility-and-acceptance.md",
+        "docs/review.md",
+        "docs/validation.md",
+        "review/fact-review-1.1.json",
+        "README.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "릴리스",
+          "url": "https://kubernetes.io/releases/"
+        },
+        {
+          "label": "종료 일정",
+          "url": "https://kubernetes.io/releases/patch-releases/"
+        },
+        {
+          "label": "현재 비교 규약",
+          "url": "https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions"
+        }
+      ]
+    },
+    {
+      "id": "C-Collector",
+      "verdict": "수용",
+      "finding": "현재 0.162.0. core published_at=2026-09-28T14:09:31Z, 배포판=2026-09-29T12:34:07Z. 9월 29일은 배포판 기준으로 맞음. 0.137.0 실행 기록 유지.",
+      "changed_files": [
+        "docs/coverage.md",
+        "docs/application/trace-sampling-and-context.md",
+        "docs/product/telemetry-delivery-contracts.md",
+        "docs/product/compatibility-and-acceptance.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "core release",
+          "url": "https://github.com/open-telemetry/opentelemetry-collector/releases/tag/v0.162.0"
+        },
+        {
+          "label": "distribution release",
+          "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.162.0"
+        }
+      ]
+    },
+    {
+      "id": "C-Prometheus",
+      "verdict": "수용",
+      "finding": "3.5 LTS 종료 2026-07-31, 현재 LTS 3.13.4·최신 3.15.0. 과거 promtool 3.5.0 결과는 그대로 둠. 공식 release 목록과 v3.5.5 태그도 대조: 검토 시점 3.5 계열의 마지막 게시 패치는 3.5.5.",
+      "changed_files": [
+        "docs/coverage.md",
+        "docs/cross-domain/reproducible-labs.md",
+        "docs/validation.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "지원 주기",
+          "url": "https://prometheus.io/docs/introduction/release-cycle/"
+        },
+        {
+          "label": "다운로드",
+          "url": "https://prometheus.io/download/"
+        },
+        {
+          "label": "3.5.5 릴리스",
+          "url": "https://github.com/prometheus/prometheus/releases/tag/v3.5.5"
+        }
+      ]
+    },
+    {
+      "id": "C-MySQL",
+      "verdict": "부분 수용",
+      "finding": "9.7 LTS·YY.M 체계 수용. 9.7.3은 Docker image 전용 보안 패치로 범위 제한. 8.4 LTS 문서 기준을 유지하며 새 LTS 출시를 8.4 EOL로 해석하지 않음.",
+      "changed_files": [
+        "docs/coverage.md",
+        "docs/database/mysql-mariadb.md",
+        "docs/database/collection-contracts.md",
+        "docs/database/transactions-and-locks.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "릴리스 정책",
+          "url": "https://dev.mysql.com/doc/refman/9.7/en/mysql-releases.html"
+        },
+        {
+          "label": "9.7.2",
+          "url": "https://dev.mysql.com/doc/relnotes/mysql/9.7/en/news-9-7-2.html"
+        },
+        {
+          "label": "9.7.3 Docker only",
+          "url": "https://dev.mysql.com/doc/relnotes/mysql/9.7/en/news-9-7-3.html"
+        }
+      ]
+    },
+    {
+      "id": "C-Ceph",
+      "verdict": "부분 수용",
+      "finding": "공식 표는 Squid 2026-10-31을 estimated EOL로 표시. 현재 Tentacle 20.2.4, Squid 19.2.6. 확정 보증일로 쓰지 않음.",
+      "changed_files": [
+        "docs/coverage.md",
+        "docs/storage/capacity-and-protection.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "Ceph 릴리스 표",
+          "url": "https://docs.ceph.com/en/latest/releases/"
+        }
+      ]
+    },
+    {
+      "id": "C-cAdvisor",
+      "verdict": "수용",
+      "finding": "Kubernetes 1.37.1 go.mod의 github.com/google/cadvisor/lib v0.60.5 확인. lib/v0.60.5 handler.go에서도 Usage−inactive_file, 0 하한 식 확인.",
+      "changed_files": [
+        "docs/coverage.md",
+        "docs/containers/memory-accounting-and-oom.md",
+        "review/fact-review-1.1.json"
+      ],
+      "primary_sources": [
+        {
+          "label": "go.mod",
+          "url": "https://github.com/kubernetes/kubernetes/blob/v1.37.1/go.mod"
+        },
+        {
+          "label": "handler.go",
+          "url": "https://github.com/google/cadvisor/blob/lib/v0.60.5/lib/container/libcontainer/handler.go"
+        }
+      ]
+    },
+    {
+      "id": "C-OCI-CSI",
+      "verdict": "수용",
+      "finding": "공식 latest release의 runtime-spec 1.3.0·CSI 1.13.0 확인. 책의 고정 판본 유지; 명세 판본과 제품 EOL 구분.",
+      "changed_files": [
+        "docs/coverage.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "OCI 1.3.0",
+          "url": "https://github.com/opencontainers/runtime-spec/releases/tag/v1.3.0"
+        },
+        {
+          "label": "CSI 1.13.0",
+          "url": "https://github.com/container-storage-interface/spec/releases/tag/v1.13.0"
+        }
+      ]
+    },
+    {
+      "id": "C-Flink",
+      "verdict": "수용",
+      "finding": "공식 다운로드에 안정 2.3.0, 1.20 LTS 및 1.20.5 표기 확인.",
+      "changed_files": [
+        "docs/coverage.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "Flink downloads",
+          "url": "https://flink.apache.org/downloads/"
+        }
+      ]
+    },
+    {
+      "id": "C-Tomcat",
+      "verdict": "수용",
+      "finding": "Spring Boot 4의 Tomcat 11 확인. Tomcat 10.1은 여전히 지원 계열이므로 EOL처럼 표시하지 않음.",
+      "changed_files": [
+        "docs/coverage.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "Tomcat 지원 버전",
+          "url": "https://tomcat.apache.org/whichversion.html"
+        },
+        {
+          "label": "Spring Boot requirements",
+          "url": "https://docs.spring.io/spring-boot/system-requirements.html"
+        }
+      ]
+    },
+    {
+      "id": "C-PostgreSQL",
+      "verdict": "수용",
+      "finding": "공식 지원 표의 18.6 확인, 18 계열 종료 예정 2030-11-14.",
+      "changed_files": [
+        "docs/coverage.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "PostgreSQL versioning",
+          "url": "https://www.postgresql.org/support/versioning/"
+        }
+      ]
+    },
+    {
+      "id": "C-OTLP",
+      "verdict": "부분 수용",
+      "finding": "공식 웹 규약의 제목은 1.11.0이 맞다. 반면 원천 저장소 latest release는 1.11.1(2026-09-29T08:46:40Z). 문서 판 표시와 소스 릴리스의 최신성을 분리.",
+      "changed_files": [
+        "docs/coverage.md",
+        "docs/product/telemetry-delivery-contracts.md",
+        "docs/product/compatibility-and-acceptance.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "웹 규약 1.11.0",
+          "url": "https://opentelemetry.io/docs/specs/otlp/"
+        },
+        {
+          "label": "원천 릴리스 1.11.1",
+          "url": "https://github.com/open-telemetry/opentelemetry-proto/releases/tag/v1.11.1"
+        }
+      ]
+    },
+    {
+      "id": "C-etcd-보충",
+      "verdict": "수용",
+      "finding": "고정 실습 의존성 3.6.4와 현재 latest release 3.7.2를 별도 표기. 3.6 종료일은 미확정; 이번 서버 실행 변경 없음.",
+      "changed_files": [
+        "docs/coverage.md"
+      ],
+      "primary_sources": [
+        {
+          "label": "etcd release",
+          "url": "https://github.com/etcd-io/etcd/releases/tag/v3.7.2"
+        }
+      ]
+    }
+  ],
+  "validation": [
+    {
+      "command": "python -X utf8 -B scripts/build_book.py",
+      "exit_code": 0,
+      "output": "Built BOOK.md: 114 documents, 11146 lines, 874,651 bytes\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/build_html.py",
+      "exit_code": 0,
+      "output": "Built BOOK.html: 3,578,314 bytes; self-contained diagrams\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/check_docs.py",
+      "exit_code": 0,
+      "output": "PASS: 116 Markdown files; 92 detailed chapters; 1725 local links; 348 distinct external URLs\nChecked: UTF-8, headings, fences, local paths/anchors, manifest coverage, chapter indexing\nExternal URLs are inventoried, not automatically revalidated by this script\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/verify_examples.py",
+      "exit_code": 0,
+      "output": "PASS: 146 arithmetic/interpretation checks across 51 source documents\nNo production diagnostic command or database query was executed\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/verify_contracts.py",
+      "exit_code": 0,
+      "output": "PASS: 22 adapter edge cases; 28 source-bound calculations; recorded lab hashes and statuses\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/verify_revision.py",
+      "exit_code": 0,
+      "output": "PASS: published Linux clock evidence SHA256, runner hash, 4 intervals, 61 idle samples and chapter values\nIdle MONO/RAW: 0.9363740129706928 sample mean tick/10000: 0.9363754098360656 freq ppm range: -49.82659912109375 40.45188903808594\nPASS: 31 recorded scenarios in 5 suites; all evidence input hashes; SQL excerpt; 12 calculations and timestamp-value pairing\nHistorical inputs include the byte-identical archived Linux runner. Its CPU passed flag did not validate wall-clock calibration.\nSaved execution evidence was checked; servers and source facts were not re-executed by this command\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/build_book.py --check",
+      "exit_code": 0,
+      "output": "PASS: BOOK.md matches 114 source documents\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/build_html.py --check",
+      "exit_code": 0,
+      "output": "PASS: BOOK.html matches source documents and pinned renderer\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/verify_review_r1.py --linux-result .lab-runs/linux-clock-r1.json",
+      "exit_code": 0,
+      "output": "PASS: 11 synthetic clock-quality cases, 2 ABI layout checks, 5 counter/wrap checks\nNo Linux syscall, clock calibration or real counter-wrap experiment was executed\nPASS: published Linux clock evidence SHA256, runner hash, 4 intervals, 61 idle samples and chapter values\nIdle MONO/RAW: 0.9363740129706928 sample mean tick/10000: 0.9363754098360656 freq ppm range: -49.82659912109375 40.45188903808594\nPASS: 3 malformed evidence cases rejected (freq conversion, RAW midpoint, idle ordering)\nbusy CPU/MONO 1.0667638157621326 CPU/RAW 0.9999163645633722 quality ['single_thread_cpu_over_monotonic', 'monotonic_raw_rate_difference', 'clock_slew_suspected']\nbusy CPU/MONO 1.066903436027357 CPU/RAW 0.9999249502659497 quality ['single_thread_cpu_over_monotonic', 'monotonic_raw_rate_difference', 'clock_slew_suspected']\nbusy CPU/MONO 1.0670284572639317 CPU/RAW 0.9999548050582799 quality ['single_thread_cpu_over_monotonic', 'monotonic_raw_rate_difference', 'clock_slew_suspected']\nsleep CPU/MONO 2.8432976134644064e-05 CPU/RAW 2.6645683498979535e-05 quality ['monotonic_raw_rate_difference']\nSupplied idle summary: {'sample_count': 61, 'adjtimex_available_count': 61, 'monotonic_seconds': 60.011948727, 'raw_seconds': 64.089720449, 'monotonic_over_raw': 0.9363740129706928, 'tick_min': 9353, 'tick_max': 9371, 'tick_distinct_count': 7, 'tick_sample_mean_us': 9363.754098360656, 'freq_ppm_min': -49.82659912109375, 'freq_ppm_max': 40.45188903808594, 'status_bits': [8192]}\nPASS: supplied Linux evidence hash, arithmetic, quality flags and idle samples; not a clock calibration certificate\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/check_html.py",
+      "exit_code": 1,
+      "output": "file:///C:/project/Domain-Knowledge/scripts/check_html.mjs:26\n    const timer=setTimeout(()=>{pending.delete(id);reject(new Error(`Timeout: ${method}`))},20000);\n                                                          ^\n\nError: Timeout: Page.enable\n    at Timeout._onTimeout (file:///C:/project/Domain-Knowledge/scripts/check_html.mjs:26:59)\n    at listOnTimeout (node:internal/timers:588:17)\n    at process.processTimers (node:internal/timers:523:7)\n\nNode.js v22.17.1\nTraceback (most recent call last):\n  File \"C:\\project\\Domain-Knowledge\\scripts\\check_html.py\", line 18, in <module>\n    main()\n  File \"C:\\project\\Domain-Knowledge\\scripts\\check_html.py\", line 14, in main\n    subprocess.run([\"node\", str(ROOT / \"scripts/check_html.mjs\"), str(args.browser)], check=True, timeout=180)\n  File \"C:\\Users\\최연진\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\subprocess.py\", line 571, in run\n    raise CalledProcessError(retcode, process.args,\nsubprocess.CalledProcessError: Command '['node', 'C:\\\\project\\\\Domain-Knowledge\\\\scripts\\\\check_html.mjs', 'C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe']' returned non-zero exit status 1.\n",
+      "scope": "Attempted round-1b HTML before documenting the visual timeout; see review/html-check-r1.json for hashes."
+    },
+    {
+      "command": "git -c safe.directory=C:/project/Domain-Knowledge diff --check",
+      "exit_code": 0,
+      "output": ""
+    }
+  ],
+  "shared_changes": [
+    "BOOK.md",
+    "BOOK.html",
+    "review/chapter-review.json",
+    "review/source-status.json",
+    "review/html-check-r1.json",
+    "scripts/check_html.mjs",
+    "review/html-check-r1b-incoming.json",
+    "labs/results/1.1-linux-clock-r1.json"
+  ],
+  "shared_change_reason": "Round-1 corrections plus round-1b evidence publication, source-linked interpretation, hash validation and regenerated book; visual reports scoped to their exact HTML hashes.",
+  "round_1a_history": {
+    "limits": [
+      "No commit, push or branch switch performed.",
+      "Historical execution JSON and PostgreSQL SQL unchanged.",
+      "WSL execution denied; corrected Linux runner not independently executed.",
+      "Latest-version reruns deferred to round 2.",
+      "HTML visual recheck incomplete: Chrome Page.enable timeout twice; historical visual report not reused as current."
+    ],
+    "validation": [
+      {
+        "command": "python -X utf8 -B scripts/build_book.py",
+        "exit_code": 0,
+        "output": "Built BOOK.md: 114 documents, 11128 lines, 868,221 bytes\n"
+      },
+      {
+        "command": "python -X utf8 -B scripts/build_html.py",
+        "exit_code": 0,
+        "output": "Built BOOK.html: 3,570,456 bytes; self-contained diagrams\n"
+      },
+      {
+        "command": "python -X utf8 -B scripts/check_docs.py",
+        "exit_code": 0,
+        "output": "PASS: 116 Markdown files; 92 detailed chapters; 1711 local links; 348 distinct external URLs\nChecked: UTF-8, headings, fences, local paths/anchors, manifest coverage, chapter indexing\nExternal URLs are inventoried, not automatically revalidated by this script\n"
+      },
+      {
+        "command": "python -X utf8 -B scripts/verify_examples.py",
+        "exit_code": 0,
+        "output": "PASS: 146 arithmetic/interpretation checks across 51 source documents\nNo production diagnostic command or database query was executed\n"
+      },
+      {
+        "command": "python -X utf8 -B scripts/verify_contracts.py",
+        "exit_code": 0,
+        "output": "PASS: 22 adapter edge cases; 28 source-bound calculations; recorded lab hashes and statuses\n"
+      },
+      {
+        "command": "python -X utf8 -B scripts/verify_revision.py",
+        "exit_code": 0,
+        "output": "PASS: 31 recorded scenarios in 5 suites; all evidence input hashes; SQL excerpt; 12 calculations and timestamp-value pairing\nHistorical inputs include the byte-identical archived Linux runner. Its CPU passed flag did not validate wall-clock calibration.\nSaved execution evidence was checked; servers and source facts were not re-executed by this command\n"
+      },
+      {
+        "command": "python -X utf8 -B scripts/build_book.py --check",
+        "exit_code": 0,
+        "output": "PASS: BOOK.md matches 114 source documents\n"
+      },
+      {
+        "command": "python -X utf8 -B scripts/build_html.py --check",
+        "exit_code": 0,
+        "output": "PASS: BOOK.html matches source documents and pinned renderer\n"
+      },
+      {
+        "command": "python -X utf8 -B scripts/verify_review_r1.py",
+        "exit_code": 0,
+        "output": "PASS: 11 synthetic clock-quality cases, 2 ABI layout checks, 5 counter/wrap checks\nNo Linux syscall, clock calibration or real counter-wrap experiment was executed\n"
+      },
+      {
+        "command": "python -X utf8 scripts/check_sources.py --output .lab-runs/source-status-r1.json",
+        "exit_code": 0,
+        "output": "348 URLs; 338 HTTP 200 and 10 HTTP 403. Availability only; 403 source reading recorded separately."
+      },
+      {
+        "command": "python -X utf8 -B scripts/check_html.py",
+        "exit_code": 1,
+        "output": "Two attempts: Timeout: Page.enable. Current visual verification remains incomplete."
+      },
+      {
+        "command": "wsl -d Ubuntu -- python3 -c \"import platform; print(platform.release())\"",
+        "exit_code": 1,
+        "output": "Wsl/Service/E_ACCESSDENIED. No bypass or repeated WSL attempt."
+      },
+      {
+        "command": "git -c safe.directory=C:/project/Domain-Knowledge diff --check",
+        "exit_code": 0,
+        "output": "No whitespace errors. Branch, HEAD and protected historical input/result files unchanged."
+      }
+    ],
+    "completed_at_utc": "2026-10-04T04:06:58.791478+00:00"
+  },
+  "round_1b": {
+    "execution_attribution": "Claude ran the repository Linux runner on 2026-10-04; Codex checked the supplied artifact.",
+    "run_at_utc": "2026-10-04T04:10:49.909618+00:00",
+    "evidence": "labs/results/1.1-linux-clock-r1.json",
+    "sha256": "86bd2e990411d6c1db179a59df52000c8fc4bc6768542b6be52d3d8205cd4f58",
+    "idle_recalculation": {
+      "sample_count": 61,
+      "adjtimex_available_count": 61,
+      "monotonic_seconds": 60.011948727,
+      "raw_seconds": 64.089720449,
+      "monotonic_over_raw": 0.9363740129706928,
+      "tick_min": 9353,
+      "tick_max": 9371,
+      "tick_distinct_count": 7,
+      "tick_sample_mean_us": 9363.754098360656,
+      "freq_ppm_min": -49.82659912109375,
+      "freq_ppm_max": 40.45188903808594,
+      "status_bits": [
+        8192
+      ],
+      "nominal_tick_us_for_this_environment": 10000,
+      "tick_sample_mean_ratio": 0.9363754098360656
+    },
+    "corrections_to_claude_summary": [
+      {
+        "field": "idle tick sample mean / 10000",
+        "reported": 0.93639,
+        "recalculated": 0.9363754098360656,
+        "basis": "sum(tick)=571189 over 61 samples; rounds to 0.93638 at 5 decimal places"
+      },
+      {
+        "field": "idle maximum freq_ppm",
+        "reported_approximate": 10.9,
+        "recalculated": 40.45188903808594,
+        "basis": "maximum among all 61 idle adjtimex samples, checked against freq_scaled_ppm/65536"
+      }
+    ],
+    "sample_mean_limit": "Arithmetic mean of sampled tick values is not a time-weighted integral; freq also contributes, reads are sequential, and between-sample changes are unobserved.",
+    "withdrawn_evidence": "Unpreserved reviewer/subagent measurements and the Windows Stopwatch comparison are excluded from claims.",
+    "incoming_html_report": "review/html-check-r1b-incoming.json",
+    "incoming_html_scope": "Passed 6 viewport/location cases and 17 diagrams; matched incoming BOOK.html, not automatically the later round-1b rebuild.",
+    "completed_at_utc": "2026-10-04T04:25:15.593486+00:00",
+    "preservation_check": {
+      "protected_files_unchanged": [
+        "book.json",
+        "scripts/run_linux_lab.py",
+        "labs/archive/run_linux_lab_1_1.py",
+        "labs/postgresql/collect-database.sql",
+        "labs/results/1.1-http11.json",
+        "labs/results/1.1-kubernetes.json",
+        "labs/results/1.1-linux.json",
+        "labs/results/1.1-otel.json",
+        "labs/results/1.1-postgresql.json",
+        "labs/results/2026-10-04.json"
+      ],
+      "raw_copy_byte_identical": true,
+      "incoming_html_report_byte_identical": true,
+      "branch": "review/claude-codex-r1",
+      "head": "6aea2ed1a7bd53496bfb539bf13f688aa8e7a1d0",
+      "book_json_as_of_and_edition": "byte-identical to round-1b baseline"
+    },
+    "final_book_html_sha256": "c3772207ff1a7e6b6f53617bb8980bb62cc2841079607ba37f14e19ece74b28a",
+    "html_visual_status": "Page.enable timeout; Claude rerun requested for final artifact only"
+  }
+}

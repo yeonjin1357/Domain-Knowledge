@@ -2,6 +2,8 @@
 
 > 상태: 검토됨 · 적용 범위: 관계형 DB 공통 개념, PostgreSQL 18과 MySQL 8.4 InnoDB 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
 
+버전 상태: MySQL 사례는 8.4 LTS 문서에 고정했습니다. 9.7 LTS와 이후 YY.M 번호 체계가 존재하며, 새 계열의 모든 동작을 검증한 설명은 아닙니다. 9.7.3은 Docker image 전용 보안 패치입니다. [버전별 기준과 지원 상태](../coverage.md#교차-검토-시점의-버전-상태)
+
 ## 먼저 이해할 것
 
 송금에서 한 계좌를 줄이고 다른 계좌를 늘리는 변경은 함께 성공하거나 취소되어야 합니다. transaction은 이런 작업 묶음과 동시 접근의 규칙을 다룹니다. 다른 세션의 변경을 언제 볼 수 있는지, 어떤 작업을 기다려야 하는지는 엔진과 격리 수준에 따라 달라집니다.
@@ -54,6 +56,8 @@ flowchart LR
 ## 오래 열린 트랜잭션의 영향
 
 트랜잭션이 오래 열려 있으면 잠금을 오래 유지하거나 이전 버전의 회수를 늦추는 원인이 될 수 있습니다. PostgreSQL의 행 버전 회수는 어떤 트랜잭션에도 필요하지 않은 버전을 대상으로 하므로 오래 유지되는 관측 시점이 중요합니다. [PostgreSQL Routine Vacuuming](https://www.postgresql.org/docs/18/routine-vacuuming.html)
+
+오래 유지되는 회수 기준점은 일반 세션만의 문제가 아닙니다. prepared transaction, replication slot의 `xmin`·`catalog_xmin`, `hot_standby_feedback`으로 전달된 standby의 필요 시점도 확인합니다. `catalog_xmin`은 시스템 catalog 행의 정리와 관련되므로 모든 테이블에 같은 범위로 적용되는 값은 아닙니다. `pg_stat_activity`, `pg_prepared_xacts`, `pg_replication_slots`와 standby feedback을 함께 봅니다. 관측만으로 slot 삭제나 세션 종료를 자동 처방하지 않습니다. [회수 방해 요인](https://www.postgresql.org/docs/18/routine-vacuuming.html#VACUUM-FOR-WRAPAROUND), [standby feedback](https://www.postgresql.org/docs/18/runtime-config-replication.html#GUC-HOT-STANDBY-FEEDBACK)
 
 여기서 “현재 실행 중인 쿼리가 짧다”와 “트랜잭션이 짧다”는 다른 주장입니다. 문장 사이에 앱이 외부 호출을 기다리는 동안에도 트랜잭션이 남아 있을 수 있습니다. 제품에서는 문장 시작, 트랜잭션 시작, 세션 생성 시각을 분리하도록 제안합니다.
 

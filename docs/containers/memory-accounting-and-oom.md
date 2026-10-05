@@ -2,6 +2,8 @@
 
 > 상태: 검토됨 · 적용 범위: Linux cgroup v2, cAdvisor 0.52.1 계산, Kubernetes의 메모리 관측 · 검토일: 2026-10-04 · OOM·eviction은 문서 검토이며 직접 유발하지 않음
 
+버전 상태: 계산 설명의 원래 기준은 cAdvisor 0.52.1입니다. Kubernetes 1.37.1이 참조하는 cAdvisor lib 0.60.5에서도 아래 working set 식이 유지됨을 코드로 대조했습니다. 새 버전 실행 실험은 수행하지 않았습니다. [Kubernetes 의존성](https://github.com/kubernetes/kubernetes/blob/v1.37.1/go.mod), [cAdvisor lib 0.60.5](https://github.com/google/cadvisor/blob/lib/v0.60.5/lib/container/libcontainer/handler.go)
+
 ## 먼저 이해할 것
 
 집의 전체 면적, 실제 짐이 차지하는 면적, 당장 치울 수 없는 짐의 면적은 다릅니다. 프로세스 heap, RSS, cgroup 사용량, working set도 각각 세는 범위가 다릅니다. 메모리 화면에서 숫자가 다르다고 바로 수집 오류라고 판단하지 말고 “무엇이 포함됐는가”를 먼저 확인합니다.

@@ -39,7 +39,7 @@ Start-Process .\BOOK.html
 
 12개 장을 추가했습니다. 측정값의 비교, 컨테이너 메모리와 OOM, 쓰기 지속성, trace sampling, 클라우드 지표 재조회를 풀어 설명하고 제품의 필드 계약으로 연결했습니다. Linux·PostgreSQL·Kubernetes API·OTel Collector·HTTP/1.1에서는 **31개 실제 시나리오**를 추가 실행해 원시 결과와 재현 코드를 남겼습니다.
 
-기존 Kubernetes 설명도 1.34와 1.35의 `resourceVersion` 비교 규칙을 구분하도록 수정했습니다. 발견한 반례와 미해결 측정 차이까지 [검토 기록](docs/review.md)에 적었습니다.
+Kubernetes의 `resourceVersion`은 1.35 이상 규약과 이전 버전·확장 API의 경계를 구분합니다. 교차 검토의 정정, 시계 차이의 재실행 근거와 해석 범위는 [검토 기록](docs/review.md), 고정 버전과 현재 릴리스의 차이는 [버전 상태](docs/coverage.md#교차-검토-시점의-버전-상태)에 적었습니다.
 
 ## 근거와 검증
 

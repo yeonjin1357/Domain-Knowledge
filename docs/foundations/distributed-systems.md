@@ -40,7 +40,9 @@
 
 위 말들은 같은 강도를 다른 표현으로 부르는 것이 아닙니다. 예를 들어 직렬화 가능성만으로 외부 실시간 순서까지 설명하지 못합니다. 정확한 의미와 제품의 보장 범위는 API별로 확인합니다. [Jepsen의 일관성 모델 설명](https://jepsen.io/consistency), [MongoDB 인과적 일관성](https://www.mongodb.com/docs/manual/core/causal-consistency-read-write-concerns/)
 
-CAP의 가용성은 운영 대시보드의 월간 가용률과 같은 정의가 아닙니다. 네트워크 분할을 허용하는 비동기 모델에서 모든 요청에 대한 응답 보장과 선형화 가능한 일관성을 동시에 보장할 수 없다는 한계를 다룹니다. 이를 “어떤 DB든 C/A/P 세 개 중 둘을 자유롭게 고른다”는 제품 분류표로 사용하면 조건이 사라집니다. [Gilbert와 Lynch의 원 논문](https://groups.csail.mit.edu/tds/papers/Gilbert/Brewer2.pdf)
+CAP의 가용성은 **고장 나지 않은 노드가 받은 모든 요청이 결국 응답을 얻는 것**으로 정의되며, 월간 가용률이나 일정한 응답 시간 보장과 다릅니다. Gilbert와 Lynch의 2002년 원 논문은 메시지 유실을 허용할 때 원자적 읽기·쓰기 객체의 가용성과 선형화 가능한 일관성을 모든 실행에서 함께 보장할 수 없음을 다룹니다. Theorem 1은 비동기 모델, Theorem 2는 논문이 정의한 부분 동기 모델에서도 임의의 메시지 유실을 허용하는 경우입니다. 이를 “어떤 DB든 C/A/P 세 개 중 둘을 자유롭게 고른다”는 제품 분류표로 사용하면 조건이 사라집니다. [2002년 원 논문, §2·Theorem 1–2](https://sites.cs.ucsb.edu/~rich/class/cs293b-cloud/papers/cap-proof.pdf)
+
+기존에 연결했던 `Brewer2.pdf`는 같은 저자들의 2012년 회고 논문 **Perspectives on the CAP Theorem**입니다. 원 논문과 회고 해설의 서지 정보를 구분합니다. [2012년 회고](https://groups.csail.mit.edu/tds/papers/Gilbert/Brewer2.pdf)
 
 ## 시각만으로 사건을 정렬하지 않기
 

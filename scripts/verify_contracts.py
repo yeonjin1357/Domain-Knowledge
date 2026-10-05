@@ -18,7 +18,7 @@ def main():
         ("first sample is not zero", None, base, "first", None),
         ("microseconds become CPU seconds", base, dict(base, time=10, value=3000000), "ok", .2),
         ("zero increment is known zero", base, dict(base, time=10), "ok", 0),
-        ("counter reset", base, dict(base, time=10, value=12), "reset", None),
+        ("decrease has ambiguous cause", base, dict(base, time=10, value=12), "decrease", None),
         ("new boot with larger counter", base, dict(base, time=10, value=9000000, epoch="boot-2"), "reset", None),
         ("collector clock epoch changed", base, dict(base, time=10, clock_epoch="collector-2"), "reset", None),
         ("identity changed", base, dict(base, time=10, identity="host-b/cpu"), "identity_changed", None),

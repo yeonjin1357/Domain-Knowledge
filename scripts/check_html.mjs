@@ -9,7 +9,7 @@ import path from 'node:path';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const expectedDiagrams=(await readFile(path.join(root,'BOOK.md'),'utf8')).match(/^```mermaid\s*$/gm)?.length||0;
 const browser=process.argv[2]||'C:/Program Files/Google/Chrome/Application/chrome.exe';
-const cache=path.join(root,'.render-cache');
+const cache=path.join(root,'.lab-runs','html-review');
 await mkdir(cache,{recursive:true});
 const profile=path.join(cache,`cdp-${Date.now()}`);
 const child=spawn(browser,['--headless=new','--no-first-run','--disable-extensions','--disable-sync',

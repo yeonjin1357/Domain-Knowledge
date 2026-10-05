@@ -30,14 +30,16 @@ flowchart LR
 
 | 필드 | 의미 |
 | --- | --- |
-| user | 사용자 모드 실행 시간 |
-| nice | nice 우선순위가 적용된 사용자 모드 실행 시간 |
+| user | nice≤0인 작업의 사용자 모드 실행 시간 |
+| nice | nice>0인, 낮은 우선순위 작업의 사용자 모드 실행 시간 |
 | system | 커널 모드 실행 시간 |
 | idle | idle 태스크 시간 |
 | iowait | I/O 대기와 관련된 CPU 시간 회계 항목 |
 | irq | 하드웨어 인터럽트 처리 시간 |
 | softirq | 소프트웨어 인터럽트 처리 시간 |
 | steal | 가상화 환경에서 다른 실행 때문에 빼앗긴 시간 |
+
+Linux 6.12의 `account_user_time()`은 `task_nice(p) > 0`일 때 nice에, 그렇지 않으면 user에 계정합니다. 따라서 음수 nice의 높은 우선순위 작업도 user에 포함됩니다. [CPU 회계 코드](https://github.com/torvalds/linux/blob/v6.12/kernel/sched/cputime.c#L119-L133)
 
 `guest`와 `guest_nice`는 별도로 노출되지만 해당 게스트 시간은 각각 user와 nice 회계에도 포함됩니다. 총합에 다시 더하면 중복됩니다. 이는 Linux 6.12의 `account_guest_time()`에서도 확인됩니다. [Linux CPU 회계 코드](https://github.com/torvalds/linux/blob/v6.12/kernel/sched/cputime.c)
 

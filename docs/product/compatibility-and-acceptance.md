@@ -73,9 +73,11 @@ OTel의 resource·metric 유형·temporality와 source의 식별 의미를 보�
 | --- | --- | --- | --- |
 | Linux | procfs·cgroup v2 | WSL2의 자기 프로세스·기존 cgroup 읽기 | 물리 Linux 전체·OOM·다른 배포판 |
 | PostgreSQL | 18 규약 | 18.6 동시성·권한·수집 SQL | replication·HA·상용 확장 |
-| Kubernetes | 1.34·1.35 비교 규약 | 1.34.1 API server·etcd | 1.35 서버·kubelet·CNI·CSI |
-| OTLP | 1.11.0 문서 | Collector 0.137.0 HTTP JSON | gRPC·persistent queue·tail sampling |
+| Kubernetes | 1.35 이상과 이전 규약의 경계 | 1.34.1 API server·etcd, watch cache 비활성화 | 1.35–1.37 서버·cache 활성화·kubelet·CNI·CSI |
+| OTLP | 1.11.0 고정 문서, 1.11.1 릴리스 존재 확인 | Collector 0.137.0 HTTP JSON, 내부 metric 비활성화 | Collector 0.162.0 실행·내부 거절 계수·gRPC·persistent queue·tail sampling |
 | HTTP | RFC·Python 문서 | loopback HTTP/1.1 | DNS·TLS·HTTP/2·외부 proxy |
+
+고정 실행 버전, 검토 시점 최신 버전, 종료 일정은 [버전 상태 표](../coverage.md#교차-검토-시점의-버전-상태)에 따로 기록했습니다. 최신 릴리스 존재 확인을 그 릴리스의 동작 실험으로 표시하지 않습니다.
 
 버전 문자열만 같은 환경끼리도 build 옵션·기능 활성화·권한·배포판에 따라 가용 필드가 다를 수 있습니다. “필드가 있다”와 “값이 의미 있게 계측된다”를 각각 확인합니다.
 

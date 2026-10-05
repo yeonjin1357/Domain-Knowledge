@@ -15,13 +15,13 @@
 
 ## Tomcat의 세 가지 한도
 
-Tomcat HTTP connector의 `maxThreads`, `maxConnections`, `acceptCount`는 같은 개수를 다른 이름으로 부르는 것이 아닙니다. 처리 스레드, 서버의 연결 처리 한도, OS 연결 대기열과 관련된 경계가 다릅니다. 공용 Executor를 쓰면 connector의 `maxThreads` 설정이 적용되지 않는 경우도 있습니다. [Tomcat 10.1 HTTP Connector](https://tomcat.apache.org/tomcat-10.1-doc/config/http.html)
+Tomcat HTTP connector의 `maxThreads`, `maxConnections`, `acceptCount`는 같은 개수를 다른 이름으로 부르는 것이 아닙니다. 처리 스레드, 서버의 연결 처리 한도, OS 연결 대기열과 관련된 경계가 다릅니다. 해당 connector에 Executor를 연결하면 connector의 `maxThreads`는 무시되고 Executor가 스레드를 관리합니다. 설정값은 보존되더라도 JMX 등에는 사용되지 않음을 뜻하는 `-1`로 보고됩니다. [Tomcat 10.1 HTTP Connector](https://tomcat.apache.org/tomcat-10.1-doc/config/http.html)
 
 keep-alive 연결이 많다는 사실만으로 같은 수의 업무 요청이 CPU에서 실행 중이라고 계산하지 않습니다. 비동기 Servlet이나 가상 스레드 사용 등 실행 방식이 달라지면 스레드 수의 의미도 확인합니다. 제품은 연결 수, 현재 처리 요청, executor 작업 수, 거절·timeout을 서로 다른 지표로 둡니다.
 
 ## DB 연결 풀의 의미
 
-연결 풀은 DB 연결을 매번 새로 만들지 않고 재사용하도록 관리합니다. HikariCP의 `maximumPoolSize`는 idle과 사용 중 연결을 합친 최대 크기이며, 풀이 한도에 도달해 사용할 연결이 없으면 `getConnection()`이 최대 `connectionTimeout` 동안 대기합니다. 이 timeout은 SQL 문장의 실행 시간 제한과 다릅니다. [HikariCP 설정](https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby)
+연결 풀은 DB 연결을 매번 새로 만들지 않고 재사용하도록 관리합니다. HikariCP의 `maximumPoolSize`는 idle과 사용 중 연결을 합친 최대 크기이며, 풀이 한도에 도달해 사용할 연결이 없으면 `getConnection()`이 최대 `connectionTimeout` 동안 대기합니다. 이 timeout은 SQL 문장의 실행 시간 제한과 다릅니다. [HikariCP 설정](https://github.com/brettwooldridge/HikariCP#gear-configuration-knobs-baby)
 
 | 상태 | 입문용 뜻 | 중요한 후속 질문 |
 | --- | --- | --- |

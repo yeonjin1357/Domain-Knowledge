@@ -56,7 +56,7 @@ finalizer가 있는 객체에 삭제를 요청하면 `deletionTimestamp`가 기�
 
 한 번의 화면 갱신에서 Deployment와 Pod를 서로 다른 시각에 읽을 수 있습니다. 그 사이 조정이 진행되면 집계가 잠시 일치하지 않을 수 있습니다. 제품은 이를 즉시 데이터 손상으로 단정하지 말고 수집 시각과 캐시 동기화 상태를 확인해야 합니다.
 
-API의 `resourceVersion`은 변경 추적과 동시성 제어에 사용합니다. **비교 규약은 버전별로 다릅니다.** Kubernetes 1.34 문서는 동일성 비교만 허용합니다. 1.35부터는 정해진 조건 아래 같은 클러스터의 같은 API group·resource type의 값을 임의 정밀도 정수 순서로 비교할 수 있습니다. 어느 경우에도 값의 차이를 경과 시간이나 객체 나이로 바꾸지 않습니다. [1.34 규약](https://v1-34.docs.kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions), [1.35 규약](https://v1-35.docs.kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions)
+API의 `resourceVersion`은 변경 추적과 동시성 제어에 사용합니다. **비교 규약은 버전별로 다릅니다.** 1.34 이하의 규약에서는 동일성만 비교합니다. 1.35 이상(검토 시점 최신 3개 브랜치 1.35–1.37)에서는 정해진 조건 아래 같은 클러스터의 같은 API group·resource type의 값을 임의 정밀도 정수 순서로 비교할 수 있습니다. 이 순서 규약을 보장하지 않는 확장 API server의 값에는 동일성 비교만 사용합니다. 어느 경우에도 값의 차이를 경과 시간이나 객체 나이로 바꾸지 않습니다. [1.34 규약](https://v1-34.docs.kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions), [1.35 이상 현재 규약](https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions)
 
 ## 이해 확인
 

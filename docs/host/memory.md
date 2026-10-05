@@ -30,7 +30,8 @@ RSS를 합하면 330 MiB이지만 이 예시의 고유 물리 페이지는 `50 +
 | MemTotal | 운영체제가 사용할 수 있는 RAM 총량 |
 | MemFree | 현재 미사용 RAM |
 | MemAvailable | 스왑 없이 새 작업에 제공할 수 있는 메모리의 추정량 |
-| Cached | 파일 데이터 등의 페이지 캐시 관측 항목 |
+| Cached | 파일 page cache와 tmpfs·shmem을 포함; SwapCached 제외 |
+| Shmem | shmem·tmpfs 사용량; Cached와 중복되는 범위 확인 |
 | Dirty | 저장 장치에 써야 하는 변경된 메모리 |
 | Writeback | 현재 쓰기 작업이 진행 중인 메모리 |
 | SwapTotal·SwapFree | 스왑 총량과 남은 양 |
@@ -38,6 +39,8 @@ RSS를 합하면 330 MiB이지만 이 예시의 고유 물리 페이지는 `50 +
 이들은 `/proc/meminfo`의 항목입니다. 일부 필드는 커널 구성에 따라 달라집니다. [Linux proc_meminfo](https://man7.org/linux/man-pages/man5/proc_meminfo.5.html)
 
 `MemAvailable`은 단순히 `MemFree + Cached`가 아닙니다. 커널은 회수 가능성과 필요한 여유 등을 고려해 추정합니다. 모든 메모리 항목이 서로 배타적인 것도 아니므로 항목을 임의로 합쳐 총량을 맞추지 않습니다. [Linux proc의 meminfo 설명](https://docs.kernel.org/filesystems/proc.html#meminfo)
+
+특히 Cached에 포함되는 tmpfs·shmem의 살아 있는 내용을 일반적인 깨끗한 파일 캐시처럼 버릴 수는 없습니다. 내용 보존을 위해 swap이 필요할 수 있으므로 “Cached 전체를 스왑 없이 즉시 회수 가능”으로 계산하지 않습니다. Shmem을 별도로 수집하고 Cached에 다시 더해 중복 합산하지 않습니다.
 
 메모리에 캐시가 많이 남아 있다는 사실만으로 누수라고 판단하지 않습니다. 반대로 캐시라는 이유만으로 즉시 전부 회수할 수 있다고 가정하지도 않습니다. 가용량, 회수·쓰기 동작, 실제 지연을 함께 봅니다.
 

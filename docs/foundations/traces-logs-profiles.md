@@ -80,7 +80,7 @@ Head sampling은 처리 초기에 표본 선택을 하고, Tail sampling은 수�
 저장된 Trace의 오류 비율 = 100 / (100 + 99) ≈ 50.25%
 ```
 
-저장된 Trace의 오류 비율은 전체 서비스 오류율이 아닙니다. 표본 선택 확률과 포함 조건을 모르면 전체 비율을 복구할 수 없습니다. 서비스 수준 계산에는 그 목적에 맞게 계측된 전체 건수 또는 통계적으로 설명 가능한 추정 방식을 사용합니다.
+저장된 Trace의 오류 비율은 전체 서비스 오류율이 아닙니다. 표본 선택 확률과 포함 조건을 모르면 전체 비율을 복구할 수 없습니다. 서비스 수준 계산에는 그 목적에 맞게 계측된 전체 건수 또는 통계적으로 설명 가능한 추정 방식을 사용합니다. 확률을 역수 가중치로 사용하는 구체적인 규약은 [OTel TraceState Probability Sampling](https://opentelemetry.io/docs/specs/otel/trace/tracestate-probability-sampling/)의 adjusted count를 참고합니다. 이 명세는 검토 시점 Development이며, 알려진 포함 확률·적용 조건이 없는 편향 표본을 자동 복원하는 보장이 아닙니다.
 
 ## 프로파일은 자원 소비를 코드에 연결한다
 

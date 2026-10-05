@@ -2,6 +2,8 @@
 
 > 상태: 검토됨 · 적용 범위: OTLP 1.11.0 문서, Collector 0.137.0의 OTLP/HTTP JSON 로컬 실험 · 검토일: 2026-10-04
 
+버전 상태: OTLP 문서 1.11.0·Collector 0.137.0을 고정한 실험입니다. 검토 시점 원천 릴리스는 OTLP 1.11.1·Collector 0.162.0이며 새 버전으로 실행한 결과로 바꾸지 않습니다. [고정·최신·지원 상태](../coverage.md#교차-검토-시점의-버전-상태)
+
 ## 먼저 이해할 것
 
 관측 데이터도 네트워크를 통해 전달되는 업무입니다. 보내는 쪽이 응답을 못 받았어도 받는 쪽은 이미 데이터를 읽었을 수 있습니다. 반대로 HTTP 200을 받았어도 목적지에서 일부 항목을 거절했을 수 있습니다. 전송 횟수, 받은 항목, 저장된 항목, 조회 가능한 항목을 구분해야 합니다.
@@ -17,7 +19,7 @@ flowchart LR
     Exporter --> Backend["응답을 통제하는<br/>loopback 서버"]
 ```
 
-공식 Collector 0.137.0 실행 파일을 사용했습니다. receiver·exporter를 실제로 통과시켰으며 목적지는 JSON으로 성공·실패·부분 성공을 반환했습니다. sending queue는 껐고 재시도 시간은 짧게 제한했습니다. 이 설정은 입력 요청과 exporter 결과의 관계를 관찰하기 위한 실험 조건입니다. [고정 버전 exporter 문서](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/otlphttpexporter/README.md)
+공식 Collector 0.137.0 실행 파일을 사용했습니다. receiver·exporter를 실제로 통과시켰으며 목적지는 JSON으로 성공·실패·부분 성공을 반환했습니다. sending queue는 껐고 재시도 시간은 짧게 제한했습니다. Collector 로그는 `error`, 내부 metric은 `none`으로 설정했습니다. 따라서 기록은 목적지 요청과 receiver 응답을 보여 주며, Collector 내부의 거절 인지 로그·거절 계수나 `send_failed_*` 증가를 직접 관측한 근거는 없습니다. 이 설정은 입력 요청과 exporter 결과의 관계를 관찰하기 위한 실험 조건입니다. [고정 버전 exporter 문서](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/otlphttpexporter/README.md)
 
 [실행 코드](../../scripts/run_otel_lab.py)와 [원시 기록](../../labs/results/1.1-otel.json)에 모든 시나리오의 목적지 요청 수·span ID·receiver 응답이 있습니다.
 
@@ -66,7 +68,9 @@ OTLP/HTTP 규약이 재시도 대상으로 열거한 상태는 429·502·503·50
 
 ## 수집기의 실패 지표를 읽기
 
-Collector의 전송 실패 지표가 증가했다고 모든 항목이 영구 유실됐다고 해석하지 않습니다. 재시도 중일 수 있습니다. enqueue 실패, 원천 거절, 최종 폐기, 재전송 성공을 구분해 봅니다. [Collector 내부 관측](https://opentelemetry.io/docs/collector/internal-telemetry/)
+Collector 0.137.0의 exporterhelper는 `queue → 관측 → retry → timeout → exporter` 순서로 호출을 감쌉니다. `send_failed_*`는 내부 retry가 오류를 반환한 뒤 관측 계층에서 항목 수를 기록합니다. 일시 실패 후 같은 retry 호출 안에서 성공하면 그 중간 시도마다 이 실패 계수가 증가하는 구조가 아닙니다. [호출 구성](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/exporterhelper/internal/base_exporter.go#L66-L102), [실패 계수 기록](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/exporterhelper/internal/obs_report_sender.go#L86-L141)
+
+따라서 이 버전의 계수 증가를 “그 exporter의 동일한 내부 재시도가 아직 진행 중”이라고 풀이하지 않습니다. queue 경로에서는 최종 반환 오류에 대해 dropping 로그를 기록합니다. 다만 상류의 별도 재전송이나 다른 목적지의 성공까지 이 계수 하나로 알 수는 없어 종단 간 영구 유실 수와도 동일하지 않습니다. enqueue 실패, exporter 최종 실패, 목적지 부분 거절, 고유 저장 항목 수를 구분합니다. 이 설명은 코드 검토이며 이번 실험의 내부 metric 관측 결과가 아닙니다. [QueueSender](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/exporterhelper/internal/queue_sender.go#L38-L49), [일반 관측 안내](https://opentelemetry.io/docs/collector/internal-telemetry/)
 
 다음은 **제품 적용 제안**입니다.
 

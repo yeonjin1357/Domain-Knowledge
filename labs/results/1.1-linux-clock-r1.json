@@ -1,0 +1,1589 @@
+{
+  "run_at_utc": "2026-10-04T04:10:49.909618+00:00",
+  "kernel": "6.18.33.2-microsoft-standard-WSL2",
+  "python": "3.12.3",
+  "environment": "Linux; WSL if identified in kernel release",
+  "experiments": {
+    "process_name_parsing": {
+      "status": "passed",
+      "observed_comm": "dk ) worker",
+      "starttime_ticks": 42301362
+    },
+    "cpu_accounting": {
+      "status": "observed",
+      "clock_ticks_per_second": 100,
+      "intervals": [
+        {
+          "workload": "busy",
+          "target_monotonic_seconds": 0.2,
+          "before": {
+            "monotonic_ns": 423013700775401,
+            "process_cpu_ns": 37824411,
+            "raw_before_ns": 440624642309628,
+            "raw_after_ns": 440624642311808,
+            "raw_midpoint_ns": 440624642310718,
+            "read_bracket_ns": 2180
+          },
+          "after": {
+            "monotonic_ns": 423013900782753,
+            "process_cpu_ns": 251185017,
+            "raw_before_ns": 440624855686666,
+            "raw_after_ns": 440624855691675,
+            "raw_midpoint_ns": 440624855689170,
+            "read_bracket_ns": 5009
+          },
+          "first": {
+            "pid": 783891,
+            "comm": "python3",
+            "state": "R",
+            "utime_ticks": 2,
+            "stime_ticks": 1,
+            "num_threads": 1,
+            "starttime_ticks": 42301362,
+            "vsize_bytes": 25812992,
+            "rss_pages": 4705
+          },
+          "second": {
+            "pid": 783891,
+            "comm": "python3",
+            "state": "R",
+            "utime_ticks": 23,
+            "stime_ticks": 1,
+            "num_threads": 1,
+            "starttime_ticks": 42301362,
+            "vsize_bytes": 25812992,
+            "rss_pages": 4705
+          },
+          "thread_counts": [
+            1,
+            1
+          ],
+          "monotonic_seconds": 0.200007352,
+          "raw_seconds": 0.213378452,
+          "process_clock_seconds": 0.213360606,
+          "delta_ticks": 21,
+          "cpu_seconds": 0.21,
+          "process_over_monotonic": 1.0667638157621326,
+          "process_over_raw": 0.9999163645633722,
+          "monotonic_over_raw": 0.9373362217474518,
+          "tick_cpu_over_monotonic": 1.0499614034188103,
+          "accounting_views_within_three_ticks": true,
+          "adjtimex_before": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9373,
+            "freq_scaled_ppm": 2867140,
+            "freq_ppm": 43.74908447265625,
+            "status_bits": 8192
+          },
+          "adjtimex_after": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9373,
+            "freq_scaled_ppm": 2867140,
+            "freq_ppm": 43.74908447265625,
+            "status_bits": 8192
+          },
+          "quality_flags": [
+            "single_thread_cpu_over_monotonic",
+            "monotonic_raw_rate_difference",
+            "clock_slew_suspected"
+          ]
+        },
+        {
+          "workload": "busy",
+          "target_monotonic_seconds": 1.0,
+          "before": {
+            "monotonic_ns": 423013901106538,
+            "process_cpu_ns": 251527154,
+            "raw_before_ns": 440624856032103,
+            "raw_after_ns": 440624856032893,
+            "raw_midpoint_ns": 440624856032498,
+            "read_bracket_ns": 790
+          },
+          "after": {
+            "monotonic_ns": 423014901108675,
+            "process_cpu_ns": 1318432870,
+            "raw_before_ns": 440625923017471,
+            "raw_after_ns": 440625923019111,
+            "raw_midpoint_ns": 440625923018291,
+            "read_bracket_ns": 1640
+          },
+          "first": {
+            "pid": 783891,
+            "comm": "python3",
+            "state": "R",
+            "utime_ticks": 23,
+            "stime_ticks": 1,
+            "num_threads": 1,
+            "starttime_ticks": 42301362,
+            "vsize_bytes": 25812992,
+            "rss_pages": 4705
+          },
+          "second": {
+            "pid": 783891,
+            "comm": "python3",
+            "state": "R",
+            "utime_ticks": 130,
+            "stime_ticks": 1,
+            "num_threads": 1,
+            "starttime_ticks": 42301362,
+            "vsize_bytes": 25812992,
+            "rss_pages": 4705
+          },
+          "thread_counts": [
+            1,
+            1
+          ],
+          "monotonic_seconds": 1.000002137,
+          "raw_seconds": 1.066985793,
+          "process_clock_seconds": 1.066905716,
+          "delta_ticks": 107,
+          "cpu_seconds": 1.07,
+          "process_over_monotonic": 1.066903436027357,
+          "process_over_raw": 0.9999249502659497,
+          "monotonic_over_raw": 0.9372216045991909,
+          "tick_cpu_over_monotonic": 1.0699977134148864,
+          "accounting_views_within_three_ticks": true,
+          "adjtimex_before": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9373,
+            "freq_scaled_ppm": 2867140,
+            "freq_ppm": 43.74908447265625,
+            "status_bits": 8192
+          },
+          "adjtimex_after": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9371,
+            "freq_scaled_ppm": 2651055,
+            "freq_ppm": 40.45188903808594,
+            "status_bits": 8192
+          },
+          "quality_flags": [
+            "single_thread_cpu_over_monotonic",
+            "monotonic_raw_rate_difference",
+            "clock_slew_suspected"
+          ]
+        },
+        {
+          "workload": "busy",
+          "target_monotonic_seconds": 2.0,
+          "before": {
+            "monotonic_ns": 423014901381275,
+            "process_cpu_ns": 1318722879,
+            "raw_before_ns": 440625923308352,
+            "raw_after_ns": 440625923309029,
+            "raw_midpoint_ns": 440625923308690,
+            "read_bracket_ns": 677
+          },
+          "after": {
+            "monotonic_ns": 423016901382580,
+            "process_cpu_ns": 3452781186,
+            "raw_before_ns": 440628057461526,
+            "raw_after_ns": 440628057465374,
+            "raw_midpoint_ns": 440628057463450,
+            "read_bracket_ns": 3848
+          },
+          "first": {
+            "pid": 783891,
+            "comm": "python3",
+            "state": "R",
+            "utime_ticks": 130,
+            "stime_ticks": 1,
+            "num_threads": 1,
+            "starttime_ticks": 42301362,
+            "vsize_bytes": 25812992,
+            "rss_pages": 4705
+          },
+          "second": {
+            "pid": 783891,
+            "comm": "python3",
+            "state": "R",
+            "utime_ticks": 343,
+            "stime_ticks": 1,
+            "num_threads": 1,
+            "starttime_ticks": 42301362,
+            "vsize_bytes": 25812992,
+            "rss_pages": 4705
+          },
+          "thread_counts": [
+            1,
+            1
+          ],
+          "monotonic_seconds": 2.000001305,
+          "raw_seconds": 2.13415476,
+          "process_clock_seconds": 2.134058307,
+          "delta_ticks": 213,
+          "cpu_seconds": 2.13,
+          "process_over_monotonic": 1.0670284572639317,
+          "process_over_raw": 0.9999548050582799,
+          "monotonic_over_raw": 0.937139771906701,
+          "tick_cpu_over_monotonic": 1.0649993050879534,
+          "accounting_views_within_three_ticks": true,
+          "adjtimex_before": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9371,
+            "freq_scaled_ppm": 2651055,
+            "freq_ppm": 40.45188903808594,
+            "status_bits": 8192
+          },
+          "adjtimex_after": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9371,
+            "freq_scaled_ppm": 2651055,
+            "freq_ppm": 40.45188903808594,
+            "status_bits": 8192
+          },
+          "quality_flags": [
+            "single_thread_cpu_over_monotonic",
+            "monotonic_raw_rate_difference",
+            "clock_slew_suspected"
+          ]
+        },
+        {
+          "workload": "sleep",
+          "target_monotonic_seconds": 2.0,
+          "before": {
+            "monotonic_ns": 423016901665729,
+            "process_cpu_ns": 3453081001,
+            "raw_before_ns": 440628057763648,
+            "raw_after_ns": 440628057764371,
+            "raw_midpoint_ns": 440628057764009,
+            "read_bracket_ns": 723
+          },
+          "after": {
+            "monotonic_ns": 423018901772919,
+            "process_cpu_ns": 3453137870,
+            "raw_before_ns": 440630192028218,
+            "raw_after_ns": 440630192033577,
+            "raw_midpoint_ns": 440630192030897,
+            "read_bracket_ns": 5359
+          },
+          "first": {
+            "pid": 783891,
+            "comm": "python3",
+            "state": "R",
+            "utime_ticks": 343,
+            "stime_ticks": 1,
+            "num_threads": 1,
+            "starttime_ticks": 42301362,
+            "vsize_bytes": 25812992,
+            "rss_pages": 4705
+          },
+          "second": {
+            "pid": 783891,
+            "comm": "python3",
+            "state": "R",
+            "utime_ticks": 343,
+            "stime_ticks": 1,
+            "num_threads": 1,
+            "starttime_ticks": 42301362,
+            "vsize_bytes": 25812992,
+            "rss_pages": 4705
+          },
+          "thread_counts": [
+            1,
+            1
+          ],
+          "monotonic_seconds": 2.00010719,
+          "raw_seconds": 2.134266888,
+          "process_clock_seconds": 5.6869e-05,
+          "delta_ticks": 0,
+          "cpu_seconds": 0.0,
+          "process_over_monotonic": 2.8432976134644064e-05,
+          "process_over_raw": 2.6645683498979535e-05,
+          "monotonic_over_raw": 0.9371401492689044,
+          "tick_cpu_over_monotonic": 0.0,
+          "accounting_views_within_three_ticks": true,
+          "adjtimex_before": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9371,
+            "freq_scaled_ppm": 2651055,
+            "freq_ppm": 40.45188903808594,
+            "status_bits": 8192
+          },
+          "adjtimex_after": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9371,
+            "freq_scaled_ppm": 2651055,
+            "freq_ppm": 40.45188903808594,
+            "status_bits": 8192
+          },
+          "quality_flags": [
+            "monotonic_raw_rate_difference"
+          ]
+        }
+      ],
+      "quality_flags": [
+        "clock_slew_suspected",
+        "monotonic_raw_rate_difference",
+        "single_thread_cpu_over_monotonic"
+      ],
+      "diagnostic_relative_tolerance": 0.01,
+      "interpretation": "Self-process CPU-accounting agreement is not elapsed-time calibration. RAW is an unadjusted comparison clock, not proof of accurate physical time. Thread counts are endpoint observations; this runner creates no worker threads.",
+      "clock_implementations": {
+        "monotonic": {
+          "implementation": "clock_gettime(CLOCK_MONOTONIC)",
+          "monotonic": true,
+          "adjustable": false,
+          "resolution": 1e-09
+        },
+        "process_time": {
+          "implementation": "clock_gettime(CLOCK_PROCESS_CPUTIME_ID)",
+          "monotonic": true,
+          "adjustable": false,
+          "resolution": 1e-09
+        }
+      },
+      "idle_clock_series": [
+        {
+          "clocks": {
+            "monotonic_ns": 423018902091303,
+            "process_cpu_ns": 3453475473,
+            "raw_before_ns": 440630192369628,
+            "raw_after_ns": 440630192370141,
+            "raw_midpoint_ns": 440630192369884,
+            "read_bracket_ns": 513
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9371,
+            "freq_scaled_ppm": 2651055,
+            "freq_ppm": 40.45188903808594,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423019902194497,
+            "process_cpu_ns": 3453554249,
+            "raw_before_ns": 440631259554202,
+            "raw_after_ns": 440631259558608,
+            "raw_midpoint_ns": 440631259556405,
+            "read_bracket_ns": 4406
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9371,
+            "freq_scaled_ppm": 2651055,
+            "freq_ppm": 40.45188903808594,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423020902440390,
+            "process_cpu_ns": 3453800981,
+            "raw_before_ns": 440632326891823,
+            "raw_after_ns": 440632326898180,
+            "raw_midpoint_ns": 440632326895001,
+            "read_bracket_ns": 6357
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9371,
+            "freq_scaled_ppm": 2651055,
+            "freq_ppm": 40.45188903808594,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423021902637385,
+            "process_cpu_ns": 3453955749,
+            "raw_before_ns": 440633394177908,
+            "raw_after_ns": 440633394182552,
+            "raw_midpoint_ns": 440633394180230,
+            "read_bracket_ns": 4644
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9371,
+            "freq_scaled_ppm": 2651055,
+            "freq_ppm": 40.45188903808594,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423022902828966,
+            "process_cpu_ns": 3454138648,
+            "raw_before_ns": 440634461493246,
+            "raw_after_ns": 440634461501478,
+            "raw_midpoint_ns": 440634461497362,
+            "read_bracket_ns": 8232
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9371,
+            "freq_scaled_ppm": -811472,
+            "freq_ppm": -12.382080078125,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423023903079270,
+            "process_cpu_ns": 3454378492,
+            "raw_before_ns": 440635528897685,
+            "raw_after_ns": 440635528902112,
+            "raw_midpoint_ns": 440635528899898,
+            "read_bracket_ns": 4427
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9371,
+            "freq_scaled_ppm": -811472,
+            "freq_ppm": -12.382080078125,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423024903348414,
+            "process_cpu_ns": 3454599969,
+            "raw_before_ns": 440636596320369,
+            "raw_after_ns": 440636596326695,
+            "raw_midpoint_ns": 440636596323532,
+            "read_bracket_ns": 6326
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9371,
+            "freq_scaled_ppm": -811472,
+            "freq_ppm": -12.382080078125,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423025903501917,
+            "process_cpu_ns": 3454748664,
+            "raw_before_ns": 440637663620667,
+            "raw_after_ns": 440637663625173,
+            "raw_midpoint_ns": 440637663622920,
+            "read_bracket_ns": 4506
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9371,
+            "freq_scaled_ppm": -811472,
+            "freq_ppm": -12.382080078125,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423026903719076,
+            "process_cpu_ns": 3454958101,
+            "raw_before_ns": 440638730985712,
+            "raw_after_ns": 440638730999889,
+            "raw_midpoint_ns": 440638730992800,
+            "read_bracket_ns": 14177
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9371,
+            "freq_scaled_ppm": -811472,
+            "freq_ppm": -12.382080078125,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423027903942231,
+            "process_cpu_ns": 3455165579,
+            "raw_before_ns": 440639798362811,
+            "raw_after_ns": 440639798367792,
+            "raw_midpoint_ns": 440639798365301,
+            "read_bracket_ns": 4981
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9371,
+            "freq_scaled_ppm": -811472,
+            "freq_ppm": -12.382080078125,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423028904162017,
+            "process_cpu_ns": 3455344916,
+            "raw_before_ns": 440640865733107,
+            "raw_after_ns": 440640865739292,
+            "raw_midpoint_ns": 440640865736199,
+            "read_bracket_ns": 6185
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9371,
+            "freq_scaled_ppm": -811472,
+            "freq_ppm": -12.382080078125,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423029904439802,
+            "process_cpu_ns": 3455589345,
+            "raw_before_ns": 440641933165942,
+            "raw_after_ns": 440641933171044,
+            "raw_midpoint_ns": 440641933168493,
+            "read_bracket_ns": 5102
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9371,
+            "freq_scaled_ppm": -811472,
+            "freq_ppm": -12.382080078125,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423030904616265,
+            "process_cpu_ns": 3455732515,
+            "raw_before_ns": 440643000607796,
+            "raw_after_ns": 440643000612934,
+            "raw_midpoint_ns": 440643000610365,
+            "read_bracket_ns": 5138
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9369,
+            "freq_scaled_ppm": 716100,
+            "freq_ppm": 10.92681884765625,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423031904795064,
+            "process_cpu_ns": 3455870637,
+            "raw_before_ns": 440644068136413,
+            "raw_after_ns": 440644068140781,
+            "raw_midpoint_ns": 440644068138597,
+            "read_bracket_ns": 4368
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9369,
+            "freq_scaled_ppm": 716100,
+            "freq_ppm": 10.92681884765625,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423032904983464,
+            "process_cpu_ns": 3456008605,
+            "raw_before_ns": 440645135674006,
+            "raw_after_ns": 440645135679226,
+            "raw_midpoint_ns": 440645135676616,
+            "read_bracket_ns": 5220
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9369,
+            "freq_scaled_ppm": 716100,
+            "freq_ppm": 10.92681884765625,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423033905174174,
+            "process_cpu_ns": 3456157426,
+            "raw_before_ns": 440646203215349,
+            "raw_after_ns": 440646203219356,
+            "raw_midpoint_ns": 440646203217352,
+            "read_bracket_ns": 4007
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9369,
+            "freq_scaled_ppm": 716100,
+            "freq_ppm": 10.92681884765625,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423034905320153,
+            "process_cpu_ns": 3456298832,
+            "raw_before_ns": 440647270708695,
+            "raw_after_ns": 440647270712698,
+            "raw_midpoint_ns": 440647270710696,
+            "read_bracket_ns": 4003
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9369,
+            "freq_scaled_ppm": 716100,
+            "freq_ppm": 10.92681884765625,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423035905478290,
+            "process_cpu_ns": 3456424789,
+            "raw_before_ns": 440648338214984,
+            "raw_after_ns": 440648338219488,
+            "raw_midpoint_ns": 440648338217236,
+            "read_bracket_ns": 4504
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9369,
+            "freq_scaled_ppm": 716100,
+            "freq_ppm": 10.92681884765625,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423036905605721,
+            "process_cpu_ns": 3456557954,
+            "raw_before_ns": 440649405688011,
+            "raw_after_ns": 440649405691847,
+            "raw_midpoint_ns": 440649405689929,
+            "read_bracket_ns": 3836
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9369,
+            "freq_scaled_ppm": 716100,
+            "freq_ppm": 10.92681884765625,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423037905783503,
+            "process_cpu_ns": 3456692082,
+            "raw_before_ns": 440650473215108,
+            "raw_after_ns": 440650473219828,
+            "raw_midpoint_ns": 440650473217468,
+            "read_bracket_ns": 4720
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9369,
+            "freq_scaled_ppm": 716100,
+            "freq_ppm": 10.92681884765625,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423038905971086,
+            "process_cpu_ns": 3456833990,
+            "raw_before_ns": 440651540924291,
+            "raw_after_ns": 440651540928452,
+            "raw_midpoint_ns": 440651540926371,
+            "read_bracket_ns": 4161
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9367,
+            "freq_scaled_ppm": -3265436,
+            "freq_ppm": -49.82659912109375,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423039906166061,
+            "process_cpu_ns": 3456976583,
+            "raw_before_ns": 440652608766696,
+            "raw_after_ns": 440652608771343,
+            "raw_midpoint_ns": 440652608769019,
+            "read_bracket_ns": 4647
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9367,
+            "freq_scaled_ppm": -3265436,
+            "freq_ppm": -49.82659912109375,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423040906374326,
+            "process_cpu_ns": 3457134867,
+            "raw_before_ns": 440653676623082,
+            "raw_after_ns": 440653676629457,
+            "raw_midpoint_ns": 440653676626269,
+            "read_bracket_ns": 6375
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9367,
+            "freq_scaled_ppm": -3265436,
+            "freq_ppm": -49.82659912109375,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423041906512016,
+            "process_cpu_ns": 3457277263,
+            "raw_before_ns": 440654744404952,
+            "raw_after_ns": 440654744410504,
+            "raw_midpoint_ns": 440654744407728,
+            "read_bracket_ns": 5552
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9367,
+            "freq_scaled_ppm": -3265436,
+            "freq_ppm": -49.82659912109375,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423042906683295,
+            "process_cpu_ns": 3457432643,
+            "raw_before_ns": 440655812222453,
+            "raw_after_ns": 440655812227330,
+            "raw_midpoint_ns": 440655812224891,
+            "read_bracket_ns": 4877
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9367,
+            "freq_scaled_ppm": -3265436,
+            "freq_ppm": -49.82659912109375,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423043906825364,
+            "process_cpu_ns": 3457580606,
+            "raw_before_ns": 440656880007935,
+            "raw_after_ns": 440656880013913,
+            "raw_midpoint_ns": 440656880010924,
+            "read_bracket_ns": 5978
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9367,
+            "freq_scaled_ppm": -3265436,
+            "freq_ppm": -49.82659912109375,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423044907112131,
+            "process_cpu_ns": 3457865089,
+            "raw_before_ns": 440657947946202,
+            "raw_after_ns": 440657947962816,
+            "raw_midpoint_ns": 440657947954509,
+            "read_bracket_ns": 16614
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9367,
+            "freq_scaled_ppm": -3265436,
+            "freq_ppm": -49.82659912109375,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423045907321699,
+            "process_cpu_ns": 3458033262,
+            "raw_before_ns": 440659015803213,
+            "raw_after_ns": 440659015815699,
+            "raw_midpoint_ns": 440659015809456,
+            "read_bracket_ns": 12486
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9367,
+            "freq_scaled_ppm": -3265436,
+            "freq_ppm": -49.82659912109375,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423046907601532,
+            "process_cpu_ns": 3458263635,
+            "raw_before_ns": 440660084044012,
+            "raw_after_ns": 440660084049885,
+            "raw_midpoint_ns": 440660084046948,
+            "read_bracket_ns": 5873
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9362,
+            "freq_scaled_ppm": -1062395,
+            "freq_ppm": -16.210861206054688,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423047907839773,
+            "process_cpu_ns": 3458451060,
+            "raw_before_ns": 440661152464334,
+            "raw_after_ns": 440661152470725,
+            "raw_midpoint_ns": 440661152467529,
+            "read_bracket_ns": 6391
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9362,
+            "freq_scaled_ppm": -1062395,
+            "freq_ppm": -16.210861206054688,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423048908031659,
+            "process_cpu_ns": 3458618591,
+            "raw_before_ns": 440662220836707,
+            "raw_after_ns": 440662220841230,
+            "raw_midpoint_ns": 440662220838968,
+            "read_bracket_ns": 4523
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9362,
+            "freq_scaled_ppm": -1062395,
+            "freq_ppm": -16.210861206054688,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423049908197884,
+            "process_cpu_ns": 3458774372,
+            "raw_before_ns": 440663289180351,
+            "raw_after_ns": 440663289185835,
+            "raw_midpoint_ns": 440663289183093,
+            "read_bracket_ns": 5484
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9362,
+            "freq_scaled_ppm": -1062395,
+            "freq_ppm": -16.210861206054688,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423050908406152,
+            "process_cpu_ns": 3458951493,
+            "raw_before_ns": 440664357569108,
+            "raw_after_ns": 440664357573831,
+            "raw_midpoint_ns": 440664357571469,
+            "read_bracket_ns": 4723
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9362,
+            "freq_scaled_ppm": -1062395,
+            "freq_ppm": -16.210861206054688,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423051908594127,
+            "process_cpu_ns": 3459110667,
+            "raw_before_ns": 440665425936087,
+            "raw_after_ns": 440665425940234,
+            "raw_midpoint_ns": 440665425938160,
+            "read_bracket_ns": 4147
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9362,
+            "freq_scaled_ppm": -1062395,
+            "freq_ppm": -16.210861206054688,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423052908769752,
+            "process_cpu_ns": 3459242990,
+            "raw_before_ns": 440666494290079,
+            "raw_after_ns": 440666494294171,
+            "raw_midpoint_ns": 440666494292125,
+            "read_bracket_ns": 4092
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9362,
+            "freq_scaled_ppm": -1062395,
+            "freq_ppm": -16.210861206054688,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423053908961988,
+            "process_cpu_ns": 3459393810,
+            "raw_before_ns": 440667562661945,
+            "raw_after_ns": 440667562666232,
+            "raw_midpoint_ns": 440667562664088,
+            "read_bracket_ns": 4287
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9362,
+            "freq_scaled_ppm": -1062395,
+            "freq_ppm": -16.210861206054688,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423054909146647,
+            "process_cpu_ns": 3459541348,
+            "raw_before_ns": 440668631191965,
+            "raw_after_ns": 440668631196317,
+            "raw_midpoint_ns": 440668631194141,
+            "read_bracket_ns": 4352
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9359,
+            "freq_scaled_ppm": 1669748,
+            "freq_ppm": 25.47833251953125,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423055909395521,
+            "process_cpu_ns": 3459764896,
+            "raw_before_ns": 440669699916255,
+            "raw_after_ns": 440669699931158,
+            "raw_midpoint_ns": 440669699923706,
+            "read_bracket_ns": 14903
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9359,
+            "freq_scaled_ppm": 1669748,
+            "freq_ppm": 25.47833251953125,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423056909532177,
+            "process_cpu_ns": 3459904553,
+            "raw_before_ns": 440670768526652,
+            "raw_after_ns": 440670768530408,
+            "raw_midpoint_ns": 440670768528530,
+            "read_bracket_ns": 3756
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9359,
+            "freq_scaled_ppm": 1669748,
+            "freq_ppm": 25.47833251953125,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423057909788638,
+            "process_cpu_ns": 3460094345,
+            "raw_before_ns": 440671837261335,
+            "raw_after_ns": 440671837265934,
+            "raw_midpoint_ns": 440671837263634,
+            "read_bracket_ns": 4599
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9359,
+            "freq_scaled_ppm": 1669748,
+            "freq_ppm": 25.47833251953125,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423058909962527,
+            "process_cpu_ns": 3460239809,
+            "raw_before_ns": 440672905908205,
+            "raw_after_ns": 440672905914182,
+            "raw_midpoint_ns": 440672905911193,
+            "read_bracket_ns": 5977
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9359,
+            "freq_scaled_ppm": 1669748,
+            "freq_ppm": 25.47833251953125,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423059910228787,
+            "process_cpu_ns": 3460467406,
+            "raw_before_ns": 440673974654177,
+            "raw_after_ns": 440673974658387,
+            "raw_midpoint_ns": 440673974656282,
+            "read_bracket_ns": 4210
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9359,
+            "freq_scaled_ppm": 1669748,
+            "freq_ppm": 25.47833251953125,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423060910414959,
+            "process_cpu_ns": 3460637699,
+            "raw_before_ns": 440675043313588,
+            "raw_after_ns": 440675043320117,
+            "raw_midpoint_ns": 440675043316852,
+            "read_bracket_ns": 6529
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9359,
+            "freq_scaled_ppm": 1669748,
+            "freq_ppm": 25.47833251953125,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423061910574733,
+            "process_cpu_ns": 3460788599,
+            "raw_before_ns": 440676111945855,
+            "raw_after_ns": 440676111951589,
+            "raw_midpoint_ns": 440676111948722,
+            "read_bracket_ns": 5734
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9359,
+            "freq_scaled_ppm": 1669748,
+            "freq_ppm": 25.47833251953125,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423062910758450,
+            "process_cpu_ns": 3460929908,
+            "raw_before_ns": 440677180730248,
+            "raw_after_ns": 440677180734841,
+            "raw_midpoint_ns": 440677180732544,
+            "read_bracket_ns": 4593
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9357,
+            "freq_scaled_ppm": 1727462,
+            "freq_ppm": 26.358978271484375,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423063910957197,
+            "process_cpu_ns": 3461092063,
+            "raw_before_ns": 440678249630672,
+            "raw_after_ns": 440678249637179,
+            "raw_midpoint_ns": 440678249633925,
+            "read_bracket_ns": 6507
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9357,
+            "freq_scaled_ppm": 1727462,
+            "freq_ppm": 26.358978271484375,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423064911112105,
+            "process_cpu_ns": 3461252626,
+            "raw_before_ns": 440679318485054,
+            "raw_after_ns": 440679318489777,
+            "raw_midpoint_ns": 440679318487415,
+            "read_bracket_ns": 4723
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9357,
+            "freq_scaled_ppm": 1727462,
+            "freq_ppm": 26.358978271484375,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423065911283529,
+            "process_cpu_ns": 3461391208,
+            "raw_before_ns": 440680387357055,
+            "raw_after_ns": 440680387361368,
+            "raw_midpoint_ns": 440680387359211,
+            "read_bracket_ns": 4313
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9357,
+            "freq_scaled_ppm": 1727462,
+            "freq_ppm": 26.358978271484375,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423066911535452,
+            "process_cpu_ns": 3461570333,
+            "raw_before_ns": 440681456314653,
+            "raw_after_ns": 440681456319401,
+            "raw_midpoint_ns": 440681456317027,
+            "read_bracket_ns": 4748
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9357,
+            "freq_scaled_ppm": 1727462,
+            "freq_ppm": 26.358978271484375,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423067911706894,
+            "process_cpu_ns": 3461722205,
+            "raw_before_ns": 440682525186294,
+            "raw_after_ns": 440682525192704,
+            "raw_midpoint_ns": 440682525189499,
+            "read_bracket_ns": 6410
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9357,
+            "freq_scaled_ppm": 1727462,
+            "freq_ppm": 26.358978271484375,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423068911957543,
+            "process_cpu_ns": 3461909338,
+            "raw_before_ns": 440683594142511,
+            "raw_after_ns": 440683594147308,
+            "raw_midpoint_ns": 440683594144909,
+            "read_bracket_ns": 4797
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9357,
+            "freq_scaled_ppm": 1727462,
+            "freq_ppm": 26.358978271484375,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423069912196271,
+            "process_cpu_ns": 3462092660,
+            "raw_before_ns": 440684663086444,
+            "raw_after_ns": 440684663091650,
+            "raw_midpoint_ns": 440684663089047,
+            "read_bracket_ns": 5206
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9357,
+            "freq_scaled_ppm": 1727462,
+            "freq_ppm": 26.358978271484375,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423070912382852,
+            "process_cpu_ns": 3462245915,
+            "raw_before_ns": 440685731877426,
+            "raw_after_ns": 440685731882760,
+            "raw_midpoint_ns": 440685731880093,
+            "read_bracket_ns": 5334
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9359,
+            "freq_scaled_ppm": -1294136,
+            "freq_ppm": -19.7469482421875,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423071912604629,
+            "process_cpu_ns": 3462404682,
+            "raw_before_ns": 440686800627106,
+            "raw_after_ns": 440686800632135,
+            "raw_midpoint_ns": 440686800629620,
+            "read_bracket_ns": 5029
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9359,
+            "freq_scaled_ppm": -1294136,
+            "freq_ppm": -19.7469482421875,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423072912788234,
+            "process_cpu_ns": 3462545640,
+            "raw_before_ns": 440687869336083,
+            "raw_after_ns": 440687869339987,
+            "raw_midpoint_ns": 440687869338035,
+            "read_bracket_ns": 3904
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9359,
+            "freq_scaled_ppm": -1294136,
+            "freq_ppm": -19.7469482421875,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423073912982120,
+            "process_cpu_ns": 3462695626,
+            "raw_before_ns": 440688938055641,
+            "raw_after_ns": 440688938061879,
+            "raw_midpoint_ns": 440688938058760,
+            "read_bracket_ns": 6238
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9359,
+            "freq_scaled_ppm": -1294136,
+            "freq_ppm": -19.7469482421875,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423074913141114,
+            "process_cpu_ns": 3462846190,
+            "raw_before_ns": 440690006738913,
+            "raw_after_ns": 440690006743824,
+            "raw_midpoint_ns": 440690006741368,
+            "read_bracket_ns": 4911
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9359,
+            "freq_scaled_ppm": -1294136,
+            "freq_ppm": -19.7469482421875,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423075913336118,
+            "process_cpu_ns": 3463005256,
+            "raw_before_ns": 440691075459677,
+            "raw_after_ns": 440691075466635,
+            "raw_midpoint_ns": 440691075463156,
+            "read_bracket_ns": 6958
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9359,
+            "freq_scaled_ppm": -1294136,
+            "freq_ppm": -19.7469482421875,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423076913590978,
+            "process_cpu_ns": 3463198898,
+            "raw_before_ns": 440692144244374,
+            "raw_after_ns": 440692144251035,
+            "raw_midpoint_ns": 440692144247704,
+            "read_bracket_ns": 6661
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9359,
+            "freq_scaled_ppm": -1294136,
+            "freq_ppm": -19.7469482421875,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423077913855034,
+            "process_cpu_ns": 3463426188,
+            "raw_before_ns": 440693213039230,
+            "raw_after_ns": 440693213043928,
+            "raw_midpoint_ns": 440693213041579,
+            "read_bracket_ns": 4698
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9359,
+            "freq_scaled_ppm": -1294136,
+            "freq_ppm": -19.7469482421875,
+            "status_bits": 8192
+          }
+        },
+        {
+          "clocks": {
+            "monotonic_ns": 423078914040030,
+            "process_cpu_ns": 3463577584,
+            "raw_before_ns": 440694282087197,
+            "raw_after_ns": 440694282093470,
+            "raw_midpoint_ns": 440694282090333,
+            "read_bracket_ns": 6273
+          },
+          "adjtimex": {
+            "available": true,
+            "modes": 0,
+            "return_clock_state": 0,
+            "tick_microseconds": 9353,
+            "freq_scaled_ppm": 2530343,
+            "freq_ppm": 38.60997009277344,
+            "status_bits": 8192
+          }
+        }
+      ]
+    },
+    "virtual_vs_resident": {
+      "status": "passed",
+      "requested_bytes": 33554432,
+      "page_size_bytes": 4096,
+      "after_mapping_before_touch": {
+        "Size_KiB": 32768,
+        "Rss_KiB": 0,
+        "Pss_KiB": 0,
+        "Private_Dirty_KiB": 0,
+        "Anonymous_KiB": 0,
+        "AnonHugePages_KiB": 0
+      },
+      "after_touch": {
+        "Size_KiB": 32768,
+        "Rss_KiB": 32768,
+        "Pss_KiB": 32768,
+        "Private_Dirty_KiB": 32768,
+        "Anonymous_KiB": 32768,
+        "AnonHugePages_KiB": 0
+      },
+      "interpretation": "mapping can merge with adjacent mappings; not a leak or cgroup OOM experiment"
+    },
+    "logical_vs_storage_io": {
+      "status": "passed",
+      "payload_bytes": 1048576,
+      "before": {
+        "rchar": 1614541,
+        "wchar": 32,
+        "syscr": 451,
+        "syscw": 1,
+        "read_bytes": 64174,
+        "write_bytes": 0,
+        "cancelled_write_bytes": 0
+      },
+      "after_write_and_fsync": {
+        "rchar": 1614644,
+        "wchar": 1048608,
+        "syscr": 453,
+        "syscw": 2,
+        "read_bytes": 64174,
+        "write_bytes": 0,
+        "cancelled_write_bytes": 0
+      },
+      "after_two_reads": {
+        "rchar": 3711904,
+        "wchar": 1048608,
+        "syscr": 459,
+        "syscw": 2,
+        "read_bytes": 2161326,
+        "write_bytes": 0,
+        "cancelled_write_bytes": 0
+      },
+      "interpretation": "own proc-file reads also contribute to rchar; no cache was dropped"
+    },
+    "cgroup_read_only": {
+      "status": "observed",
+      "membership": "0::/init.scope",
+      "fields": {
+        "cpu.stat": "usage_usec 17848180964\nuser_usec 10563176577\nsystem_usec 7285004387\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0",
+        "cpu.max": "max 100000",
+        "cpuset.cpus.effective": {
+          "unavailable": "FileNotFoundError"
+        },
+        "memory.current": "9328390144",
+        "memory.max": "max",
+        "memory.high": "max",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+        "memory.events.local": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+        "memory.swap.current": "0",
+        "memory.swap.max": "max"
+      },
+      "interpretation": "existing group may contain other processes; no isolated cgroup workload or limit experiment"
+    }
+  },
+  "script_sha256": "4ab9ded21e6fa371cda4453b2e837864d4195b9b9334636d2a5045794ae38f2b"
+}

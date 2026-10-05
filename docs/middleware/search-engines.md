@@ -18,7 +18,7 @@ Elasticsearch의 refresh는 새 segment를 열어 최근 변경을 검색에 보
 
 Elasticsearch와 OpenSearch의 cluster health에서 green은 primary와 replica shard가 할당된 상태, yellow는 primary는 할당됐지만 일부 replica가 할당되지 않은 상태, red는 일부 primary가 할당되지 않은 상태를 표현합니다. 이 상태는 모든 쿼리의 지연이나 검색 결과의 업무 정확도를 보증하지 않습니다. [Elasticsearch Cluster Health](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-cluster-health), [OpenSearch Cluster Health](https://docs.opensearch.org/latest/api-reference/cluster-api/cluster-health/)
 
-가상 계산으로 primary shard 6개에 replica를 각각 1개 두면 배치 대상 복제본은 총 12개입니다. 집계 저장량을 볼 때 primary만 센 값과 replica까지 포함한 값을 구분해야 합니다. 둘을 다시 더하면 primary를 중복 셀 수 있습니다.
+가상 계산으로 primary shard 6개에 replica를 각각 1개 두면 primary 6개와 replica 6개를 합쳐 배치 대상 shard 사본은 총 12개입니다. replica 자체의 수는 6개입니다. 집계 저장량을 볼 때 primary만 센 값과 replica까지 포함한 값을 구분해야 합니다. 둘을 다시 더하면 primary를 중복 셀 수 있습니다.
 
 ## 검색 요청의 시간
 

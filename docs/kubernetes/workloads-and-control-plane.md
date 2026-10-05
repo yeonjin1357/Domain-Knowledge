@@ -26,7 +26,7 @@ StatefulSet은 Pod마다 ordinal 기반 식별과 안정적인 네트워크·저
 
 안정적인 `db-0` 이름이 프로세스의 무중단 실행이나 DB 데이터 복제의 정확성을 보장하지는 않습니다. 교체된 Pod는 새 실행 수명으로 관측하고, `db-0`이라는 논리 슬롯과 실행 UID를 둘 다 남깁니다. DB의 primary 선출·데이터 동기화는 사용하는 DB 또는 operator의 동작을 확인해야 합니다.
 
-예를 들어 `db-0`이 Pending이면 앞 순서 Pod의 readiness, PVC의 바인딩·마운트, 배치 조건을 조사합니다. `db-0`이 Ready이어도 follower 복제 지연은 DB 자료로 확인해야 합니다.
+기본 시작 ordinal이 0인 예에서 `db-0`이 Pending이면 그 Pod의 배치 조건, PVC 바인딩과 볼륨 준비 등을 조사합니다. `db-0`에는 앞 순서 Pod가 없습니다. 기본 `OrderedReady`로 새 복제본을 만드는 경우에는 앞 Pod가 Running·Ready가 될 때까지 다음 Pod를 생성하지 않으므로, “다음 Pod가 아직 없음”과 “이미 생성된 Pod가 Pending”을 구분합니다. `minReadySeconds`를 설정했다면 앞 Pod의 가용 시간 조건도 확인합니다. `db-0`이 Ready이어도 follower 복제 지연은 DB 자료로 확인해야 합니다. [생성·확장 보장](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#deployment-and-scaling-guarantees)
 
 ## DaemonSet의 분모
 
@@ -62,7 +62,7 @@ Pod 작업 시작 = 02:00:38
 
 ## etcd와 제어 평면
 
-etcd의 상태 변경 합의에는 voting member의 과반수가 필요합니다. 3개 voting member에서는 2개, 5개에서는 3개가 필요합니다. 서버 프로세스 개수에 learner까지 단순히 더한 값으로 quorum을 계산하지 않습니다. [etcd 3.6 FAQ](https://etcd.io/docs/v3.6/faq/)
+etcd의 상태 변경 합의에는 voting member의 과반수가 필요합니다. 3개 voting member에서는 2개, 5개에서는 3개가 필요합니다. 서버 프로세스 개수에 learner까지 단순히 더한 값으로 quorum을 계산하지 않습니다. [etcd 3.6 FAQ](https://etcd.io/docs/v3.6/faq/), [투표하지 않는 learner](https://etcd.io/docs/v3.6/learning/design-learner/)
 
 ```text
 고정된 voting member N의 quorum = floor(N / 2) + 1
