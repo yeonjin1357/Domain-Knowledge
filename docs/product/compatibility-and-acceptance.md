@@ -1,6 +1,6 @@
 # 어댑터를 지원한다고 말하기 전에: 필드 계약과 검증 근거
 
-> 상태: 검토됨 · 적용 범위: 이 책의 제품 설계 제안과 연결된 원천 규약·실험 · 검토일: 2026-10-04 · 사용자 제품의 지원 인증을 뜻하지 않음
+> 상태: 검토됨 · 적용 범위: 이 책의 제품 설계 제안과 연결된 원천 규약·실험 · 검토일: 2026-10-04 · 2라운드 실행 근거 반영: 2026-10-05 · 사용자 제품의 지원 인증을 뜻하지 않음
 
 ## 먼저 이해할 것
 
@@ -72,9 +72,9 @@ OTel의 resource·metric 유형·temporality와 source의 식별 의미를 보�
 | 대상 | 공식 자료 검토 | 실제 실행 | 남는 경계 |
 | --- | --- | --- | --- |
 | Linux | procfs·cgroup v2 | WSL2의 자기 프로세스·기존 cgroup 읽기 | 물리 Linux 전체·OOM·다른 배포판 |
-| PostgreSQL | 18 규약 | 18.6 동시성·권한·수집 SQL | replication·HA·상용 확장 |
-| Kubernetes | 1.35 이상과 이전 규약의 경계 | 1.34.1 API server·etcd, watch cache 비활성화 | 1.35–1.37 서버·cache 활성화·kubelet·CNI·CSI |
-| OTLP | 1.11.0 고정 문서, 1.11.1 릴리스 존재 확인 | Collector 0.137.0 HTTP JSON, 내부 metric 비활성화 | Collector 0.162.0 실행·내부 거절 계수·gRPC·persistent queue·tail sampling |
+| PostgreSQL | 18 규약 | 18.6 동시성·권한·수집 SQL와 prepared transaction·slot·standby의 회수 기준점 | 운영 replication 부하·HA 전환·상용 확장 |
+| Kubernetes | 1.35 이상과 이전 규약의 경계 | 1.34.1·1.37.0 API server·etcd, 각각 watch cache true/false | 최신 patch·1.35/1.36 서버·kubelet·CNI·CSI |
+| OTLP | 1.11.0 고정 문서, 1.11.1 릴리스 존재 확인 | 0.137.0 HTTP JSON 기록 보존; 0.162.0 내부 로그의 부분 거절·최종 실패 지표·queue 수락 경계 | gRPC·persistent queue·tail sampling·목적지 영속 저장 |
 | HTTP | RFC·Python 문서 | loopback HTTP/1.1 | DNS·TLS·HTTP/2·외부 proxy |
 
 고정 실행 버전, 검토 시점 최신 버전, 종료 일정은 [버전 상태 표](../coverage.md#교차-검토-시점의-버전-상태)에 따로 기록했습니다. 최신 릴리스 존재 확인을 그 릴리스의 동작 실험으로 표시하지 않습니다.

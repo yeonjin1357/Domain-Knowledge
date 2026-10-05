@@ -1,6 +1,6 @@
 # 쓰기가 끝났다는 뜻: 버퍼, fsync, WAL과 복제
 
-> 상태: 검토됨 · 적용 범위: Linux 파일 API와 PostgreSQL 18의 지속성 규약 · 검토일: 2026-10-04 · 전원 장애·장치 고장·복제 장애는 직접 재현하지 않음
+> 상태: 검토됨 · 적용 범위: Linux 파일 API와 PostgreSQL 18의 지속성 규약 · 검토일: 2026-10-04 · 전원 장애·장치 고장·복제 장애는 직접 재현하지 않음 · 2라운드 보강 확인: 2026-10-05 (FLUSH/FUA·PG18 fsync 실패)
 
 ## 먼저 이해할 것
 
@@ -41,6 +41,18 @@ Linux `write()`는 요청한 크기보다 적은 byte를 쓸 수 있으므로 �
 | fsync 성공 | OS·장치 인터페이스가 보고한 동기화 완료 | 실제 장치가 약속을 지키는지와 장애 범위 |
 | DB commit 응답 | DB 설정이 정의한 완료 경계 | 복제본·HA 전환·전체 업무 완료 |
 
+## 장치 write cache와 FLUSH·FUA
+
+**Linux block 규약, 2026-10-05 확인:** 장치가 휘발성 write-back cache에서 완료를 응답하면 전원 상실 전에 매체에 도달하지 않은 데이터가 있을 수 있습니다. `REQ_PREFLUSH`는 해당 I/O에 앞서 장치의 기존 휘발성 cache를 flush하게 하고, `REQ_FUA`는 그 쓰기 자체가 비휘발성 경계에 도달하기 전에 완료로 보고하지 않게 합니다. 둘은 범위와 순서가 다르며 장치·driver가 기능을 구현하거나 적절히 대체하는 조건이 필요합니다. [Linux write cache 제어](https://docs.kernel.org/block/writeback_cache_control.html)
+
+`O_DIRECT`는 주로 page cache와의 상호작용을 줄이는 I/O 경로 선택입니다. 이것만으로 `O_SYNC`의 동기화 보장을 주지 않습니다. direct I/O 측정이 빠르거나 느린 이유를 설명할 때 cache 우회·정렬 제약·장치 cache·flush 포함 여부를 나눕니다. 제품에서 `direct=true`만으로 “전원 장애에도 지속”이라는 속성을 만들지 않습니다. [open(2)의 O_DIRECT](https://man7.org/linux/man-pages/man2/open.2.html)
+
+## fsync 오류 후 재시도가 성공했다는 의미
+
+첫 fsync가 실패한 뒤 두 번째 fsync가 성공해도 이전 dirty data까지 복구됐다고 단정할 수 없습니다. OS가 실패한 dirty page를 버린다면 재시도는 잃은 내용을 다시 쓰지 못합니다. PostgreSQL 18의 `data_sync_retry`는 기본 `off`이며, 수정한 데이터 파일 동기화 실패에서 PANIC을 발생시킵니다. `on`은 다음 checkpoint에서 재시도하지만 OS 동작에 따라 데이터 손상 위험이 있어 단순 가용성 개선 옵션으로 소개하지 않습니다. [PostgreSQL 오류 처리](https://www.postgresql.org/docs/18/runtime-config-error-handling.html#GUC-DATA-SYNC-RETRY)
+
+제품 적용 제안은 최초 동기화 오류·관련 파일/장치·checkpoint·복구 사건을 남겨 후속 성공으로 덮어쓰지 않는 것입니다. 이 절에서는 cache 설정·`data_sync_retry` 변경이나 실패 주입을 실행하지 않았습니다.
+
 ## DB가 데이터 페이지보다 WAL을 먼저 다루는 이유
 
 PostgreSQL은 변경 복구에 필요한 WAL을 이용합니다. commit을 확인할 때 모든 변경 데이터 페이지를 제자리 파일에 즉시 기록해야 하는 방식과 구분합니다. 저장 장치·컨트롤러·파일시스템이 동기화 요구를 올바르게 이행하는 것도 지속성의 전제입니다. [PostgreSQL WAL 신뢰성](https://www.postgresql.org/docs/18/wal-reliability.html), [WAL 개요](https://www.postgresql.org/docs/18/wal-intro.html)
@@ -72,6 +84,8 @@ PostgreSQL의 asynchronous commit에서는 최근에 성공 응답한 트랜잭�
 두 실험 모두 물리 전원 장애, 저장 장치 캐시 고장, 네트워크 파일시스템 단절, 복제본 승격을 수행하지 않았습니다. 성공적인 정상 실행과 장애 시 복구 보장은 구분합니다. 실제 지속성 검증에는 버전·파일시스템·장치·동기화 설정·장애 주입 지점을 명세한 별도 환경이 필요합니다.
 
 ## 이해 확인
+
+추가 질문: O_DIRECT 성공이나 fsync 재시도 성공만으로 앞선 실패 데이터의 지속성을 확정할 수 있는가? **직접 I/O·동기화 완료·실패 후 캐시 상태는 서로 다른 계약입니다.**
 
 1. write가 요청 크기를 반환하면 전원 장애에도 보존되는가? **지속성 경계를 확인해야 합니다. write 성공만으로 충분하지 않습니다.**
 2. DB commit은 모든 데이터 페이지가 제자리 파일에 기록됐다는 뜻인가? **WAL과 실제 commit 정책을 확인합니다.**

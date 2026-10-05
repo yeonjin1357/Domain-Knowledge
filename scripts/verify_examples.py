@@ -237,6 +237,41 @@ def main():
     p = "metric-catalog"
     case(p, "Mbit/s to MB/s", F(100, 8), 12.5)
 
+    # Round 2b examples: check both arithmetic and the reviewed printed result.
+    # These are synthetic explanations, not replayed vendor metrics or queries.
+    r2_examples = [
+        ("network/linux-stack-counters", "180 / 12000 × 100 = 1.5%", F(180, 12000) * 100, 1.5),
+        ("network/linux-stack-counters", "180 / 60 = 3회/초", F(180, 60), 3),
+        ("kubernetes/pressure-and-termination", "78.125% → 39.0625%", F(400, 512) * 100, 78.125),
+        ("kubernetes/pressure-and-termination", "78.125% → 39.0625%", F(400, 1024) * 100, 39.0625),
+        ("database/postgresql-operations", "`75%`", F(150_000_000, 200_000_000) * 100, 75),
+        ("database/postgresql-operations", "차이는 5000만 XID", 200_000_000 - 150_000_000, 50_000_000),
+        ("database/postgresql-operations", "50000초 ≈ 13.89시간", F(50_000_000, 1000), 50000),
+        ("database/postgresql-operations", "50000초 ≈ 13.89시간", round(F(50000, 3600), 2), F(1389, 100)),
+        ("foundations/metric-context-and-start-time", "12−7=5건", 12 - 7, 5),
+        ("foundations/metric-context-and-start-time", "0.5건/초", F(12 - 7, 20 - 10), .5),
+        ("foundations/metric-context-and-start-time", "0.6건/초", F(12, 20), .6),
+        ("application/trace-sampling-and-context", "90/0.1 + 20/0.5 = 940건", 90 / F(1, 10) + 20 / F(1, 2), 940),
+        ("application/trace-sampling-and-context", "표본 110개", 90 + 20, 110),
+        ("application/semantic-conventions", "250 / 1000 = 0.25", F(250, 1000), .25),
+        ("host/windows", "75%", F(12, 16) * 100, 75),
+        ("cloud/provider-metrics", "(10+20)/2=15", F(10 + 20, 2), 15),
+        ("cloud/provider-metrics", "(10+0+20)/3=10", F(10 + 0 + 20, 3), 10),
+        ("product/alerts-and-incidents", "180초", 10 + 20 + 120 + 30, 180),
+        ("network/tls-http", "약 60 ms와 30 ms", 2 * 30, 60),
+        ("network/tls-http", "약 60 ms와 30 ms", 1 * 30, 30),
+        ("storage/capacity-and-protection", "`4+min(1,1)=5`", 4 + min(1, 2 - 1), 5),
+    ]
+    for index, (p, token, actual, expected) in enumerate(r2_examples, 1):
+        assert token in (ROOT / "docs" / (p + ".md")).read_text(encoding="utf-8"), (p, token)
+        case(p, f"round 2b printed example {index}", actual, expected)
+    p = "application/trace-sampling-and-context"
+    case(p, "half-space threshold has probability one half", F(2**56 - 2**55, 2**56), F(1, 2))
+    case(p, "adjusted count at probability one half", 1 / F(1, 2), 2)
+    # Same used bytes, different limit: changed percentage is not freed memory.
+    p = "kubernetes/pressure-and-termination"
+    case(p, "doubling limit halves ratio without changing numerator", F(400, 1024) / F(400, 512), F(1, 2))
+
     # Boundary checks: these make the limitations in the text explicit.
     p = "foundations/time-series"
     case(p, "reset must not become a negative request rate", 80 < 12500, True)

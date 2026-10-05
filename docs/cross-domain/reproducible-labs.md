@@ -1,8 +1,8 @@
 # 재현 실습: 계산, 실제 엔진, 운영 검증의 경계
 
-> 상태: 검토됨 · 적용 범위: Windows 로컬 실행, Python 3.11.9·SQLite 3.45.1·promtool 3.5.0 · 실행일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: Windows·WSL 로컬 실습과 아래 고정 버전·입력 · 기존 실행일: 2026-10-04 · WSL 2라운드 추가 실행: 2026-10-05
 
-버전 상태: promtool 3.5.0은 이 기록의 고정 실행 파일입니다. Prometheus 3.5 LTS는 2026-07-31 지원이 끝났고, 검토 시점 LTS는 3.13.4, 최신 안정 릴리스는 3.15.0입니다. [릴리스·지원 표](../coverage.md#교차-검토-시점의-버전-상태)를 참고하며 이 실습을 현재 권장 설치 버전으로 읽지 않습니다.
+버전 상태: promtool 3.5.0은 기존 기록의 고정 실행 파일입니다. Prometheus 3.5 LTS는 2026-07-31 지원이 끝났고, 검토 시점 LTS 3.13.4와 최신 안정 3.15.0의 별도 실행을 이번에 추가했습니다. [릴리스·지원 표](../coverage.md#교차-검토-시점의-버전-상태)를 참고하며 과거 재현 버전을 현재 권장 설치 버전으로 읽지 않습니다.
 
 공식 설명을 읽는 것과 실제 프로그램에서 같은 동작을 보는 것은 서로 보완합니다. 이 장은 작성 환경에서 직접 실행한 실습입니다. 운영 서버나 사용자의 DB를 사용하지 않았고, 로컬 임시 DB와 loopback HTTP, 읽기 전용 Win32 API, 합성 PromQL 입력을 사용했습니다.
 
@@ -19,6 +19,53 @@
 | [HTTP/1.1 연결](../network/dns-and-connection-lifecycle.md) | 2 | 요청 수·연결 수·본문 완료가 어떻게 다른가? |
 
 Linux의 기존 cgroup 읽기는 별도 관측으로 기록했으며 위 4개 실험 수에 추가하지 않았습니다. [검증 기록](../validation.md)은 두 판의 근거와 실행하지 않은 범위를 함께 정리합니다.
+
+## 2라운드에서 출판한 별도 실행
+
+2026-10-05 Claude가 WSL Ubuntu 24.04·Linux 6.18.33.2·Python 3.12.3에서 실행한 최종 JSON 네 개를 바이트 그대로 출판했습니다. Codex는 원시값·입력 hash·판정 조건을 대조했으며 이 샌드박스에서 Linux 서버를 다시 실행하지 않았습니다. [provenance](../../review/evidence-provenance.json)가 당시 입력과 출판 파일을 연결합니다. `supported`는 명시한 가설·버전·구성의 관측이고 제품 전체의 보장이 아닙니다.
+
+| 실습 | 고정 실행과 판정 | 출판 결과 |
+| --- | --- | --- |
+| Kubernetes | 1.34.1·1.37.0 × cache true/false, 16조건 중 supported 14·refuted 2 | [JSON](../../labs/results/1.1-r2-kubernetes.json) |
+| promtool | 3.13.4·3.15.0, 두 버전 모두 check rules·test rules 성공 | [JSON](../../labs/results/1.1-r2-prometheus.json) |
+| Collector | 0.162.0, 내부 관측·queue 경계·이름 수용 14조건 supported | [JSON](../../labs/results/1.1-r2-otel.json) |
+| PostgreSQL | 18.6, prepared·catalog_xmin·feedback·physical xmin 네 조건 supported | [JSON](../../labs/results/1.1-r2-postgresql.json) |
+
+Kubernetes 실행 patch는 검토 시 최신 1.34.12·1.37.1이 아닙니다. cache-on의 과거 Exact LIST 200은 “compaction 뒤 반드시 410” 가설을 반박하며 오류 결과를 숨기기 위해 통과로 고치지 않았습니다. Collector는 내부 거절 로그·최종 실패 계수·비동기 응답 경계를, PostgreSQL은 회수 기준점을 해제하기 전후의 실제 행 회수를 관측했습니다. [Kubernetes 해석](../kubernetes/inventory-consistency.md), [Collector 해석](../product/telemetry-delivery-contracts.md), [PostgreSQL 해석](../database/postgresql-operations.md)
+
+promtool 두 버전은 기존 `labs/prometheus/rules.yml`·`tests.yml`을 변경 없이 다시 평가했습니다. 각 버전에서 기존 표현식 8개·알림 5개의 fixture가 성공했으며, 최초 3.5.0 결과와 새 실행을 모두 보존합니다. exemplar·created timestamp·TSDB 저장·Alertmanager 전송은 이 규칙 검사에 포함되지 않습니다.
+
+### 경로·권한·정리 범위
+
+공식 자산과 추출 도구는 `.tools/`, 출력 JSON·일반 작업 파일은 `.lab-runs/`에 제한합니다. 시스템 패키지 설치·sudo·서비스 등록·cloud 호출 없이 일반 Linux 사용자의 일회성 loopback 프로세스만 사용합니다. 다운로드 URL·공식 SHA256 pin은 [공통 manifest](../../labs/review-r2/assets.json)와 [Kubernetes manifest](../../labs/review-r2/kubernetes-assets.json)에 있습니다. `.tools/pg18`은 기존 검증 도구를 재사용합니다.
+
+**PostgreSQL 데이터 디렉터리 예외:** metadata 옵션 없는 WSL DrvFs에서는 필요한 0700 권한이 유지되지 않아 최초 initdb가 실패했습니다. 최종 실행은 `mkdtemp`가 만든 Linux native 임시 디렉터리(해당 기록에서는 `/tmp/dk-r2-pgdata-*`)의 실제 mode 0700을 검사하고 primary·standby 데이터를 그 아래에 뒀습니다. 경로·사유·mode·정리 완료가 JSON에 남으며, 소유 프로세스를 멈춘 뒤 그 디렉터리만 제거합니다. 미리 존재한 DB나 사용자가 지정한 외부 경로로 연결하지 않습니다. PostgreSQL 실습 자체는 fixture·slot·prepared transaction·VACUUM 등 상태를 변경하므로 운영 DB에서 실행하는 수집 명령과 다릅니다. [실행기](../../scripts/run_postgres_r2_lab.py)
+
+2d 검토에서는 native 디렉터리의 resolve/chmod/stat 검사 **이전**에 소유권을 등록하도록 보완했습니다. 삭제 실패를 exit code·status에도 반영하고 로그 읽기 실패가 데이터 정리 시도까지 막지 않게 했습니다. 프로세스 종료에 실패하면 사용 중일 수 있는 디렉터리는 보존합니다. 성공한 네 실행에 쓰인 [당시 공통 모듈](../../labs/archive/lab_r2_common_2026_10_05.py)은 그대로 보존했으므로 새 helper의 실패 경로 보완 때문에 옛 수치를 현재 코드의 실행 결과로 바꿔 쓰지 않습니다. Windows에서는 저장소 내부 fixture로 여섯 실패 경로를 검사했으며, 수정한 native 성공 경로의 Linux 재실행은 아래 smoke 명령으로 별도 확인합니다.
+
+최초 initdb 실패 `postgresql.json`, 입력 hash 변경으로 대체한 `prometheus.json`·`otel.json`·`postgresql-2.json`·`prometheus-2.json`·`otel-2.json`이 있었다는 사실은 기록에 남깁니다. 해당 중간 실행은 출판 근거로 채택하지 않았습니다. [2d 검토 기록](../../review/claude-codex-r2.md)
+
+### 2라운드 후속 재현 명령
+
+PowerShell의 저장소 루트에서 실행하는 **후속 재현 예시**입니다. 이미 존재하는 출력은 덮어쓰지 않으므로 같은 명령을 반복할 때는 새 파일명을 사용합니다. 아래는 2d에서 실행한 명령 목록이 아닙니다. Linux 서버 재현에는 해당 배포판 공유 라이브러리와 기존 PostgreSQL 도구가 필요합니다.
+
+```powershell
+python -X utf8 -B scripts/get_review_r2_assets.py --which all
+python -X utf8 -B scripts/run_kubernetes_r2_lab.py --prepare-assets
+wsl -d Ubuntu --cd /mnt/c/project/Domain-Knowledge -- python3 -B scripts/run_kubernetes_r2_lab.py --output .lab-runs/r2/repeat-kubernetes.json
+wsl -d Ubuntu --cd /mnt/c/project/Domain-Knowledge -- python3 -B scripts/run_prometheus_r2_lab.py --output .lab-runs/r2/repeat-prometheus.json
+wsl -d Ubuntu --cd /mnt/c/project/Domain-Knowledge -- python3 -B scripts/run_otel_r2_lab.py --output .lab-runs/r2/repeat-otel.json
+wsl -d Ubuntu --cd /mnt/c/project/Domain-Knowledge -- python3 -B scripts/run_postgres_r2_lab.py --output .lab-runs/r2/repeat-postgresql.json
+python -X utf8 -B scripts/verify_review_r2.py --result .lab-runs/r2/repeat-kubernetes.json --result .lab-runs/r2/repeat-prometheus.json --result .lab-runs/r2/repeat-otel.json --result .lab-runs/r2/repeat-postgresql.json
+```
+
+실행 부하는 전용 API server·etcd 또는 Collector, 작은 primary·standby의 CPU·메모리·디스크와 로컬 요청입니다. 원시 JSON에 자원 최고 사용량은 없어 메모리 실측치를 주장하지 않습니다. 새 실습 없이 출판 증거만 확인하는 명령은 도구 cache 없이도 동작합니다. native smoke는 DB를 띄우지 않고 작은 임시 파일만 만들며, 이 Linux 명령은 Claude의 후속 실행 대상으로 남깁니다.
+
+```powershell
+python -X utf8 -B scripts/verify_review_r2.py --published
+python -X utf8 -B scripts/verify_lab_r2_cleanup.py
+wsl -d Ubuntu --cd /mnt/c/project/Domain-Knowledge -- python3 -B scripts/verify_lab_r2_cleanup.py --native-output .lab-runs/r2/native-cleanup-r2d.json
+```
 
 ## 실행 자료와 재현
 

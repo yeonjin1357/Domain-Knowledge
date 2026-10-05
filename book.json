@@ -15,6 +15,7 @@
         "docs/foundations/README.md",
         "docs/foundations/system-map.md",
         "docs/foundations/time-series.md",
+        "docs/foundations/metric-context-and-start-time.md",
         "docs/foundations/distributions.md",
         "docs/foundations/performance-and-statistics.md",
         "docs/foundations/service-level-objectives.md",
@@ -49,6 +50,7 @@
         "docs/network/tls-http.md",
         "docs/network/dns-and-connection-lifecycle.md",
         "docs/network/network-metrics.md",
+        "docs/network/linux-stack-counters.md",
         "docs/network/layers-and-routing.md",
         "docs/network/snmp-and-device-models.md",
         "docs/network/routing-convergence-and-qos.md"
@@ -82,6 +84,7 @@
         "docs/kubernetes/objects-and-control-loops.md",
         "docs/kubernetes/pod-lifecycle.md",
         "docs/kubernetes/resources-and-scheduling.md",
+        "docs/kubernetes/pressure-and-termination.md",
         "docs/kubernetes/collection.md",
         "docs/kubernetes/inventory-consistency.md",
         "docs/kubernetes/network-and-storage.md",
@@ -98,6 +101,7 @@
         "docs/application/servers-and-pools.md",
         "docs/application/timeouts-and-retries.md",
         "docs/application/managed-runtimes.md",
+        "docs/application/semantic-conventions.md",
         "docs/application/async-runtimes.md",
         "docs/application/user-experience.md",
         "docs/application/instrumentation-and-profiling.md",
@@ -111,6 +115,7 @@
         "docs/database/transactions-and-locks.md",
         "docs/database/queries-and-indexes.md",
         "docs/database/postgresql.md",
+        "docs/database/postgresql-operations.md",
         "docs/database/mysql-mariadb.md",
         "docs/database/sqlserver-oracle.md",
         "docs/database/replication-and-recovery.md",
@@ -188,5 +193,5 @@
     }
   ],
   "edition": "1.1",
-  "detailed_chapters": 92
+  "detailed_chapters": 97
 }

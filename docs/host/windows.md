@@ -1,6 +1,6 @@
 # Windows의 CPU와 메모리 관측
 
-> 상태: 검토됨 · 범위: Windows Win32 성능 API와 PDH · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 범위: Windows Win32 성능 API와 PDH · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (PDH 실명과 Task Manager 빌드 차이)
 
 ## 먼저 이해할 것
 
@@ -78,6 +78,27 @@ PDH는 Windows 성능 카운터를 조회하고 기록을 다루는 API입니다
 
 카운터 이름의 번역 여부, 프로세서 그룹 범위, 제공자의 설치 여부는 대상 환경에서 검증합니다. PDH 수집과 메모리 API는 이 판에서 실행하지 않았습니다. `GetSystemTimes`와 현재 프로세스의 `GetProcessTimes`는 [로컬 실습](../cross-domain/reproducible-labs.md)에서 실제 표본과 계산을 확인했습니다.
 
+## 성능 카운터의 실제 이름과 분모
+
+다음은 **2026-10-05 공식 자료 확인** 기준의 영문 카운터 경로입니다. OS 언어·제공자·instance 범위는 별도 확인하며 이 경로를 이번에 실제 조회하지 않았습니다. 각 행의 이름·의미를 뒷받침하는 원천을 구분했습니다. 인용 문서의 특정 서비스용 임계값을 Windows 전체의 기본 경보값으로 사용하지 않습니다.
+
+| 영문 경로 | 단위·의미 | 해석 함정 |
+| --- | --- | --- |
+| `\Processor Information(_Total)\% Processor Time` | %: 관측 구간의 비 idle 시간 기준 | 주파수 반영 작업량·프로세스별 CPU 합과 다름. [Time/Utility 정의](https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/cpu-usage-exceeds-100) |
+| `\Processor Information(_Total)\% Processor Utility` | %: 기준 성능 대비 작업 능력의 사용, 주파수 변화를 반영 | nominal 성능 기준이므로 turbo에서 100%를 넘을 수 있음. [Microsoft 설명](https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/cpu-usage-exceeds-100) |
+| `\Memory\Available MBytes` | MBytes: 즉시 할당 가능한 물리 메모리 | free 목록만이 아니라 standby 등 재사용 가능한 메모리도 포함. [Windows 성능 진단](https://learn.microsoft.com/en-us/troubleshoot/windows-server/performance/troubleshoot-performance-problems-in-windows), [가용량 정의](https://learn.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-performance_information) |
+| `\Memory\Committed Bytes` | byte: 시스템 commit charge | 실제 RAM 상주량·페이지 파일 쓰기량 아님. [commit와 카운터](https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/introduction-to-the-page-file) |
+| `\Memory\% Committed Bytes In Use` | %: Committed Bytes / Commit Limit | 물리 메모리 사용률 아님; 한도 변경도 영향. [commit 비율 정의](https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/introduction-to-the-page-file) |
+| `\System\Processor Queue Length` | 실행을 기다리는 ready thread 수, 현재 표본 | 실행 중인 thread는 제외; I/O 대기나 전체 thread 수 아님. [Microsoft의 해당 System 카운터 정의](https://learn.microsoft.com/en-us/exchange/exchange-2013-performance-counters-exchange-2013-help) |
+
+Utility와 Time은 같은 100% 척도가 아닙니다. 주파수 반영 비율이 100%를 넘었다고 값을 잘라내거나 불가능한 CPU 시간이라고 판정하지 않습니다. 반대로 GetProcessTimes의 다중 CPU 시간 합이 100%를 넘는 이유와도 구분합니다. [Microsoft Utility 설명](https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/cpu-usage-exceeds-100)
+
+**Task Manager와의 비교에는 Windows build·탭·열도 필요합니다.** Windows 8을 설명한 위 KB는 Utility 사용을 말하지만, Windows 11의 2025년 업데이트 문서는 CPU 계산을 바꾸고 기존 값을 Details의 선택적 `CPU Utility` 열로 남겼다고 설명합니다. 따라서 “현재 모든 Task Manager의 CPU는 항상 Utility”라고 쓰지 않습니다. 해당 공지는 새 계산의 모든 PDH 대응을 명세하지도 않습니다. [Windows 11 KB5064081](https://support.microsoft.com/en-au/servicing/os/windows-11/2025/08/august-29-2025-kb5064081-os-build-26100-5074-preview)
+
+PDH의 rate 계열 등 두 표본이 필요한 카운터는 `PdhCollectQueryData`로 첫 기준점을 얻고 간격 뒤 다시 수집한 다음 formatted 값을 계산합니다. 첫 응답의 미완성 상태를 0%로 출력하지 않습니다. 모든 gauge까지 무조건 두 점 차분하는 것도 잘못입니다. 원천 counter type, 반환 `CStatus`, instance 수명과 계산 구간을 확인합니다. [PDH 표본 수집](https://learn.microsoft.com/en-us/windows/win32/perfctrs/collecting-performance-data)
+
+**예시:** Committed Bytes=12 GiB, Commit Limit=16 GiB이면 `75%`입니다. 동시에 Available MBytes가 보고하는 물리 여유는 별도 값이며 이 식으로 역산하지 않습니다. 제품에는 원천 counter path·OS build·표본 간격·원래 단위를 남기고 범용 임계값을 임의로 붙이지 않습니다. 실제 조회에는 제공자별 읽기 권한이 필요하고 많은 instance의 고빈도 수집은 부하를 늘립니다.
+
 ## Linux와 비교할 때
 
 | 질문 | Linux에서 읽을 개념 | Windows에서 읽을 개념 |
@@ -94,5 +115,6 @@ PDH는 Windows 성능 카운터를 조회하고 기록을 다루는 API입니다
 - GetSystemTimes의 Kernel+User+Idle을 총량으로 쓰는가? **Idle이 Kernel에 포함되므로 중복이다.**
 - PrivateUsage가 1 GiB면 페이지 파일에 1 GiB가 쓰여 있는가? **Commit Charge이므로 그렇게 해석할 수 없다.**
 - 프로세서 128개 시스템에서 한 번 호출한 GetSystemTimes가 전체를 대표하는가? **문서의 Processor Group 범위를 먼저 확인해야 한다.**
+- Task Manager와 수집기 CPU가 다르면 수집기가 틀린가? **Time/Utility·build·표본 구간·instance 범위를 먼저 맞춘다.**
 
 관련: [CPU](cpu.md), [메모리](memory.md), [시계열](../foundations/time-series.md)

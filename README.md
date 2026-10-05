@@ -1,6 +1,6 @@
 # 통합 모니터링 도메인 지식서
 
-**제1.1판 · 2026-10-04 · 12개 분야 · 상세 본문 92장**
+**제1.1판 · 2026-10-04 · 12개 분야 · 상세 본문 97장**
 
 통합 모니터링 제품을 설계·구현하는 개발자를 위한 한국어 지식서입니다. 도메인을 처음 배우는 독자가 시스템의 구조부터 원천 지표, 계산, 장애 분석, 제품 설계까지 한 권으로 연결해 읽을 수 있게 구성했습니다.
 
@@ -22,14 +22,14 @@ Start-Process .\BOOK.html
 
 | 분야 | 상세 장 | 배우는 내용 |
 | --- | ---: | --- |
-| [공통 관측](docs/foundations/README.md) | 9 | 시스템 지도, 시계열·분포·SLO·시간·추적, 성능과 분산 시스템 |
+| [공통 관측](docs/foundations/README.md) | 10 | 시스템 지도, 시계열·분포·SLO·시간·추적, 성능과 분산 시스템 |
 | [호스트](docs/host/README.md) | 10 | CPU·메모리·I/O·프로세스, Windows·VM·GPU, NUMA와 수집 계약 |
-| [네트워크](docs/network/README.md) | 8 | DNS·TCP·TLS·HTTP, 라우팅·MTU, SNMP·OSPF·EVPN·QoS |
+| [네트워크](docs/network/README.md) | 9 | DNS·TCP·TLS·HTTP, 라우팅·MTU, SNMP·OSPF·EVPN·QoS |
 | [스토리지](docs/storage/README.md) | 4 | 저장 모델·성능·용량·복구, RAID·LVM·SAN·NAS |
 | [컨테이너](docs/containers/README.md) | 5 | 격리·수명·파일 계층, cgroup v1/v2와 Windows 차이 |
-| [Kubernetes](docs/kubernetes/README.md) | 9 | 객체·Pod·배치·수집·workload·etcd, CNI·CSI·Operator |
-| [애플리케이션](docs/application/README.md) | 8 | 요청·연결 풀·재시도·런타임·사용자 경험·계측 |
-| [DB](docs/database/README.md) | 11 | 트랜잭션·질의·주요 엔진·복제·HA·특수 모델·수집 SQL |
+| [Kubernetes](docs/kubernetes/README.md) | 10 | 객체·Pod·배치·수집·workload·etcd, CNI·CSI·Operator |
+| [애플리케이션](docs/application/README.md) | 9 | 요청·연결 풀·재시도·런타임·사용자 경험·계측 |
+| [DB](docs/database/README.md) | 12 | 트랜잭션·질의·주요 엔진·복제·HA·특수 모델·수집 SQL |
 | [미들웨어](docs/middleware/README.md) | 6 | 캐시·로그·메시지·검색·프록시·스트림 처리 |
 | [클라우드](docs/cloud/README.md) | 6 | 자원·API·지표·서버리스·네트워크·quota·비용 |
 | [도메인 간 분석](docs/cross-domain/README.md) | 7 | 장애 가설과 증거, 실제 로컬 실습, 종합 연습 |
@@ -40,6 +40,12 @@ Start-Process .\BOOK.html
 12개 장을 추가했습니다. 측정값의 비교, 컨테이너 메모리와 OOM, 쓰기 지속성, trace sampling, 클라우드 지표 재조회를 풀어 설명하고 제품의 필드 계약으로 연결했습니다. Linux·PostgreSQL·Kubernetes API·OTel Collector·HTTP/1.1에서는 **31개 실제 시나리오**를 추가 실행해 원시 결과와 재현 코드를 남겼습니다.
 
 Kubernetes의 `resourceVersion`은 1.35 이상 규약과 이전 버전·확장 API의 경계를 구분합니다. 교차 검토의 정정, 시계 차이의 재실행 근거와 해석 범위는 [검토 기록](docs/review.md), 고정 버전과 현재 릴리스의 차이는 [버전 상태](docs/coverage.md#교차-검토-시점의-버전-상태)에 적었습니다.
+
+## 2026-10-05 교차 검토 보강 원고
+
+판 번호와 판 기준일은 유지했습니다. [Linux 스택 카운터](docs/network/linux-stack-counters.md), [Kubernetes 압박·종료](docs/kubernetes/pressure-and-termination.md), [PostgreSQL 운영 통계](docs/database/postgresql-operations.md), [exemplar·counter 시작](docs/foundations/metric-context-and-start-time.md), [OTel 안정 이름](docs/application/semantic-conventions.md) 5장을 추가했습니다. Kafka·Windows·cloud 시간·알림 지연·저장 지속성·HTTP/TLS·SNMP도 기존 장에서 보강했습니다.
+
+원천 확인과 채택하지 않은 단서는 [2라운드 검토 기록](review/claude-codex-r2.md)에 있습니다. Claude가 실행한 Kubernetes·Collector·PostgreSQL·promtool의 새 결과 36개 판정을 별도로 출판했습니다. 고정 버전·구성·반증과 실행하지 않은 범위는 [실습](docs/cross-domain/reproducible-labs.md)과 [검증 기록](docs/validation.md)에 적었습니다.
 
 ## 근거와 검증
 

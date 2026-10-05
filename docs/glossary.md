@@ -161,4 +161,25 @@
 | Backfill / 재조회 | 과거 구간의 자료를 뒤늦게 확보·보완하는 처리; 중복 집계 정책 필요 | [Cloud 재조회](cloud/late-data-and-reconciliation.md) |
 | Capability | 버전·설정·권한 등을 고려해 실제 사용할 수 있는 기능 | [필드 수용 기준](product/compatibility-and-acceptance.md) |
 
+## 원천 통계와 제어 정책을 구분하는 용어
+
+| 용어 | 의미·구분 | 상세 |
+| --- | --- | --- |
+| Exemplar | 집계 지표에서 선택한 개별 관측 사건과 trace 등의 연결 정보 | [지표 문맥](foundations/metric-context-and-start-time.md) |
+| Counter start time | counter 집계가 시작된 시각; 최초 수집 시각과 다름 | [시작 시각](foundations/metric-context-and-start-time.md) |
+| Adjusted count | 알려진 포함 확률의 역수인 추정 가중치; 실제 건수의 확정값 아님 | [Sampling 확률](application/trace-sampling-and-context.md) |
+| Semantic conventions | 지표·속성 등의 이름·단위·의미를 공유하는 규약 | [안정 이름](application/semantic-conventions.md) |
+| CurrEstab / RetransSegs | 현재 TCP 연결 gauge / namespace의 누적 재전송 세그먼트 계정 | [Linux 스택](network/linux-stack-counters.md) |
+| RTO / cwnd | TCP 재전송 timeout / 혼잡 윈도; 복구 목표 RTO와 다른 문맥 | [소켓 통계](network/linux-stack-counters.md) |
+| Pod QoS class | 자원 명세에 따른 Guaranteed·Burstable·BestEffort 분류; 네트워크 QoS와 구분 | [압박과 종료](kubernetes/pressure-and-termination.md) |
+| WatchList | watch에서 초기 상태를 합성 이벤트로 전달하는 Kubernetes 기능 | [수집](kubernetes/collection.md) |
+| Freeze / XID age | 오래된 행 XID를 정리하는 처리 / ID 공간의 거리; 경과 초와 다름 | [PostgreSQL 운영](database/postgresql-operations.md) |
+| MultiXact | 여러 transaction의 행 잠금 구성원을 가리키는 별도 ID 체계 | [PostgreSQL 운영](database/postgresql-operations.md) |
+| xmin horizon | 아직 필요한 행 버전의 회수를 막는 기준점; slot의 WAL 위치와 구분 | [회수 기준점](database/postgresql-operations.md) |
+| Prepared transaction | 2단계 commit의 준비 상태로 남은 transaction; prepared statement와 다름 | [PostgreSQL 운영](database/postgresql-operations.md) |
+| Share group | Kafka 레코드를 획득·확인·재전달하는 소비 모델; consumer group offset과 다른 진행 모델 | [Kafka](middleware/kafka.md) |
+| FLUSH / FUA | 장치 캐시의 선행 쓰기 반영 / 해당 쓰기의 지속성 완료를 요청하는 동작 | [쓰기 경로](storage/write-path-and-durability.md) |
+| PMTUD / DPLPMTUD | 경로 MTU 탐색 / datagram packetization layer의 MTU 탐색 | [MTU](network/layers-and-routing.md) |
+| Time grain / Ingestion delay | 집계 구간 크기 / 측정 후 조회 가능해지기까지의 지연 | [Cloud 시간 축](cloud/provider-metrics.md) |
+
 용어의 짧은 정의는 학습을 돕는 요약입니다. 실제 판정과 계산은 연결된 원천·버전·조건을 따릅니다.

@@ -46,8 +46,9 @@ TCP에는 연결 상태, 확인 응답 ACK, 연결 초기화 RST, 재전송 같�
 3. [TLS, HTTP와 요청 단계별 시간](tls-http.md)
 4. [이름 조회에서 응답 본문까지: DNS, 연결 재사용과 실패 위치](dns-and-connection-lifecycle.md)
 5. [인터페이스, 장비, 흐름과 능동 검사](network-metrics.md)
-6. [링크, 오버레이, MTU와 경로 제어](layers-and-routing.md)
-7. [네트워크 장비 수집: SNMP, MIB와 인터페이스 수명](snmp-and-device-models.md)
-8. [경로 수렴과 QoS: 연결은 살아 있는데 통신이 느린 이유](routing-convergence-and-qos.md)
+6. [Linux 네트워크 스택 카운터 읽기](linux-stack-counters.md)
+7. [링크, 오버레이, MTU와 경로 제어](layers-and-routing.md)
+8. [네트워크 장비 수집: SNMP, MIB와 인터페이스 수명](snmp-and-device-models.md)
+9. [경로 수렴과 QoS: 연결은 살아 있는데 통신이 느린 이유](routing-convergence-and-qos.md)
 
 관련 문서: [호스트](../host/README.md), [애플리케이션](../application/README.md), [쿠버네티스](../kubernetes/README.md)

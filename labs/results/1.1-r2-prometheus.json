@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "suite": "prometheus",
+  "started": {
+    "utc": "2026-10-05T12:49:50.481560+00:00",
+    "monotonic_ns": 537214607949795,
+    "monotonic_raw_ns": 558162624010401
+  },
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "scope": "local synthetic lab; no production, cloud or external clock calibration",
+  "input_sha256": {
+    "labs/prometheus/rules.yml": "73e7f917c38367cc4e98058018e1f1c887ae780a90333a2b002ba34646f4e1a2",
+    "labs/prometheus/tests.yml": "601812e7a9684b17dd7639fcc8b86e6f1adb7b6ff13704c93a808f8afae082b5",
+    "labs/review-r2/assets.json": "6859cca01bfcca358cb514f0bb16bc772cbc3c0fb1c30ef793e21dadd1e92555",
+    "scripts/get_review_r2_assets.py": "57f1db4fb200b76b5fff8cdfec20903a4f6c1937809d512d3f17efbd12b48366",
+    "scripts/lab_r2_common.py": "260f654988729f0119f17e50a6c9b8fe2cf89f7edf697170ffe45338e8af8518",
+    "scripts/run_prometheus_r2_lab.py": "dcc9dec4ffa10a24d4f29d1101ea7f5f7422df1715738f590279f650cf1edc23"
+  },
+  "scenarios": {
+    "3.13.4": {
+      "hypothesis": "기존 규칙과 표현식·alert 기대값이 이 promtool에서도 성립한다.",
+      "success_condition": "check rules와 test rules가 모두 exit 0.",
+      "refutation_condition": "입력을 평가한 promtool이 규칙·표현식·alert 불일치를 보고한다.",
+      "verdict": "supported",
+      "reason": "Actual stdout/stderr and exit codes retained; no Prometheus server or production query.",
+      "observations": {
+        "version": {
+          "argv": [
+            "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.13.4/promtool",
+            "--version"
+          ],
+          "started": {
+            "utc": "2026-10-05T12:49:50.894112+00:00",
+            "monotonic_ns": 537215020507971,
+            "monotonic_raw_ns": 558163042065386
+          },
+          "finished": {
+            "utc": "2026-10-05T12:49:51.174339+00:00",
+            "monotonic_ns": 537215300730595,
+            "monotonic_raw_ns": 558163326018251
+          },
+          "returncode": 0,
+          "stdout": "promtool, version 3.13.4 (branch: HEAD, revision: 007a9e9ba628f815ce83e1ba9f29b97981996c3c)\n  build user:       root@f73b5a01ed25\n  build date:       20260929-13:32:05\n  go version:       go1.26.8\n  platform:         linux/amd64\n  tags:             netgo,builtinassets\n",
+          "stderr": ""
+        },
+        "executable_sha256": "dd140e4eab2f93b854f0e6e8bd42c99f0a3d74cf97270e6937dbcdd89a5ba869",
+        "commands": [
+          {
+            "argv": [
+              "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.13.4/promtool",
+              "check",
+              "rules",
+              "rules.yml"
+            ],
+            "started": {
+              "utc": "2026-10-05T12:49:51.174358+00:00",
+              "monotonic_ns": 537215300737936,
+              "monotonic_raw_ns": 558163326024140
+            },
+            "finished": {
+              "utc": "2026-10-05T12:49:51.386216+00:00",
+              "monotonic_ns": 537215512607263,
+              "monotonic_raw_ns": 558163540716895
+            },
+            "returncode": 0,
+            "stdout": "Checking rules.yml\n  SUCCESS: 2 rules found\n\n",
+            "stderr": ""
+          },
+          {
+            "argv": [
+              "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.13.4/promtool",
+              "test",
+              "rules",
+              "tests.yml"
+            ],
+            "started": {
+              "utc": "2026-10-05T12:49:51.386234+00:00",
+              "monotonic_ns": 537215512613423,
+              "monotonic_raw_ns": 558163540721366
+            },
+            "finished": {
+              "utc": "2026-10-05T12:49:51.683957+00:00",
+              "monotonic_ns": 537215810350880,
+              "monotonic_raw_ns": 558163842426388
+            },
+            "returncode": 0,
+            "stdout": "  SUCCESS\n\n",
+            "stderr": ""
+          }
+        ]
+      }
+    },
+    "3.15.0": {
+      "hypothesis": "기존 규칙과 표현식·alert 기대값이 이 promtool에서도 성립한다.",
+      "success_condition": "check rules와 test rules가 모두 exit 0.",
+      "refutation_condition": "입력을 평가한 promtool이 규칙·표현식·alert 불일치를 보고한다.",
+      "verdict": "supported",
+      "reason": "Actual stdout/stderr and exit codes retained; no Prometheus server or production query.",
+      "observations": {
+        "version": {
+          "argv": [
+            "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.15.0/promtool",
+            "--version"
+          ],
+          "started": {
+            "utc": "2026-10-05T12:49:52.485566+00:00",
+            "monotonic_ns": 537216611985348,
+            "monotonic_raw_ns": 558164654737730
+          },
+          "finished": {
+            "utc": "2026-10-05T12:49:52.753679+00:00",
+            "monotonic_ns": 537216880071767,
+            "monotonic_raw_ns": 558164926393866
+          },
+          "returncode": 0,
+          "stdout": "promtool, version 3.15.0 (branch: HEAD, revision: 5241a27fe3c6983549fccc32f6e65917408c63cd)\n  build user:       root@4635dd007a60\n  build date:       20260925-07:33:45\n  go version:       go1.27.1\n  platform:         linux/amd64\n  tags:             netgo,builtinassets\n",
+          "stderr": ""
+        },
+        "executable_sha256": "c736d55d3ccd959fe48329965fb5cb671d45585a9483954766448035100ff75c",
+        "commands": [
+          {
+            "argv": [
+              "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.15.0/promtool",
+              "check",
+              "rules",
+              "rules.yml"
+            ],
+            "started": {
+              "utc": "2026-10-05T12:49:52.753701+00:00",
+              "monotonic_ns": 537216880081354,
+              "monotonic_raw_ns": 558164926401073
+            },
+            "finished": {
+              "utc": "2026-10-05T12:49:53.047860+00:00",
+              "monotonic_ns": 537217174252779,
+              "monotonic_raw_ns": 558165224492591
+            },
+            "returncode": 0,
+            "stdout": "Checking rules.yml\n  SUCCESS: 2 rules found\n\n",
+            "stderr": ""
+          },
+          {
+            "argv": [
+              "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.15.0/promtool",
+              "test",
+              "rules",
+              "tests.yml"
+            ],
+            "started": {
+              "utc": "2026-10-05T12:49:53.047880+00:00",
+              "monotonic_ns": 537217174259895,
+              "monotonic_raw_ns": 558165224497527
+            },
+            "finished": {
+              "utc": "2026-10-05T12:49:53.416924+00:00",
+              "monotonic_ns": 537217543318181,
+              "monotonic_raw_ns": 558165598473303
+            },
+            "returncode": 0,
+            "stdout": "  SUCCESS\n\n",
+            "stderr": ""
+          }
+        ]
+      }
+    }
+  },
+  "temporary_workspace": ".lab-runs/r2/work/prometheus-_jo_qk3x",
+  "fixture_sha256": {
+    "rules.yml": "73e7f917c38367cc4e98058018e1f1c887ae780a90333a2b002ba34646f4e1a2",
+    "tests.yml": "601812e7a9684b17dd7639fcc8b86e6f1adb7b6ff13704c93a808f8afae082b5"
+  },
+  "logs": {},
+  "verdict_counts": {
+    "supported": 2
+  },
+  "native_directories_removed": true,
+  "cleanup": {
+    "completed": true,
+    "owned_processes_stopped": 6
+  },
+  "finished": {
+    "utc": "2026-10-05T12:49:53.771093+00:00",
+    "monotonic_ns": 537217897485723,
+    "monotonic_raw_ns": 558165957356822
+  },
+  "status": "recorded"
+}

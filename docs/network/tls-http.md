@@ -1,6 +1,6 @@
 # TLS, HTTP와 요청 단계별 시간
 
-> 상태: 검토됨 · 적용 범위: TLS 1.3, HTTP 의미론·HTTP/2·HTTP/3, curl 시간 필드 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: TLS 1.3, HTTP 의미론·HTTP/2·HTTP/3, curl 시간 필드 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (TLS 1.2/1.3·HTTP/1.1·BR 2.3.1)
 
 ## 먼저 이해할 것
 
@@ -34,6 +34,45 @@ HTTP/2는 한 연결에서 여러 스트림을 사용합니다. 이로써 요청
 HTTP/3은 QUIC를 사용합니다. 스트림을 구분하는 전송 기반이 달라지지만 헤더 압축의 의존성 등 별도의 대기 원인은 남을 수 있습니다. “HTTP/3에는 모든 형태의 대기가 없다”는 결론은 성립하지 않습니다. [HTTP/3, RFC 9114](https://www.rfc-editor.org/rfc/rfc9114.html)
 
 이에 따라 제품은 TCP 연결, QUIC 연결, HTTP 스트림, 업무 요청을 서로 다른 개체로 모델링하는 것이 좋습니다. 이 문단은 위 프로토콜 차이에 따른 설계 제안입니다.
+
+## HTTP/1.1에서 본문의 끝을 정하는 순서
+
+수신자가 본문 경계를 다르게 해석하면 같은 연결의 다음 요청까지 잘못 읽을 수 있습니다. RFC 9112 §6.3의 순서는 단순히 “길이 필드 중 하나를 고른다”보다 구체적입니다. [HTTP/1.1 본문 길이](https://www.rfc-editor.org/rfc/rfc9112.html#section-6.3)
+
+| 먼저 적용할 조건 | 의미 |
+| --- | --- |
+| HEAD 응답, 1xx·204·304 응답 | 헤더에 길이 정보가 있더라도 메시지 본문 없음 |
+| CONNECT의 2xx 응답 | 헤더 이후 터널로 전환; Content-Length·Transfer-Encoding 무시 |
+| 그 외 메시지에 Transfer-Encoding과 Content-Length 모두 존재 | Transfer-Encoding 우선; 모호한 메시지로 오류 처리하는 것이 원칙 |
+| 마지막 transfer coding이 chunked | chunked framing으로 본문 끝 판별 |
+| Transfer-Encoding 없이 유효한 Content-Length 존재 | 해당 octet 수로 길이 판별 |
+
+송신자는 Transfer-Encoding이 있는 메시지에 Content-Length를 보내면 안 됩니다. 둘 다 받은 서버는 거부하거나 Transfer-Encoding만 따라 처리할 수 있지만 응답 후 연결을 닫아야 합니다. 전달을 선택한 중계자는 먼저 Content-Length를 제거하고 Transfer-Encoding을 처리해야 합니다. 따라서 “우선순위가 있으니 둘을 함께 보내도 정상”이라는 해석은 틀립니다. [RFC 9112 §6.1–6.3](https://www.rfc-editor.org/rfc/rfc9112.html#section-6.1)
+
+제품에서는 프록시와 앱의 framing 오류·연결 종료를 같은 요청 경로에 연결하도록 제안합니다. 위 표는 주요 조건의 요약이며 모든 잘못된 헤더를 허용하는 parser 명세가 아닙니다.
+
+## TLS 왕복 횟수와 측정 시간
+
+새 TCP 연결 위에서 수행하는 일반적인 full handshake를 메시지 흐름으로 세면 TLS 1.2는 2 RTT, TLS 1.3은 1 RTT가 기본 비교 모델입니다. TCP 연결·DNS 시간은 별도입니다. TLS 1.2 재개, TLS 1.3 HelloRetryRequest에 따른 추가 왕복, 0-RTT는 이 모델과 구분합니다. 이는 표준 메시지 흐름에서 도출한 비교이지 모든 연결이 정확히 그 시간에 끝난다는 성능 보장이 아닙니다. [TLS 1.2 §7.3](https://www.rfc-editor.org/rfc/rfc5246.html#section-7.3), [TLS 1.3 §2](https://www.rfc-editor.org/rfc/rfc8446.html#section-2)
+
+**합성 예시:** RTT가 30 ms이고 DNS·TCP·계산·인증서 검증 시간 등을 제외하면 위 TLS 교환의 왕복 대기 성분은 각각 약 60 ms와 30 ms입니다. 반면 curl `time_appconnect`는 **시작부터** 보안 연결 완료까지의 초 단위 누적 시간입니다. 직접 연결·새 TCP·리다이렉트 없음 조건에서 TLS 구간을 보려면 `time_appconnect−time_connect`처럼 앞 구간을 분리합니다. 재사용·프록시·HTTP/3에는 동일한 차감식을 자동 적용하지 않습니다. [curl APPCONNECT_TIME](https://curl.se/libcurl/c/CURLINFO_APPCONNECT_TIME.html)
+
+TLS 1.2의 선택적 False Start는 조건을 만족한 client가 server Finished를 받기 전에 애플리케이션 데이터를 보내게 합니다. 따라서 **첫 데이터 송신 가능 시각**과 **handshake 검증 완료 시각**을 구분해야 합니다. 2 RTT 모델을 모든 요청의 송신 대기 시간으로 일반화하지 않습니다. 이 예외의 curl 타이머 반영은 사용하는 TLS backend를 포함한 별도 실행 검증 대상입니다. [RFC 7918 §4](https://www.rfc-editor.org/rfc/rfc7918.html#section-4)
+
+## 인증서 유효기간 단축과 경보
+
+2026-10-05 확인한 CA/Browser Forum TLS Baseline Requirements 2.3.1의 공개 신뢰 TLS subscriber 인증서 최대 유효기간은 발급일에 따라 달라집니다. 사설 PKI나 모든 종류의 인증서에 자동 적용하는 표가 아닙니다. [BR §6.3.2](https://cabforum.org/working-groups/server/baseline-requirements/requirements/#632-certificate-operational-periods-and-key-pair-usage-periods)
+
+| 발급일 범위 | MUST NOT으로 정한 최대 유효기간 |
+| --- | ---: |
+| 2026-03-15 이전 | 398일 |
+| 2026-03-15 이상, 2027-03-15 미만 | 200일 |
+| 2027-03-15 이상, 2029-03-15 미만 | 100일 |
+| 2029-03-15 이상 | 47일 |
+
+이 표는 최대값이며 최대 기간으로 발급하는 것을 권장한다는 뜻이 아닙니다. 표준의 SHOULD NOT 한도는 각각 하루 더 짧으며, 기간 계산에서 하루는 86,400초입니다. 변경일에 이미 발급한 모든 인증서가 소급하여 그날 만료되는 것도 아닙니다.
+
+**제품 적용 제안:** 실제 `notAfter`와 현재 시각의 차이, 자동 갱신의 예정·실패, 새 인증서가 각 TLS 종단에 배포됐는지를 함께 봅니다. 유효기간이 짧아지는데 모든 인증서에 고정된 긴 사전 경보 기간을 적용하면 발급 직후부터 경보가 울릴 수 있습니다. 발급 주기·갱신 여유·실제 남은 시간을 기준으로 정책을 정합니다. 본문 설명을 위해 인증서를 발급하거나 실제 endpoint를 검사하지 않았습니다.
 
 ## 누적 타이머를 더하면 안 되는 이유
 
@@ -82,5 +121,8 @@ flowchart LR
 1. 인증서 만료가 멀면 TLS 검증은 성공하는가? **이름, 신뢰 체인 등 다른 조건도 필요합니다.**
 2. TTFB에서 TLS 완료 시간을 빼면 서버 CPU 시간인가? **아니요. 그 구간에 여러 대기·전송·실행이 포함됩니다.**
 3. HTTP 요청 1,000개면 연결도 1,000개인가? **연결 재사용과 다중화 때문에 그렇지 않습니다.**
+4. Transfer-Encoding이 우선이면 Content-Length와 함께 보내도 되는가? **송신 금지·수신 오류 처리·연결 종료 규칙도 따라야 합니다.**
+5. TLS 1.3이면 time_appconnect가 반드시 1 RTT인가? **누적 타이머이며 DNS·TCP, 재시도와 처리 시간이 포함될 수 있습니다.**
+6. 최대 인증서 기간이 바뀌면 기존 인증서의 만료일도 그날 바뀌는가? **발급일별 규칙과 실제 notAfter를 확인합니다.**
 
 다음: [인터페이스와 흐름 관측](network-metrics.md) · [네트워크 목차](README.md)

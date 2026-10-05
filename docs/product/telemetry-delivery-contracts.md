@@ -1,8 +1,8 @@
 # 관측 데이터 전송 계약: 부분 성공, 재시도와 중복
 
-> 상태: 검토됨 · 적용 범위: OTLP 1.11.0 문서, Collector 0.137.0의 OTLP/HTTP JSON 로컬 실험 · 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: OTLP 1.11.0 문서, Collector 0.137.0·0.162.0의 OTLP/HTTP JSON 로컬 실험 · 검토일: 2026-10-05
 
-버전 상태: OTLP 문서 1.11.0·Collector 0.137.0을 고정한 실험입니다. 검토 시점 원천 릴리스는 OTLP 1.11.1·Collector 0.162.0이며 새 버전으로 실행한 결과로 바꾸지 않습니다. [고정·최신·지원 상태](../coverage.md#교차-검토-시점의-버전-상태)
+버전 상태: 기존 0.137.0 실행을 보존하고 2라운드에서 0.162.0의 내부 로그·metric과 queue on/off 결과를 추가했습니다. OTLP 웹 문서 1.11.0과 원천 릴리스 1.11.1도 구분합니다. [고정·최신·지원 상태](../coverage.md#교차-검토-시점의-버전-상태)
 
 ## 먼저 이해할 것
 
@@ -10,7 +10,7 @@
 
 이 장은 [수집 파이프라인](collection-pipelines.md)을 실제 Collector 동작으로 보강합니다. 테스트 목적지는 응답을 통제하는 임시 서버입니다. 영속 저장이나 검색은 구현하지 않았으므로 “저장 성공”을 측정한 실험으로 표시하지 않습니다.
 
-## 실험 경로와 고정 조건
+## 기존 0.137.0 실험 경로와 고정 조건
 
 ```mermaid
 flowchart LR
@@ -70,7 +70,7 @@ OTLP/HTTP 규약이 재시도 대상으로 열거한 상태는 429·502·503·50
 
 Collector 0.137.0의 exporterhelper는 `queue → 관측 → retry → timeout → exporter` 순서로 호출을 감쌉니다. `send_failed_*`는 내부 retry가 오류를 반환한 뒤 관측 계층에서 항목 수를 기록합니다. 일시 실패 후 같은 retry 호출 안에서 성공하면 그 중간 시도마다 이 실패 계수가 증가하는 구조가 아닙니다. [호출 구성](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/exporterhelper/internal/base_exporter.go#L66-L102), [실패 계수 기록](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/exporterhelper/internal/obs_report_sender.go#L86-L141)
 
-따라서 이 버전의 계수 증가를 “그 exporter의 동일한 내부 재시도가 아직 진행 중”이라고 풀이하지 않습니다. queue 경로에서는 최종 반환 오류에 대해 dropping 로그를 기록합니다. 다만 상류의 별도 재전송이나 다른 목적지의 성공까지 이 계수 하나로 알 수는 없어 종단 간 영구 유실 수와도 동일하지 않습니다. enqueue 실패, exporter 최종 실패, 목적지 부분 거절, 고유 저장 항목 수를 구분합니다. 이 설명은 코드 검토이며 이번 실험의 내부 metric 관측 결과가 아닙니다. [QueueSender](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/exporterhelper/internal/queue_sender.go#L38-L49), [일반 관측 안내](https://opentelemetry.io/docs/collector/internal-telemetry/)
+따라서 이 버전의 계수 증가를 “그 exporter의 동일한 내부 재시도가 아직 진행 중”이라고 풀이하지 않습니다. queue 경로에서는 최종 반환 오류에 대해 dropping 로그를 기록합니다. 다만 상류의 별도 재전송이나 다른 목적지의 성공까지 이 계수 하나로 알 수는 없어 종단 간 영구 유실 수와도 동일하지 않습니다. enqueue 실패, exporter 최종 실패, 목적지 부분 거절, 고유 저장 항목 수를 구분합니다. 이 설명은 코드 검토이며 0.137.0 실험의 내부 metric 관측 결과가 아닙니다. 0.162.0의 별도 실측은 다음 절에 있습니다. [QueueSender](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/exporterhelper/internal/queue_sender.go#L38-L49), [일반 관측 안내](https://opentelemetry.io/docs/collector/internal-telemetry/)
 
 다음은 **제품 적용 제안**입니다.
 
@@ -84,6 +84,25 @@ Collector 0.137.0의 exporterhelper는 `queue → 관측 → retry → timeout �
 
 필터와 sampling이 있는 파이프라인에서 입력 수와 출력 수를 단순히 빼서 전부 “장애 유실”로 부르지 않습니다. 의도된 제거와 비의도적 유실을 같은 단위·시간 구간에서 각각 설명해야 합니다.
 
+## 0.162.0에서 내부 관측과 큐 경계를 다시 확인하기
+
+**2026-10-05 실행:** 공식 core Collector 0.162.0, OTLP/HTTP JSON, loopback 목적지, debug 로그·detailed 내부 metric을 사용했습니다. `sending_queue.enabled`를 true/false로 나누고 `wait_for_result=false`, consumer 1개, 요청 단위 queue 10, 짧은 retry 한도를 고정했습니다. 프로세스마다 준비 요청(primer)으로 실패 계수를 만든 뒤 실험 요청 span 2개를 보냈습니다. 이 때문에 아래 시작값은 0이 아니라 **2**입니다. [원시 config·로그·metric](../../labs/results/1.1-r2-otel.json), [실행기](../../scripts/run_otel_r2_lab.py)
+
+| 실험 요청의 결과 | queue | `send_failed_spans` 기준 → 종료 | upstream HTTP·완료 경계 |
+| --- | --- | --- | --- |
+| 정상 성공 | off / on | 각각 `2→2`, 증가 0 | 200 |
+| 부분 거절 1개 | off / on | 각각 `2→2`, 증가 0 | 200, 빈 `partialSuccess` |
+| 재시도 후 성공 | off / on | 각각 `2→2`, 증가 0 | off는 목적지 차단 해제 뒤 200, on은 해제 전 200 |
+| 재시도 소진 | off / on | 각각 `2→4`, 증가 2 | off는 해제 뒤 503, on은 해제 전 200 |
+
+**Collector 0.162.0의 이 구성에서는 재시도 진행 중 관측한 send_failed_spans가 기준값 2에 머물렀고, 재시도 소진 뒤 4로 증가해 실패한 span 2개를 계수했습니다.** 성공한 재시도에는 증가가 없었습니다. 마지막 목적지 시도 이전의 증가 표본은 없었으며 증가 시각은 metric polling의 관측 구간으로만 한정합니다. 실시간의 모든 순간을 계측한 것은 아닙니다. 이 결과는 1라운드에서 코드로 확인한 “내부 retry가 최종 오류를 반환한 뒤 항목 수를 기록”한다는 설명을 해당 새 버전·구성에서 지지합니다.
+
+부분 성공에서는 목적지의 고유 사유 `r2-partial-rejected-one`과 `dropped_spans: 1`을 담은 warn 로그가 두 queue 구성 모두에 남았습니다. 준비 요청을 제외한 목적지 요청은 각각 1회였고 `send_failed_spans` 증가는 0이었습니다. **부분 거절을 Collector가 로그로 인지했다는 근거는 생겼지만, 이 실패 계수가 거절된 span 1개를 세지는 않았습니다.** upstream 응답도 거절 수를 보존하지 않았으므로 그 성공만으로 종단 간 수용률을 계산할 수 없습니다.
+
+**`wait_for_result=false`인 queue를 켠 경우 upstream은 목적지 차단 해제 전에 200을 받았고, 끈 경우에는 차단 해제 뒤 exporter 결과를 받았습니다.** 이는 메모리 queue 수용 경계의 관측입니다. 재시작·영속 queue·실제 저장소의 commit을 시험한 결과로 확대하지 않습니다. 재시도 횟수와 ms 단위 지연은 재실행마다 달라질 수 있습니다.
+
+`otlp_http`와 기존 `otlphttp` 이름은 모두 `validate`에서 수용됐습니다. 실제 전송 실험은 `otlp_http/lab`으로 수행했으므로 옛 별칭의 전체 전송 동작을 따로 실행했다고 표시하지 않습니다. core exporter 이름 변경은 0.144.0 릴리스부터 확인되며, 이름 수용 여부와 향후 alias 제거 정책은 별도입니다. [0.144.0 릴리스](https://github.com/open-telemetry/opentelemetry-collector/releases/tag/v0.144.0), [구성 검증 결과](../../labs/results/1.1-r2-otel.json)
+
 ## 재현
 
 Ubuntu amd64의 저장소 루트에서 실행합니다. 기본 결과는 `.lab-runs/otel.json`입니다.
@@ -93,9 +112,11 @@ python3 scripts/get_runtime_lab_assets.py --which otelcol
 python3 scripts/run_otel_lab.py
 ```
 
+2라운드 실행의 공식 자산 pin·새 결과 경로·재현 명령은 [공통 재현 절차](../cross-domain/reproducible-labs.md)에 있습니다.
+
 ## 이해 확인
 
 1. HTTP 500이면 OTLP/HTTP에서 언제나 재시도하는가? **열거된 재시도 코드를 따라야 하며 이번 500은 한 번만 전송됐습니다.**
 2. 부분 성공의 거절 수가 1이면 어느 span인지 반드시 아는가? **개수만으로 개별 항목을 식별할 수 없습니다.**
 3. 재시도에서 같은 span ID가 다시 왔다면 새 업무가 하나 더 발생했는가? **같은 관측의 중복 전송일 수 있습니다.**
-4. 이 결과로 영속 큐의 무손실을 보장하는가? **큐를 끈 HTTP 전송 실험이며 영속 큐 장애 검증은 별도입니다.**
+4. 이 결과로 영속 큐의 무손실을 보장하는가? **기존 queue-off와 새 메모리 queue on/off 관측이며 영속 큐 장애 검증은 별도입니다.**

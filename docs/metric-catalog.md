@@ -67,6 +67,33 @@
 
 비율을 여러 대상으로 합칠 때는 분자·분모의 합으로 다시 계산합니다. 누적값은 같은 실행 수명에서 rate를 구한 뒤 합치고, 분포는 원천 분포의 호환성을 확인합니다. 0 분모, reset, 미지원, 누락, 늦은 도착은 모두 정상 숫자와 구분해서 처리해야 합니다.
 
+## 원천 필드와 시간·버전의 연결
+
+아래는 2026-10-05 보강한 대표 필드입니다. 수집을 실행했다는 목록이 아니며, 원천 정의와 버전별 지원 범위는 연결된 장을 따릅니다.
+
+| 원천 필드·개념 | 단위·형태 | 해석 경계 | 상세 |
+| --- | --- | --- | --- |
+| `Tcp.CurrEstab` | 연결 수 gauge | ESTABLISHED·CLOSE-WAIT, namespace 단위 | [Linux 스택](network/linux-stack-counters.md) |
+| `Tcp.RetransSegs / Tcp.OutSegs`의 구간 차분 비 | ratio 또는 % | 제어·반복 전송 포함 범위; 손실률 아님 | [Linux 스택](network/linux-stack-counters.md) |
+| `Udp.InErrors`, `Udp.RcvbufErrors` | 누적 횟수 | 겹치는 실패를 합산하지 않음 | [Linux 스택](network/linux-stack-counters.md) |
+| `TcpExt.ListenOverflows/ListenDrops` | 누적 횟수 | 대기열·LISTEN 경로; 같은 drop이 겹칠 수 있음 | [Linux 스택](network/linux-stack-counters.md) |
+| eviction `memory.available` | byte·capacity 비율 | capacity−node working set; MemAvailable과 구분 | [Kubernetes 압박](kubernetes/pressure-and-termination.md) |
+| `memory.events.oom_group_kill` | group OOM 횟수 | 종료 프로세스 수·재시작 수와 다름 | [Kubernetes 압박](kubernetes/pressure-and-termination.md) |
+| `containerStatuses[].resources` | CPU·memory 자원 명세 | spec 희망값과 실제 적용 분모 구분 | [resize](kubernetes/pressure-and-termination.md) |
+| `age(datfrozenxid)`, `mxid_age(datminmxid)` | 각각 XID·MultiXact 거리 | 초·실행 SQL 수 아님; 별도 한도 | [PostgreSQL 운영](database/postgresql-operations.md) |
+| slot `xmin`·`catalog_xmin`, sender `backend_xmin` | ID·age | 행 보존·catalog 보존·feedback; LSN과 구분 | [회수 기준점](database/postgresql-operations.md) |
+| `pg_stat_io.read_bytes/write_bytes` | PostgreSQL 18 누적 byte | 16–17 op_bytes 계산과 분기 | [통계 호환성](database/postgresql-operations.md) |
+| exemplar | 개별 관측 값·시각·문맥 | 일반 metric label이나 모든 사건의 목록 아님 | [지표 문맥](foundations/metric-context-and-start-time.md) |
+| `StartTimeUnixNano` / `_created` | epoch ns / epoch s | 원천 시작·수명 정보; 첫 수집 시각과 다름 | [시작 시각](foundations/metric-context-and-start-time.md) |
+| `http.server.request.duration` | Histogram, s, Stable | 구 ms 규약과 변환·중복 제거 | [안정 이름](application/semantic-conventions.md) |
+| `jvm.memory.used/committed/limit` | UpDownCounter, By, Stable | used·확보·최대·미정 분모 | [JVM 규약](application/semantic-conventions.md) |
+| `jvm.gc.duration` / `dotnet.gc.pause.time` | Histogram s / Counter s, Stable | GC action 분포 / 누적 정지 시간 | [런타임 규약](application/semantic-conventions.md) |
+| Kafka UnderReplicated·UnderMinIsr | partition 수 gauge | RF 대비 / min ISR 미만을 구분 | [Kafka](middleware/kafka.md) |
+| Windows Processor Time / Utility | % | 점유 시간 / 성능 상태 보정; 100% 상한 가정 금지 | [Windows](host/windows.md) |
+| CloudWatch `Errors` (Lambda) | 기간별 오류 수 | 호출 시작 시각 귀속, 완료 시각 아님 | [서버리스](cloud/managed-and-serverless.md) |
+| 인증서 `notAfter−현재 시각` | 남은 초·일 | 발급일별 BR 한도·갱신·배포 상태 확인 | [TLS](network/tls-http.md) |
+| SNMP `ifSpeed` / `ifHighSpeed` | bit/s / 백만 bit/s | Gauge32 포화와 속도 분모 | [SNMP](network/snmp-and-device-models.md) |
+
 ## 비슷한 이름이 다른 값을 뜻하는 경우
 
 | 비교 대상 | 구분해야 하는 경계 | 상세 |

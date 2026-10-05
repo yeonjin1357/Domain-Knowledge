@@ -1,6 +1,6 @@
 # 트레이스를 읽는 전제: 문맥 전파, sampling과 모집단
 
-> 상태: 검토됨 · 적용 범위: W3C Trace Context, OpenTelemetry 개념·SDK 규약, tail sampling processor 0.137.0 문서 · 검토일: 2026-10-04 · sampling 수치는 가상 예시
+> 상태: 검토됨 · 적용 범위: W3C Trace Context, OpenTelemetry 개념·SDK 규약, tail sampling processor 0.137.0 문서 · 검토일: 2026-10-04 · sampling 수치는 가상 예시 · 2라운드 보강 확인: 2026-10-05 (probability sampling·W3C 문서 상태)
 
 버전 상태: 0.137.0은 설명을 고정한 기준입니다. 검토 시점 Collector 배포판은 0.162.0이며 최신 버전에서 tail sampling을 재실행하지 않았습니다. [고정·최신·지원 상태](../coverage.md#교차-검토-시점의-버전-상태)
 
@@ -58,6 +58,32 @@ SDK에는 기록하지 않음, 기록만 함, 기록하고 sampled로 표시함�
 
 오류·서비스·tenant마다 선택 확률이 다르거나 제한에 걸린 trace가 더 빠진다면 단일 10배를 적용할 수 없습니다. trace 하나의 span 수를 요청 수와 혼동해서도 안 됩니다. 포함 확률을 모르면 정확한 전체 비율을 복원할 정보가 부족할 수 있습니다.
 
+## 확률을 전달하는 th·rv와 adjusted count
+
+**2026-10-05 확인:** OTel의 probability sampling·tracestate 규약은 Development 상태입니다. `ot` tracestate 안의 `rv`는 56-bit randomness 값, `th`는 rejection threshold를 표현합니다. 같은 randomness `R`에 대해 `R ≥ T`인 항목을 선택하는 모델에서는 포함 확률이 `p=(2^56−T)/2^56`이고, adjusted count는 `1/p`입니다. `th`의 wire 표현은 축약된 16진 문자열 규칙이 있으므로 그대로 일반 정수 parser에 넘겨 전체 threshold라고 간주하지 않습니다. [probability sampling](https://opentelemetry.io/docs/specs/otel/trace/tracestate-probability-sampling/), [tracestate encoding](https://opentelemetry.io/docs/specs/otel/trace/tracestate-handling/)
+
+adjusted count는 해당 표본 하나가 대표하는 모집단 항목 수의 추정 가중치입니다. 같은 randomness를 쓰는 일관된 다단계 sampler는 적용된 최대 threshold로 유효 확률을 표현합니다. 독립적인 동전 던지기처럼 각 단계의 확률을 무조건 곱하지 않습니다. 중간 sampler가 정책을 바꾸면 이 문맥도 규약대로 갱신해야 합니다. non-probabilistic 선택이나 `th`가 없는 sampled span에 이 규약의 adjusted count가 정의된 것으로 간주하지 않습니다. [확률·threshold 전파](https://opentelemetry.io/docs/specs/otel/trace/tracestate-probability-sampling/)
+
+**예시:** 요청당 server span 하나를 집계하며 각 표본의 최종 포함 확률이 정확히 알려졌다고 가정합니다. `p=0.1`인 표본 90개와 `p=0.5`인 표본 20개라면 추정 요청 수는 `90/0.1 + 20/0.5 = 940건`입니다. 표본 110개에 임의의 공통 배수를 곱하지 않습니다. 940은 추정값이며 실제 요청 수의 확정값이 아닙니다.
+
+| 추정에 필요한 조건 | 없을 때 생기는 문제 |
+| --- | --- |
+| 모집단과 요청당 대표 span의 명세 | 자식 span·retry를 요청으로 중복 계산 |
+| 양수이며 알려진 최종 포함 확률 | p=0으로 제외된 집단이나 미확인 tail 규칙을 역가중으로 복구 불가 |
+| randomness와 threshold 규약의 일관성 | 언어·단계마다 표본 선택이 다르거나 유효 확률이 틀림 |
+| 선택 후 전송·저장 유실과 중복의 통제 | sampling 확률이 실제 관측 확률을 설명하지 못함 |
+| 같은 시간·service·조건 범위 | 정책 변경 전후를 하나의 분모로 잘못 비교 |
+
+따라서 “sampled span이 있다”는 사실만으로 전체 요청 수 추정을 켜지 않습니다. 오류를 무조건 보존하는 규칙과 rate limit, 불완전 trace 폐기 등이 섞이면 실제 포함 확률을 먼저 입증해야 합니다. metric에서 trace를 여는 [exemplar](../foundations/metric-context-and-start-time.md)도 모집단 추정을 위한 가중치가 아닙니다.
+
+`rv`는 **선택적인 explicit randomness**입니다. 존재하면 그 56-bit 값을, 없으면 TraceID의 하위 56bit를 randomness `R`로 사용합니다. `rv`가 없다는 이유만으로 잘못된 trace로 버리지는 않습니다. 다만 SDK의 randomness 추정 규칙과 실제 ID 생성기의 균등성·random flag 지원을 구분하고, 이를 검증하지 않은 데이터를 무조건 정확한 확률 표본이라고 표시하지 않습니다. [SDK randomness 규약](https://opentelemetry.io/docs/specs/otel/trace/sdk/#presumption-of-traceid-randomness)
+
+## sampler 폐기와 W3C 문서 단계
+
+확인 시점 SDK 규약에서 `TraceIdRatioBased` 절은 **Stable이면서 deprecated**입니다. 대체 방향인 `ProbabilitySampler`는 **Development**이고 SDK Sampler API를 직접 구현하는 **non-composable** 형태입니다. `CompositeSampler`와 조합하는 별도 형태의 이름은 `ComposableProbability`입니다. 이름·안정성·조합 방식을 섞어 소개하지 않습니다. 기존 `TraceIdRatioBased` 구현의 동작 변경·제거는 **최소 2027-01-01까지 금지**되므로 2026년 SDK에서 이름이 보이는 것 자체는 규약 위반이 아닙니다. 언어별 지원 릴리스를 확인하며, parent 결정을 존중하려면 `ParentBased` 등 별도 구성을 봅니다. [TraceIdRatioBased](https://opentelemetry.io/docs/specs/otel/trace/sdk/#traceidratiobased), [ProbabilitySampler와 조합형의 구분](https://opentelemetry.io/docs/specs/otel/trace/sdk/#probabilitysampler)
+
+W3C Trace Context Level 2는 확인한 공개 판본이 **2024-03-28 Candidate Recommendation Draft**입니다. 최종 Recommendation으로 소개하지 않습니다. random trace ID flag는 sampled flag와 다른 bit이며 TraceID의 randomness 요구를 나타냅니다. 확률 자체나 요청의 성공·신뢰도를 뜻하지 않습니다. “random flag가 있으면 표본은 모두 같은 확률”이라는 결론도 나오지 않습니다. [W3C Level 2의 문서 상태와 flags](https://www.w3.org/TR/2024/CRD-trace-context-2-20240328/)
+
 ## tail sampling의 기다림과 배치
 
 고정 버전 tail sampling processor는 같은 trace의 span을 모아 정책을 평가하는 상태를 유지합니다. 관련 span이 서로 다른 Collector에 흩어지면 각자 불완전한 정보로 판단할 수 있으므로 trace ID를 고려한 라우팅이 필요합니다. 결정 대기 시간, 보관 가능한 trace 수, decision cache와 늦게 도착한 span의 처리를 실제 버전에 맞춰 검토합니다. [Tail sampling processor 0.137.0](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.137.0/processor/tailsamplingprocessor/README.md)
@@ -85,3 +111,5 @@ SDK에는 기록하지 않음, 기록만 함, 기록하고 sampled로 표시함�
 2. sampled bit가 있으면 목적지 저장까지 보장되는가? **sampling 문맥이며 수집·전송·저장 성공을 보장하지 않습니다.**
 3. tail sampling을 쓰면 모든 늦은 span까지 반드시 모이는가? **대기·용량·라우팅·늦은 데이터 정책에 한계가 있습니다.**
 4. trace ID를 tenant 접근 권한으로 사용해도 되는가? **관측 연결 정보와 인증된 접근 범위를 분리합니다.**
+5. 10% head sampling 후 추가 tail 폐기가 있어도 열 배하면 되는가? **최종 포함 확률과 추가 유실을 알아야 한다.**
+6. `rv`는 sampling 비율인가? **randomness 값이다. 유효 확률은 threshold와 함께 해석한다.**

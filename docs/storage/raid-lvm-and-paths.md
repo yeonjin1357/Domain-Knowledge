@@ -1,6 +1,6 @@
 # 저장 경로를 따라가기: RAID, LVM, SAN과 NAS
 
-> 상태: 검토됨 · 적용 범위: Linux MD·device mapper, iSCSI·NFS 개념 · 검토일: 2026-10-04 · 장치 변경 명령과 장애 주입은 실행하지 않음
+> 상태: 검토됨 · 적용 범위: Linux MD·device mapper, iSCSI·NFS 개념 · 검토일: 2026-10-04 · 장치 변경 명령과 장애 주입은 실행하지 않음 · 2라운드 보강 확인: 2026-10-05 (RHEL 9 multipath 경로 부재 정책)
 
 앱에서 보이는 파일과 물리 디스크 사이에는 여러 계층이 있을 수 있습니다. 가상으로 `/data/order.db`는 파일시스템 위에 있고, 파일시스템은 논리 볼륨, 논리 볼륨은 RAID 장치, RAID는 여러 디스크를 사용할 수 있습니다. 클라우드와 스토리지 어레이에서는 더 아래의 일부 계층이 사용자에게 공개되지 않습니다.
 
@@ -52,7 +52,15 @@ NAS는 네트워크를 통해 파일 접근을 제공하는 환경입니다. NFS
 
 “볼륨 가득 참” 화면에서 사용자에게 어느 층이 가득 찼는지를 보여 주는 것이 핵심입니다. 파일시스템, thin pool 데이터, thin pool 메타데이터, 원격 quota를 한 비율로 덮지 않습니다.
 
+## 모든 경로가 끊겼는데 오류가 보이지 않는 경우
+
+SAN 경로가 모두 사라지면 I/O가 즉시 실패할 수도, 큐에서 계속 기다릴 수도 있습니다. **RHEL 9 dm-multipath 문서, 2026-10-05 확인:** `queue_if_no_path`는 `no_path_retry=queue`와 같은 의미의 무경로 대기 정책입니다. 이 구성에서는 경로가 돌아올 때까지 I/O를 낸 프로세스가 멈춘 것처럼 보일 수 있습니다. `no_path_retry`의 유한 값·fail 설정, 하부 SCSI 복구 timeout과도 구분합니다. [DM Multipath 설정](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html-single/configuring_device_mapper_multipath/index)
+
+따라서 “디스크 오류 counter=0”이 정상 응답을 보장하지 않습니다. path 상태, 미완료 I/O, 앱 지연·timeout을 함께 봅니다. 같은 LUN의 여러 경로를 독립 데이터 디스크처럼 합산하지 않는 것과 더불어, 대기 정책 때문에 실패가 지연된 상태도 모델링해야 합니다. 제품 적용 제안은 path 복구를 기다리는 시간과 업무 deadline을 따로 표시하는 것입니다. multipath 정책 변경·서비스 재시작·경로 차단은 실행하지 않았습니다.
+
 ## 이해 확인
+
+추가 질문: 모든 경로가 사라졌는데 I/O 오류가 안 보이면 정상인가? **queue_if_no_path 정책으로 작업이 계속 대기하는 상태일 수 있습니다.**
 
 1. RAID가 있으니 백업이 불필요한가? **잘못된 변경의 복구와 장치 고장 대응은 다릅니다.**
 2. 24TiB를 논리 제공했으니 물리 디스크도 24TiB 사용 중인가? **thin 할당과 실제 소비를 확인합니다.**

@@ -1,6 +1,6 @@
 # 알림 조건, 상태, 통지와 장애 사건
 
-> 상태: 검토됨 · 범위: Prometheus·Alertmanager 개념과 제품 설계 제안 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 범위: Prometheus·Alertmanager 개념과 제품 설계 제안 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (Alertmanager 지연·resolved 규약)
 
 ## 먼저 이해할 것
 
@@ -69,6 +69,24 @@ Alertmanager는 알림의 중복 제거·그룹화·수신처 라우팅을 수�
 
 호스트 장애 때문에 그 위의 Pod 알림을 묶는 것은 유용하지만, 호스트가 원인임을 자동으로 증명하지는 않습니다. 관계와 시간·실제 증거가 맞는지 [도메인 간 분석](../cross-domain/README.md)에서 확인해야 합니다.
 
+## 조건 발생부터 첫 통지까지의 지연
+
+문제가 시작됐어도 scrape가 아직 안 왔고, 다음 평가를 기다린 뒤 `for`와 통지 그룹 대기까지 거칠 수 있습니다. **2026-10-05 확인** Alertmanager route 기본값은 `group_wait=30s`, `group_interval=5m`, `repeat_interval=4h`입니다. 상위 route에서 상속하거나 하위에서 변경할 수 있으므로 활성 설정을 저장합니다. [Alertmanager configuration](https://prometheus.io/docs/alerting/latest/configuration/#route)
+
+| 설정 | 기다리는 대상 | 혼동하면 안 되는 값 |
+| --- | --- | --- |
+| `group_wait` | 새 그룹의 첫 통지 전 모으는 시간 | 모든 firing 알림에 매번 더해지는 시간 아님 |
+| `group_interval` | 기존 그룹의 새 firing·resolved 등 변화 통지 확인 주기 | 원천 metric 수집 간격 아님 |
+| `repeat_interval` | 변화 없는 firing 통지 반복 간격 | 장애 판정의 지속 시간 아님; group interval·보존 설정과 상호작용 |
+
+**단순 모델:** 새 그룹이며 정상 전송인 경우 `관측 가능해질 때까지 + 다음 평가 대기 + for 충족 및 평가 정렬 + group_wait + 통지 전달`로 지연을 나눕니다. 흔히 쓰는 `수집 + 평가 간격 + for + group_wait`는 각 단계의 지연을 요약한 근사식입니다. 발생 위상에 따라 수집·평가 대기는 전체 주기보다 짧을 수 있고 `for` 종료도 평가 시점에 맞춰집니다. query window의 평활화, cloud 지연, 기존 그룹 합류, silence·inhibition·재시도는 별도로 추가됩니다. [규칙 평가](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/)
+
+**예시:** 이상이 실제로 발생한 뒤 10초에 표본이 준비되고 그로부터 20초 후 첫 참 평가가 이루어졌다고 가정합니다. 평가 간격 30초, `for=120초`, 계속 참, 새 그룹 `group_wait=30초`, 전송 지연 무시라면 첫 통지는 `10+20+120+30=180초` 뒤입니다. 첫 통지 지연이 언제나 180초라는 성능 보장이 아닙니다.
+
+resolved는 조건 평가의 복귀와 수신처 통지를 나누어 기록합니다. 알림이 첫 group_wait 전에 해소되면 통지가 아예 없을 수 있습니다. receiver별 `send_resolved` 설정·기본값이 다르고, 기존 그룹의 resolved 통지도 group interval과 전송 경로를 거칩니다. `keep_firing_for`를 설정했다면 rule의 firing 유지 시간도 포함합니다. 모든 수신처의 `send_resolved`가 같은 기본값이라고 가정하지 않습니다. [통지 설정](https://prometheus.io/docs/alerting/latest/configuration/)
+
+제품 적용 제안은 발생 추정·원천 표본·첫 참 평가·firing·Alertmanager 수신·통지 성공·업무 회복의 timestamp를 나눠 저장하는 것입니다. 이 절에서는 Alertmanager 서버나 수신처를 호출하지 않았고 예시의 시간 합만 검증합니다.
+
 ## 장애 사건 모델 제안
 
 사건에는 영향 시작·인지·조치·회복 시각, 영향받은 업무, 연결한 알림, 확인한 증거, 원인 가설과 확정 수준을 남깁니다. 알림 한 개가 사건 여러 개에 반복해서 나타날 수도 있고, 사건 하나에 여러 도메인의 알림이 모일 수도 있습니다.
@@ -76,6 +94,8 @@ Alertmanager는 알림의 중복 제거·그룹화·수신처 라우팅을 수�
 평가 서비스의 정상 동작, 통지 API 성공, 운영자의 인지는 별도 단계입니다. 통지 사업자가 메시지를 접수했다는 응답만으로 사람이 읽었다고 저장하지 않습니다. 이 구분은 제품의 자체 관측에도 동일하게 적용합니다.
 
 ## 이해 확인
+
+추가 질문: group_wait=30초면 모든 장애 알림이 30초 안에 도착하는가? **수집·평가·for·그룹 대기·전달 지연을 각각 확인해야 합니다.**
 
 1. 5분 평균을 2분 동안 평가하면 7분 평균인가? **아니다. 5분 window의 계산 결과가 각 평가에서 2분 동안 조건을 유지하는 것이다.**
 2. Silence 상태면 장애가 해결되었는가? **통지가 억제된 상태일 뿐이다.**

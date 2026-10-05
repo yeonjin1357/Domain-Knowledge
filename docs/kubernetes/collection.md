@@ -1,6 +1,6 @@
 # Kubernetes 수집 경로와 데이터의 의미
 
-> 상태: 검토됨 · 적용 범위: API 객체, kube-state-metrics, Resource Metrics API, 컴포넌트 지표 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 1.1판 resourceVersion 규약 재검토: 2026-10-04
+> 상태: 검토됨 · 적용 범위: API 객체, kube-state-metrics, Resource Metrics API, 컴포넌트 지표 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 1.1판 resourceVersion 규약 재검토: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (1.37 WatchList·streaming list)
 
 ## 먼저 이해할 것
 
@@ -42,6 +42,14 @@ API는 객체 목록 조회와 변경 watch를 지원합니다. 오래된 `resou
 
 재목록 조회에 실패한 상태에서 이전 캐시의 모든 객체를 삭제 처리하지 않습니다. 목록을 다 받기 전에는 아직 관측하지 않은 객체와 삭제된 객체를 구분할 수 없기 때문입니다. 페이지를 나눠 받은 경우에도 수집 범위의 완료 여부가 필요합니다.
 
+## streaming list와 초기 동기화 완료
+
+**2026-10-05, Kubernetes 1.37 문서·코드 확인:** 기존 list → watch 외에 watch 요청에 `sendInitialEvents=true`를 넣는 streaming list가 있습니다. `resourceVersionMatch=NotOlderThan`이 필요하며 `allowWatchBookmarks=true`로 초기 상태의 끝을 나타내는 bookmark를 요청합니다. 초기 객체들은 합성 `ADDED`로 오므로 이들을 “방금 생성된 객체”로 기록하지 않습니다. 완료 bookmark 전 단절되면 완전한 초기 목록을 확보한 것으로 처리하지 않습니다. [API streaming lists](https://kubernetes.io/docs/reference/using-api/api-concepts/#streaming-lists)
+
+`WatchList` 서버 gate는 1.32 Beta 기본 true, 1.33 기본 false, **1.34 이후 Beta 기본 true**로 변경됐습니다. client-go의 `WatchListClient` 기본값은 1.35부터 true입니다. 서버 지원과 client의 사용 여부는 별개이며, 실제 설정을 보존해야 합니다. 큰 LIST 응답의 JSON/Protobuf streaming encoding과 `sendInitialEvents` 프로토콜도 다른 기능입니다. [feature gate 이력](https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/), [v1.37.0 client 기본값](https://github.com/kubernetes/kubernetes/blob/v1.37.0/staging/src/k8s.io/client-go/features/known_features.go)
+
+pagination의 continue token도 무기한 재사용할 수 없습니다. `410 ResourceExpired` 뒤 동일 snapshot이 필요하면 처음부터 다시 목록을 얻습니다. 응답의 새 continue token으로 이어 가면 최신 snapshot을 사용하므로 앞 페이지와 일관성이 깨집니다. [ListOptions.continue 주석](https://github.com/kubernetes/apimachinery/blob/v0.37.0/pkg/apis/meta/v1/types.go#L426)이 이 차이를 명시합니다. API 개요는 watch history와 continue token 만료에 기본 5분을 설명합니다. **제품 적용 제안:** 이 설명을 모든 cache·서버 설정에서 두 보존 기간이 같다는 보장으로 확대하지 말고 요청 종류별 만료 응답과 재동기화 절차를 관리합니다. [API pagination](https://kubernetes.io/docs/reference/using-api/api-concepts/#retrieving-large-results-sets-in-chunks)
+
 ## 수집기 권한과 범위
 
 제품은 어떤 클러스터·namespace·리소스 종류를 수집하도록 설정했는지 명시해야 합니다. 권한이 없는 namespace에서 객체가 보이지 않는 것을 “대상 없음”으로 해석하면 안 됩니다. 수집 결과에 `성공`, `권한 거부`, `연결 실패`, `지원 안 함`, `부분 결과`를 구분하는 상태 모델을 제안합니다.
@@ -71,5 +79,7 @@ Pod가 API에는 있고 자원 지표에는 없다면 생성 직후 아직 측�
 1. kube-state-metrics가 모든 CPU 사용량을 측정하는가? **주 목적은 API 객체 상태의 지표화입니다.**
 2. watch가 끊기면 모든 객체가 삭제된 것인가? **수집 연결의 실패와 대상의 삭제는 다릅니다.**
 3. working set이 앱 heap인가? **관측 범위와 계산 방식이 다릅니다.**
+4. streaming list의 초기 ADDED는 모두 방금 생성된 객체인가? **현재 상태를 전달하는 합성 이벤트이며 초기 동기화 완료도 확인해야 합니다.**
+5. Summary API와 모든 cAdvisor 지표가 같은 목록인가? **[kubelet 경로별 범위와 PSI 지원](pressure-and-termination.md)을 확인합니다.**
 
 다음: [네트워크와 저장소 연결](network-and-storage.md) · [Kubernetes 목차](README.md)

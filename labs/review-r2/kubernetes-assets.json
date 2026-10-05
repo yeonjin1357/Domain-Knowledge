@@ -1,0 +1,54 @@
+{
+  "prepared_on": "2026-10-05",
+  "platform": "Linux amd64",
+  "assets": [
+    {
+      "id": "envtest-1.34.1",
+      "suite": "kubernetes",
+      "version": "1.34.1",
+      "status": "available",
+      "name": "envtest-v1.34.1-linux-amd64.tar.gz",
+      "url": "https://github.com/kubernetes-sigs/controller-tools/releases/download/envtest-v1.34.1/envtest-v1.34.1-linux-amd64.tar.gz",
+      "sha256": "c8500090806ed5ce4064eeeb2a5666476a5168c1f4ff0eadd54fe59b22c4baa7",
+      "size": 51872266,
+      "release_api": "https://api.github.com/repos/kubernetes-sigs/controller-tools/releases/tags/envtest-v1.34.1",
+      "release_url": "https://github.com/kubernetes-sigs/controller-tools/releases/tag/envtest-v1.34.1",
+      "published_at": "2025-09-15T06:17:56Z",
+      "checked_at_utc": "2026-10-05T12:18:21.481361+00:00",
+      "verification": "SHA256 pinned from official GitHub release asset digest; archive verified before extraction",
+      "destination": ".tools/r2/envtest-1.34.1",
+      "members": [
+        "etcd",
+        "kube-apiserver"
+      ],
+      "latest_patch_at_review": "1.34.12",
+      "patch_scope": "Execution version is not the latest patch of this minor at review date 2026-10-05."
+    },
+    {
+      "id": "envtest-1.37.0",
+      "suite": "kubernetes",
+      "version": "1.37.0",
+      "status": "available",
+      "name": "envtest-v1.37.0-linux-amd64.tar.gz",
+      "url": "https://github.com/kubernetes-sigs/controller-tools/releases/download/envtest-v1.37.0/envtest-v1.37.0-linux-amd64.tar.gz",
+      "sha256": "f03faedfc68d2a78cee5cb02618bb44e7f67044f4c5fc957f72d3307fda61a9c",
+      "size": 54907240,
+      "release_api": "https://api.github.com/repos/kubernetes-sigs/controller-tools/releases/tags/envtest-v1.37.0",
+      "release_url": "https://github.com/kubernetes-sigs/controller-tools/releases/tag/envtest-v1.37.0",
+      "published_at": "2026-08-27T11:13:23Z",
+      "checked_at_utc": "2026-10-05T12:18:21.745470+00:00",
+      "verification": "SHA256 pinned from official GitHub release asset digest; archive verified before extraction",
+      "destination": ".tools/r2/envtest-1.37.0",
+      "members": [
+        "etcd",
+        "kube-apiserver"
+      ],
+      "latest_patch_at_review": "1.37.1",
+      "patch_scope": "Execution version is not the latest patch of this minor at review date 2026-10-05."
+    }
+  ],
+  "authorization": "Claude 2b: official available 1.34.1 and 1.37.0; minor API/cache comparison",
+  "supersedes": "Kubernetes-only unavailable entries in assets.json; common manifest preserved for concurrent experiments",
+  "kubernetes_patch_source": "https://kubernetes.io/releases/patch-releases/",
+  "execution_status": "Prepared; Linux execution delegated to Claude"
+}

@@ -1,6 +1,6 @@
 # 링크, 오버레이, MTU와 경로 제어
 
-> 상태: 검토됨 · 범위: Ethernet의 주소 해석, IPv6 ND·PMTUD, VXLAN, 기본 BGP 관측 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 범위: Ethernet의 주소 해석, IPv6 ND·PMTUD, VXLAN, 기본 BGP 관측 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (IPv4 PMTUD·DPLPMTUD)
 
 ## 먼저 이해할 것
 
@@ -57,6 +57,14 @@ VXLAN = 8 B
 
 IPv6 PMTUD는 경로의 더 작은 MTU를 Packet Too Big 메시지 등을 통해 알아내도록 정의합니다. 필요한 메시지가 전달되지 않는 경로에서는 작은 요청은 성공하지만 큰 패킷 전송이 멈추는 문제를 조사해야 합니다. [RFC 8201](https://www.rfc-editor.org/rfc/rfc8201.txt)
 
+## IPv4 PMTUD와 탐색 패킷을 쓰는 방법
+
+IPv4의 전통적인 PMTUD는 DF(Don't Fragment)를 설정한 패킷과 라우터의 ICMP fragmentation needed 응답을 이용합니다. 더 작은 경로 MTU를 알게 되면 송신 크기를 조절합니다. 필요한 ICMP가 차단되면 TCP 연결이나 작은 요청은 성공한 뒤 큰 데이터만 멈추는 black hole 현상이 생길 수 있습니다. IPv6의 Packet Too Big과 같은 이름·형식의 메시지로 저장하지 않습니다. [IPv4 PMTUD, RFC 1191](https://www.rfc-editor.org/rfc/rfc1191.html), [black hole 장애 양상, RFC 2923 §2.1](https://www.rfc-editor.org/rfc/rfc2923.html#section-2.1)
+
+PLPMTUD는 packetization layer가 탐색 크기와 전달 성공의 피드백을 이용해 경로 MTU를 찾는 방법입니다. 유효한 ICMP 오류의 도착에만 의존하지 않지만, 구현의 탐색·확인·손실 구분 절차가 필요합니다. RFC 4821의 일반 방법과 RFC 8899의 **datagram용 DPLPMTUD**를 구분합니다. RFC 8899를 모든 TCP 구현의 동작 명세로 인용하지 않습니다. [PLPMTUD, RFC 4821](https://www.rfc-editor.org/rfc/rfc4821.html), [DPLPMTUD, RFC 8899](https://www.rfc-editor.org/rfc/rfc8899.html)
+
+**제품 적용 제안:** 작은 요청과 큰 응답의 성공 차이, 경로 MTU·터널 헤더, ICMP 오류, TCP 재전송 또는 datagram probe 결과를 같은 관측 구간에 연결합니다. 이것들은 원인 후보를 좁히는 증거이며 ICMP 차단의 단독 증명은 아닙니다. 이 장에서는 능동 probe나 패킷 캡처를 실행하지 않았습니다. 실제 진단에는 대상 경로에 대한 권한과 probe 부하·캡처 권한을 확인하고, MTU·방화벽을 수집기가 자동 변경하지 않도록 합니다.
+
 ## 경로 제어와 실제 전달
 
 BGP는 경로 정보를 교환하며, 받은 경로·로컬에서 선택한 경로·이웃에게 광고하는 경로의 논리적 구분을 둡니다. 정책과 next-hop 도달성 등이 경로 선택·광고에 영향을 줍니다. [RFC 4271](https://www.rfc-editor.org/rfc/rfc4271.txt)
@@ -81,5 +89,6 @@ BGP는 경로 정보를 교환하며, 받은 경로·로컬에서 선택한 경�
 1. 원격 서버 IP의 ARP 항목이 없으면 통신할 수 없는가? **Ethernet의 로컬 다음 홉 주소가 필요한 경로일 수 있다.**
 2. BGP 연결이 정상이면 모든 prefix가 정상인가? **수신·선택·설치·실제 전달은 따로 확인해야 한다.**
 3. 내부 IP MTU 1,450 B를 업무 payload 1,450 B로 사용해도 되는가? **내부 전송·IP 헤더 크기를 추가로 고려해야 한다.**
+4. RFC 8899는 모든 TCP의 MTU 탐색 규약인가? **datagram용 DPLPMTUD이며 적용 전송과 구현을 확인해야 한다.**
 
 관련: [주소와 DNS](addressing-routing-dns.md), [인터페이스·흐름 지표](network-metrics.md), [Kubernetes 네트워크](../kubernetes/network-and-storage.md)

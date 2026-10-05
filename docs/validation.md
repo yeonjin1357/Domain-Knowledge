@@ -1,8 +1,52 @@
 # 제1.1판 검증 기록
 
-검증 기준일은 **2026-10-04**입니다. 공식 원천의 의미 검토, 자동 문서 검사, 실제 실행, 화면 확인의 범위를 나누어 기록합니다. 사용자 제품이나 운영 환경 전체의 지원 인증을 뜻하지 않습니다.
+판 기준일은 **2026-10-04**로 유지합니다. 2b 원고 보강과 2d 결과 반영·검사는 **2026-10-05**, 기존 실행·화면 기록은 각 기록의 날짜를 따릅니다. 공식 원천의 의미 검토, 자동 문서 검사, 실제 실행, 화면 확인의 범위를 나누어 기록합니다. 사용자 제품이나 운영 환경 전체의 지원 인증을 뜻하지 않습니다.
 
-## 문서·계산·화면 검사
+## 2d 결과 출판과 재검사
+
+Claude가 WSL Ubuntu 24.04·Linux 6.18.33.2·Python 3.12.3에서 실행한 네 최종 JSON을 byte 단위로 복사했습니다. 입력 hash와 원시 응답·로그·지표·SQL 결과를 대조했으며, 과거 1.1 실행 결과는 덮어쓰지 않았습니다. [출판·입력 연결](../review/evidence-provenance.json), [항목별 사실 판정](../review/claude-codex-r2.md)
+
+| 실행 근거 | 판정 | 확인한 범위 |
+| --- | --- | --- |
+| [Kubernetes 1.34.1·1.37.0](../labs/results/1.1-r2-kubernetes.json) | supported 14·refuted 2 | 각 버전 cache true/false. cache-on Exact RV=1 LIST의 200·빈 목록 때문에 410 가설 2개 반증; 최신 patch·gate 인과는 미검증 |
+| [Collector 0.162.0](../labs/results/1.1-r2-otel.json) | supported 14 | 내부 로그의 부분 거절, 재시도 소진 뒤 send_failed 증가, 메모리 queue의 upstream 수락 경계, exporter 이름 두 개의 구성 수용 |
+| [PostgreSQL 18.6](../labs/results/1.1-r2-postgresql.json) | supported 4 | prepared transaction·logical catalog_xmin·slot 없는 standby feedback·단절 뒤 physical slot xmin의 회수 지연과 해제 |
+| [promtool 3.13.4·3.15.0](../labs/results/1.1-r2-prometheus.json) | supported 2 | 각 버전에서 기존 규칙·합성 테스트 평가; 서버의 exemplar·WAL 기능 실행 아님 |
+
+36개 판정 중 지지 34개·반증 2개입니다. `supported`는 실행기의 좁은 가설이 관측과 부합했다는 뜻이며 보편적 지원 인증이 아닙니다. 2d의 Codex 작업은 저장 근거 검사와 원천 대조이며 이 샌드박스에서 Linux 서버를 재실행하지 않았습니다.
+
+| 검사 | 2d 확인 범위 |
+| --- | --- |
+| `check_docs` | 상세 97장의 UTF-8·구조·로컬 링크·목차·검토 hash |
+| `verify_examples` | 57개 원문의 산술·해석 170개; Ceph EC 4+2의 기본 min_size=5 예시 추가 |
+| `verify_contracts` | 기존 어댑터 경계 22개·원문 연결 계산 28개·보존 실습 hash |
+| `verify_revision` | 기존 31개 시나리오·12개 계산·Linux 시계 추가 근거에 새 36개 출판 판정의 hash·핵심 값 검사 추가 |
+| `verify_review_r2 --published` | 네 최종 결과의 입력·실행기·파일 hash, cache/queue/회수 경계 값과 판정 수; 도구 설치나 서버 실행 없음 |
+| `verify_lab_r2_cleanup` | 저장소 안의 합성 fixture로 resolve/chmod/mode·삭제·로그·프로세스 종료 실패의 여섯 경로 검사 |
+| 통합본 | 원문 119개에서 BOOK.md·BOOK.html 재생성, 두 `--check`로 생성 일치 검사 |
+
+PostgreSQL의 성공한 실행은 DrvFs 권한 제약 때문에 Linux native tempdir의 **전용 0700 디렉터리**를 사용했고 결과에 삭제 완료를 기록했습니다. 이 실행 당시 [공통 모듈](../labs/archive/lab_r2_common_2026_10_05.py)을 보존한 뒤 실패 경로를 보완했습니다. 수정 helper의 Linux native 성공 경로 smoke와 이번 BOOK.html의 **화면 검사**는 Claude에게 넘깁니다. 자동 생성 일치 검사가 화면 검사를 대신하지 않습니다. [재현 명령·정리 범위](cross-domain/reproducible-labs.md)
+
+새 문서의 SQL 예시·PDH·cloud·SNMP·kubelet workload·runtime 계측 전체를 실행한 것은 아닙니다. 2c의 버전 소스·명세를 개별 확인했지만 전체 외부 URL 상태 파일을 전수 재조회하지 않았습니다. 중간 실패·입력 hash 불일치 실행은 존재 이력만 남기고 출판에서 제외했습니다.
+
+## 2b 원고 보강의 검사 범위
+
+새 5장을 포함한 상세 97장을 목차·학습 안내·용어집·지표 참조표에 연결했습니다. G1–G12의 원천 확인·자체 수정·채택하지 않은 해석은 [2라운드 기록](../review/claude-codex-r2.md), 변경·추가 상세 21장의 검토 초점과 본문 hash는 [장별 기록](../review/chapter-review.json)에 있습니다.
+
+| 검사 | 2026-10-05 확인 범위 |
+| --- | --- |
+| `check_docs` | Markdown 121개, 상세 97장, UTF-8·구조·로컬 링크·목차·장별 hash |
+| `verify_examples` | 57개 원문의 산술·해석 169개; 이번 23개 추가 중 20개는 본문 결과 문자열도 대조 |
+| `verify_contracts` | 기존 어댑터 경계 22개·원문 연결 계산 28개·보존 실습 hash |
+| `verify_revision` | 기존 31개 시나리오·입력 hash·계산 12개, Linux 시계 추가 근거 4구간·idle 61표본 |
+| 통합본 | 원문 119개에서 BOOK.md·BOOK.html 재생성; 두 `--check`로 생성 일치 검사 |
+| Kubernetes 준비 | 1.34.1·1.37.0 전용 manifest·16개 조건 계획·receipt·binary hash·ELF 형식 확인; Linux 서버 실행 없음 |
+
+위 표는 **2b 당시 기록**입니다. 당시 새 실습 결과는 출판하지 않았습니다. 새 SQL·PDH·cloud·SNMP·kubelet workload·runtime 계측 명령도 실행하지 않았고, HTML 화면 검사를 다시 하지 않았습니다. 기존 HTML 화면 기록의 hash는 이전 파일에 해당하므로 이번 생성본의 표시 검증을 대신하지 않습니다. 새 외부 링크는 관련 사실을 직접 열람했지만 전체 URL 상태 파일을 갱신한 전수 재조회는 하지 않았습니다.
+
+공통 2a 실습 입력을 보존하기 위해 Kubernetes 전용 manifest를 분리했습니다. `.lab-runs/` 임시 fixture를 쓰는 `verify_review_r2.py`는 2b의 Codex 턴에 실행하지 않았으며 Claude의 결과 검증 명령으로 넘겼습니다. 2d에서 추가한 `--published`는 위 출판 파일을 읽기 전용으로 검사합니다. 준비와 결과 반영의 이력은 [Kubernetes 계획](../review/claude-codex-r2.md)에 있습니다.
+
+## 1라운드 당시 문서·계산·화면 검사
 
 | 검사 | 확인 결과 | 확인하지 않는 것 |
 | --- | --- | --- |
@@ -60,7 +104,7 @@ Kubernetes 실험은 API server·etcd만 띄웠습니다. 실제 업무 Pod·kub
 
 ## 실행하지 않은 범위
 
-물리 Linux 장비 전체와 모든 procfs 필드, cgroup 제한·OOM·eviction, Kubernetes 1.35 이상 서버·업무 workload·CNI·CSI, MySQL·SQL Server·Oracle 서버 질의, JVM·.NET 등 runtime agent 전수, 실제 DNS·TLS·HTTP/2, 상용 SNMP 장비, cloud 계정·비용 API, 분산 장애 전환·전원 장애·복구는 실행하지 않았습니다. 본문에서는 연결한 공식 원천의 적용 범위로 설명하며 해당 환경을 검증했다고 표시하지 않습니다.
+물리 Linux 장비 전체와 모든 procfs 필드, cgroup 제한·OOM·eviction, Kubernetes 최신 patch·1.35/1.36 서버·업무 workload·CNI·CSI, MySQL·SQL Server·Oracle 서버 질의, JVM·.NET 등 runtime agent 전수, 실제 DNS·TLS·HTTP/2, 상용 SNMP 장비, cloud 계정·비용 API, 분산 장애 전환·전원 장애·복구는 실행하지 않았습니다. 본문에서는 연결한 공식 원천의 적용 범위로 설명하며 해당 환경을 검증했다고 표시하지 않습니다.
 
 ## 문서 검사 재현
 
@@ -84,7 +128,7 @@ python scripts/check_html.py
 
 ## Linux 실습 재현
 
-이번 교차 검토의 Linux CPU 진단은 Claude가 아래 첫 두 명령으로 실행·검증한 결과를 전달했고, 출판 경로에 보존한 뒤 다시 검사했습니다. 아래 명령은 후속 재현 방법이며, 나머지 서버 실험을 이번 1b에 재실행했다는 뜻은 아닙니다. 최신 버전 재실행은 2라운드 계획에 둡니다.
+1b의 Linux CPU 진단은 Claude가 아래 첫 두 명령으로 실행·검증한 결과를 전달했고, 출판 경로에 보존한 뒤 다시 검사했습니다. 아래는 과거 고정 버전의 후속 재현 방법입니다. 2d에서 출판한 별도 서버 실행의 명령·입력은 [2라운드 실습](cross-domain/reproducible-labs.md)에 있습니다.
 
 WSL을 포함한 Ubuntu 24.04 amd64의 일반 사용자로 **이 저장소의 Linux 경로**에서 실행합니다. Python 3, OpenSSL, dpkg-deb와 실행 파일의 공유 라이브러리가 필요합니다. PostgreSQL 도구는 Ubuntu 24.04 패키지의 의존성을 전제로 하므로 다른 배포판의 범용 설치기로 취급하지 않습니다. 다운로드 목록과 SHA256은 [PostgreSQL 패키지](../labs/postgresql/packages.json), [runtime archive](../labs/runtime-assets.json)에 고정했습니다.
 

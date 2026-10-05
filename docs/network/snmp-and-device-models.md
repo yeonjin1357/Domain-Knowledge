@@ -1,6 +1,6 @@
 # 네트워크 장비 수집: SNMP, MIB와 인터페이스 수명
 
-> 상태: 검토됨 · 적용 범위: SNMPv3·IF-MIB·SNMPv2-MIB 표준, 수집기 설계 · 검토일: 2026-10-04 · 실제 장비 질의는 실행하지 않음
+> 상태: 검토됨 · 적용 범위: SNMPv3·IF-MIB·SNMPv2-MIB 표준, 수집기 설계 · 검토일: 2026-10-04 · 실제 장비 질의는 실행하지 않음 · 2라운드 보강 확인: 2026-10-05 (SNMPv1/v2c/v3 Counter64)
 
 SNMP는 장비의 관리 정보를 질의하는 프로토콜이고, MIB는 그 정보의 이름·타입·의미를 정의한 모음입니다. OID는 그 정의를 계층적인 숫자 주소로 식별합니다. 장비 이름이 같다고 모든 제조사의 CPU 지표가 같은 OID에 있는 것은 아닙니다. 표준 MIB와 제조사별 확장을 구분해야 합니다.
 
@@ -32,6 +32,24 @@ SNMP는 장비의 관리 정보를 질의하는 프로토콜이고, MIB는 그 �
 
 32bit Counter를 사용할 때는 수집 사이 여러 번 순환하면 단순 차분으로 복원할 수 없습니다. 1Gbit/s가 계속 흐른다는 단순 가정에서 32bit octet 카운터는 약 34.36초 만에 한 바퀴 돕니다. Counter64 지원 여부를 확인하고 32bit fallback에서는 가능한 최대 증가량과 수집 간격을 함께 다룹니다.
 
+## Counter64는 SNMPv3만의 기능이 아니다
+
+SNMPv1은 Counter64를 표현하지 못합니다. RFC 3584 §4.2.2.1은 여러 SNMP 버전을 지원하는 responder가 **v1 메시지를 받은 경우**를 규정합니다. Counter64 객체의 GET에는 `noSuchName`을 반환하고, GETNEXT에서는 그 객체를 건너뜁니다. 따라서 v1 walk가 진행돼도 `ifHC*`가 빠질 수 있으며 이를 장비 자체의 고용량 카운터 미지원으로 확정하지 않습니다. SNMPv2c와 v3에서는 Counter64를 사용할 수 있지만 실제 MIB 구현·접근 권한도 확인해야 합니다. 암호화·인증과 카운터 폭은 별개입니다. [공존 규칙](https://www.rfc-editor.org/rfc/rfc3584.html#section-4.2.2.1)
+
+RFC 2863 §3.1.6의 속도별 카운터 요구 설명은 다음과 같습니다. 여기서 octet은 byte 단위이며 packet 카운터와 구분됩니다. [IF-MIB 고용량 카운터](https://www.rfc-editor.org/rfc/rfc2863.html#section-3.1.6)
+
+| 인터페이스 속도 | §3.1.6이 요구하는 카운터 |
+| --- | --- |
+| 20,000,000 bit/s 이하 | 32bit octet·packet |
+| 20,000,000 초과, 650,000,000 bit/s 미만 | 64bit octet·32bit packet |
+| 650,000,000 bit/s 이상 | 64bit octet·packet |
+
+단, 같은 RFC 뒤의 MIB conformance group 문구는 packet 카운터의 경계를 `greater than 650,000,000`으로 표현합니다. **정확히 650 Mbit/s인 장비의 구현 의무를 이 요약 표만으로 판정하지 않습니다.** 어댑터는 실제 지원 OID와 Counter64 반환 타입을 확인하고 미지원은 명시합니다. 64bit 카운터를 지원하더라도 불연속 시각·재시작 검사는 필요합니다.
+
+`ifSpeed`는 bit/s 단위의 Gauge32이며 표현 범위를 넘으면 최대값 `4,294,967,295`를 보고합니다. 고속 인터페이스에서는 `ifHighSpeed`의 1,000,000 bit/s 단위 속도 추정값을 사용합니다. 포화된 ifSpeed를 실제 링크 속도로 사용하면 이용률 분모가 작아집니다. [ifSpeed·ifHighSpeed 정의](https://www.rfc-editor.org/rfc/rfc2863.html)
+
+장비 조회는 이 장에서 실행하지 않았습니다. 실제 수집에는 읽기용 SNMP view·자격 증명·관리 경로가 필요하며, 대규모 walk는 장비 CPU와 관리 대역폭을 사용합니다. 지원 확인을 위해 설정을 변경하는 SET을 자동 실행하지 않는 수집 계약을 제안합니다.
+
 ## 조회와 알림은 서로 보완한다
 
 GET은 지정한 객체를 읽고, GETNEXT·GETBULK는 테이블을 순회하는 데 사용합니다. GETBULK의 반복 수를 크게 하면 패킷 크기·장비 부하·응답 절단이 문제가 될 수 있습니다. 마지막 응답의 일부 행만으로 전체 인터페이스가 삭제되었다고 처리하지 않고, walk 완료 상태를 기록합니다. [SNMP 프로토콜 연산 RFC 3416](https://www.rfc-editor.org/rfc/rfc3416.html)
@@ -51,5 +69,7 @@ SNMPv3에서는 보안 모델과 인증·프라이버시 수준을 명시합니�
 1. sysUpTime 감소는 항상 호스트 재부팅인가? **관리 프로세스 초기화나 wrap 등을 구분해야 합니다.**
 2. ifIndex=7은 모든 장비의 같은 포트인가? **장비와 관리 범위가 필요한 지역 식별자입니다.**
 3. SNMP 응답 timeout이면 포트가 down인가? **관리 경로·자격 증명·부하를 먼저 구분합니다.**
+4. Counter64를 읽으려면 반드시 SNMPv3이어야 하는가? **v2c도 표현할 수 있고, 장비 구현·권한은 따로 확인합니다.**
+5. 포화된 ifSpeed를 분모로 삼아도 되는가? **ifHighSpeed 등 올바른 속도 근거를 확인해야 합니다.**
 
 관련: [네트워크 지표](network-metrics.md) · [수집 계약](../product/adapter-contracts.md)

@@ -7,6 +7,34 @@
       "archived_path": "labs/archive/run_linux_lab_1_1.py",
       "sha256": "aaa96961e9be62b9e749c41338cd02435b0d1c1233a22d135958553961dab861",
       "reason": "Round 1 A1: historical CPU/accounting agreement did not validate elapsed-time calibration; corrected runner adds RAW, read-only adjtimex and thread-count observations."
+    },
+    {
+      "evidence": "labs/results/1.1-r2-kubernetes.json",
+      "original_path": "scripts/lab_r2_common.py",
+      "archived_path": "labs/archive/lab_r2_common_2026_10_05.py",
+      "sha256": "260f654988729f0119f17e50a6c9b8fe2cf89f7edf697170ffe45338e8af8518",
+      "reason": "Round 2d: preserve successfully executed helper before correcting native-directory registration and cleanup failure reporting. Recorded observations are unchanged."
+    },
+    {
+      "evidence": "labs/results/1.1-r2-prometheus.json",
+      "original_path": "scripts/lab_r2_common.py",
+      "archived_path": "labs/archive/lab_r2_common_2026_10_05.py",
+      "sha256": "260f654988729f0119f17e50a6c9b8fe2cf89f7edf697170ffe45338e8af8518",
+      "reason": "Round 2d: preserve successfully executed helper before correcting native-directory registration and cleanup failure reporting. Recorded observations are unchanged."
+    },
+    {
+      "evidence": "labs/results/1.1-r2-otel.json",
+      "original_path": "scripts/lab_r2_common.py",
+      "archived_path": "labs/archive/lab_r2_common_2026_10_05.py",
+      "sha256": "260f654988729f0119f17e50a6c9b8fe2cf89f7edf697170ffe45338e8af8518",
+      "reason": "Round 2d: preserve successfully executed helper before correcting native-directory registration and cleanup failure reporting. Recorded observations are unchanged."
+    },
+    {
+      "evidence": "labs/results/1.1-r2-postgresql.json",
+      "original_path": "scripts/lab_r2_common.py",
+      "archived_path": "labs/archive/lab_r2_common_2026_10_05.py",
+      "sha256": "260f654988729f0119f17e50a6c9b8fe2cf89f7edf697170ffe45338e8af8518",
+      "reason": "Round 2d: preserve successfully executed helper before correcting native-directory registration and cleanup failure reporting. Recorded observations are unchanged."
     }
   ],
   "published": [
@@ -23,6 +51,67 @@
       "scope": "3 busy intervals, 1 sleep interval, 61 idle clock/adjtimex samples. CPU clock observation is not external clock calibration.",
       "historical_evidence_preserved": "labs/results/1.1-linux.json",
       "validator": "scripts/verify_review_r1.py; also called by scripts/verify_revision.py"
+    },
+    {
+      "id": "kubernetes-r2",
+      "evidence": "labs/results/1.1-r2-kubernetes.json",
+      "sha256": "f97eb0a3b048f1b023aca532e72d62118c5e67b971b97feeeb35af12ab445341",
+      "runner": "scripts/run_kubernetes_r2_lab.py",
+      "runner_sha256": "cd4d3c23bdae50df2f34ba050b1cfd8869d79f5e9fd4264221516928bd775194",
+      "run_at_utc": "2026-10-05T12:49:24.158852+00:00",
+      "execution_attribution": "Claude executed the repository runner on WSL Ubuntu 24.04 and supplied the final output for user-approved round 2d; Codex checked the saved inputs and observations.",
+      "publication_method": "Byte-identical copy from .lab-runs/r2/kubernetes.json; raw values, status and verdicts unchanged.",
+      "scope": "local synthetic lab; no production, cloud or external clock calibration",
+      "verdict_counts": {
+        "refuted": 2,
+        "supported": 14
+      },
+      "validator": "scripts/verify_review_r2.py --published; also called by scripts/verify_revision.py"
+    },
+    {
+      "id": "prometheus-r2",
+      "evidence": "labs/results/1.1-r2-prometheus.json",
+      "sha256": "424ee8a03016848ef16f2f6ec061357f11912055b7466116f02bb4dd9d03ce06",
+      "runner": "scripts/run_prometheus_r2_lab.py",
+      "runner_sha256": "dcc9dec4ffa10a24d4f29d1101ea7f5f7422df1715738f590279f650cf1edc23",
+      "run_at_utc": "2026-10-05T12:49:50.481560+00:00",
+      "execution_attribution": "Claude executed the repository runner on WSL Ubuntu 24.04 and supplied the final output for user-approved round 2d; Codex checked the saved inputs and observations.",
+      "publication_method": "Byte-identical copy from .lab-runs/r2/prometheus-3.json; raw values, status and verdicts unchanged.",
+      "scope": "local synthetic lab; no production, cloud or external clock calibration",
+      "verdict_counts": {
+        "supported": 2
+      },
+      "validator": "scripts/verify_review_r2.py --published; also called by scripts/verify_revision.py"
+    },
+    {
+      "id": "otel-r2",
+      "evidence": "labs/results/1.1-r2-otel.json",
+      "sha256": "0f451a5e25da770c27ca812aaeaa3974fde9f84217bdc32b03dd6cf99717d64f",
+      "runner": "scripts/run_otel_r2_lab.py",
+      "runner_sha256": "3a648e65da2866c5556b70141a7b811f5321ec8486a99b8c811f0fd439173738",
+      "run_at_utc": "2026-10-05T12:49:53.939534+00:00",
+      "execution_attribution": "Claude executed the repository runner on WSL Ubuntu 24.04 and supplied the final output for user-approved round 2d; Codex checked the saved inputs and observations.",
+      "publication_method": "Byte-identical copy from .lab-runs/r2/otel-3.json; raw values, status and verdicts unchanged.",
+      "scope": "local synthetic lab; no production, cloud or external clock calibration",
+      "verdict_counts": {
+        "supported": 14
+      },
+      "validator": "scripts/verify_review_r2.py --published; also called by scripts/verify_revision.py"
+    },
+    {
+      "id": "postgresql-r2",
+      "evidence": "labs/results/1.1-r2-postgresql.json",
+      "sha256": "3409ea201ab70cc27ee895a1d531f2cb38937d613eef87743003f39c4cf06873",
+      "runner": "scripts/run_postgres_r2_lab.py",
+      "runner_sha256": "3396f70c1f39a87def48d5b2b215b3f9cb5c4ec7a4332008b53c40f548d372ff",
+      "run_at_utc": "2026-10-05T12:50:32.838920+00:00",
+      "execution_attribution": "Claude executed the repository runner on WSL Ubuntu 24.04 and supplied the final output for user-approved round 2d; Codex checked the saved inputs and observations.",
+      "publication_method": "Byte-identical copy from .lab-runs/r2/postgresql-3.json; raw values, status and verdicts unchanged.",
+      "scope": "local synthetic lab; no production, cloud or external clock calibration",
+      "verdict_counts": {
+        "supported": 4
+      },
+      "validator": "scripts/verify_review_r2.py --published; also called by scripts/verify_revision.py"
     }
   ]
 }

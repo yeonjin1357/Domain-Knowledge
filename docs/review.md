@@ -2,6 +2,16 @@
 
 2026-10-04에 작성·자체 검토·공식 원천 대조·실제 실행을 반복한 보강판입니다. 제1.0판의 80장에서 **92장**으로 확장했습니다. 이번 검토는 작성자의 자체 검토이며 외부 전문가 감수를 의미하지 않습니다. 실행 환경과 자동 검사 결과는 [검증 기록](validation.md)에 있습니다.
 
+## Claude–Codex 교차 검토 2차: 원고 보강과 실행 근거
+
+2026-10-05에는 위 92장에 5장을 추가해 상세 97장으로 보강했습니다. G1–G5 필수 주제와 G6–G12를 공식 문서·명세·버전 소스에 대조했고, 2d에서는 Claude가 전달한 네 최종 실행 결과를 출판했습니다. 주제별 원천·위치·채택하지 않은 단서와 이유, 2c 지적 29개와 추가 단서의 판정은 [2라운드 기록](../review/claude-codex-r2.md)에 있습니다. 과거 1.1 실행 결과·hash와 판 번호·판 기준일은 유지합니다.
+
+Windows Task Manager의 CPU를 모든 빌드에서 Utility로 단정하지 않고, EC2 basic의 상태 검사 1분 예외, datagram용 RFC 8899의 범위, SNMP RFC 내 650 Mbit/s 경계 표현 차이를 명시했습니다. 새 예시 산술을 기존 검사에 연결했으며 저장 근거 검사와 실제 서버 재실행을 계속 구분합니다.
+
+2c 대조에서는 PostgreSQL 12의 `total_time`이 이미 실행 시간이었다는 오류를 바로잡아 13의 `total_exec_time`과 의미를 연결했습니다. Linux PassiveOpens의 실제 증가 위치, CLOSE-WAIT 수정 포함 여부, UDP MemErrors, Kubernetes Burstable의 하한 3과 Pod-level QoS, OOM의 현재·이전 종료 상태를 보강했습니다. exemplar의 메모리 조회 창과 WAL 보존을 구분하고, Lambda suppressed init의 REPORT 관측을 CloudWatch 지표로 무리하게 확장하지 않았습니다.
+
+새 실행 36개 판정은 지지 34개·반증 2개입니다. Collector 0.162.0에서는 재시도 진행 중 유지되던 send_failed 값이 소진 뒤 증가했고, queue 활성화 시 upstream 수락이 목적지 해제보다 앞섰습니다. PostgreSQL 18.6에서는 네 회수 기준점의 유지·해제를 관측했으며 회수 성공을 freeze 전진으로 해석하지 않았습니다. [실습 원시 결과·한계](cross-domain/reproducible-labs.md)
+
 ## Claude–Codex 교차 검토 1차
 
 동일한 제1.1판에 A·B·C 정정을 반영했습니다. [항목별 판정과 직접 확인한 원천](../review/claude-codex-r1.md)에 수용 범위, 다른 수정 방식을 택한 이유, 1b에서 이어 받은 Linux 재실행 근거를 기록했습니다. AI 간 교차 검토이며 외부 전문가 인증은 아닙니다. 판 번호와 기준일, 과거 실행 원시 결과는 유지했습니다. 최신 버전으로 실행하지 않은 항목은 [버전 상태 표](coverage.md#교차-검토-시점의-버전-상태)에서 구분합니다.
@@ -52,7 +62,7 @@
 
 **Linux CPU 계정과 시계:** 최초 표본의 약 1.06은 MONOTONIC 분모를 사용한 관측입니다. 원시 기록과 원래 실행기를 보존하고 현재 실행기에 RAW·읽기 전용 adjtimex·스레드 수·품질 표시를 추가했습니다. Claude가 같은 WSL 환경에서 재실행한 [새 JSON](../labs/results/1.1-linux-clock-r1.json)을 그대로 보존하고 Codex가 실행기 hash와 계산을 확인했습니다. busy 3개 구간의 프로세스 CPU clock/RAW는 약 0.99992–0.99995, MONOTONIC/RAW는 약 0.937이었으며 sleep·idle에서도 시계 속도 차이가 나타났습니다. adjtimex 조정값과도 부합하므로 이 재실행의 CPU/MONOTONIC > 1은 분모 시계의 주파수 조정으로 설명됩니다. 원래 표본에는 RAW·tick이 없어 같은 원인을 소급 확정하지 않으며, 조정 주체와 RAW의 외부 정확도도 확인하지 않았습니다. 기존 두 CPU 계정의 일치 검사는 경과 시간의 정확도를 검증하지 못한다는 정정을 유지합니다. [관측값과 한계](host/linux-observation-lab.md)에 idle 61개 표본의 비율·tick·freq 재계산과 표본 평균의 한계를 함께 적었습니다.
 
-**Kubernetes 과거 버전 조회:** 저장된 7개 시나리오는 모두 `--watch-cache=false` 조건입니다. 410 사례에는 전용 etcd의 physical compaction도 사용했습니다. 이전 원고에 적었던 “예비 시도에서 200”은 원시 증거가 보존되지 않아 검증된 결과에서 제외했습니다. `ListFromCacheSnapshot` 등 특정 기능을 그 원인으로 단정하지 않습니다. selector 이탈의 DELETED는 1.34.1의 etcd watcher와 cache watcher 코드 모두에서 확인했지만, cache를 켠 실행 증거는 이번 기록에 없습니다.
+**Kubernetes 과거 버전 조회:** 기존 7개 시나리오는 모두 `--watch-cache=false`였고, 당시 보존하지 않은 “예비 시도 200”은 계속 근거에서 제외합니다. 별도로 보존한 2d의 1.34.1·1.37.0 실행에서는 cache를 켜면 compaction 뒤 Exact RV=1 LIST가 200·빈 목록으로, 끄면 410으로 반환됐습니다. 따라서 compaction만으로 반드시 410을 얻는다는 가설은 두 cache-on 구성에서 반증됐습니다. `ListFromCacheSnapshot` 활성 상태는 기록했지만 gate를 분리 변경하지 않아 인과는 확정하지 않습니다. 빈 RV=1 목록과 새 etcd의 초기 상태가 부합한다는 것은 코드·실행 순서에 근거한 추론입니다. 네 구성의 selector 이탈도 DELETED 뒤 GET 200·동일 UID로 확인했습니다. [새 증거와 해석](kubernetes/inventory-consistency.md)
 
 ## 읽기 쉽게 바꾼 부분
 

@@ -1,6 +1,6 @@
 # 관리형 서비스와 서버리스 관측
 
-> 상태: 검토됨 · 적용 범위: 관리형 관측 모델, AWS Lambda·Google Cloud Run 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: 관리형 관측 모델, AWS Lambda·Google Cloud Run 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (Lambda INIT·Errors 시각)
 
 ## 먼저 이해할 것
 
@@ -26,6 +26,18 @@ Lambda Invocations는 함수 코드가 호출된 횟수이며 throttled 요청 �
 ```
 
 둘 중 하나만 보면 다른 실패를 놓칠 수 있습니다. 실제 전체 요청의 결과를 합칠 때는 재시도·중복·다른 오류 유형도 확인합니다.
+
+## 초기화 시간, 과금 시간과 오류 시각
+
+Lambda 초기화의 관측 출처를 먼저 구분합니다. cold start의 `Init Duration`은 REPORT 로그에서 확인할 수 있으며, Telemetry API의 `platform.initReport`는 초기화 보고 이벤트와 `metrics.durationMs`를 제공합니다. invoke 실패 뒤 suppressed init은 CloudWatch Logs에 추가 INIT 단계로 명시되지 않으면서 **REPORT의 Duration에 INIT+INVOKE 시간이 포함**될 수 있습니다. Telemetry API의 `phase=invoke` 초기화 이벤트로 구분할 수 있으므로 “Init Duration 필드가 없으면 초기화가 없었다”고 결론 내리지 않습니다. [실행 환경 수명과 suppressed init](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html), [Telemetry API 이벤트 스키마](https://docs.aws.amazon.com/lambda/latest/dg/telemetry-schema-reference.html)
+
+기본 on-demand Init의 10초 제한을 넘으면 첫 호출 시 함수 timeout 범위에서 Init을 다시 시도하는 경로도 있습니다. 이는 invoke 실패 뒤 suppressed init과 구분합니다. REPORT 로그에서 확인한 시간 포함 관계를 CloudWatch `Duration` 지표에도 그대로 적용하지 않습니다. 공식 지표 설명은 cold start 제외를 명시하지만 suppressed init과의 세부 대응은 이 장에서 실측하지 않았습니다. [Init 실패·재시도](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html), [Duration 지표 정의](https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics-types.html)
+
+2025-08-01부터 managed runtime·ZIP·on-demand 함수의 INIT 단계도 과금 대상이 되었습니다. 다른 실행·배포 방식에서는 이미 적용되던 과금과 구분해야 합니다. **과금 규칙의 변경은 CloudWatch `Duration` 지표에 cold start가 포함된다는 뜻이 아닙니다.** 원천 지표, 로그의 Duration·Init Duration·Billed Duration을 각각의 정의로 읽습니다. [AWS INIT 과금 변경 공지](https://aws.amazon.com/blogs/compute/aws-lambda-standardizes-billing-for-init-phase/)
+
+표준 Lambda `Errors`의 timestamp는 오류가 발생하거나 실행이 끝난 시각이 아니라 **호출이 시작된 시각**입니다. 오래 실행된 호출의 실패가 앞 구간의 지표를 늦게 바꿀 수 있습니다. 제품은 로그·trace의 실제 오류 시각과 지표의 귀속 구간을 구분하고 [재조회 정책](late-data-and-reconciliation.md)으로 연결하도록 제안합니다. [Lambda 지표 유형](https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics-types.html)
+
+이 내용은 문서 대조이며 함수 호출·배포·설정 변경을 실행하지 않았습니다. Telemetry API는 실행 환경의 extension이 구독하는 경로입니다. 원격 지표 API 조회와 같지 않으며 extension의 처리·메모리 비용도 설계에 포함합니다. [Telemetry API](https://docs.aws.amazon.com/lambda/latest/dg/telemetry-api.html)
 
 ## 동시성과 확장
 
@@ -54,5 +66,7 @@ Cloud Run 요청 timeout은 응답 기한을 넘기면 연결을 닫고 504를 �
 1. Errors/Invocations가 모든 진입 요청의 실패율인가? **throttle 등 빠지는 범주가 있습니다.**
 2. Lambda Duration에 cold start가 포함되는가? **해당 지표의 정의에서는 포함하지 않습니다.**
 3. Cloud Run 504면 코드 실행도 종료됐는가? **그렇다고 보장되지 않습니다.**
+4. Errors의 표본 시각은 에러 로그가 기록된 시각인가? **표준 Lambda Errors는 호출 시작 시각에 귀속됩니다.**
+5. INIT 과금이 시작되면 Duration 지표도 자동으로 같은 시간이 되는가? **과금·지표·로그의 계약을 각각 확인해야 합니다.**
 
 다음: [클라우드 네트워크](networking.md) · [클라우드 목차](README.md)

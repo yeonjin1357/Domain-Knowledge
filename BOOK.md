@@ -2,7 +2,7 @@
 
 # 통합 모니터링 도메인 지식서
 
-> 제1.1판 · 기준일: 2026-10-04 · 상세 본문 92장
+> 제1.1판 · 기준일: 2026-10-04 · 상세 본문 97장
 
 통합 모니터링 제품을 설계·구현하는 개발자를 위한 지식서입니다. 공식 자료로 확인한 설명, 가상 계산, 설계 제안을 구분합니다.
 
@@ -17,6 +17,7 @@
   - [모니터링 공통 개념](#chapter-docs-foundations-readme)
   - [처음 읽는 시스템 지도: 요청 하나가 지나가는 길](#chapter-docs-foundations-system-map)
   - [시계열과 지표의 데이터 모델](#chapter-docs-foundations-time-series)
+  - [지표에 남겨야 할 문맥: exemplar와 카운터 시작 시각](#chapter-docs-foundations-metric-context-and-start-time)
   - [평균과 백분위수 및 분포의 집계](#chapter-docs-foundations-distributions)
   - [성능을 읽는 순서: 처리량, 대기열, 표본과 실험](#chapter-docs-foundations-performance-and-statistics)
   - [서비스 수준 지표와 오류 예산](#chapter-docs-foundations-service-level-objectives)
@@ -43,6 +44,7 @@
   - [TLS, HTTP와 요청 단계별 시간](#chapter-docs-network-tls-http)
   - [이름 조회에서 응답 본문까지: DNS, 연결 재사용과 실패 위치](#chapter-docs-network-dns-and-connection-lifecycle)
   - [인터페이스, 장비, 흐름과 능동 검사](#chapter-docs-network-network-metrics)
+  - [Linux 네트워크 스택 카운터 읽기](#chapter-docs-network-linux-stack-counters)
   - [링크, 오버레이, MTU와 경로 제어](#chapter-docs-network-layers-and-routing)
   - [네트워크 장비 수집: SNMP, MIB와 인터페이스 수명](#chapter-docs-network-snmp-and-device-models)
   - [경로 수렴과 QoS: 연결은 살아 있는데 통신이 느린 이유](#chapter-docs-network-routing-convergence-and-qos)
@@ -64,6 +66,7 @@
   - [Kubernetes 객체와 제어 루프](#chapter-docs-kubernetes-objects-and-control-loops)
   - [Pod 수명, 컨테이너 상태와 건강 검사](#chapter-docs-kubernetes-pod-lifecycle)
   - [자원 요청, 제한, 배치와 확장](#chapter-docs-kubernetes-resources-and-scheduling)
+  - [Kubernetes 자원 압박과 종료 원인](#chapter-docs-kubernetes-pressure-and-termination)
   - [Kubernetes 수집 경로와 데이터의 의미](#chapter-docs-kubernetes-collection)
   - [Kubernetes 인벤토리의 정확성: 목록, watch와 삭제의 의미](#chapter-docs-kubernetes-inventory-consistency)
   - [Kubernetes 네트워크와 저장소의 연결 관계](#chapter-docs-kubernetes-network-and-storage)
@@ -76,6 +79,7 @@
   - [웹 서버와 연결 풀: 요청이 기다리는 여러 장소](#chapter-docs-application-servers-and-pools)
   - [시간 제한, 취소, 재시도와 과부하](#chapter-docs-application-timeouts-and-retries)
   - [JVM과 .NET: 메모리, GC, 실행 자원](#chapter-docs-application-managed-runtimes)
+  - [OpenTelemetry 이름·단위·안정성으로 의미 연결하기](#chapter-docs-application-semantic-conventions)
   - [Go, Node.js, Python의 동시성과 관측](#chapter-docs-application-async-runtimes)
   - [브라우저, 실제 사용자 관측과 합성 검사](#chapter-docs-application-user-experience)
   - [계측을 넣는 위치: 자동 계측, 수동 span, eBPF와 프로파일](#chapter-docs-application-instrumentation-and-profiling)
@@ -85,6 +89,7 @@
   - [트랜잭션, 격리, MVCC와 잠금](#chapter-docs-database-transactions-and-locks)
   - [쿼리, 인덱스, 실행 계획과 비용](#chapter-docs-database-queries-and-indexes)
   - [PostgreSQL 관측: 활동, 누적 통계와 정리 작업](#chapter-docs-database-postgresql)
+  - [PostgreSQL 운영 관측: 오래된 ID, 회수 기준점, 통계 호환성](#chapter-docs-database-postgresql-operations)
   - [MySQL과 MariaDB 관측](#chapter-docs-database-mysql-mariadb)
   - [SQL Server와 Oracle: 대기와 실행 통계](#chapter-docs-database-sqlserver-oracle)
   - [로그, 지속성, 복제와 복구](#chapter-docs-database-replication-and-recovery)
@@ -192,6 +197,23 @@
 | 대상·관계 설계 | 프로세스·Pod·cloud ID → [entity와 topology](#chapter-docs-product-entities-and-topology) |
 | 알림 구현 | [데이터 품질](#chapter-docs-foundations-time-and-data-quality) → [SLO](#chapter-docs-foundations-service-level-objectives) → [알림](#chapter-docs-product-alerts-and-incidents) → [PromQL 실습](#chapter-docs-cross-domain-reproducible-labs) |
 | 용량 계획 | [성능과 통계](#chapter-docs-foundations-performance-and-statistics) → [보존과 질의](#chapter-docs-product-storage-and-query) → [용량과 손실 예산](#chapter-docs-product-capacity-and-loss-budgets) |
+
+<a id="chapter-docs-reading-guide--원천-필드까지-이해하려는-두-번째-읽기"></a>
+
+### 원천 필드까지 이해하려는 두 번째 읽기
+
+2026-10-05 보강 원고는 다음 경로로 이어집니다. 모두 필드 이름을 외우기보다 **같은 이름으로 합치면 틀리는 경계**를 확인하는 학습입니다. 2d에서 출판한 새 실습은 [재현 방법과 결과](#chapter-docs-cross-domain-reproducible-labs)에 연결했습니다. kubelet 자원 압박·새 PDH 조회·cloud 호출처럼 실행하지 않은 항목은 원천 검토 범위로 남습니다.
+
+| 출발 상황 | 읽을 장 | 스스로 확인할 것 |
+| --- | --- | --- |
+| NIC는 정상인데 연결을 놓침 | [Linux 스택 카운터](#chapter-docs-network-linux-stack-counters) | namespace·소켓 범위, 재전송 비율과 손실률의 차이 |
+| Pod 종료·사용률 급변 | [자원 압박과 종료](#chapter-docs-kubernetes-pressure-and-termination) → [수집](#chapter-docs-kubernetes-collection) | OOM/eviction 증거, resize의 실제 분모, 수집 endpoint |
+| DB 정리가 안 되거나 업그레이드 후 지표 누락 | [PostgreSQL 운영 관측](#chapter-docs-database-postgresql-operations) | ID 나이·회수 기준점·통계 view 버전·권한 |
+| 지표에서 trace로 이동하거나 첫 counter 해석 | [exemplar와 시작 시각](#chapter-docs-foundations-metric-context-and-start-time) → [sampling](#chapter-docs-application-trace-sampling-and-context) | 사건 연결과 모집단 추정은 어떻게 다른가 |
+| 계측기 교체 뒤 이름·단위가 변함 | [Semantic conventions](#chapter-docs-application-semantic-conventions) | Stable 상태, s/ms, 현재값/마지막 GC, 누적/분포 |
+| 화면과 알림이 늦거나 다르게 보임 | [cloud 시간 축](#chapter-docs-cloud-provider-metrics) → [알림 지연](#chapter-docs-product-alerts-and-incidents) | 측정·게시·평가·발송의 각 시간 |
+
+Kafka broker·share group은 [Kafka](#chapter-docs-middleware-kafka), Windows의 PDH와 CPU 표시는 [Windows](#chapter-docs-host-windows), 저장 완료는 [쓰기 경로](#chapter-docs-storage-write-path-and-durability), 프로토콜의 세부 경계는 [TLS·HTTP](#chapter-docs-network-tls-http)와 [SNMP](#chapter-docs-network-snmp-and-device-models)를 찾아봅니다.
 
 <a id="chapter-docs-reading-guide--개념을-배운-뒤-실제-결과와-연결하기"></a>
 
@@ -363,13 +385,14 @@ Prometheus에서 Counter는 재시작 시 초기화될 수 있는 누적 증가�
 
 1. [처음 읽는 시스템 지도: 요청 하나가 지나가는 길](#chapter-docs-foundations-system-map)
 2. [시계열과 지표의 데이터 모델](#chapter-docs-foundations-time-series)
-3. [평균과 백분위수 및 분포의 집계](#chapter-docs-foundations-distributions)
-4. [성능을 읽는 순서: 처리량, 대기열, 표본과 실험](#chapter-docs-foundations-performance-and-statistics)
-5. [서비스 수준 지표와 오류 예산](#chapter-docs-foundations-service-level-objectives)
-6. [시간과 관측 데이터의 품질](#chapter-docs-foundations-time-and-data-quality)
-7. [숫자가 다를 때: 측정 경계, 시간 구간과 오차](#chapter-docs-foundations-measurement-and-comparability)
-8. [트레이스와 로그 및 프로파일의 연결](#chapter-docs-foundations-traces-logs-profiles)
-9. [분산 시스템: 복제, 합의, 시간과 불확실한 결과](#chapter-docs-foundations-distributed-systems)
+3. [지표에 남겨야 할 문맥: exemplar와 카운터 시작 시각](#chapter-docs-foundations-metric-context-and-start-time)
+4. [평균과 백분위수 및 분포의 집계](#chapter-docs-foundations-distributions)
+5. [성능을 읽는 순서: 처리량, 대기열, 표본과 실험](#chapter-docs-foundations-performance-and-statistics)
+6. [서비스 수준 지표와 오류 예산](#chapter-docs-foundations-service-level-objectives)
+7. [시간과 관측 데이터의 품질](#chapter-docs-foundations-time-and-data-quality)
+8. [숫자가 다를 때: 측정 경계, 시간 구간과 오차](#chapter-docs-foundations-measurement-and-comparability)
+9. [트레이스와 로그 및 프로파일의 연결](#chapter-docs-foundations-traces-logs-profiles)
+10. [분산 시스템: 복제, 합의, 시간과 불확실한 결과](#chapter-docs-foundations-distributed-systems)
 
 관련 문서: [지표 명세 템플릿](#chapter-templates-metric), [도메인 간 장애 분석](#chapter-docs-cross-domain-readme)
 
@@ -602,6 +625,107 @@ Prometheus는 라벨 조합마다 별도의 시계열이 생기므로 사용자 
 3. 재시작 후 같은 이름의 대상에 이전 누적값을 이어 붙여도 되는가? **실행 수명과 초기화 의미를 확인해야 한다. 이름만으로 연속성을 보장할 수 없다.**
 
 다음: [분포와 집계](#chapter-docs-foundations-distributions) · 관련: [공통 개념](#chapter-docs-foundations-readme), [지표 템플릿](#chapter-templates-metric)
+
+[통합 목차로](#book-top)
+
+---
+
+<a id="chapter-docs-foundations-metric-context-and-start-time"></a>
+
+<a id="chapter-docs-foundations-metric-context-and-start-time--지표에-남겨야-할-문맥-exemplar와-카운터-시작-시각"></a>
+
+## 지표에 남겨야 할 문맥: exemplar와 카운터 시작 시각
+
+> 상태: 검토됨 · 적용 범위: OpenTelemetry Metrics Data Model, OpenMetrics 1.0, Prometheus 3.15.0 기능 문서 · 원천 확인일: 2026-10-05 · 기능 실행 미검증
+
+<a id="chapter-docs-foundations-metric-context-and-start-time--먼저-이해할-상황"></a>
+
+### 먼저 이해할 상황
+
+지연 histogram에서 긴 요청이 보이면 어떤 trace였는지 보고 싶습니다. 한편 새 프로세스의 첫 counter 값이 7이라면 “이번 수집 구간에 7건이 발생했다”라고 더해도 되는지 고민하게 됩니다. 두 문제 모두 값만으로 부족합니다. 첫 문제에는 관측 사건의 연결 정보, 두 번째에는 카운터의 시작 시각과 연속성이 필요합니다.
+
+<a id="chapter-docs-foundations-metric-context-and-start-time--exemplar는-집계값에서-원래-사건으로-가는-연결이다"></a>
+
+### Exemplar는 집계값에서 원래 사건으로 가는 연결이다
+
+OTel exemplar는 지표 관측 사건의 값·시각과 문맥을 남깁니다. `trace_id`, `span_id`는 선택 사항이고, 지표 집계에서 필터된 attribute를 보존할 수도 있습니다. histogram의 모든 관측을 저장하는 기능은 아니며 reservoir와 filter 정책으로 일부를 선택합니다. 따라서 exemplar가 없다고 해당 bucket에 관측이 없었던 것은 아닙니다. [데이터 모델](https://opentelemetry.io/docs/specs/otel/metrics/data-model/#exemplars), [SDK exemplar 규약](https://opentelemetry.io/docs/specs/otel/metrics/sdk/#exemplar)
+
+OpenMetrics 1.0의 exemplar는 별도의 label 집합과 값, 선택적인 시각으로 표현합니다. 아래는 **가상 형식 예시**이며 서버에 노출하거나 수집하지 않았습니다. `trace_id`는 bucket 시계열의 label이 아니라 뒤에 붙은 exemplar의 label입니다. [OpenMetrics exemplars](https://prometheus.io/docs/specs/om/open_metrics_spec/#exemplars)
+
+```text
+# TYPE demo_request_duration_seconds histogram
+demo_request_duration_seconds_bucket{le="1.0"} 20 # {trace_id="11111111111111111111111111111111"} 0.8
+demo_request_duration_seconds_bucket{le="+Inf"} 20
+demo_request_duration_seconds_count 20
+demo_request_duration_seconds_sum 4.2
+# EOF
+```
+
+여기서 20은 누적 관측 수이고 0.8초는 연결된 한 사건의 값입니다. 이를 “20건 모두가 0.8초”, “p95가 0.8초”로 해석할 수 없습니다. exemplar를 metric point의 일반 label로 펼치면 요청마다 시계열이 늘 수 있습니다. trace 저장 기간·sampling·tenant 권한이 달라 링크를 따라가도 trace가 없을 수 있습니다.
+
+<a id="chapter-docs-foundations-metric-context-and-start-time--시작-시각은-처음-수집한-시각과-다르다"></a>
+
+### 시작 시각은 처음 수집한 시각과 다르다
+
+OTel의 `StartTimeUnixNano`와 `TimeUnixNano`는 누적 또는 구간 집계의 범위를 해석하게 합니다. Cumulative sum에서 같은 시작 시각을 유지하는 연속 구간과 reset 이후 새 구간을 구분합니다. 시작을 알 수 없는 첫 점을 실제 0 시작으로 꾸미지 않습니다. `StartTimeUnixNano = TimeUnixNano`인 첫 점은 시작 시각을 모르는 reset을 나타내는 모델이므로 그 첫 값의 전체를 알려진 구간 증가량으로 귀속할 수 없습니다. [reset과 start time](https://opentelemetry.io/docs/specs/otel/metrics/data-model/#resets-and-gaps)
+
+OpenMetrics Counter의 선택적 Created 값은 Unix epoch 이후 **초** 단위이며 text 형식의 `_created`로 표현합니다. OTel의 시작 필드는 epoch 이후 **nanosecond**입니다. Created는 scrape 수행 시각이 아니며, `_created` 시계열이 보인다는 사실만으로 저장·질의 엔진이 이를 counter의 시작 문맥으로 사용한다고 단정하지 않습니다. [OpenMetrics counter](https://prometheus.io/docs/specs/om/open_metrics_spec/#counter), [OTel 변환 규약](https://opentelemetry.io/docs/specs/otel/compatibility/prometheus_and_openmetrics/)
+
+<a id="chapter-docs-foundations-metric-context-and-start-time--계산-예시-첫-증가분을-어디까지-알-수-있는가"></a>
+
+### 계산 예시: 첫 증가분을 어디까지 알 수 있는가
+
+**예시:** 프로세스가 상대 시각 0초에 counter=0으로 시작했고 10초에 7, 20초에 12를 노출했다고 가정합니다.
+
+| 보존한 정보 | 말할 수 있는 것 | 말할 수 없는 것 |
+| --- | --- | --- |
+| 10초의 7, 20초의 12만 | **그 사이 reset·수명 교체가 없다는 전제에서** 증가량 `12−7=5건`, 평균 `0.5건/초` | 처음 7건의 시작 시각·구간 내 배치; 값 증가만으로 중간 reset 부재를 증명할 수 없음 |
+| 실제 0초의 시작과 위 표본 | 연속성이 확인되면 0–20초 총 `12건`, 평균 `0.6건/초` | 각 요청이 발생한 개별 시각 |
+| 10초에 발견했으므로 임의의 0을 삽입 | 새로운 가정을 추가한 것 | 0–10초의 실제 기록을 복구했다고 주장할 수 없음 |
+
+이는 두 점 차분의 설명입니다. 실제 PromQL `rate()`·`increase()`는 query window·외삽·reset·사용 기능에 영향을 받으므로 위 산술과 모든 조건에서 같은 값을 반환한다고 주장하지 않습니다. [시계열 계산](#chapter-docs-foundations-time-series)
+
+<a id="chapter-docs-foundations-metric-context-and-start-time--prometheus의-수용과-질의는-별도-확인한다"></a>
+
+### Prometheus의 수용과 질의는 별도 확인한다
+
+**3.15.0 고정 문서 기준** 기능 flag를 구분합니다. 최신 기본값을 추측해 “Prometheus면 자동 해결”로 표현하지 않습니다. 아래 기능은 이번 promtool 규칙 재평가만으로 검증되지 않습니다. 실제 scrape·저장·PromQL 시나리오가 별도로 필요합니다. [v3.15.0 feature flags](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/feature_flags.md)
+
+| 기능 | 의미 | 구현 시 확인할 것 |
+| --- | --- | --- |
+| `created-timestamp-zero-ingestion` | 제공된 시작 시각에 적절한 0 표본을 삽입하는 방식 | 전역 기본 `scrape_protocols`를 PrometheusProto 우선으로 변경; 명시 설정은 별도 |
+| `st-storage` | 표본별 start timestamp를 WAL·TSDB/Agent·Remote Write 2.0으로 보존 | 실험 기능의 저장·복구 호환성 |
+| `use-start-timestamps` | `rate`, `irate`, `increase` 등의 질의가 start timestamp를 사용 | 저장 여부와 질의 사용 여부를 별도 점검 |
+| `st-synthesis` | 첫 점을 기준으로 빼고 새 시작 문맥을 합성 | 첫 점이 제거되고 raw counter가 바뀜; 잃은 최초 증가분 복구 아님 |
+
+3.15.0의 `created-timestamp-zero-ingestion`이 바꾸는 전역 기본 순서는 `PrometheusProto, OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText0.0.4`입니다. exporter가 시작 시각을 실제로 노출해야 하며 OpenMetrics의 `_created`가 추가 시계열로 저장되는 비용·불필요한 증가도 확인합니다. [고정 버전 flag 설명](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/feature_flags.md)
+
+Prometheus 3.15.0의 exemplar 수용에는 기본 비활성인 `--enable-feature=exemplar-storage`가 필요합니다. 로컬 조회 저장소는 모든 시계열이 공유하는 **개수 제한 원형 메모리 버퍼**이며 오래된 항목은 새 항목에 밀려납니다. 켜면 WAL에도 기록하지만 그 디스크 지속성은 WAL 보존 범위에 한정됩니다. 따라서 “항상 WAL 기간만큼 조회 가능”이라는 고정 시간 보존 보장은 아닙니다. 일반 TSDB metric 보존 기간과도 다릅니다. Prometheus text 0.0.4는 exemplar를 전달하지 못하므로 OpenMetrics 등 지원 형식과 exporter 출력을 확인합니다. [exemplar flag](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/feature_flags.md#exemplars-storage), [원형 버퍼 구현](https://github.com/prometheus/prometheus/blob/v3.15.0/tsdb/exemplar.go), [노출 형식](https://prometheus.io/docs/instrumenting/exposition_formats/#exemplars-experimental)
+
+서버가 지원해도 exporter·전송 변환이 시작 시각이나 exemplar를 버리면 끝까지 보존되지 않습니다. 반대로 형식에 필드가 있어도 SDK가 넣지 않을 수 있습니다. 기능 설정·도구 버전·지원 형식을 수집 계약에 포함해야 합니다.
+
+<a id="chapter-docs-foundations-metric-context-and-start-time--제품-적용-제안"></a>
+
+### 제품 적용 제안
+
+exemplar는 해당 tenant의 trace 조회로 연결하며 “표본 연결”, “trace 미보존”, “접근 불가”를 구분합니다. 시계열 identity와 exemplar의 사건 identity를 분리합니다. Counter에서는 원천 시작 시각·관측 시각·수명 ID·temporality·시작을 아는지 여부를 보존하고, 초기 증가량을 계산에서 제외했으면 그 경계를 표시합니다.
+
+계측·저장 기능을 켜는 일은 수집 메모리와 보존 비용을 바꿀 수 있습니다. 이 장에서는 기능 flag 설정, 서버 실행, scrape 요청을 수행하지 않았습니다. 가상 형식과 산술만 문서 검사 대상으로 사용합니다.
+
+<a id="chapter-docs-foundations-metric-context-and-start-time--이해-확인"></a>
+
+### 이해 확인
+
+1. exemplar 하나가 histogram의 모든 관측을 대표하는가? **일부 사건의 연결이며 모집단의 분포를 대신하지 않는다.**
+2. 처음 본 counter=7을 바로 이번 구간 7건으로 더해도 되는가? **시작 시각과 연속성을 알아야 한다.**
+3. `_created`가 저장돼 있으면 모든 `rate()`가 이를 사용했는가? **수용 형식·flag·저장과 질의 동작을 확인해야 한다.**
+4. start time 합성이 원래 첫 7건의 발생 시각을 되살리는가? **아니다. 기준점을 새로 정하는 처리다.**
+
+<a id="chapter-docs-foundations-metric-context-and-start-time--함께-읽기"></a>
+
+### 함께 읽기
+
+[시계열](#chapter-docs-foundations-time-series) · [분포](#chapter-docs-foundations-distributions) · [sampling 확률과 추정](#chapter-docs-application-trace-sampling-and-context) · [전송 계약](#chapter-docs-product-telemetry-delivery-contracts)
 
 [통합 목차로](#book-top)
 
@@ -1989,7 +2113,7 @@ Linux `status`에는 스레드 그룹·스레드 ID, 부모 ID, 상태와 스레
 
 ## Windows의 CPU와 메모리 관측
 
-> 상태: 검토됨 · 범위: Windows Win32 성능 API와 PDH · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 범위: Windows Win32 성능 API와 PDH · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (PDH 실명과 Task Manager 빌드 차이)
 
 <a id="chapter-docs-host-windows--먼저-이해할-것"></a>
 
@@ -2079,6 +2203,29 @@ PDH는 Windows 성능 카운터를 조회하고 기록을 다루는 API입니다
 
 카운터 이름의 번역 여부, 프로세서 그룹 범위, 제공자의 설치 여부는 대상 환경에서 검증합니다. PDH 수집과 메모리 API는 이 판에서 실행하지 않았습니다. `GetSystemTimes`와 현재 프로세스의 `GetProcessTimes`는 [로컬 실습](#chapter-docs-cross-domain-reproducible-labs)에서 실제 표본과 계산을 확인했습니다.
 
+<a id="chapter-docs-host-windows--성능-카운터의-실제-이름과-분모"></a>
+
+### 성능 카운터의 실제 이름과 분모
+
+다음은 **2026-10-05 공식 자료 확인** 기준의 영문 카운터 경로입니다. OS 언어·제공자·instance 범위는 별도 확인하며 이 경로를 이번에 실제 조회하지 않았습니다. 각 행의 이름·의미를 뒷받침하는 원천을 구분했습니다. 인용 문서의 특정 서비스용 임계값을 Windows 전체의 기본 경보값으로 사용하지 않습니다.
+
+| 영문 경로 | 단위·의미 | 해석 함정 |
+| --- | --- | --- |
+| `\Processor Information(_Total)\% Processor Time` | %: 관측 구간의 비 idle 시간 기준 | 주파수 반영 작업량·프로세스별 CPU 합과 다름. [Time/Utility 정의](https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/cpu-usage-exceeds-100) |
+| `\Processor Information(_Total)\% Processor Utility` | %: 기준 성능 대비 작업 능력의 사용, 주파수 변화를 반영 | nominal 성능 기준이므로 turbo에서 100%를 넘을 수 있음. [Microsoft 설명](https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/cpu-usage-exceeds-100) |
+| `\Memory\Available MBytes` | MBytes: 즉시 할당 가능한 물리 메모리 | free 목록만이 아니라 standby 등 재사용 가능한 메모리도 포함. [Windows 성능 진단](https://learn.microsoft.com/en-us/troubleshoot/windows-server/performance/troubleshoot-performance-problems-in-windows), [가용량 정의](https://learn.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-performance_information) |
+| `\Memory\Committed Bytes` | byte: 시스템 commit charge | 실제 RAM 상주량·페이지 파일 쓰기량 아님. [commit와 카운터](https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/introduction-to-the-page-file) |
+| `\Memory\% Committed Bytes In Use` | %: Committed Bytes / Commit Limit | 물리 메모리 사용률 아님; 한도 변경도 영향. [commit 비율 정의](https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/introduction-to-the-page-file) |
+| `\System\Processor Queue Length` | 실행을 기다리는 ready thread 수, 현재 표본 | 실행 중인 thread는 제외; I/O 대기나 전체 thread 수 아님. [Microsoft의 해당 System 카운터 정의](https://learn.microsoft.com/en-us/exchange/exchange-2013-performance-counters-exchange-2013-help) |
+
+Utility와 Time은 같은 100% 척도가 아닙니다. 주파수 반영 비율이 100%를 넘었다고 값을 잘라내거나 불가능한 CPU 시간이라고 판정하지 않습니다. 반대로 GetProcessTimes의 다중 CPU 시간 합이 100%를 넘는 이유와도 구분합니다. [Microsoft Utility 설명](https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/cpu-usage-exceeds-100)
+
+**Task Manager와의 비교에는 Windows build·탭·열도 필요합니다.** Windows 8을 설명한 위 KB는 Utility 사용을 말하지만, Windows 11의 2025년 업데이트 문서는 CPU 계산을 바꾸고 기존 값을 Details의 선택적 `CPU Utility` 열로 남겼다고 설명합니다. 따라서 “현재 모든 Task Manager의 CPU는 항상 Utility”라고 쓰지 않습니다. 해당 공지는 새 계산의 모든 PDH 대응을 명세하지도 않습니다. [Windows 11 KB5064081](https://support.microsoft.com/en-au/servicing/os/windows-11/2025/08/august-29-2025-kb5064081-os-build-26100-5074-preview)
+
+PDH의 rate 계열 등 두 표본이 필요한 카운터는 `PdhCollectQueryData`로 첫 기준점을 얻고 간격 뒤 다시 수집한 다음 formatted 값을 계산합니다. 첫 응답의 미완성 상태를 0%로 출력하지 않습니다. 모든 gauge까지 무조건 두 점 차분하는 것도 잘못입니다. 원천 counter type, 반환 `CStatus`, instance 수명과 계산 구간을 확인합니다. [PDH 표본 수집](https://learn.microsoft.com/en-us/windows/win32/perfctrs/collecting-performance-data)
+
+**예시:** Committed Bytes=12 GiB, Commit Limit=16 GiB이면 `75%`입니다. 동시에 Available MBytes가 보고하는 물리 여유는 별도 값이며 이 식으로 역산하지 않습니다. 제품에는 원천 counter path·OS build·표본 간격·원래 단위를 남기고 범용 임계값을 임의로 붙이지 않습니다. 실제 조회에는 제공자별 읽기 권한이 필요하고 많은 instance의 고빈도 수집은 부하를 늘립니다.
+
 <a id="chapter-docs-host-windows--linux와-비교할-때"></a>
 
 ### Linux와 비교할 때
@@ -2099,6 +2246,7 @@ PDH는 Windows 성능 카운터를 조회하고 기록을 다루는 API입니다
 - GetSystemTimes의 Kernel+User+Idle을 총량으로 쓰는가? **Idle이 Kernel에 포함되므로 중복이다.**
 - PrivateUsage가 1 GiB면 페이지 파일에 1 GiB가 쓰여 있는가? **Commit Charge이므로 그렇게 해석할 수 없다.**
 - 프로세서 128개 시스템에서 한 번 호출한 GetSystemTimes가 전체를 대표하는가? **문서의 Processor Group 범위를 먼저 확인해야 한다.**
+- Task Manager와 수집기 CPU가 다르면 수집기가 틀린가? **Time/Utility·build·표본 구간·instance 범위를 먼저 맞춘다.**
 
 관련: [CPU](#chapter-docs-host-cpu), [메모리](#chapter-docs-host-memory), [시계열](#chapter-docs-foundations-time-series)
 
@@ -2647,9 +2795,10 @@ TCP에는 연결 상태, 확인 응답 ACK, 연결 초기화 RST, 재전송 같�
 3. [TLS, HTTP와 요청 단계별 시간](#chapter-docs-network-tls-http)
 4. [이름 조회에서 응답 본문까지: DNS, 연결 재사용과 실패 위치](#chapter-docs-network-dns-and-connection-lifecycle)
 5. [인터페이스, 장비, 흐름과 능동 검사](#chapter-docs-network-network-metrics)
-6. [링크, 오버레이, MTU와 경로 제어](#chapter-docs-network-layers-and-routing)
-7. [네트워크 장비 수집: SNMP, MIB와 인터페이스 수명](#chapter-docs-network-snmp-and-device-models)
-8. [경로 수렴과 QoS: 연결은 살아 있는데 통신이 느린 이유](#chapter-docs-network-routing-convergence-and-qos)
+6. [Linux 네트워크 스택 카운터 읽기](#chapter-docs-network-linux-stack-counters)
+7. [링크, 오버레이, MTU와 경로 제어](#chapter-docs-network-layers-and-routing)
+8. [네트워크 장비 수집: SNMP, MIB와 인터페이스 수명](#chapter-docs-network-snmp-and-device-models)
+9. [경로 수렴과 QoS: 연결은 살아 있는데 통신이 느린 이유](#chapter-docs-network-routing-convergence-and-qos)
 
 관련 문서: [호스트](#chapter-docs-host-readme), [애플리케이션](#chapter-docs-application-readme), [쿠버네티스](#chapter-docs-kubernetes-readme)
 
@@ -2863,7 +3012,7 @@ QUIC는 UDP 위에서 동작하지만 연결, 보안, 신뢰성 있는 스트림
 
 ## TLS, HTTP와 요청 단계별 시간
 
-> 상태: 검토됨 · 적용 범위: TLS 1.3, HTTP 의미론·HTTP/2·HTTP/3, curl 시간 필드 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: TLS 1.3, HTTP 의미론·HTTP/2·HTTP/3, curl 시간 필드 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (TLS 1.2/1.3·HTTP/1.1·BR 2.3.1)
 
 <a id="chapter-docs-network-tls-http--먼저-이해할-것"></a>
 
@@ -2903,6 +3052,51 @@ HTTP/2는 한 연결에서 여러 스트림을 사용합니다. 이로써 요청
 HTTP/3은 QUIC를 사용합니다. 스트림을 구분하는 전송 기반이 달라지지만 헤더 압축의 의존성 등 별도의 대기 원인은 남을 수 있습니다. “HTTP/3에는 모든 형태의 대기가 없다”는 결론은 성립하지 않습니다. [HTTP/3, RFC 9114](https://www.rfc-editor.org/rfc/rfc9114.html)
 
 이에 따라 제품은 TCP 연결, QUIC 연결, HTTP 스트림, 업무 요청을 서로 다른 개체로 모델링하는 것이 좋습니다. 이 문단은 위 프로토콜 차이에 따른 설계 제안입니다.
+
+<a id="chapter-docs-network-tls-http--http11에서-본문의-끝을-정하는-순서"></a>
+
+### HTTP/1.1에서 본문의 끝을 정하는 순서
+
+수신자가 본문 경계를 다르게 해석하면 같은 연결의 다음 요청까지 잘못 읽을 수 있습니다. RFC 9112 §6.3의 순서는 단순히 “길이 필드 중 하나를 고른다”보다 구체적입니다. [HTTP/1.1 본문 길이](https://www.rfc-editor.org/rfc/rfc9112.html#section-6.3)
+
+| 먼저 적용할 조건 | 의미 |
+| --- | --- |
+| HEAD 응답, 1xx·204·304 응답 | 헤더에 길이 정보가 있더라도 메시지 본문 없음 |
+| CONNECT의 2xx 응답 | 헤더 이후 터널로 전환; Content-Length·Transfer-Encoding 무시 |
+| 그 외 메시지에 Transfer-Encoding과 Content-Length 모두 존재 | Transfer-Encoding 우선; 모호한 메시지로 오류 처리하는 것이 원칙 |
+| 마지막 transfer coding이 chunked | chunked framing으로 본문 끝 판별 |
+| Transfer-Encoding 없이 유효한 Content-Length 존재 | 해당 octet 수로 길이 판별 |
+
+송신자는 Transfer-Encoding이 있는 메시지에 Content-Length를 보내면 안 됩니다. 둘 다 받은 서버는 거부하거나 Transfer-Encoding만 따라 처리할 수 있지만 응답 후 연결을 닫아야 합니다. 전달을 선택한 중계자는 먼저 Content-Length를 제거하고 Transfer-Encoding을 처리해야 합니다. 따라서 “우선순위가 있으니 둘을 함께 보내도 정상”이라는 해석은 틀립니다. [RFC 9112 §6.1–6.3](https://www.rfc-editor.org/rfc/rfc9112.html#section-6.1)
+
+제품에서는 프록시와 앱의 framing 오류·연결 종료를 같은 요청 경로에 연결하도록 제안합니다. 위 표는 주요 조건의 요약이며 모든 잘못된 헤더를 허용하는 parser 명세가 아닙니다.
+
+<a id="chapter-docs-network-tls-http--tls-왕복-횟수와-측정-시간"></a>
+
+### TLS 왕복 횟수와 측정 시간
+
+새 TCP 연결 위에서 수행하는 일반적인 full handshake를 메시지 흐름으로 세면 TLS 1.2는 2 RTT, TLS 1.3은 1 RTT가 기본 비교 모델입니다. TCP 연결·DNS 시간은 별도입니다. TLS 1.2 재개, TLS 1.3 HelloRetryRequest에 따른 추가 왕복, 0-RTT는 이 모델과 구분합니다. 이는 표준 메시지 흐름에서 도출한 비교이지 모든 연결이 정확히 그 시간에 끝난다는 성능 보장이 아닙니다. [TLS 1.2 §7.3](https://www.rfc-editor.org/rfc/rfc5246.html#section-7.3), [TLS 1.3 §2](https://www.rfc-editor.org/rfc/rfc8446.html#section-2)
+
+**합성 예시:** RTT가 30 ms이고 DNS·TCP·계산·인증서 검증 시간 등을 제외하면 위 TLS 교환의 왕복 대기 성분은 각각 약 60 ms와 30 ms입니다. 반면 curl `time_appconnect`는 **시작부터** 보안 연결 완료까지의 초 단위 누적 시간입니다. 직접 연결·새 TCP·리다이렉트 없음 조건에서 TLS 구간을 보려면 `time_appconnect−time_connect`처럼 앞 구간을 분리합니다. 재사용·프록시·HTTP/3에는 동일한 차감식을 자동 적용하지 않습니다. [curl APPCONNECT_TIME](https://curl.se/libcurl/c/CURLINFO_APPCONNECT_TIME.html)
+
+TLS 1.2의 선택적 False Start는 조건을 만족한 client가 server Finished를 받기 전에 애플리케이션 데이터를 보내게 합니다. 따라서 **첫 데이터 송신 가능 시각**과 **handshake 검증 완료 시각**을 구분해야 합니다. 2 RTT 모델을 모든 요청의 송신 대기 시간으로 일반화하지 않습니다. 이 예외의 curl 타이머 반영은 사용하는 TLS backend를 포함한 별도 실행 검증 대상입니다. [RFC 7918 §4](https://www.rfc-editor.org/rfc/rfc7918.html#section-4)
+
+<a id="chapter-docs-network-tls-http--인증서-유효기간-단축과-경보"></a>
+
+### 인증서 유효기간 단축과 경보
+
+2026-10-05 확인한 CA/Browser Forum TLS Baseline Requirements 2.3.1의 공개 신뢰 TLS subscriber 인증서 최대 유효기간은 발급일에 따라 달라집니다. 사설 PKI나 모든 종류의 인증서에 자동 적용하는 표가 아닙니다. [BR §6.3.2](https://cabforum.org/working-groups/server/baseline-requirements/requirements/#632-certificate-operational-periods-and-key-pair-usage-periods)
+
+| 발급일 범위 | MUST NOT으로 정한 최대 유효기간 |
+| --- | ---: |
+| 2026-03-15 이전 | 398일 |
+| 2026-03-15 이상, 2027-03-15 미만 | 200일 |
+| 2027-03-15 이상, 2029-03-15 미만 | 100일 |
+| 2029-03-15 이상 | 47일 |
+
+이 표는 최대값이며 최대 기간으로 발급하는 것을 권장한다는 뜻이 아닙니다. 표준의 SHOULD NOT 한도는 각각 하루 더 짧으며, 기간 계산에서 하루는 86,400초입니다. 변경일에 이미 발급한 모든 인증서가 소급하여 그날 만료되는 것도 아닙니다.
+
+**제품 적용 제안:** 실제 `notAfter`와 현재 시각의 차이, 자동 갱신의 예정·실패, 새 인증서가 각 TLS 종단에 배포됐는지를 함께 봅니다. 유효기간이 짧아지는데 모든 인증서에 고정된 긴 사전 경보 기간을 적용하면 발급 직후부터 경보가 울릴 수 있습니다. 발급 주기·갱신 여유·실제 남은 시간을 기준으로 정책을 정합니다. 본문 설명을 위해 인증서를 발급하거나 실제 endpoint를 검사하지 않았습니다.
 
 <a id="chapter-docs-network-tls-http--누적-타이머를-더하면-안-되는-이유"></a>
 
@@ -2959,6 +3153,9 @@ flowchart LR
 1. 인증서 만료가 멀면 TLS 검증은 성공하는가? **이름, 신뢰 체인 등 다른 조건도 필요합니다.**
 2. TTFB에서 TLS 완료 시간을 빼면 서버 CPU 시간인가? **아니요. 그 구간에 여러 대기·전송·실행이 포함됩니다.**
 3. HTTP 요청 1,000개면 연결도 1,000개인가? **연결 재사용과 다중화 때문에 그렇지 않습니다.**
+4. Transfer-Encoding이 우선이면 Content-Length와 함께 보내도 되는가? **송신 금지·수신 오류 처리·연결 종료 규칙도 따라야 합니다.**
+5. TLS 1.3이면 time_appconnect가 반드시 1 RTT인가? **누적 타이머이며 DNS·TCP, 재시도와 처리 시간이 포함될 수 있습니다.**
+6. 최대 인증서 기간이 바뀌면 기존 인증서의 만료일도 그날 바뀌는가? **발급일별 규칙과 실제 notAfter를 확인합니다.**
 
 다음: [인터페이스와 흐름 관측](#chapter-docs-network-network-metrics) · [네트워크 목차](#chapter-docs-network-readme)
 
@@ -3189,13 +3386,126 @@ IPFIX는 관측 지점에서 얻은 흐름 정보를 템플릿과 데이터 레�
 
 ---
 
+<a id="chapter-docs-network-linux-stack-counters"></a>
+
+<a id="chapter-docs-network-linux-stack-counters--linux-네트워크-스택-카운터-읽기"></a>
+
+## Linux 네트워크 스택 카운터 읽기
+
+> 상태: 검토됨 · 적용 범위: Linux 6.12 procfs·TCP/UDP 코드, iproute2 `ss` 문서 · 원천 확인일: 2026-10-05 · 명령 실행 미검증
+
+<a id="chapter-docs-network-linux-stack-counters--먼저-이해할-상황"></a>
+
+### 먼저 이해할 상황
+
+웹 서버가 연결을 놓치는데 NIC의 오류 카운터는 증가하지 않을 수 있습니다. NIC가 패킷을 정상 수신한 뒤 TCP의 연결 대기열이나 UDP의 소켓 버퍼에서 처리가 막힐 수 있기 때문입니다. [인터페이스 지표](#chapter-docs-network-network-metrics)는 링크 경계, 이 장의 카운터는 커널 프로토콜 처리 경계를 설명합니다. 어느 쪽도 단독으로 업무 요청의 성공 수를 세지는 않습니다.
+
+`/proc/net/snmp`라는 이름이 있어도 SNMP agent를 설치하거나 UDP 161번 포트를 열어야 읽을 수 있는 파일은 아닙니다. `/proc/net`은 현재 프로세스의 network namespace에 해당하는 `/proc/self/net`을 가리킵니다. `/proc/PID/net`도 **그 PID만의 트래픽**이 아니라 그 프로세스가 속한 network namespace의 통계입니다. [proc_pid_net(5)](https://man7.org/linux/man-pages/man5/proc_pid_net.5.html)
+
+따라서 호스트 namespace와 별도 Pod namespace의 값은 범위가 다릅니다. 같은 namespace를 공유하는 여러 컨테이너에서 읽은 값을 더하면 중복될 수 있습니다. 제품은 호스트 ID·부팅 수명·network namespace 식별자와 그 수명을 함께 보존해야 합니다. 프로세스가 바뀌었다는 이유만으로 namespace 카운터를 재시작된 프로세스 카운터처럼 처리하지 않습니다.
+
+<a id="chapter-docs-network-linux-stack-counters--tcp-시도-연결-세그먼트를-구분한다"></a>
+
+### TCP: 시도, 연결, 세그먼트를 구분한다
+
+다음은 `/proc/net/snmp`의 `Tcp:` 블록입니다. `CurrEstab` 이외의 아래 항목은 누적 횟수이며, 구간 발생률은 같은 수명의 두 표본 차이를 초 단위 간격으로 나눕니다. 표의 연결 상태 전이는 [TCP-MIB 정의](https://www.rfc-editor.org/rfc/rfc4022.html#section-3), Linux 구현상 차이는 [커널 설명](https://docs.kernel.org/networking/snmp_counter.html)을 기준으로 합니다.
+
+| 필드 | 단위·정의 | 읽을 때 주의할 점 |
+| --- | --- | --- |
+| `ActiveOpens` | 회: CLOSED → SYN-SENT의 능동 연결 시작 | 연결 성공 횟수 아님 |
+| `PassiveOpens` | 회: Linux 6.12에서 수동 연결의 child 소켓 생성 | SYN 도착 수·애플리케이션의 `accept()` 완료 수 아님 |
+| `AttemptFails` | 회: TCP-MIB의 추상 정의는 SYN-SENT/SYN-RCVD → CLOSED 및 SYN-RCVD → LISTEN | Linux request socket 만료의 예외는 아래 설명; 연결 실패의 전수 아님 |
+| `EstabResets` | 회: ESTABLISHED/CLOSE-WAIT → CLOSED | 정상 FIN 종료 수와 구분 |
+| `CurrEstab` | 연결 수, **gauge**: 이 장의 6.12에서는 ESTABLISHED 또는 CLOSE-WAIT | 아래 커널 수정 조건 확인; 전체 소켓 수 아님 |
+| `InSegs` | 수신 세그먼트 수, 오류가 있는 세그먼트도 포함 | GRO 병합의 영향을 받으므로 NIC 패킷 수와 다를 수 있음 |
+| `OutSegs` | 송신 세그먼트 계정, ACK·SYN·RST도 포함 | 원래 데이터 전송량이나 wire에서 실제 전달된 수가 아님 |
+| `RetransSegs` | 재전송 세그먼트 수 | 손실된 고유 세그먼트 수 아님; 같은 데이터가 여러 번 재전송될 수 있음 |
+| `InErrs` | 수신 TCP 오류 세그먼트 수 | 지연·애플리케이션 오류의 포괄 지표 아님 |
+| `OutRsts` | RST 송신 시도 수 | Linux에서는 실제 송신 이전 실패도 가능 |
+
+`OutSegs`는 일반적인 데이터 재전송을 제외하는 계정이지만 “원본 데이터 패킷만”을 뜻하지 않습니다. Linux 6.12의 `__tcp_transmit_skb()`는 sequence 진행과 제어 세그먼트 조건으로 증가시키고, SYN/ACK 작성 경로는 별도로 증가시킵니다. offload의 GSO 분할 수를 반영하는 경로도 있습니다. RFC의 추상 정의를 커널 전체의 모든 경로에서 동일한 패킷 집합으로 단순화하지 않습니다. [고정 버전 송신 코드](https://github.com/torvalds/linux/blob/v6.12/net/ipv4/tcp_output.c)
+
+`PassiveOpens`의 증가 지점은 `tcp_create_openreq_child()`입니다. 일반 handshake에서는 마지막 ACK를 처리하는 경로에서, TCP Fast Open에서는 더 일찍 child를 만들 수 있습니다. accept queue 포화로 child 생성 전에 빠지는 경로에서는 증가하지 않습니다. 커널 설명 문서의 SYN 수신 중심 설명보다 이 장의 고정 버전 구현을 우선하며 SYN 도착률로 사용하지 않습니다. [6.12 child 생성](https://github.com/torvalds/linux/blob/v6.12/net/ipv4/tcp_minisocks.c#L629), [accept queue 검사](https://github.com/torvalds/linux/blob/v6.12/net/ipv4/tcp_ipv4.c#L1757)
+
+`CurrEstab`에 CLOSE-WAIT를 포함하는 수정은 upstream 6.10에 들어갔습니다. 수정 전 구현은 ESTABLISHED만 계정하며, 이전 stable 계열에도 backport되므로 minor 번호 하나로 의미를 결정하지 않습니다. 배포 커널의 수정 포함 여부를 확인합니다. [원 수정](https://github.com/torvalds/linux/commit/a46d0ea5c94205f40ecf912d1bb7806a8a64704f), [6.9 구현](https://github.com/torvalds/linux/blob/v6.9/net/ipv4/tcp.c#L2635), [6.10 구현](https://github.com/torvalds/linux/blob/v6.10/net/ipv4/tcp.c#L2647), [6.6 stable 구현](https://github.com/gregkh/linux/blob/linux-6.6.y/net/ipv4/tcp.c)
+
+`AttemptFails`도 모든 실패 handshake를 세지는 않습니다. Linux 6.12의 일반 IPv4 request socket이 SYN/ACK 재시도를 소진하는 timer 경로는 `TCPTimeouts`를 증가시키고 요청을 제거하며, 이 경로에서 `AttemptFails`를 올리지 않습니다. 따라서 이 카운터와 `PassiveOpens`만으로 서버의 전체 연결 실패율을 계산하지 않습니다. 이는 고정 버전 코드 대조이며 패킷 손실 실험은 실행하지 않았습니다. [request timer·제거 경로](https://github.com/torvalds/linux/blob/v6.12/net/ipv4/inet_connection_sock.c#L1149), [timeout 계수](https://github.com/torvalds/linux/blob/v6.12/net/ipv4/tcp_timer.c#L732), [IPv4 request 해제](https://github.com/torvalds/linux/blob/v6.12/net/ipv4/tcp_ipv4.c#L1218)
+
+<a id="chapter-docs-network-linux-stack-counters--udp와-확장-tcp-카운터"></a>
+
+### UDP와 확장 TCP 카운터
+
+UDP는 TCP처럼 재전송·연결 수립을 커널이 보장하지 않습니다. 아래 UDP 값은 `/proc/net/snmp`의 `Udp:` 블록을 대상으로 하며 IPv6용 `Udp6*`는 `/proc/net/snmp6`에서 별도로 확인합니다. 파일 전체를 동일한 주소 family의 통계라고 가정하지 말고 프로토콜별 원천을 명세합니다. [IPv4 UDP 코드](https://github.com/torvalds/linux/blob/v6.12/net/ipv4/udp.c), [IPv6 proc 출력](https://github.com/torvalds/linux/blob/v6.12/net/ipv6/proc.c)
+
+| 필드 | 누적 단위와 의미 | 가설을 좁힐 추가 증거 |
+| --- | --- | --- |
+| `InDatagrams` | 애플리케이션에 전달된 UDP datagram 수 | 수신 프로그램의 처리·업무 성공 카운터 |
+| `NoPorts` | 받을 소켓/포트가 없는 datagram 수 | 목적지·리스너 수명·배포 시각 |
+| `InErrors` | 포트 부재 이외의 수신 오류 수 | checksum·버퍼 관련 세부 필드 |
+| `RcvbufErrors` | 주 수신 큐 경로의 소켓 수신 버퍼 초과(`-ENOMEM`) 등 | 소비 속도·`sk_rcvbuf`; multicast 복제 실패 경로도 있음 |
+| `MemErrors` | 주 수신 큐 경로의 프로토콜 메모리 확보 실패(`-ENOBUFS`) | 전역 UDP 메모리 압박·`udp_mem` 등; 소켓 한도와 구분 |
+| `SndbufErrors` | 송신 실패 경로의 `-ENOBUFS` 또는 `SOCK_NOSPACE` 등 | kernel 메모리와 소켓 송신 버퍼를 구분 |
+
+Linux 6.12의 주 수신 큐 실패 경로는 `RcvbufErrors` 또는 `MemErrors`와 함께 `InErrors`도 증가시킵니다. 이를 더해 “전체 오류”를 만들면 중복됩니다. 다만 multicast의 `skb_clone()` 실패도 `RcvbufErrors`를 증가시키므로 이 필드를 소켓 한도 초과의 전용 증거로 보지는 않습니다. 송신에서는 `ip_send_skb()`의 `-ENOBUFS`를 `IP_RECVERR` 비활성 조건에서 호출자에게 숨기면서 `SndbufErrors`만 올리는 경로도 있습니다. 반환 오류 수와 커널 계정 수가 항상 같지는 않습니다. [수신 큐 분기](https://github.com/torvalds/linux/blob/v6.12/net/ipv4/udp.c#L2065), [multicast 예외](https://github.com/torvalds/linux/blob/v6.12/net/ipv4/udp.c#L2284), [송신 분기](https://github.com/torvalds/linux/blob/v6.12/net/ipv4/udp.c#L983)
+
+`/proc/net/netstat`의 `TcpExt:`에는 Linux 확장 계정이 있습니다. `ListenOverflows`는 accept queue 포화 관련 경로를, `ListenDrops`는 LISTEN 소켓에서의 더 넓은 drop 경로를 관측합니다. 두 값은 겹치므로 합하지 않습니다. `TCPSynRetrans`는 SYN 및 SYN/ACK 재전송, `TCPTimeouts`는 TCP 재전송 timeout 경로를 셉니다. `TCPTimeouts`를 애플리케이션 timeout이나 실패 연결 수와 일대일 대응시키지 않습니다. [확장 카운터 설명](https://docs.kernel.org/networking/snmp_counter.html), [6.12 TCP timer](https://github.com/torvalds/linux/blob/v6.12/net/ipv4/tcp_timer.c)
+
+<a id="chapter-docs-network-linux-stack-counters--계산-예시-재전송-비율은-손실-확률이-아니다"></a>
+
+### 계산 예시: 재전송 비율은 손실 확률이 아니다
+
+**예시:** 같은 namespace·수명·60초 구간에서 `ΔOutSegs=12000`, `ΔRetransSegs=180`이면 송신 계정 대비 재전송 비율은 `180 / 12000 × 100 = 1.5%`, 재전송 발생률은 `180 / 60 = 3회/초`입니다. 이는 가상 입력이며 권장 임계값이 아닙니다.
+
+이 비율을 “패킷 손실률 1.5%”로 표시하지 않습니다. 제어 세그먼트가 분모에 있고, 반복 재전송과 구간 이전에 보낸 데이터의 재전송이 분자에 들어올 수 있습니다. 수신 ACK 유실·순서 변경·spurious 재전송도 확인해야 합니다. 분모가 0이면 비율은 미정이며, 값이 100%를 넘었다고 자동으로 잘라내지 않습니다. 데이터만의 다른 비율을 정의하려면 `TCPOrigDataSent` 등으로 분모를 바꾼 **별도 지표**로 명명하고 SYN 재전송 포함 여부도 맞춥니다. [커널의 재전송·원본 데이터 구분](https://docs.kernel.org/networking/snmp_counter.html)
+
+<a id="chapter-docs-network-linux-stack-counters--연결-하나를-더-자세히-읽기"></a>
+
+### 연결 하나를 더 자세히 읽기
+
+다음은 **실행하지 않은 읽기 전용 예시**입니다. 현재 Linux network namespace에서 실행하며, 보통 일반 사용자로 통계 조회가 가능하지만 procfs 접근 정책·보안 설정에 따라 제한될 수 있습니다. 프로세스 소유자 표시나 다른 namespace 진입은 별도 권한이 필요합니다. `ss -K`처럼 소켓을 종료하는 옵션은 사용하지 않습니다. 전체 소켓 조회 비용은 소켓 수에 따라 커지므로 제품에서는 대상 필터와 주기를 둡니다.
+
+```sh
+cat /proc/net/snmp
+cat /proc/net/netstat
+ss -tin
+```
+
+`ss -ti`의 `rtt`는 평활 RTT와 편차(ms), `rto`는 재전송 timeout(ms), `cwnd`는 혼잡 윈도 크기(세그먼트 단위)입니다. 이들은 연결의 현재 상태이지 같은 길이의 구간 평균이 아닙니다. `retrans` 출력의 값도 단순한 비율이 아닙니다. iproute2의 `retrans:현재/누적` 표현은 `tcpi_retrans`와 `tcpi_total_retrans`에서 나오므로 해당 버전의 출력 형식과 소켓 수명을 확인합니다. [ss(8)](https://man7.org/linux/man-pages/man8/ss.8.html), [iproute2 v6.12.0 ss 출력 코드](https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/tree/misc/ss.c?h=v6.12.0)
+
+<a id="chapter-docs-network-linux-stack-counters--제품-적용-제안"></a>
+
+### 제품 적용 제안
+
+헤더의 이름 목록과 다음 값 목록을 짝지어 파싱하고 열 번호를 고정하지 않습니다. 필드 추가·누락·행 길이 불일치를 별도로 기록합니다. `snmp6`의 이름-값 행 형식은 다른 parser로 취급합니다. Linux 출력은 [SNMP 출력 코드](https://github.com/torvalds/linux/blob/v6.12/net/ipv4/proc.c)에서 확인할 수 있으며, RFC의 Counter32 표기를 Linux proc 파일의 실제 저장 폭에 그대로 대입하지 않습니다.
+
+재부팅·namespace 교체·관측 수명 불연속이면 새 기준점을 만듭니다. 값 감소 시 폭·연속성이 확인되지 않으면 wrap 보정을 추측하지 않습니다. 없는 필드를 0으로 채우지 않고 지원 여부와 수집 실패를 분리합니다. namespace 전체 이상에서 시작해 포트·소켓·프로세스로 좁혀 가되, 살아남은 소켓의 `ss` 표본만으로 이미 종료된 연결의 실패를 복원하지 않습니다.
+
+<a id="chapter-docs-network-linux-stack-counters--이해-확인"></a>
+
+### 이해 확인
+
+1. `CurrEstab`가 줄었으면 카운터 리셋인가? **아니다. 현재 연결 수 gauge다. CLOSE-WAIT 포함 여부는 upstream 6.10의 수정과 backport 여부를 확인한다.**
+2. `RcvbufErrors`와 `InErrors`를 더해도 되는가? **같은 실패가 겹칠 수 있어 합산하면 안 된다.**
+3. 재전송 비율 1.5%는 업무 요청의 실패율인가? **아니다. namespace의 세그먼트 계정 비율이며 요청과 대응하지 않는다.**
+4. 같은 Pod의 두 컨테이너에서 읽은 namespace 카운터가 같으면 수집 오류인가? **namespace 공유로 같은 원천을 두 번 읽었을 수 있다.**
+
+<a id="chapter-docs-network-linux-stack-counters--함께-읽기"></a>
+
+### 함께 읽기
+
+[TCP와 UDP](#chapter-docs-network-tcp-and-udp) · [네트워크 지표](#chapter-docs-network-network-metrics) · [호스트 수집 계약](#chapter-docs-host-collection-contracts) · [컨테이너 격리](#chapter-docs-containers-isolation-and-lifecycle)
+
+[통합 목차로](#book-top)
+
+---
+
 <a id="chapter-docs-network-layers-and-routing"></a>
 
 <a id="chapter-docs-network-layers-and-routing--링크-오버레이-mtu와-경로-제어"></a>
 
 ## 링크, 오버레이, MTU와 경로 제어
 
-> 상태: 검토됨 · 범위: Ethernet의 주소 해석, IPv6 ND·PMTUD, VXLAN, 기본 BGP 관측 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 범위: Ethernet의 주소 해석, IPv6 ND·PMTUD, VXLAN, 기본 BGP 관측 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (IPv4 PMTUD·DPLPMTUD)
 
 <a id="chapter-docs-network-layers-and-routing--먼저-이해할-것"></a>
 
@@ -3260,6 +3570,16 @@ VXLAN = 8 B
 
 IPv6 PMTUD는 경로의 더 작은 MTU를 Packet Too Big 메시지 등을 통해 알아내도록 정의합니다. 필요한 메시지가 전달되지 않는 경로에서는 작은 요청은 성공하지만 큰 패킷 전송이 멈추는 문제를 조사해야 합니다. [RFC 8201](https://www.rfc-editor.org/rfc/rfc8201.txt)
 
+<a id="chapter-docs-network-layers-and-routing--ipv4-pmtud와-탐색-패킷을-쓰는-방법"></a>
+
+### IPv4 PMTUD와 탐색 패킷을 쓰는 방법
+
+IPv4의 전통적인 PMTUD는 DF(Don't Fragment)를 설정한 패킷과 라우터의 ICMP fragmentation needed 응답을 이용합니다. 더 작은 경로 MTU를 알게 되면 송신 크기를 조절합니다. 필요한 ICMP가 차단되면 TCP 연결이나 작은 요청은 성공한 뒤 큰 데이터만 멈추는 black hole 현상이 생길 수 있습니다. IPv6의 Packet Too Big과 같은 이름·형식의 메시지로 저장하지 않습니다. [IPv4 PMTUD, RFC 1191](https://www.rfc-editor.org/rfc/rfc1191.html), [black hole 장애 양상, RFC 2923 §2.1](https://www.rfc-editor.org/rfc/rfc2923.html#section-2.1)
+
+PLPMTUD는 packetization layer가 탐색 크기와 전달 성공의 피드백을 이용해 경로 MTU를 찾는 방법입니다. 유효한 ICMP 오류의 도착에만 의존하지 않지만, 구현의 탐색·확인·손실 구분 절차가 필요합니다. RFC 4821의 일반 방법과 RFC 8899의 **datagram용 DPLPMTUD**를 구분합니다. RFC 8899를 모든 TCP 구현의 동작 명세로 인용하지 않습니다. [PLPMTUD, RFC 4821](https://www.rfc-editor.org/rfc/rfc4821.html), [DPLPMTUD, RFC 8899](https://www.rfc-editor.org/rfc/rfc8899.html)
+
+**제품 적용 제안:** 작은 요청과 큰 응답의 성공 차이, 경로 MTU·터널 헤더, ICMP 오류, TCP 재전송 또는 datagram probe 결과를 같은 관측 구간에 연결합니다. 이것들은 원인 후보를 좁히는 증거이며 ICMP 차단의 단독 증명은 아닙니다. 이 장에서는 능동 probe나 패킷 캡처를 실행하지 않았습니다. 실제 진단에는 대상 경로에 대한 권한과 probe 부하·캡처 권한을 확인하고, MTU·방화벽을 수집기가 자동 변경하지 않도록 합니다.
+
 <a id="chapter-docs-network-layers-and-routing--경로-제어와-실제-전달"></a>
 
 ### 경로 제어와 실제 전달
@@ -3290,6 +3610,7 @@ BGP는 경로 정보를 교환하며, 받은 경로·로컬에서 선택한 경�
 1. 원격 서버 IP의 ARP 항목이 없으면 통신할 수 없는가? **Ethernet의 로컬 다음 홉 주소가 필요한 경로일 수 있다.**
 2. BGP 연결이 정상이면 모든 prefix가 정상인가? **수신·선택·설치·실제 전달은 따로 확인해야 한다.**
 3. 내부 IP MTU 1,450 B를 업무 payload 1,450 B로 사용해도 되는가? **내부 전송·IP 헤더 크기를 추가로 고려해야 한다.**
+4. RFC 8899는 모든 TCP의 MTU 탐색 규약인가? **datagram용 DPLPMTUD이며 적용 전송과 구현을 확인해야 한다.**
 
 관련: [주소와 DNS](#chapter-docs-network-addressing-routing-dns), [인터페이스·흐름 지표](#chapter-docs-network-network-metrics), [Kubernetes 네트워크](#chapter-docs-kubernetes-network-and-storage)
 
@@ -3303,7 +3624,7 @@ BGP는 경로 정보를 교환하며, 받은 경로·로컬에서 선택한 경�
 
 ## 네트워크 장비 수집: SNMP, MIB와 인터페이스 수명
 
-> 상태: 검토됨 · 적용 범위: SNMPv3·IF-MIB·SNMPv2-MIB 표준, 수집기 설계 · 검토일: 2026-10-04 · 실제 장비 질의는 실행하지 않음
+> 상태: 검토됨 · 적용 범위: SNMPv3·IF-MIB·SNMPv2-MIB 표준, 수집기 설계 · 검토일: 2026-10-04 · 실제 장비 질의는 실행하지 않음 · 2라운드 보강 확인: 2026-10-05 (SNMPv1/v2c/v3 Counter64)
 
 SNMP는 장비의 관리 정보를 질의하는 프로토콜이고, MIB는 그 정보의 이름·타입·의미를 정의한 모음입니다. OID는 그 정의를 계층적인 숫자 주소로 식별합니다. 장비 이름이 같다고 모든 제조사의 CPU 지표가 같은 OID에 있는 것은 아닙니다. 표준 MIB와 제조사별 확장을 구분해야 합니다.
 
@@ -3341,6 +3662,26 @@ SNMP는 장비의 관리 정보를 질의하는 프로토콜이고, MIB는 그 �
 
 32bit Counter를 사용할 때는 수집 사이 여러 번 순환하면 단순 차분으로 복원할 수 없습니다. 1Gbit/s가 계속 흐른다는 단순 가정에서 32bit octet 카운터는 약 34.36초 만에 한 바퀴 돕니다. Counter64 지원 여부를 확인하고 32bit fallback에서는 가능한 최대 증가량과 수집 간격을 함께 다룹니다.
 
+<a id="chapter-docs-network-snmp-and-device-models--counter64는-snmpv3만의-기능이-아니다"></a>
+
+### Counter64는 SNMPv3만의 기능이 아니다
+
+SNMPv1은 Counter64를 표현하지 못합니다. RFC 3584 §4.2.2.1은 여러 SNMP 버전을 지원하는 responder가 **v1 메시지를 받은 경우**를 규정합니다. Counter64 객체의 GET에는 `noSuchName`을 반환하고, GETNEXT에서는 그 객체를 건너뜁니다. 따라서 v1 walk가 진행돼도 `ifHC*`가 빠질 수 있으며 이를 장비 자체의 고용량 카운터 미지원으로 확정하지 않습니다. SNMPv2c와 v3에서는 Counter64를 사용할 수 있지만 실제 MIB 구현·접근 권한도 확인해야 합니다. 암호화·인증과 카운터 폭은 별개입니다. [공존 규칙](https://www.rfc-editor.org/rfc/rfc3584.html#section-4.2.2.1)
+
+RFC 2863 §3.1.6의 속도별 카운터 요구 설명은 다음과 같습니다. 여기서 octet은 byte 단위이며 packet 카운터와 구분됩니다. [IF-MIB 고용량 카운터](https://www.rfc-editor.org/rfc/rfc2863.html#section-3.1.6)
+
+| 인터페이스 속도 | §3.1.6이 요구하는 카운터 |
+| --- | --- |
+| 20,000,000 bit/s 이하 | 32bit octet·packet |
+| 20,000,000 초과, 650,000,000 bit/s 미만 | 64bit octet·32bit packet |
+| 650,000,000 bit/s 이상 | 64bit octet·packet |
+
+단, 같은 RFC 뒤의 MIB conformance group 문구는 packet 카운터의 경계를 `greater than 650,000,000`으로 표현합니다. **정확히 650 Mbit/s인 장비의 구현 의무를 이 요약 표만으로 판정하지 않습니다.** 어댑터는 실제 지원 OID와 Counter64 반환 타입을 확인하고 미지원은 명시합니다. 64bit 카운터를 지원하더라도 불연속 시각·재시작 검사는 필요합니다.
+
+`ifSpeed`는 bit/s 단위의 Gauge32이며 표현 범위를 넘으면 최대값 `4,294,967,295`를 보고합니다. 고속 인터페이스에서는 `ifHighSpeed`의 1,000,000 bit/s 단위 속도 추정값을 사용합니다. 포화된 ifSpeed를 실제 링크 속도로 사용하면 이용률 분모가 작아집니다. [ifSpeed·ifHighSpeed 정의](https://www.rfc-editor.org/rfc/rfc2863.html)
+
+장비 조회는 이 장에서 실행하지 않았습니다. 실제 수집에는 읽기용 SNMP view·자격 증명·관리 경로가 필요하며, 대규모 walk는 장비 CPU와 관리 대역폭을 사용합니다. 지원 확인을 위해 설정을 변경하는 SET을 자동 실행하지 않는 수집 계약을 제안합니다.
+
 <a id="chapter-docs-network-snmp-and-device-models--조회와-알림은-서로-보완한다"></a>
 
 ### 조회와 알림은 서로 보완한다
@@ -3366,6 +3707,8 @@ SNMPv3에서는 보안 모델과 인증·프라이버시 수준을 명시합니�
 1. sysUpTime 감소는 항상 호스트 재부팅인가? **관리 프로세스 초기화나 wrap 등을 구분해야 합니다.**
 2. ifIndex=7은 모든 장비의 같은 포트인가? **장비와 관리 범위가 필요한 지역 식별자입니다.**
 3. SNMP 응답 timeout이면 포트가 down인가? **관리 경로·자격 증명·부하를 먼저 구분합니다.**
+4. Counter64를 읽으려면 반드시 SNMPv3이어야 하는가? **v2c도 표현할 수 있고, 장비 구현·권한은 따로 확인합니다.**
+5. 포화된 ifSpeed를 분모로 삼아도 되는가? **ifHighSpeed 등 올바른 속도 근거를 확인해야 합니다.**
 
 관련: [네트워크 지표](#chapter-docs-network-network-metrics) · [수집 계약](#chapter-docs-product-adapter-contracts)
 
@@ -3590,7 +3933,7 @@ Linux `fsync()`는 파일의 변경된 데이터·메타데이터를 저장 장�
 
 ## 쓰기가 끝났다는 뜻: 버퍼, fsync, WAL과 복제
 
-> 상태: 검토됨 · 적용 범위: Linux 파일 API와 PostgreSQL 18의 지속성 규약 · 검토일: 2026-10-04 · 전원 장애·장치 고장·복제 장애는 직접 재현하지 않음
+> 상태: 검토됨 · 적용 범위: Linux 파일 API와 PostgreSQL 18의 지속성 규약 · 검토일: 2026-10-04 · 전원 장애·장치 고장·복제 장애는 직접 재현하지 않음 · 2라운드 보강 확인: 2026-10-05 (FLUSH/FUA·PG18 fsync 실패)
 
 <a id="chapter-docs-storage-write-path-and-durability--먼저-이해할-것"></a>
 
@@ -3639,6 +3982,22 @@ Linux `write()`는 요청한 크기보다 적은 byte를 쓸 수 있으므로 �
 | fsync 성공 | OS·장치 인터페이스가 보고한 동기화 완료 | 실제 장치가 약속을 지키는지와 장애 범위 |
 | DB commit 응답 | DB 설정이 정의한 완료 경계 | 복제본·HA 전환·전체 업무 완료 |
 
+<a id="chapter-docs-storage-write-path-and-durability--장치-write-cache와-flushfua"></a>
+
+### 장치 write cache와 FLUSH·FUA
+
+**Linux block 규약, 2026-10-05 확인:** 장치가 휘발성 write-back cache에서 완료를 응답하면 전원 상실 전에 매체에 도달하지 않은 데이터가 있을 수 있습니다. `REQ_PREFLUSH`는 해당 I/O에 앞서 장치의 기존 휘발성 cache를 flush하게 하고, `REQ_FUA`는 그 쓰기 자체가 비휘발성 경계에 도달하기 전에 완료로 보고하지 않게 합니다. 둘은 범위와 순서가 다르며 장치·driver가 기능을 구현하거나 적절히 대체하는 조건이 필요합니다. [Linux write cache 제어](https://docs.kernel.org/block/writeback_cache_control.html)
+
+`O_DIRECT`는 주로 page cache와의 상호작용을 줄이는 I/O 경로 선택입니다. 이것만으로 `O_SYNC`의 동기화 보장을 주지 않습니다. direct I/O 측정이 빠르거나 느린 이유를 설명할 때 cache 우회·정렬 제약·장치 cache·flush 포함 여부를 나눕니다. 제품에서 `direct=true`만으로 “전원 장애에도 지속”이라는 속성을 만들지 않습니다. [open(2)의 O_DIRECT](https://man7.org/linux/man-pages/man2/open.2.html)
+
+<a id="chapter-docs-storage-write-path-and-durability--fsync-오류-후-재시도가-성공했다는-의미"></a>
+
+### fsync 오류 후 재시도가 성공했다는 의미
+
+첫 fsync가 실패한 뒤 두 번째 fsync가 성공해도 이전 dirty data까지 복구됐다고 단정할 수 없습니다. OS가 실패한 dirty page를 버린다면 재시도는 잃은 내용을 다시 쓰지 못합니다. PostgreSQL 18의 `data_sync_retry`는 기본 `off`이며, 수정한 데이터 파일 동기화 실패에서 PANIC을 발생시킵니다. `on`은 다음 checkpoint에서 재시도하지만 OS 동작에 따라 데이터 손상 위험이 있어 단순 가용성 개선 옵션으로 소개하지 않습니다. [PostgreSQL 오류 처리](https://www.postgresql.org/docs/18/runtime-config-error-handling.html#GUC-DATA-SYNC-RETRY)
+
+제품 적용 제안은 최초 동기화 오류·관련 파일/장치·checkpoint·복구 사건을 남겨 후속 성공으로 덮어쓰지 않는 것입니다. 이 절에서는 cache 설정·`data_sync_retry` 변경이나 실패 주입을 실행하지 않았습니다.
+
 <a id="chapter-docs-storage-write-path-and-durability--db가-데이터-페이지보다-wal을-먼저-다루는-이유"></a>
 
 ### DB가 데이터 페이지보다 WAL을 먼저 다루는 이유
@@ -3683,6 +4042,8 @@ PostgreSQL의 asynchronous commit에서는 최근에 성공 응답한 트랜잭�
 
 ### 이해 확인
 
+추가 질문: O_DIRECT 성공이나 fsync 재시도 성공만으로 앞선 실패 데이터의 지속성을 확정할 수 있는가? **직접 I/O·동기화 완료·실패 후 캐시 상태는 서로 다른 계약입니다.**
+
 1. write가 요청 크기를 반환하면 전원 장애에도 보존되는가? **지속성 경계를 확인해야 합니다. write 성공만으로 충분하지 않습니다.**
 2. DB commit은 모든 데이터 페이지가 제자리 파일에 기록됐다는 뜻인가? **WAL과 실제 commit 정책을 확인합니다.**
 3. receive lag와 apply lag는 같은가? **복제본의 완료 단계가 다릅니다.**
@@ -3698,7 +4059,7 @@ PostgreSQL의 asynchronous commit에서는 최근에 성공 응답한 트랜잭�
 
 ## 저장 용량, 복제, 스냅샷과 복구 가능성
 
-> 상태: 검토됨 · 적용 범위: 공통 용량 모델, Ceph Squid erasure coding·EBS snapshot 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: 공통 용량 모델, Ceph Squid erasure coding·EBS snapshot 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (Ceph Squid min_size·PG 상태)
 
 버전 상태: Ceph 설명은 Squid 문서에 고정했습니다. 공식 표의 Squid 예상 종료일은 2026-10-31이며 검토 시점 최신 계열은 Tentacle 20.2.x입니다. 확정 보증일과 예상 일정을 구분합니다. [버전 상태와 공식 근거](#chapter-docs-coverage--교차-검토-시점의-버전-상태)
 
@@ -3741,6 +4102,18 @@ Ceph의 replicated pool은 객체 복사본을 유지하고 erasure-coded pool�
 
 후자가 이 계산에서 적은 공간을 쓰더라도 지연·복구 비용·작은 쓰기 특성까지 동일한 것은 아닙니다. “chunk 3개 손실 대응”과 “임의의 물리 호스트 3개 장애 대응”도 배치 조건 없이 같은 보장으로 바꾸지 않습니다.
 
+<a id="chapter-docs-storage-capacity-and-protection--ceph의-복제-목표와-io-가능-기준"></a>
+
+### Ceph의 복제 목표와 I/O 가능 기준
+
+복제본이 목표보다 줄어든 것과 I/O를 못 하는 것은 다릅니다. **Squid 문서, 2026-10-05 확인:** replicated pool의 `size`는 목표 복사본 수, `min_size`는 degraded 상태에서 I/O를 허용할 최소 복사본 수입니다. PG는 객체들을 함께 배치·복구하는 placement group입니다. `undersized`는 목표보다 사본이 적은 상태, `peered`이지만 active가 아닌 경우에는 min_size 부족으로 **읽기를 포함한 client I/O**를 제공하지 못하면서 복구가 진행될 수 있습니다. [pool](https://docs.ceph.com/en/squid/rados/operations/pools/), [PG 상태](https://docs.ceph.com/en/squid/rados/operations/pg-states/)
+
+**예시:** size=3, min_size=2인 replicated pool에서 유효 사본 2개라면 다른 조건이 충족될 때 degraded I/O가 가능하지만, 1개라면 min_size에 미달합니다. “OSD가 한 개 죽었으므로 모든 PG가 inactive”라는 결론도, “사본이 하나 있으므로 읽기는 항상 가능”이라는 결론도 나오지 않습니다. PG별 acting set·peering·다른 상태와 장애 영역을 확인합니다.
+
+Squid 19.2.3의 EC pool 생성 기본 계산은 `min_size = k + min(1, m−1)`입니다. **예시:** k=4, m=2이면 기본 min_size는 `4+min(1,1)=5`입니다. 복원에 필요한 k개 chunk가 남는 것과 client I/O 허용 조건은 다릅니다. 실제 pool에서 명시적으로 바꾼 `min_size`를 우선 읽으며, 이 식을 모든 Ceph 버전·복제 pool에 적용하지 않습니다. [고정 버전 생성 코드](https://github.com/ceph/ceph/blob/v19.2.3/src/mon/OSDMonitor.cc#L7773)
+
+제품 적용 제안은 목표 복제 수·최소 수·PG 상태·가용성 영향을 분리하는 것입니다. `min_size`를 낮추는 변경은 보호 수준을 바꾸므로 자동 복구용 수집 동작에 포함하지 않습니다. Ceph 명령이나 장애 주입은 이번에 실행하지 않았습니다.
+
 <a id="chapter-docs-storage-capacity-and-protection--스냅샷과-백업"></a>
 
 ### 스냅샷과 백업
@@ -3774,6 +4147,8 @@ EBS snapshot은 증분 방식으로 이전 snapshot 이후 변경된 블록을 �
 
 ### 이해 확인
 
+추가 질문: Ceph에서 size=3 중 두 사본만 남으면 반드시 I/O가 멈추는가? **min_size와 PG의 peering·active 상태 등 조건을 함께 봐야 합니다.**
+
 1. k=4, m=2의 이상화된 보호 공간 비율은? **1.5배입니다.**
 2. snapshot 10개가 논리 볼륨 10배의 실제 저장량인가? **증분·중복 구조를 확인해야 합니다.**
 3. 저장 성공과 복구 시험 성공은 같은가? **복구 가능성은 별도 검증 대상입니다.**
@@ -3790,7 +4165,7 @@ EBS snapshot은 증분 방식으로 이전 snapshot 이후 변경된 블록을 �
 
 ## 저장 경로를 따라가기: RAID, LVM, SAN과 NAS
 
-> 상태: 검토됨 · 적용 범위: Linux MD·device mapper, iSCSI·NFS 개념 · 검토일: 2026-10-04 · 장치 변경 명령과 장애 주입은 실행하지 않음
+> 상태: 검토됨 · 적용 범위: Linux MD·device mapper, iSCSI·NFS 개념 · 검토일: 2026-10-04 · 장치 변경 명령과 장애 주입은 실행하지 않음 · 2라운드 보강 확인: 2026-10-05 (RHEL 9 multipath 경로 부재 정책)
 
 앱에서 보이는 파일과 물리 디스크 사이에는 여러 계층이 있을 수 있습니다. 가상으로 `/data/order.db`는 파일시스템 위에 있고, 파일시스템은 논리 볼륨, 논리 볼륨은 RAID 장치, RAID는 여러 디스크를 사용할 수 있습니다. 클라우드와 스토리지 어레이에서는 더 아래의 일부 계층이 사용자에게 공개되지 않습니다.
 
@@ -3852,9 +4227,19 @@ NAS는 네트워크를 통해 파일 접근을 제공하는 환경입니다. NFS
 
 “볼륨 가득 참” 화면에서 사용자에게 어느 층이 가득 찼는지를 보여 주는 것이 핵심입니다. 파일시스템, thin pool 데이터, thin pool 메타데이터, 원격 quota를 한 비율로 덮지 않습니다.
 
+<a id="chapter-docs-storage-raid-lvm-and-paths--모든-경로가-끊겼는데-오류가-보이지-않는-경우"></a>
+
+### 모든 경로가 끊겼는데 오류가 보이지 않는 경우
+
+SAN 경로가 모두 사라지면 I/O가 즉시 실패할 수도, 큐에서 계속 기다릴 수도 있습니다. **RHEL 9 dm-multipath 문서, 2026-10-05 확인:** `queue_if_no_path`는 `no_path_retry=queue`와 같은 의미의 무경로 대기 정책입니다. 이 구성에서는 경로가 돌아올 때까지 I/O를 낸 프로세스가 멈춘 것처럼 보일 수 있습니다. `no_path_retry`의 유한 값·fail 설정, 하부 SCSI 복구 timeout과도 구분합니다. [DM Multipath 설정](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html-single/configuring_device_mapper_multipath/index)
+
+따라서 “디스크 오류 counter=0”이 정상 응답을 보장하지 않습니다. path 상태, 미완료 I/O, 앱 지연·timeout을 함께 봅니다. 같은 LUN의 여러 경로를 독립 데이터 디스크처럼 합산하지 않는 것과 더불어, 대기 정책 때문에 실패가 지연된 상태도 모델링해야 합니다. 제품 적용 제안은 path 복구를 기다리는 시간과 업무 deadline을 따로 표시하는 것입니다. multipath 정책 변경·서비스 재시작·경로 차단은 실행하지 않았습니다.
+
 <a id="chapter-docs-storage-raid-lvm-and-paths--이해-확인"></a>
 
 ### 이해 확인
+
+추가 질문: 모든 경로가 사라졌는데 I/O 오류가 안 보이면 정상인가? **queue_if_no_path 정책으로 작업이 계속 대기하는 상태일 수 있습니다.**
 
 1. RAID가 있으니 백업이 불필요한가? **잘못된 변경의 복구와 장치 고장 대응은 다릅니다.**
 2. 24TiB를 논리 제공했으니 물리 디스크도 24TiB 사용 중인가? **thin 할당과 실제 소비를 확인합니다.**
@@ -4482,12 +4867,13 @@ API에서 얻는 리소스 상태, 런타임에서 얻는 사용량, 애플리�
 1. [Kubernetes 객체와 제어 루프](#chapter-docs-kubernetes-objects-and-control-loops)
 2. [Pod 수명, 컨테이너 상태와 건강 검사](#chapter-docs-kubernetes-pod-lifecycle)
 3. [자원 요청, 제한, 배치와 확장](#chapter-docs-kubernetes-resources-and-scheduling)
-4. [Kubernetes 수집 경로와 데이터의 의미](#chapter-docs-kubernetes-collection)
-5. [Kubernetes 인벤토리의 정확성: 목록, watch와 삭제의 의미](#chapter-docs-kubernetes-inventory-consistency)
-6. [Kubernetes 네트워크와 저장소의 연결 관계](#chapter-docs-kubernetes-network-and-storage)
-7. [워크로드 종류와 제어 평면의 가용성](#chapter-docs-kubernetes-workloads-and-control-plane)
-8. [CNI와 CSI: Pod 연결과 볼륨 준비가 실패하는 위치](#chapter-docs-kubernetes-cni-csi-and-data-paths)
-9. [API 변경, CRD와 Operator를 관측하는 방법](#chapter-docs-kubernetes-operators-and-api-lifecycle)
+4. [Kubernetes 자원 압박과 종료 원인](#chapter-docs-kubernetes-pressure-and-termination)
+5. [Kubernetes 수집 경로와 데이터의 의미](#chapter-docs-kubernetes-collection)
+6. [Kubernetes 인벤토리의 정확성: 목록, watch와 삭제의 의미](#chapter-docs-kubernetes-inventory-consistency)
+7. [Kubernetes 네트워크와 저장소의 연결 관계](#chapter-docs-kubernetes-network-and-storage)
+8. [워크로드 종류와 제어 평면의 가용성](#chapter-docs-kubernetes-workloads-and-control-plane)
+9. [CNI와 CSI: Pod 연결과 볼륨 준비가 실패하는 위치](#chapter-docs-kubernetes-cni-csi-and-data-paths)
+10. [API 변경, CRD와 Operator를 관측하는 방법](#chapter-docs-kubernetes-operators-and-api-lifecycle)
 
 관련 문서: [호스트](#chapter-docs-host-readme), [애플리케이션](#chapter-docs-application-readme), [도메인 간 분석](#chapter-docs-cross-domain-readme)
 
@@ -4788,13 +5174,131 @@ HPA의 기본 비례 계산은 다음과 같습니다. 실제 결정에는 누�
 
 ---
 
+<a id="chapter-docs-kubernetes-pressure-and-termination"></a>
+
+<a id="chapter-docs-kubernetes-pressure-and-termination--kubernetes-자원-압박과-종료-원인"></a>
+
+## Kubernetes 자원 압박과 종료 원인
+
+> 상태: 검토됨 · 적용 범위: Kubernetes 1.34–1.37, Linux cgroup v2와 명시한 v1 차이 · 원천 확인일: 2026-10-05 · workload 실행 미검증
+
+<a id="chapter-docs-kubernetes-pressure-and-termination--먼저-이해할-상황"></a>
+
+### 먼저 이해할 상황
+
+“Pod가 메모리 때문에 죽었다”는 설명만으로는 제품의 원인 분류를 정하기 어렵습니다. 컨테이너의 한도에 도달해 커널이 프로세스를 종료했는지, 노드 전체의 부족을 감지한 kubelet이 Pod를 축출했는지에 따라 증거와 복구가 다릅니다. [request와 limit](#chapter-docs-kubernetes-resources-and-scheduling), [cgroup 메모리 계정](#chapter-docs-containers-memory-accounting-and-oom)을 먼저 구분합니다.
+
+<a id="chapter-docs-kubernetes-pressure-and-termination--qos는-자원-명세의-분류다"></a>
+
+### QoS는 자원 명세의 분류다
+
+컨테이너 수준 CPU·메모리 자원 설정을 사용하는 경우 아래 규칙을 적용합니다. init container도 고려하며, 사용자가 보낸 원본 YAML이 아닌 admission과 defaulting 이후의 객체를 봅니다. 실제 분류는 `status.qosClass`로 확인합니다. [QoS 정의](https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/), [QoS 계산 코드 v1.37.0](https://github.com/kubernetes/kubernetes/blob/v1.37.0/pkg/apis/core/v1/helper/qos/qos.go)
+
+| QoS | 분류 기준 | 보장하지 않는 것 |
+| --- | --- | --- |
+| Guaranteed | 모든 컨테이너에 양수 CPU·메모리 request와 limit이 있고, 각 자원에서 request=limit | 노드 장애·디스크 압박·자기 한도 OOM에 대한 생존 보장 |
+| BestEffort | CPU·메모리 request/limit이 없음 | 유휴 자원의 장기 확보 |
+| Burstable | 위 두 조건 사이 | 실제 사용량이 항상 request 이하라는 보장 |
+
+1.34부터 기본 활성 Beta인 Pod-level resources를 사용하는 1.37의 해당 분기에서는 **컨테이너별 값 대신 `.spec.resources`로 QoS를 결정**합니다. 두 자원의 request=limit인 Pod-level Guaranteed 조건이 있으므로 컨테이너 필드만 재계산하면 오분류할 수 있습니다. 실제 코드는 gate와 Pod-level 자원 설정 여부를 검사하므로 비어 있는 `.spec.resources`의 존재만으로 분기를 단정하지 않습니다. Pod-level resize와 컨테이너 resize의 단계도 구분합니다. [Pod-level 규칙](https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/#guaranteed), [1.37 ComputePodQOS](https://github.com/kubernetes/kubernetes/blob/v1.37.0/pkg/apis/core/v1/helper/qos/qos.go)
+
+<a id="chapter-docs-kubernetes-pressure-and-termination--노드-압박을-감지하는-신호와-축출-순서"></a>
+
+### 노드 압박을 감지하는 신호와 축출 순서
+
+Linux의 kubelet eviction 신호 `memory.available`은 `node capacity − node memory working set`으로 산출합니다. `/proc/meminfo`의 `MemAvailable`을 그대로 읽은 값이 아닙니다. kubelet의 working set 계산에서는 `inactive_file`을 회수 가능하다고 보고 제외하는 점도 유의합니다. [eviction 신호](https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals)
+
+**1.37의 예외:** `HugepageAwareEviction`은 Beta·기본 활성입니다. hugepage를 구성한 노드에서는 eviction manager가 쓰는 `memory.available`에서 노드의 hugepage 총용량을 추가로 뺍니다. memory cgroup working set이 hugetlb 할당을 계정하지 않아 여유가 부풀려지는 것을 보정합니다. 사용 중인 hugepage만 빼는 식이 아니므로 제품은 보정 여부를 함께 보존합니다. [hugepage 보정](https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#memory-signals), [gate 이력](https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/)
+
+| 신호 | 단위·범위 | 추가로 확인할 것 |
+| --- | --- | --- |
+| `memory.available` | byte 또는 capacity 대비 비율 | 노드 working set·시스템 daemon 사용량·cgroup OOM |
+| `nodefs.available`, `nodefs.inodesFree` | 파일시스템 여유 byte / inode 수 | 로그·emptyDir·쓰기 계층, 실제 mount |
+| `imagefs.available`, `imagefs.inodesFree` | 이미지 전용 파일시스템이 있는 경우의 여유 | runtime이 보고한 분리 구성 |
+| `containerfs.*` | 지원 구성의 컨테이너 쓰기 계층 파일시스템 | Kubernetes·runtime·feature gate 지원 여부 |
+| `pid.available` | PID 여유 수 | 프로세스·스레드 소비, 노드 PID 제한 |
+
+soft 임계는 지정한 grace 기간 동안 부족이 지속되어야 하며, hard 임계는 이 유예 없이 반응합니다. soft eviction의 Pod 종료 유예도 별도 설정을 봅니다. node-pressure eviction은 Eviction API를 통한 자발적 중단과 달라 PDB를 존중한다고 가정할 수 없습니다. 먼저 노드 자원을 회수한 뒤 Pod 축출이 필요하면 **request 초과 여부 → Pod Priority → request 대비 사용량**을 고려합니다. 디스크·PID는 자원별 ranking 조건이 달라 “항상 BestEffort → Burstable → Guaranteed”라는 고정 정렬로 구현하지 않습니다. [축출과 순위](https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#pod-selection-for-kubelet-eviction), [ranking 코드](https://github.com/kubernetes/kubernetes/blob/v1.37.0/pkg/kubelet/eviction/helpers.go)
+
+<a id="chapter-docs-kubernetes-pressure-and-termination--커널-oom-선택과-컨테이너의-종료-범위"></a>
+
+### 커널 OOM 선택과 컨테이너의 종료 범위
+
+Linux kubelet **1.37.0 구현**의 `oom_score_adj`는 Guaranteed `−997`, BestEffort `1000`입니다. 일반 Burstable 컨테이너는 `1000 − (1000 × memoryRequestBytes / machineMemoryCapacityBytes)`를 정수 나눗셈으로 계산하고 하한 **3**, 상한 999로 제한합니다. 설명 문서의 하한 2보다 고정 버전 코드의 `1000 + guaranteedOOMScoreAdj = 3`을 우선합니다. Pod-level request를 나누는 보정과 재시작 가능한 init container(sidecar) 보정이 있어 이 기본 식 하나로 모든 컨테이너 값을 재계산하지 않습니다. `system-node-critical`에도 별도 규칙이 있습니다. 이 값은 kernel OOM 선택을 조정하며 kubelet eviction 순위 자체가 아닙니다. [1.37 정책·정수 계산](https://github.com/kubernetes/kubernetes/blob/v1.37.0/pkg/kubelet/qos/policy.go), [회귀 테스트](https://github.com/kubernetes/kubernetes/blob/v1.37.0/pkg/kubelet/qos/policy_test.go)
+
+cgroup v2 Linux의 kubelet 설정 `singleProcessOOMKill`은 기본값이 `false`입니다. 이 경우 컨테이너 cgroup에 `memory.oom.group`을 설정하는 동작을 사용합니다. `true`이면 이 flag 설정을 막아 프로세스를 개별 종료하는 v1 방식에 가깝게 합니다. kernel의 `memory.events`에서 `oom`은 한도에 도달해 할당이 실패할 상황에 이른 횟수입니다. 모든 할당 실패가 이 계정에 들어가거나 모두 kill로 이어지는 것은 아닙니다. `oom_kill`은 OOM killer가 종료한 프로세스 수, `oom_group_kill`은 group OOM 발생 수를 읽습니다. `memory.events`는 하위 계층 사건도 포함할 수 있으므로 `memory.events.local`과 범위를 구분합니다. [kubelet 설정](https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/), [cgroup v2](https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files)
+
+group kill에도 커널의 예외가 있으므로 “모든 프로세스가 반드시 함께 종료된다”로 일반화하지 않습니다. 특히 `oom_score_adj=-1000`인 task는 제외됩니다. OOM 사건 횟수, 종료 프로세스 수, 컨테이너 재시작 수는 서로 다른 단위입니다. [memory.oom.group 정의](https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files)
+
+<a id="chapter-docs-kubernetes-pressure-and-termination--oomkilled와-evicted를-증거로-나눈다"></a>
+
+### OOMKilled와 Evicted를 증거로 나눈다
+
+| 관측 | 지지하는 설명 | 추가 증거·확정하지 못하는 점 |
+| --- | --- | --- |
+| `containerStatuses[].state.terminated.reason=OOMKilled` 또는 `lastState.terminated.reason=OOMKilled` | runtime이 현재 또는 직전 컨테이너 종료를 OOM으로 보고 | `restartPolicy: Never`로 재시작하지 않은 경우 현재 `state`도 확인; cgroup·kernel 로그로 한도 OOM과 노드 OOM 구분 |
+| Pod `phase=Failed`, `reason=Evicted`와 압박 관련 message | kubelet의 Pod 축출 | node condition, eviction 신호, kubelet event/log의 시간순서 |
+| exit code 137만 존재 | SIGKILL과 일치하는 종료 코드일 수 있음 | OOM의 단독 증거 아님; 다른 강제 종료도 가능 |
+| `memory.events.oom_kill` 증가, 재시작 없음 | 일부 프로세스 OOM 가능 | PID 1 생존·group 설정·runtime 보고 확인 |
+| `memory.events.high` 증가, 종료 없음 | `memory.high` 초과로 task가 직접 회수·throttling 경로에 들어감 | OOM kill 횟수가 아님; 한도·PSI·처리 지연을 함께 확인 |
+
+`lastState`는 모든 과거 종료를 보존하는 원장이 아닙니다. Pod UID·container ID·시각·restartCount와 event를 연계해 이력을 수집합니다. `OOMKilled`를 곧바로 “메모리 limit 초과 확정”으로 표기하지 않고, `Evicted`도 모든 원인이 메모리라고 가정하지 않습니다. [Pod 상태](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/), [eviction 동작](https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/)
+
+**MemoryQoS는 1.37에서 Beta·기본 활성**이지만 `memoryThrottlingFactor` 기본값은 `nil`이어서 kubelet이 이 기능으로 `memory.high`를 설정하지 않습니다. 값을 지정한 지원 구성에서는 OOM 없이도 `high` 계정과 처리 지연이 늘 수 있습니다. 이는 회수 작업과 throttling으로 task가 지연되는 상황이며 회수 자체가 늦춰진다는 뜻은 아닙니다. `memory.high`는 OOM kill을 직접 일으키는 한도가 아니지만 같은 시스템의 `memory.max` 도달 등 다른 OOM 가능성을 없애지도 않습니다. [gate 기본값](https://github.com/kubernetes/kubernetes/blob/v1.37.0/pkg/features/kube_features.go#L1845), [kubelet 설정 정의](https://github.com/kubernetes/kubernetes/blob/v1.37.0/staging/src/k8s.io/kubelet/config/v1beta1/types.go#L899), [적용 코드](https://github.com/kubernetes/kubernetes/blob/v1.37.0/pkg/kubelet/kuberuntime/kuberuntime_container_linux.go), [kernel memory.high·events](https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files)
+
+<a id="chapter-docs-kubernetes-pressure-and-termination--한도와-수집-경로도-수명-중-바뀐다"></a>
+
+### 한도와 수집 경로도 수명 중 바뀐다
+
+컨테이너 CPU·메모리 in-place resize는 **1.35에서 Stable**입니다. `.spec.containers[].resources`는 원하는 값, `.status.containerStatuses[].resources`는 실행 중 컨테이너에 설정된 값입니다. 시작 전이나 재시작 시에는 다음 시작에 할당된 자원을 나타내는 의미도 있습니다. `allocatedResources`와 `PodResizePending`·`PodResizeInProgress`를 함께 보면 적용 대기와 완료를 구분할 수 있습니다. [resize 문서](https://v1-35.docs.kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/)
+
+**예시:** 같은 컨테이너의 메모리 사용량이 400 MiB인 채 실제 한도가 512 MiB에서 1024 MiB로 바뀌면 사용률은 `78.125% → 39.0625%`입니다. 사용량이 절반으로 줄어든 것이 아닙니다. 분모의 적용 시각을 저장하고 request 기준 비율과 limit 기준 비율을 구분합니다. spec 변경 시각을 실제 한도 적용 시각으로 대체하지 않습니다.
+
+| kubelet 경로 | 관측 목적 | 호환성 경계 |
+| --- | --- | --- |
+| `/stats/summary` | node·Pod·container 자원 통계 JSON | runtime/CRI 통계와 cAdvisor 경로, OS에 따라 제공 범위 확인 |
+| `/metrics/resource` | CPU·메모리 등 resource metrics용 제한된 지표 | 전체 cAdvisor 지표의 별칭 아님; metrics-server 0.6+의 사용 경로 |
+| `/metrics/cadvisor` | cAdvisor의 자세한 컨테이너 지표 | 지표 수명·label·OS·runtime 범위 별도 확인 |
+| `/metrics/probes` | kubelet probe 관련 지표 | 자원 사용량 endpoint와 구분 |
+
+Prometheus endpoint 구분은 [System Metrics](https://kubernetes.io/docs/concepts/cluster-administration/system-metrics/), Summary API와 metrics-server 경로는 [Node Metrics Data](https://kubernetes.io/docs/reference/instrumentation/node-metrics/)를 따릅니다. PSI는 `KubeletPSI`가 1.34 Beta 기본 활성, **1.36 GA**이며 Linux PSI·cgroup v2 전제가 필요합니다. Summary API와 `/metrics/cadvisor`에 노출되며 Windows에는 제공되지 않습니다. 1.36에서는 OS가 지원하지 않을 때 거짓 0 대신 생략하도록 개선됐습니다. endpoint 존재만으로 PSI 지원을 인정하지 않습니다. [PSI GA 설명](https://kubernetes.io/blog/2026/05/12/kubernetes-v1-36-psi-metrics-ga/)
+
+cgroup v1은 [1.31부터 유지보수 상태](https://kubernetes.io/blog/2024/08/14/kubernetes-1-31-moving-cgroup-v1-support-maintenance-mode/)이며 **1.35부터 Deprecated**입니다. kubelet의 `failCgroupV1` 기본값도 **1.35부터 true**입니다. 1.37에서도 `false` override가 남아 있으므로 “v1 코드가 이미 제거됐다”와 “기본 설정으로 시작을 거부한다”를 구분합니다. [cgroup v1 상태](https://kubernetes.io/docs/concepts/architecture/cgroups/), [1.37 릴리스 설명](https://kubernetes.io/blog/2026/08/26/kubernetes-v1-37-release/)
+
+<a id="chapter-docs-kubernetes-pressure-and-termination--제품-적용-제안"></a>
+
+### 제품 적용 제안
+
+종료 화면을 `관측한 reason`, `추정 원인`, `뒷받침하는 증거`, `누락된 증거`로 구성합니다. 노드 압박·cgroup 사건·실제 자원 한도·Pod UID를 같은 시간 축에서 비교합니다. workload를 실행하지 않는 envtest API 실습으로 OOM이나 eviction 동작을 검증했다고 표시하지 않습니다.
+
+API 객체 조회에는 해당 namespace/리소스의 `get/list/watch`, kubelet endpoint 조회에는 별도의 인증·인가가 필요합니다. API proxy 권한을 읽기 전용 지표 수집 권한과 동일하게 취급하지 않습니다. cgroup·kernel 로그 접근은 노드 정책을 따릅니다. 높은 빈도의 전체 Pod/컨테이너 수집은 노드와 API server에 부하를 줄 수 있습니다. 이 장에서는 조회·설정 명령이나 압박 주입을 실행하지 않았습니다.
+
+<a id="chapter-docs-kubernetes-pressure-and-termination--이해-확인"></a>
+
+### 이해 확인
+
+1. Guaranteed이면 eviction이 불가능한가? **아니다. 자원 명세의 QoS 분류이며 모든 종료 원인에 대한 면제가 아니다.**
+2. OOMKilled이면 컨테이너 limit 초과가 확정되는가? **노드 OOM 등과 구분할 추가 증거가 필요하다.**
+3. resize 후 사용률이 절반이면 사용량도 절반인가? **분모 한도가 바뀌었을 수 있다.**
+4. PSI 필드가 없으면 압력이 0인가? **OS·버전·수집 경로·지원 여부를 먼저 확인한다.**
+
+<a id="chapter-docs-kubernetes-pressure-and-termination--함께-읽기"></a>
+
+### 함께 읽기
+
+[자원과 배치](#chapter-docs-kubernetes-resources-and-scheduling) · [수집 경로](#chapter-docs-kubernetes-collection) · [메모리와 OOM](#chapter-docs-containers-memory-accounting-and-oom) · [자원 장애 분석](#chapter-docs-cross-domain-resource-failures)
+
+[통합 목차로](#book-top)
+
+---
+
 <a id="chapter-docs-kubernetes-collection"></a>
 
 <a id="chapter-docs-kubernetes-collection--kubernetes-수집-경로와-데이터의-의미"></a>
 
 ## Kubernetes 수집 경로와 데이터의 의미
 
-> 상태: 검토됨 · 적용 범위: API 객체, kube-state-metrics, Resource Metrics API, 컴포넌트 지표 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 1.1판 resourceVersion 규약 재검토: 2026-10-04
+> 상태: 검토됨 · 적용 범위: API 객체, kube-state-metrics, Resource Metrics API, 컴포넌트 지표 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 1.1판 resourceVersion 규약 재검토: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (1.37 WatchList·streaming list)
 
 <a id="chapter-docs-kubernetes-collection--먼저-이해할-것"></a>
 
@@ -4844,6 +5348,16 @@ API는 객체 목록 조회와 변경 watch를 지원합니다. 오래된 `resou
 
 재목록 조회에 실패한 상태에서 이전 캐시의 모든 객체를 삭제 처리하지 않습니다. 목록을 다 받기 전에는 아직 관측하지 않은 객체와 삭제된 객체를 구분할 수 없기 때문입니다. 페이지를 나눠 받은 경우에도 수집 범위의 완료 여부가 필요합니다.
 
+<a id="chapter-docs-kubernetes-collection--streaming-list와-초기-동기화-완료"></a>
+
+### streaming list와 초기 동기화 완료
+
+**2026-10-05, Kubernetes 1.37 문서·코드 확인:** 기존 list → watch 외에 watch 요청에 `sendInitialEvents=true`를 넣는 streaming list가 있습니다. `resourceVersionMatch=NotOlderThan`이 필요하며 `allowWatchBookmarks=true`로 초기 상태의 끝을 나타내는 bookmark를 요청합니다. 초기 객체들은 합성 `ADDED`로 오므로 이들을 “방금 생성된 객체”로 기록하지 않습니다. 완료 bookmark 전 단절되면 완전한 초기 목록을 확보한 것으로 처리하지 않습니다. [API streaming lists](https://kubernetes.io/docs/reference/using-api/api-concepts/#streaming-lists)
+
+`WatchList` 서버 gate는 1.32 Beta 기본 true, 1.33 기본 false, **1.34 이후 Beta 기본 true**로 변경됐습니다. client-go의 `WatchListClient` 기본값은 1.35부터 true입니다. 서버 지원과 client의 사용 여부는 별개이며, 실제 설정을 보존해야 합니다. 큰 LIST 응답의 JSON/Protobuf streaming encoding과 `sendInitialEvents` 프로토콜도 다른 기능입니다. [feature gate 이력](https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/), [v1.37.0 client 기본값](https://github.com/kubernetes/kubernetes/blob/v1.37.0/staging/src/k8s.io/client-go/features/known_features.go)
+
+pagination의 continue token도 무기한 재사용할 수 없습니다. `410 ResourceExpired` 뒤 동일 snapshot이 필요하면 처음부터 다시 목록을 얻습니다. 응답의 새 continue token으로 이어 가면 최신 snapshot을 사용하므로 앞 페이지와 일관성이 깨집니다. [ListOptions.continue 주석](https://github.com/kubernetes/apimachinery/blob/v0.37.0/pkg/apis/meta/v1/types.go#L426)이 이 차이를 명시합니다. API 개요는 watch history와 continue token 만료에 기본 5분을 설명합니다. **제품 적용 제안:** 이 설명을 모든 cache·서버 설정에서 두 보존 기간이 같다는 보장으로 확대하지 말고 요청 종류별 만료 응답과 재동기화 절차를 관리합니다. [API pagination](https://kubernetes.io/docs/reference/using-api/api-concepts/#retrieving-large-results-sets-in-chunks)
+
 <a id="chapter-docs-kubernetes-collection--수집기-권한과-범위"></a>
 
 ### 수집기 권한과 범위
@@ -4881,6 +5395,8 @@ Pod가 API에는 있고 자원 지표에는 없다면 생성 직후 아직 측�
 1. kube-state-metrics가 모든 CPU 사용량을 측정하는가? **주 목적은 API 객체 상태의 지표화입니다.**
 2. watch가 끊기면 모든 객체가 삭제된 것인가? **수집 연결의 실패와 대상의 삭제는 다릅니다.**
 3. working set이 앱 heap인가? **관측 범위와 계산 방식이 다릅니다.**
+4. streaming list의 초기 ADDED는 모두 방금 생성된 객체인가? **현재 상태를 전달하는 합성 이벤트이며 초기 동기화 완료도 확인해야 합니다.**
+5. Summary API와 모든 cAdvisor 지표가 같은 목록인가? **[kubelet 경로별 범위와 PSI 지원](#chapter-docs-kubernetes-pressure-and-termination)을 확인합니다.**
 
 다음: [네트워크와 저장소 연결](#chapter-docs-kubernetes-network-and-storage) · [Kubernetes 목차](#chapter-docs-kubernetes-readme)
 
@@ -4894,7 +5410,7 @@ Pod가 API에는 있고 자원 지표에는 없다면 생성 직후 아직 측�
 
 ## Kubernetes 인벤토리의 정확성: 목록, watch와 삭제의 의미
 
-> 상태: 검토됨 · 적용 범위: Kubernetes 1.35 이상과 이전 버전의 규약 구분, API server 1.34.1·etcd 3.6.4, 모든 7개 시나리오에서 watch cache 비활성화 · 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: Kubernetes 1.35 이상과 이전 규약, 1.34.1·1.37.0 API server의 cache true/false 실습 · 검토일: 2026-10-05
 
 <a id="chapter-docs-kubernetes-inventory-consistency--먼저-이해할-것"></a>
 
@@ -4902,7 +5418,9 @@ Pod가 API에는 있고 자원 지표에는 없다면 생성 직후 아직 측�
 
 인벤토리는 “현재 어떤 대상이 존재하는가”를 정리한 목록입니다. 큰 사진을 여러 조각으로 받아 오는 list와 그 뒤 바뀐 부분을 받는 watch를 결합한다고 생각하면 됩니다. 사진 몇 조각을 받지 못했다는 이유로 그 부분의 대상이 없어졌다고 판단하면 안 됩니다.
 
-이 장의 실험은 실제 kube-apiserver와 etcd를 사용합니다. **7개 시나리오 모두 `--watch-cache=false`인 비기본 구성**이며 410 실험에만 적용한 설정이 아닙니다. cache를 켠 경로의 실행 검증은 이번 기록에 포함되지 않습니다. scheduler·controller-manager·kubelet·CNI·업무 Pod는 실행하지 않습니다. 따라서 **API의 관측·권한·수명 실험**이며 컨테이너 실행이나 클러스터 네트워크 검증은 아닙니다. [envtest 구성의 범위](https://github.com/kubernetes-sigs/controller-runtime/blob/v0.22.3/pkg/envtest/server.go)
+이 장의 실험은 실제 kube-apiserver와 etcd를 사용합니다. **기존 1.1 기록의 7개 시나리오는 모두 `--watch-cache=false`**이며, 2라운드에서는 cache true/false를 별도로 비교했습니다. scheduler·controller-manager·kubelet·CNI·업무 Pod는 실행하지 않습니다. 따라서 API 관측·권한·수명 실험이며 컨테이너 실행이나 클러스터 네트워크 검증은 아닙니다. [envtest 구성 범위](https://github.com/kubernetes-sigs/controller-runtime/blob/v0.22.3/pkg/envtest/server.go)
+
+**2라운드 실행·출판, 2026-10-05:** 공식 envtest의 1.34.1·etcd 3.6.4와 1.37.0·etcd 3.7.0을 각각 cache true/false로 실행했습니다. 실행 버전은 각 minor의 최신 patch가 아닙니다(검토 시 최신 1.34.12·1.37.1). 아래 기존 실험과 새 비교 결과를 구분하며, 다른 patch·확장 API의 동작까지 보장하지 않습니다. [출판 결과](labs/results/1.1-r2-kubernetes.json), [전용 manifest](labs/review-r2/kubernetes-assets.json), [공식 patch 일정](https://kubernetes.io/releases/patch-releases/)
 
 <a id="chapter-docs-kubernetes-inventory-consistency--첫-목록은-언제-완성되는가"></a>
 
@@ -4910,7 +5428,7 @@ Pod가 API에는 있고 자원 지표에는 없다면 생성 직후 아직 측�
 
 Kubernetes list를 `limit`으로 나누면 응답의 `continue` 값을 다음 호출에 전달합니다. 동일한 목록의 페이지는 일관된 snapshot을 이어 받습니다. 처음 조회한 뒤 만들어진 객체는 그 목록의 다음 페이지에 섞이는 대신 이후 목록이나 watch에서 확인합니다. [1.34 API 목록 조회](https://v1-34.docs.kubernetes.io/docs/reference/using-api/api-concepts/#retrieving-large-results-sets-in-chunks)
 
-**실제 실험:** ConfigMap 세 개를 만든 뒤 한 페이지에 하나씩 조회했습니다. 첫 페이지를 받은 직후 `cm-late`를 추가했습니다.
+**기존 1.34.1 실험:** ConfigMap 세 개를 만든 뒤 한 페이지에 하나씩 조회했습니다. 첫 페이지를 받은 직후 `cm-late`를 추가했습니다.
 
 | 확인 | 결과 |
 | --- | --- |
@@ -4952,7 +5470,7 @@ Kubernetes list를 `limit`으로 나누면 응답의 `continue` 값을 다음 �
 
 ### DELETED가 반드시 원천 삭제인 것은 아니다
 
-이번 실험에서 watch는 `suite=domain-book`인 객체만 보도록 설정했습니다. `cm-0`의 label을 `suite=other`로 바꾸자 `DELETED` 이벤트가 왔습니다. 그러나 같은 객체를 직접 GET하면 **HTTP 200**이었고 UID도 같았습니다. 객체가 선택된 집합에서 빠진 것입니다. 실행 경로는 watch cache를 끈 etcd 직접 watch입니다. Kubernetes 1.34.1의 `watchChan.transform()`은 이전 객체만 selector를 만족하면 Deleted를 구성하며, cache 경로의 `cacheWatcher.convertToWatchEvent()`에도 같은 분기가 있습니다. 후자는 코드 대조 결과이며 cache 활성화 상태로 재실행했다는 뜻은 아닙니다. [etcd watcher 코드](https://github.com/kubernetes/kubernetes/blob/v1.34.1/staging/src/k8s.io/apiserver/pkg/storage/etcd3/watcher.go#L617-L634), [cache watcher 코드](https://github.com/kubernetes/kubernetes/blob/v1.34.1/staging/src/k8s.io/apiserver/pkg/storage/cacher/cache_watcher.go#L374-L397)
+이번 실험에서 watch는 `suite=domain-book`인 객체만 보도록 설정했습니다. `cm-0`의 label을 `suite=other`로 바꾸자 `DELETED` 이벤트가 왔습니다. 그러나 같은 객체를 직접 GET하면 **HTTP 200**이었고 UID도 같았습니다. 객체가 선택된 집합에서 빠진 것입니다. 실행 경로는 watch cache를 끈 etcd 직접 watch입니다. Kubernetes 1.34.1의 `watchChan.transform()`은 이전 객체만 selector를 만족하면 Deleted를 구성하며, cache 경로의 `cacheWatcher.convertToWatchEvent()`에도 같은 분기가 있습니다. 1라운드 당시 cache 경로는 코드로만 대조했고, 아래 2라운드에서는 cache 활성화 상태도 실행했습니다. [etcd watcher 코드](https://github.com/kubernetes/kubernetes/blob/v1.34.1/staging/src/k8s.io/apiserver/pkg/storage/etcd3/watcher.go#L617-L634), [cache watcher 코드](https://github.com/kubernetes/kubernetes/blob/v1.34.1/staging/src/k8s.io/apiserver/pkg/storage/cacher/cache_watcher.go#L374-L397)
 
 이는 [실행 코드](scripts/run_kubernetes_lab.py)와 [결과 기록](labs/results/1.1-kubernetes.json)의 `selector_exit`에 있는 실제 관측입니다. 이 결과를 모든 watch의 DELETED가 단순 label 변경이라는 뜻으로 뒤집어 해석하지 않습니다.
 
@@ -4970,7 +5488,24 @@ Kubernetes list를 `limit`으로 나누면 응답의 `continue` 값을 다음 �
 
 실험에서 reader 역할에는 한 namespace의 ConfigMap get/list/watch만 부여했습니다. 해당 목록은 성공했지만 Secret 목록과 다른 namespace 조회는 계속 403이었습니다. [Kubernetes RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
 
-410 실험은 **전용 etcd만 압축하고 API server watch cache를 꺼서** 과거 버전의 만료를 명확히 재현했습니다. 저장된 증거는 watch cache 비활성화와 physical compaction 완료 요청을 함께 적용한 최종 실행입니다. 이전 원고의 “예비 시도에서 200” 설명은 재검토 가능한 원시 결과가 보존되지 않아 검증 근거에서 제외했습니다. `ListFromCacheSnapshot`이 그 예비 응답의 원인이었다고도 판정하지 않습니다. etcd 압축 직후 모든 API 조회가 반드시 410이 된다고 일반화하지 않습니다. 응답은 요청 조건과 서버가 보유한 이력에 따라 확인합니다.
+기존 410 실험은 전용 etcd를 압축하고 API server watch cache를 꺼서 과거 버전 만료를 재현했습니다. 당시 원시 증거가 없던 “예비 시도 200”은 계속 출판 근거에서 제외합니다. 다음 표의 200은 **별도로 저장한 2라운드 결과**입니다.
+
+<a id="chapter-docs-kubernetes-inventory-consistency--2라운드-watch-cache가-있는-경우와-없는-경우"></a>
+
+### 2라운드: watch cache가 있는 경우와 없는 경우
+
+| API server·cache | etcd compaction 뒤 Exact RV=1 LIST | 기존 첫 continue token 재사용 | selector 이탈 |
+| --- | --- | --- | --- |
+| 1.34.1·true | 200, 목록 RV=`1`, 빈 items | 200 | DELETED 뒤 같은 UID GET 200 |
+| 1.34.1·false | 410 Expired | 410 Expired | DELETED 뒤 같은 UID GET 200 |
+| 1.37.0·true | 200, 목록 RV=`1`, 빈 items | 200 | DELETED 뒤 같은 UID GET 200 |
+| 1.37.0·false | 410 Expired | 410 Expired | DELETED 뒤 같은 UID GET 200 |
+
+**1.34.1과 1.37.0의 이 실행에서는 watch cache를 켜면 etcd compaction 뒤 Exact RV=1 LIST가 HTTP 200·resourceVersion="1"·빈 items로 반환됐고, cache를 끄면 410이었습니다.** 따라서 “etcd compaction만 하면 이 요청이 반드시 410”이라는 가설은 cache-on 두 조건에서 반증됐습니다. 원시 verdict `refuted`는 이 가설의 반증이며 API 규약 위반 판정이 아닙니다. 네 조건 모두 fresh LIST는 성공했고, pagination은 최초 snapshot의 세 객체만 반환한 뒤 새 LIST에 `cm-late`가 나타났습니다. [원시 요청·응답](labs/results/1.1-r2-kubernetes.json)
+
+네 서버 모두 `kubernetes_feature_enabled{name="ListFromCacheSnapshot",stage="BETA"} 1`을 기록했고 명시적 gate override는 없었습니다. **gate 활성 상태는 관측했지만 인과는 분리하지 않았습니다.** cache를 켠 채 해당 gate만 바꾸는 대조군이 없으므로 특정 기능이 이 200의 단독 원인이라고 확정하지 않습니다. continue 결과도 이 실행의 compaction 뒤 관측이며 token의 시간 만료를 기다린 실험은 아닙니다.
+
+RV=1의 빈 목록은 새 etcd의 빈 저장소와 양립하는 결과로 해석합니다. 실행기는 조건마다 새 data directory를 사용하고 API 시작 뒤 namespace·ConfigMap을 생성합니다. etcd 3.6.4·3.7.0의 새 MVCC store는 revision 1에서 시작합니다. 다만 당시 RV=1 저장소를 별도로 덤프하거나 namespace 생성 응답을 결과에 보존하지 않아 **namespace 부재까지 독립 실측한 근거는 아닙니다**. 이 설명은 실행기와 초기화 코드에 근거한 추론입니다. [실행 순서](scripts/run_kubernetes_r2_lab.py), [etcd 3.6.4 초기화](https://github.com/etcd-io/etcd/blob/v3.6.4/server/storage/mvcc/kvstore.go#L103), [3.7.0 초기화](https://github.com/etcd-io/etcd/blob/v3.7.0/server/storage/mvcc/kvstore.go#L104)
 
 <a id="chapter-docs-kubernetes-inventory-consistency--resourceversion-135-이상과-이전-버전의-경계"></a>
 
@@ -4982,7 +5517,7 @@ Kubernetes 1.35 이상에서는 같은 클러스터의 같은 API group·resourc
 
 조회 매개변수의 `resourceVersion="0"`은 별도의 조회 의미가 있는 값입니다. 위의 객체 버전 순서 비교와 혼동하지 않습니다. 같은 resource type이면 namespace가 다르더라도 규약에 따라 비교할 수 있지만, 다른 클러스터의 값을 연결하는 전역 순서로 사용하지 않습니다.
 
-이 책의 실행 실험은 1.34.1로 고정했습니다. 1.35 이상 비교 규약은 공식 문서 대조이며 1.35–1.37 서버를 실행한 결과가 아닙니다. 1.34 계열은 최신 3개 브랜치에서는 빠졌지만 2026-10-27까지 유지보수 기간이며, 1.34.1 자체가 최신 패치는 아닙니다. [릴리스·종료 일정](https://kubernetes.io/releases/patch-releases/), [고정·최신 버전 표](#chapter-docs-coverage--교차-검토-시점의-버전-상태)
+2라운드의 같은 ConfigMap 생성·두 번 수정에서 1.37.0은 cache true에서 `218→219→220`, false에서 `217→218→219`를 반환했습니다. 같은 cluster·core API·resource type의 좁은 범위에서 증가 순서를 관측한 것이며 규약 전체의 증명이 아닙니다. 1.34.1도 숫자가 증가했지만 그 관측을 이전 규약의 순서 비교 보장으로 바꾸지 않습니다. 1.34 계열은 최신 3개 브랜치 밖이지만 2026-10-27까지 유지보수 기간이며 1.34.1 자체는 최신 패치가 아닙니다. [실행 근거](labs/results/1.1-r2-kubernetes.json), [일정](https://kubernetes.io/releases/patch-releases/), [버전 표](#chapter-docs-coverage--교차-검토-시점의-버전-상태)
 
 <a id="chapter-docs-kubernetes-inventory-consistency--watch를-사건의-완전한-기록으로-사용하지-않기"></a>
 
@@ -5004,6 +5539,8 @@ python3 scripts/run_kubernetes_lab.py
 ```
 
 일곱 시나리오가 끝나면 private API server·etcd를 종료하고 임시 인증서·데이터를 제거합니다. 결과는 `.lab-runs/kubernetes.json`입니다.
+
+2라운드의 자산 검증·새 출력 경로·재현 명령은 [공통 재현 절차](#chapter-docs-cross-domain-reproducible-labs)에 있습니다. 옛 실행기와 결과를 덮어쓰지 않습니다.
 
 <a id="chapter-docs-kubernetes-inventory-consistency--이해-확인"></a>
 
@@ -5429,10 +5966,11 @@ API 상태, controller의 reconcile 성공·실패·재시도, 실제 업무 상
 2. [웹 서버와 연결 풀: 요청이 기다리는 여러 장소](#chapter-docs-application-servers-and-pools)
 3. [시간 제한, 취소, 재시도와 과부하](#chapter-docs-application-timeouts-and-retries)
 4. [JVM과 .NET: 메모리, GC, 실행 자원](#chapter-docs-application-managed-runtimes)
-5. [Go, Node.js, Python의 동시성과 관측](#chapter-docs-application-async-runtimes)
-6. [브라우저, 실제 사용자 관측과 합성 검사](#chapter-docs-application-user-experience)
-7. [계측을 넣는 위치: 자동 계측, 수동 span, eBPF와 프로파일](#chapter-docs-application-instrumentation-and-profiling)
-8. [트레이스를 읽는 전제: 문맥 전파, sampling과 모집단](#chapter-docs-application-trace-sampling-and-context)
+5. [OpenTelemetry 이름·단위·안정성으로 의미 연결하기](#chapter-docs-application-semantic-conventions)
+6. [Go, Node.js, Python의 동시성과 관측](#chapter-docs-application-async-runtimes)
+7. [브라우저, 실제 사용자 관측과 합성 검사](#chapter-docs-application-user-experience)
+8. [계측을 넣는 위치: 자동 계측, 수동 span, eBPF와 프로파일](#chapter-docs-application-instrumentation-and-profiling)
+9. [트레이스를 읽는 전제: 문맥 전파, sampling과 모집단](#chapter-docs-application-trace-sampling-and-context)
 
 관련 문서: [공통 개념](#chapter-docs-foundations-readme), [DB](#chapter-docs-database-readme), [미들웨어](#chapter-docs-middleware-readme), [도메인 간 분석](#chapter-docs-cross-domain-readme)
 
@@ -5724,7 +6262,7 @@ HTTP의 멱등 메서드는 같은 요청을 여러 번 수행했을 때 의도�
 
 ## JVM과 .NET: 메모리, GC, 실행 자원
 
-> 상태: 검토됨 · 적용 범위: JDK 25 API·HotSpot/G1 사례, .NET 공식 진단 원리 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: JDK 25 API·HotSpot/G1 사례, .NET 공식 진단 원리 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (안정 semantic conventions 연결)
 
 <a id="chapter-docs-application-managed-runtimes--먼저-이해할-것"></a>
 
@@ -5793,6 +6331,8 @@ JVM의 특정 pool 이름을 .NET 세대에 일대일 매핑하는 대신, 공�
 
 런타임 버전, GC 종류, 설정 상한, CPU·메모리의 컨테이너 제한을 인벤토리에 연결합니다. 스택과 heap 덤프는 정보량과 비용이 큰 별도 진단 자료로 다루고, 정기 지표 수집과 같은 빈도로 실행하지 않는 설계를 제안합니다. 이 저장소에서는 대상 JVM·.NET 프로세스에 진단 명령을 실행하지 않았습니다.
 
+실제 OTel 필드로 연결할 때는 [HTTP·JVM·.NET의 안정 이름과 단위](#chapter-docs-application-semantic-conventions)를 이어 읽습니다. 런타임 간 공통 분류가 원천 지표의 시점·집계 형태까지 같게 만들지는 않습니다.
+
 <a id="chapter-docs-application-managed-runtimes--이해-확인"></a>
 
 ### 이해 확인
@@ -5802,6 +6342,106 @@ JVM의 특정 pool 이름을 .NET 세대에 일대일 매핑하는 대신, 공�
 3. CPU가 낮으면 ThreadPool 대기가 없는가? **블로킹으로 대기가 늘 수 있습니다.**
 
 다음: [Go·Node.js·Python](#chapter-docs-application-async-runtimes) · [애플리케이션 목차](#chapter-docs-application-readme)
+
+[통합 목차로](#book-top)
+
+---
+
+<a id="chapter-docs-application-semantic-conventions"></a>
+
+<a id="chapter-docs-application-semantic-conventions--opentelemetry-이름단위안정성으로-의미-연결하기"></a>
+
+## OpenTelemetry 이름·단위·안정성으로 의미 연결하기
+
+> 상태: 검토됨 · 적용 범위: 공식 웹 Semantic Conventions 1.44.0, HTTP·JVM·.NET의 아래 항목 · 확인일: 2026-10-05 · 계측 실행 미검증
+
+<a id="chapter-docs-application-semantic-conventions--먼저-이해할-상황"></a>
+
+### 먼저 이해할 상황
+
+새 계측기를 붙였더니 요청 지연이 천 배 작아 보일 수 있습니다. 실제 성능 개선보다 먼저 이름·단위·집계 형태가 바뀌었는지 봐야 합니다. 같은 “GC 시간”도 한 원천은 동작별 histogram, 다른 원천은 프로세스 시작 이후의 누적 정지 시간일 수 있습니다. semantic conventions는 이런 의미를 공유하기 위한 규약입니다.
+
+이 장의 Stable 표시는 **해당 이름의 규약 상태**입니다. 사용 중인 모든 SDK·agent가 이미 그 이름을 출력하거나 모든 선택 attribute까지 Stable이라는 뜻은 아닙니다. 실제 계측 라이브러리 버전, instrumentation scope, schema URL, 출력 단위를 함께 남깁니다. [안정성 정책](https://opentelemetry.io/docs/specs/semconv/general/semantic-convention-groups/)
+
+<a id="chapter-docs-application-semantic-conventions--http의-안정-이름"></a>
+
+### HTTP의 안정 이름
+
+아래 항목은 확인 시점 Stable입니다. metric 이름과 attribute key를 같은 종류로 취급하지 않습니다. [HTTP metric 정의](https://opentelemetry.io/docs/specs/semconv/http/http-metrics/), [HTTP attribute registry](https://opentelemetry.io/docs/specs/semconv/registry/attributes/http/)
+
+| 항목 | 종류·단위 | 의미와 함정 |
+| --- | --- | --- |
+| `http.request.method` | 문자열 attribute | 요청 method; 무제한 임의 값을 지표 차원에 그대로 늘리지 않음 |
+| `http.response.status_code` | 정수 attribute | 응답 status; 응답을 받지 못한 경우 임의의 0/500으로 만들지 않음 |
+| `http.route` | 문자열 attribute | framework의 낮은 cardinality route template; 실제 URI path로 대신 채우지 않음 |
+| `http.server.request.duration` | Histogram, `s` | 서버 HTTP 요청 처리 시간의 분포 |
+
+**예시:** 같은 관측이 과거 표현에서 250 ms이고 안정 metric에서는 0.25 s이면 같은 시간입니다. `250 / 1000 = 0.25`로 값뿐 아니라 histogram bucket 경계·합계도 함께 변환해야 합니다. 기존 bucket 계정의 의미를 확인하지 않고 이름만 교체하면 잘못된 분포를 만듭니다.
+
+이전 규약을 출력하던 instrumentation의 전환 규칙에는 `OTEL_SEMCONV_STABILITY_OPT_IN=http`와 `http/dup`이 있습니다. 전자는 안정 HTTP/networking 규약으로 전환하고, 후자는 구·신 규약을 함께 내보내 단계적으로 바꾸는 용도입니다. 모든 SDK의 모든 major에서 반드시 필요한 전역 switch라고 단정하지 않습니다. [HTTP migration](https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/)
+
+제품 적용 제안은 migration 기간의 원천 이름과 설정을 보존하고 같은 요청의 구·신 metric을 중복 합산하지 않는 것입니다. `http.route`를 지원하지 않으면 실제 `/users/고유ID`를 route 대신 넣지 말고 누락 이유를 기록합니다. 업무 성공 여부도 HTTP status 하나와 동일하지 않을 수 있습니다.
+
+SemConv 1.44.0의 HTTP duration은 초 단위 경계 `[0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10]`을 `ExplicitBucketBoundaries` advice로 지정하도록 권고합니다. SDK가 이 advice를 반영하지 않고 별도 View 설정도 없다면 실제 경계를 확인해야 합니다. Metrics SDK의 일반 기본 권고 `[0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000]`을 초에 그대로 쓰면 0초 초과·5초 이하 요청이 하나의 bucket에 모여 짧은 지연의 구분이 거칠어집니다. 모든 SDK가 반드시 이 기본값을 쓴다는 뜻은 아닙니다. [HTTP 경계 권고](https://opentelemetry.io/docs/specs/semconv/http/http-metrics/#metric-httpserverrequestduration), [SDK 기본 aggregation](https://opentelemetry.io/docs/specs/otel/metrics/sdk/#explicit-bucket-histogram-aggregation)
+
+<a id="chapter-docs-application-semantic-conventions--jvm-확보사용최대와-gc-동작"></a>
+
+### JVM: 확보·사용·최대와 GC 동작
+
+아래 네 이름은 Stable입니다. 메모리 세 항목은 **UpDownCounter**, 단위는 `By`이며 pool·heap/non_heap 범위를 확인합니다. 이름에 Counter가 있어도 단조 증가 Counter가 아니므로 사용량에 `rate()`를 적용하지 않습니다. [JVM metric 정의](https://opentelemetry.io/docs/specs/semconv/runtime/jvm-metrics/)
+
+| 이름 | 의미·형태 | 함께 보존할 문맥 |
+| --- | --- | --- |
+| `jvm.memory.used` | 사용 중 메모리 | `jvm.memory.pool.name`, `jvm.memory.type` |
+| `jvm.memory.committed` | JVM이 사용 가능하도록 확보한 메모리 | OS RSS와 구분 |
+| `jvm.memory.limit` | 얻을 수 있는 최대 메모리 | 원천 max의 정의·가용 여부; cgroup 한도와 구분 |
+| `jvm.gc.duration` | Histogram, `s`: JVM GC action의 지속 시간 | `jvm.gc.name`, `jvm.gc.action` |
+
+JVM memory 원천은 `MemoryPoolMXBean.getUsage()`이고, GC duration은 GC 알림의 `GcInfo`에서 옵니다. Java `MemoryUsage.max`는 정의되지 않을 수 있으므로 음수·누락 값을 임의의 정상 한도로 나누지 않습니다. GC action의 duration을 모든 collector에서 동일한 애플리케이션 정지 시간으로 간주하지 않습니다. [JDK MemoryUsage](https://docs.oracle.com/en/java/javase/25/docs/api/java.management/java/lang/management/MemoryUsage.html), [GcInfo](https://docs.oracle.com/en/java/javase/25/docs/api/jdk.management/com/sun/management/GcInfo.html)
+
+`jvm.gc.duration`이 Stable이어도 선택 attribute `jvm.gc.cause`는 확인 시점 **Development**입니다. metric·attribute·열거 값 각각의 stability를 따로 기록합니다. [JVM GC 규약](https://opentelemetry.io/docs/specs/semconv/runtime/jvm-metrics/#metric-jvmgcduration)
+
+<a id="chapter-docs-application-semantic-conventions--net-현재값과-마지막-gc-시점의-값"></a>
+
+### .NET: 현재값과 마지막 GC 시점의 값
+
+다음 이름은 SemConv에서 Stable이며 공식 표의 기본 제공 Meter는 `System.Runtime`, 추가된 runtime 버전은 **.NET 9.0**입니다. 이전 runtime이나 별도 OTel instrumentation package의 이름까지 같다고 가정하지 않습니다. [CLR metric 정의](https://opentelemetry.io/docs/specs/semconv/runtime/dotnet-metrics/)
+
+| 이름 | 형태·단위 | 의미 |
+| --- | --- | --- |
+| `dotnet.process.memory.working_set` | UpDownCounter, `By` | 프로세스에 매핑된 물리 메모리 |
+| `dotnet.gc.heap.total_allocated` | Counter, `By` | 시작 이후 관리 heap 누적 할당의 근삿값; native 할당 제외 |
+| `dotnet.gc.last_collection.heap.size` | UpDownCounter, `By` | 마지막 GC에서 본 fragmentation 포함 heap 크기 |
+| `dotnet.gc.last_collection.memory.committed_size` | UpDownCounter, `By` | 마지막 GC에서 본 GC용 committed virtual memory |
+| `dotnet.gc.collections` | Counter, `{collection}` | 세대별로 중복을 제거해 계산한 GC 횟수 |
+| `dotnet.gc.pause.time` | Counter, `s` | 시작 이후 GC로 멈춘 시간의 누적 합 |
+
+`dotnet.gc.last_collection.heap.size`와 `dotnet.gc.collections`에는 `dotnet.gc.heap.generation` attribute가 필수입니다. heap 합계는 같은 프로세스·시점에서 `gen0/gen1/gen2/loh/poh` 중 실제 수집한 범위를 명시하며 중복 시계열을 제거합니다. collections는 상위 세대 수집에 포함된 하위 세대 작업을 중복하지 않도록 정의된 세대별 횟수이므로 원시 `GC.CollectionCount()` 값을 무조건 더하는 계산과 구분합니다. [세대 attribute와 횟수 정의](https://opentelemetry.io/docs/specs/semconv/runtime/dotnet-metrics/)
+
+`last_collection`은 수집 순간의 실시간 heap 표본이 아닙니다. `dotnet.gc.pause.time`의 구간 차분과 `jvm.gc.duration` histogram의 합계가 이름이 비슷하다고 같은 사건 집합이라고 주장하지 않습니다. [Microsoft System.Runtime metrics](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/built-in-metrics-runtime)
+
+<a id="chapter-docs-application-semantic-conventions--제품-적용-제안"></a>
+
+### 제품 적용 제안
+
+[런타임 간 매핑](#chapter-docs-application-managed-runtimes)의 “할당·메모리·회수·정지” 축은 탐색 분류로 사용합니다. 원천의 `현재/마지막 GC`, `누적/분포`, `GC action/정지`, `관리 heap/프로세스` 차이를 지운 단일 표준값으로 합치지 않습니다. 알려진 안정 이름을 registry로 관리하되 필드가 없으면 agent 버전·기능 설정·runtime 지원을 먼저 판별합니다.
+
+이 장에서는 환경변수 변경, JVM/.NET 계측기 설치, exporter 호출을 실행하지 않았습니다. 실제 적용 시에는 대상 프로세스의 계측 설정 변경 권한과 재시작 필요 여부를 확인하고, histogram·attribute 추가에 따른 집계·전송 비용을 측정합니다.
+
+<a id="chapter-docs-application-semantic-conventions--이해-확인"></a>
+
+### 이해 확인
+
+1. Stable metric이면 부속 attribute도 모두 Stable인가? **아니다. 각각 확인한다.**
+2. HTTP 지연 값이 250에서 0.25로 바뀌면 성능이 천 배 좋아졌는가? **ms에서 s로 바뀐 같은 시간일 수 있다.**
+3. JVM used와 .NET last_collection heap size를 같은 순간의 heap으로 비교해도 되는가? **관측 시점과 포함 범위가 다르다.**
+4. `http/dup`의 두 metric을 합하면 더 정확한가? **같은 요청을 중복 집계할 수 있다.**
+
+<a id="chapter-docs-application-semantic-conventions--함께-읽기"></a>
+
+### 함께 읽기
+
+[런타임 메모리와 GC](#chapter-docs-application-managed-runtimes) · [계측](#chapter-docs-application-instrumentation-and-profiling) · [시계열 문맥](#chapter-docs-foundations-metric-context-and-start-time)
 
 [통합 목차로](#book-top)
 
@@ -6065,7 +6705,7 @@ CPU 프로파일은 CPU 실행 비용을 조사하고, allocation 프로파일�
 
 ## 트레이스를 읽는 전제: 문맥 전파, sampling과 모집단
 
-> 상태: 검토됨 · 적용 범위: W3C Trace Context, OpenTelemetry 개념·SDK 규약, tail sampling processor 0.137.0 문서 · 검토일: 2026-10-04 · sampling 수치는 가상 예시
+> 상태: 검토됨 · 적용 범위: W3C Trace Context, OpenTelemetry 개념·SDK 규약, tail sampling processor 0.137.0 문서 · 검토일: 2026-10-04 · sampling 수치는 가상 예시 · 2라운드 보강 확인: 2026-10-05 (probability sampling·W3C 문서 상태)
 
 버전 상태: 0.137.0은 설명을 고정한 기준입니다. 검토 시점 Collector 배포판은 0.162.0이며 최신 버전에서 tail sampling을 재실행하지 않았습니다. [고정·최신·지원 상태](#chapter-docs-coverage--교차-검토-시점의-버전-상태)
 
@@ -6135,6 +6775,36 @@ SDK에는 기록하지 않음, 기록만 함, 기록하고 sampled로 표시함�
 
 오류·서비스·tenant마다 선택 확률이 다르거나 제한에 걸린 trace가 더 빠진다면 단일 10배를 적용할 수 없습니다. trace 하나의 span 수를 요청 수와 혼동해서도 안 됩니다. 포함 확률을 모르면 정확한 전체 비율을 복원할 정보가 부족할 수 있습니다.
 
+<a id="chapter-docs-application-trace-sampling-and-context--확률을-전달하는-thrv와-adjusted-count"></a>
+
+### 확률을 전달하는 th·rv와 adjusted count
+
+**2026-10-05 확인:** OTel의 probability sampling·tracestate 규약은 Development 상태입니다. `ot` tracestate 안의 `rv`는 56-bit randomness 값, `th`는 rejection threshold를 표현합니다. 같은 randomness `R`에 대해 `R ≥ T`인 항목을 선택하는 모델에서는 포함 확률이 `p=(2^56−T)/2^56`이고, adjusted count는 `1/p`입니다. `th`의 wire 표현은 축약된 16진 문자열 규칙이 있으므로 그대로 일반 정수 parser에 넘겨 전체 threshold라고 간주하지 않습니다. [probability sampling](https://opentelemetry.io/docs/specs/otel/trace/tracestate-probability-sampling/), [tracestate encoding](https://opentelemetry.io/docs/specs/otel/trace/tracestate-handling/)
+
+adjusted count는 해당 표본 하나가 대표하는 모집단 항목 수의 추정 가중치입니다. 같은 randomness를 쓰는 일관된 다단계 sampler는 적용된 최대 threshold로 유효 확률을 표현합니다. 독립적인 동전 던지기처럼 각 단계의 확률을 무조건 곱하지 않습니다. 중간 sampler가 정책을 바꾸면 이 문맥도 규약대로 갱신해야 합니다. non-probabilistic 선택이나 `th`가 없는 sampled span에 이 규약의 adjusted count가 정의된 것으로 간주하지 않습니다. [확률·threshold 전파](https://opentelemetry.io/docs/specs/otel/trace/tracestate-probability-sampling/)
+
+**예시:** 요청당 server span 하나를 집계하며 각 표본의 최종 포함 확률이 정확히 알려졌다고 가정합니다. `p=0.1`인 표본 90개와 `p=0.5`인 표본 20개라면 추정 요청 수는 `90/0.1 + 20/0.5 = 940건`입니다. 표본 110개에 임의의 공통 배수를 곱하지 않습니다. 940은 추정값이며 실제 요청 수의 확정값이 아닙니다.
+
+| 추정에 필요한 조건 | 없을 때 생기는 문제 |
+| --- | --- |
+| 모집단과 요청당 대표 span의 명세 | 자식 span·retry를 요청으로 중복 계산 |
+| 양수이며 알려진 최종 포함 확률 | p=0으로 제외된 집단이나 미확인 tail 규칙을 역가중으로 복구 불가 |
+| randomness와 threshold 규약의 일관성 | 언어·단계마다 표본 선택이 다르거나 유효 확률이 틀림 |
+| 선택 후 전송·저장 유실과 중복의 통제 | sampling 확률이 실제 관측 확률을 설명하지 못함 |
+| 같은 시간·service·조건 범위 | 정책 변경 전후를 하나의 분모로 잘못 비교 |
+
+따라서 “sampled span이 있다”는 사실만으로 전체 요청 수 추정을 켜지 않습니다. 오류를 무조건 보존하는 규칙과 rate limit, 불완전 trace 폐기 등이 섞이면 실제 포함 확률을 먼저 입증해야 합니다. metric에서 trace를 여는 [exemplar](#chapter-docs-foundations-metric-context-and-start-time)도 모집단 추정을 위한 가중치가 아닙니다.
+
+`rv`는 **선택적인 explicit randomness**입니다. 존재하면 그 56-bit 값을, 없으면 TraceID의 하위 56bit를 randomness `R`로 사용합니다. `rv`가 없다는 이유만으로 잘못된 trace로 버리지는 않습니다. 다만 SDK의 randomness 추정 규칙과 실제 ID 생성기의 균등성·random flag 지원을 구분하고, 이를 검증하지 않은 데이터를 무조건 정확한 확률 표본이라고 표시하지 않습니다. [SDK randomness 규약](https://opentelemetry.io/docs/specs/otel/trace/sdk/#presumption-of-traceid-randomness)
+
+<a id="chapter-docs-application-trace-sampling-and-context--sampler-폐기와-w3c-문서-단계"></a>
+
+### sampler 폐기와 W3C 문서 단계
+
+확인 시점 SDK 규약에서 `TraceIdRatioBased` 절은 **Stable이면서 deprecated**입니다. 대체 방향인 `ProbabilitySampler`는 **Development**이고 SDK Sampler API를 직접 구현하는 **non-composable** 형태입니다. `CompositeSampler`와 조합하는 별도 형태의 이름은 `ComposableProbability`입니다. 이름·안정성·조합 방식을 섞어 소개하지 않습니다. 기존 `TraceIdRatioBased` 구현의 동작 변경·제거는 **최소 2027-01-01까지 금지**되므로 2026년 SDK에서 이름이 보이는 것 자체는 규약 위반이 아닙니다. 언어별 지원 릴리스를 확인하며, parent 결정을 존중하려면 `ParentBased` 등 별도 구성을 봅니다. [TraceIdRatioBased](https://opentelemetry.io/docs/specs/otel/trace/sdk/#traceidratiobased), [ProbabilitySampler와 조합형의 구분](https://opentelemetry.io/docs/specs/otel/trace/sdk/#probabilitysampler)
+
+W3C Trace Context Level 2는 확인한 공개 판본이 **2024-03-28 Candidate Recommendation Draft**입니다. 최종 Recommendation으로 소개하지 않습니다. random trace ID flag는 sampled flag와 다른 bit이며 TraceID의 randomness 요구를 나타냅니다. 확률 자체나 요청의 성공·신뢰도를 뜻하지 않습니다. “random flag가 있으면 표본은 모두 같은 확률”이라는 결론도 나오지 않습니다. [W3C Level 2의 문서 상태와 flags](https://www.w3.org/TR/2024/CRD-trace-context-2-20240328/)
+
 <a id="chapter-docs-application-trace-sampling-and-context--tail-sampling의-기다림과-배치"></a>
 
 ### tail sampling의 기다림과 배치
@@ -6168,6 +6838,8 @@ SDK에는 기록하지 않음, 기록만 함, 기록하고 sampled로 표시함�
 2. sampled bit가 있으면 목적지 저장까지 보장되는가? **sampling 문맥이며 수집·전송·저장 성공을 보장하지 않습니다.**
 3. tail sampling을 쓰면 모든 늦은 span까지 반드시 모이는가? **대기·용량·라우팅·늦은 데이터 정책에 한계가 있습니다.**
 4. trace ID를 tenant 접근 권한으로 사용해도 되는가? **관측 연결 정보와 인증된 접근 범위를 분리합니다.**
+5. 10% head sampling 후 추가 tail 폐기가 있어도 열 배하면 되는가? **최종 포함 확률과 추가 유실을 알아야 한다.**
+6. `rv`는 sampling 비율인가? **randomness 값이다. 유효 확률은 threshold와 함께 해석한다.**
 
 [통합 목차로](#book-top)
 
@@ -6233,14 +6905,15 @@ PostgreSQL 18의 `pg_stat_activity`는 서버 프로세스의 현재 활동을 �
 1. [트랜잭션, 격리, MVCC와 잠금](#chapter-docs-database-transactions-and-locks)
 2. [쿼리, 인덱스, 실행 계획과 비용](#chapter-docs-database-queries-and-indexes)
 3. [PostgreSQL 관측: 활동, 누적 통계와 정리 작업](#chapter-docs-database-postgresql)
-4. [MySQL과 MariaDB 관측](#chapter-docs-database-mysql-mariadb)
-5. [SQL Server와 Oracle: 대기와 실행 통계](#chapter-docs-database-sqlserver-oracle)
-6. [로그, 지속성, 복제와 복구](#chapter-docs-database-replication-and-recovery)
-7. [DB 고가용성: 장애 전환, fencing과 복구 완료의 의미](#chapter-docs-database-high-availability)
-8. [문서형, 분산형, 분석형 DB의 관측](#chapter-docs-database-distributed-and-analytical)
-9. [시계열·그래프·문서·열 지향 DB를 비교하는 기준](#chapter-docs-database-specialized-data-models)
-10. [DB 수집 명세: 읽기 전용 쿼리, 단위, 권한과 통계 수명](#chapter-docs-database-collection-contracts)
-11. [PostgreSQL 실제 실습: 같은 값, 잠금 대기와 실패한 트랜잭션](#chapter-docs-database-postgresql-concurrency-lab)
+4. [PostgreSQL 운영 관측: 오래된 ID, 회수 기준점, 통계 호환성](#chapter-docs-database-postgresql-operations)
+5. [MySQL과 MariaDB 관측](#chapter-docs-database-mysql-mariadb)
+6. [SQL Server와 Oracle: 대기와 실행 통계](#chapter-docs-database-sqlserver-oracle)
+7. [로그, 지속성, 복제와 복구](#chapter-docs-database-replication-and-recovery)
+8. [DB 고가용성: 장애 전환, fencing과 복구 완료의 의미](#chapter-docs-database-high-availability)
+9. [문서형, 분산형, 분석형 DB의 관측](#chapter-docs-database-distributed-and-analytical)
+10. [시계열·그래프·문서·열 지향 DB를 비교하는 기준](#chapter-docs-database-specialized-data-models)
+11. [DB 수집 명세: 읽기 전용 쿼리, 단위, 권한과 통계 수명](#chapter-docs-database-collection-contracts)
+12. [PostgreSQL 실제 실습: 같은 값, 잠금 대기와 실패한 트랜잭션](#chapter-docs-database-postgresql-concurrency-lab)
 
 관련 문서: [애플리케이션](#chapter-docs-application-readme), [호스트](#chapter-docs-host-readme), [스토리지](#chapter-docs-storage-readme)
 
@@ -6526,6 +7199,158 @@ GROUP BY state, wait_event_type, wait_event;
 3. 누적 mean 차분은 구간 mean인가? **시간 합의 차분을 호출 수 차분으로 나눠야 합니다.**
 
 다음: [MySQL·MariaDB](#chapter-docs-database-mysql-mariadb) · [DB 목차](#chapter-docs-database-readme)
+
+[통합 목차로](#book-top)
+
+---
+
+<a id="chapter-docs-database-postgresql-operations"></a>
+
+<a id="chapter-docs-database-postgresql-operations--postgresql-운영-관측-오래된-id-회수-기준점-통계-호환성"></a>
+
+## PostgreSQL 운영 관측: 오래된 ID, 회수 기준점, 통계 호환성
+
+> 상태: 검토됨 · 적용 범위: PostgreSQL 18, 어댑터 비교용 12–17 공식 문서 · 원천 확인일: 2026-10-05 · 아래 수집 SQL은 미실행 예시, 별도 18.6 실습 결과 출판
+
+<a id="chapter-docs-database-postgresql-operations--먼저-이해할-상황"></a>
+
+### 먼저 이해할 상황
+
+DB 디스크가 계속 커지는데 “오래 실행 중인 쿼리”는 보이지 않을 수 있습니다. 세션이 끝난 prepared transaction, 사용하지 않는 replication slot, standby가 보내는 피드백도 오래된 행 버전을 보존하게 만들 수 있기 때문입니다. 한편 오래된 transaction ID를 정리하는 freeze는 삭제된 행을 회수하는 일과 목적이 다릅니다. [MVCC와 회수 기준점](#chapter-docs-database-transactions-and-locks), [PostgreSQL 기본 관측](#chapter-docs-database-postgresql)을 바탕으로 두 위험을 나눠 봅니다.
+
+<a id="chapter-docs-database-postgresql-operations--xid와-multixact의-나이는-시간이-아니다"></a>
+
+### XID와 MultiXact의 나이는 시간이 아니다
+
+PostgreSQL의 행 버전에 쓰이는 일반 XID는 32-bit 공간을 순환합니다. 오래된 XID의 가시성을 잘못 해석하지 않도록 VACUUM은 충분히 오래된 행의 XID를 freeze합니다. `age(datfrozenxid)`는 DB의 freeze 기준점이 현재 XID에서 얼마나 오래됐는지를 **transaction ID 거리**로 표현합니다. 초·일수·완료된 SQL 문장 수가 아닙니다. XID가 필요 없는 작업도 있으므로 요청률과 같다고 가정하지 않습니다. [wraparound와 freezing](https://www.postgresql.org/docs/18/routine-vacuuming.html#VACUUM-FOR-WRAPAROUND)
+
+MultiXact는 여러 transaction이 한 행을 잠글 때 관련 XID 집합을 가리키는 별도 ID입니다. 역시 순환 공간과 구성원 저장소를 관리해야 합니다. `mxid_age(datminmxid)`와 `mxid_age(relminmxid)`를 별도로 수집하며 XID age와 더하지 않습니다. ID 나이만 낮아도 구성원 저장량 위험까지 사라지는 것은 아닙니다. [MultiXact 관리](https://www.postgresql.org/docs/18/routine-vacuuming.html#VACUUM-FOR-MULTIXACT-WRAPAROUND)
+
+| 관측값 | 단위·범위 | 해석 |
+| --- | --- | --- |
+| `age(pg_database.datfrozenxid)` | DB별 XID 거리 | DB 내 테이블의 오래된 freeze 기준점을 요약 |
+| `age(pg_class.relfrozenxid)` | relation별 XID 거리 | 무엇이 DB 기준점을 붙잡는지 세분화 |
+| `mxid_age(datminmxid / relminmxid)` | DB/relation별 MultiXact 거리 | XID와 별개 경보 축 |
+| `autovacuum_freeze_max_age` | transaction 수 설정 | 테이블의 강제 anti-wraparound vacuum 시작 기준; 즉시 장애 경계 아님 |
+| `autovacuum_multixact_freeze_max_age` | MultiXact 수 설정 | MultiXact 정리 기준 |
+| `pg_stat_progress_vacuum` | 실행 중 VACUUM의 phase·block·tuple 관련 관측 | 완료율 하나로 모든 phase의 남은 시간을 계산할 수 없음 |
+
+18의 기본 `autovacuum_freeze_max_age`는 2억, MultiXact 대응 설정은 4억입니다. 실제 설정과 테이블 override를 우선 확인합니다. 일반 autovacuum을 끄더라도 wraparound 방지용 작업은 시작될 수 있습니다. 이를 “autovacuum=false이면 안전 작업도 완전히 중지”로 해석하지 않습니다. [vacuum 설정](https://www.postgresql.org/docs/18/runtime-config-vacuum.html), [진행 view](https://www.postgresql.org/docs/18/progress-reporting.html#VACUUM-PROGRESS-REPORTING)
+
+**예시:** XID age가 1억 5000만이고 설정값이 2억이면 설정 기준 비율은 `75%`입니다. 차이는 5000만 XID입니다. 이후에도 초당 1000 XID가 할당되고 freeze 기준점이 전혀 전진하지 않는다는 가정에서 그 설정값까지 `50000초 ≈ 13.89시간`입니다. 이는 위험 추적용 가정 계산이며 wraparound 장애까지 남은 시간의 보장이 아닙니다. freeze 진행·부하 변화·다른 제한으로 결과가 달라집니다.
+
+18에서는 wraparound까지 약 **4000만 XID**가 남으면 경고하고 **300만 미만**이면 새 XID 할당을 거부합니다. 이미 진행 중인 transaction, 새 읽기 전용 transaction, VACUUM의 가능 여부까지 모든 SQL 실패로 뭉뚱그리지 않습니다. `vacuum_failsafe_age` 기본값은 **16억**이며 비용 지연·비필수 작업을 생략하는 최후 수단입니다. autovacuum 시작 기준·failsafe·할당 거부는 서로 다른 경계이고, MultiXact도 별도 기준으로 관리합니다. [실제 경계](https://www.postgresql.org/docs/18/routine-vacuuming.html#VACUUM-FOR-WRAPAROUND), [failsafe와 유효값 보정](https://www.postgresql.org/docs/18/runtime-config-vacuum.html#GUC-VACUUM-FAILSAFE-AGE)
+
+<a id="chapter-docs-database-postgresql-operations--회수-기준점을-붙잡는-원천별로-읽기"></a>
+
+### 회수 기준점을 붙잡는 원천별로 읽기
+
+`xmin horizon`은 아직 누군가 필요로 할 수 있는 오래된 행 버전을 회수하지 못하게 하는 경계입니다. 원천별 ID 나이는 `age()`로, 운영상 경과 시간은 각 원천의 timestamp로 따로 읽습니다. [slot 필드](https://www.postgresql.org/docs/18/view-pg-replication-slots.html), [prepared transaction](https://www.postgresql.org/docs/18/view-pg-prepared-xacts.html), [통계 view](https://www.postgresql.org/docs/18/monitoring-stats.html)
+
+| 원천 | ID 거리 | 시각·보조 증거 | 주의 |
+| --- | --- | --- | --- |
+| 실행 중 transaction·snapshot | `age(backend_xid)`, `age(backend_xmin)` | `backend_type`, `xact_start`, `state`, wait event | walsender는 아래 복제 관측으로 분리; 오래 열린 시각만으로 같은 xmin 보존을 확정하지 않음 |
+| prepared transaction | `age(pg_prepared_xacts.transaction)` | `prepared`, `gid`, 소유자·DB | 원래 세션이 없어도 남음 |
+| replication slot | `age(xmin)`, `age(catalog_xmin)` | `active`, `slot_type`, `restart_lsn` | `xmin`과 catalog 전용 기준점은 다름; NULL은 0세 아님 |
+| standby feedback | slot 미사용: `age(pg_stat_replication.backend_xmin)`; slot 사용: 해당 slot의 `age(xmin)`·`age(catalog_xmin)` | sender PID·slot·standby 식별자, standby snapshot | slot 사용 시 walsender의 `backend_xmin`은 NULL일 수 있음 |
+
+PostgreSQL 18.6의 walsender는 physical slot을 사용하면 feedback 기준점을 slot에 두고 자신의 `PGPROC.xmin`을 비웁니다. slot이 없으면 자신의 xmin에 보존하므로 `pg_stat_replication`과 `pg_stat_activity`의 같은 walsender PID에서 중복 관측할 수 있습니다. `backend_type=walsender`를 별도 분류하고 두 view를 독립 보존 원인으로 더하지 않습니다. NULL인 sender xmin만으로 feedback 부재를 판정하지 않습니다. [18.6 PhysicalReplicationSlotNewXmin·ProcessStandbyHSFeedback](https://github.com/postgres/postgres/blob/REL_18_6/src/backend/replication/walsender.c#L2553)
+
+WAL 보존 위치인 `restart_lsn`은 byte 위치이고 `xmin`은 행 버전 회수 경계입니다. 둘 다 slot에 있어도 같은 지연이 아닙니다. feedback은 standby 쿼리 취소를 줄이는 대신 primary의 회수를 지연시킬 수 있습니다. standby 연결이 끊겼을 때 slot이 어떤 기준점을 유지하는지도 확인해야 합니다. [replication 설정](https://www.postgresql.org/docs/18/runtime-config-replication.html#GUC-HOT-STANDBY-FEEDBACK)
+
+관측은 `n_dead_tup` 추정치, `VACUUM VERBOSE`의 제거 불가 행 수, 관련 horizon ID, 해제 후 회수 결과를 함께 봅니다. `n_dead_tup` 감소와 `datfrozenxid` 전진은 같은 판정이 아닙니다. 다음 표는 **2026-10-05, PostgreSQL 18.6, WSL의 격리된 primary·standby**에서 실행한 저장소 결과입니다. [원시 증거](labs/results/1.1-r2-postgresql.json), [실행기](scripts/run_postgres_r2_lab.py), [입력 hash 연결](review/evidence-provenance.json)
+
+| 시나리오 | 보존 중 증거 | 해제 전 → 후 VACUUM 결과 |
+| --- | --- | --- |
+| prepared transaction | 세션은 idle, prepared XID `756` 존재 | 제거 불가 128행 → 128행 제거·제거 불가 0 |
+| logical slot의 catalog horizon | `xmin=NULL`, `catalog_xmin=759`; `pg_class` 대상 | 제거 불가 24행 → 24행 제거·제거 불가 0 |
+| slot 없는 standby feedback | sender `backend_xmin=813`, standby snapshot 유지 | 제거 불가 128행 → snapshot 종료 후 128행 제거 |
+| physical slot의 xmin | 연결 중 slot `xmin=815`, sender xmin NULL; 강제 단절 뒤 inactive slot도 `xmin=815` | 제거 불가 128행 → slot 삭제 후 128행 제거 |
+
+**이 실행에서는 prepared transaction, logical slot의 catalog_xmin, slot 없는 standby feedback, 단절 뒤 physical slot의 xmin이 각각 행 회수를 붙잡았고, 해당 원천을 해제한 뒤 대상 행이 회수됐습니다.** `n_dead_tup`도 각 대상에서 128 또는 24에서 0으로 변했지만 원래 추정치이므로 일반적인 정확한 행 수 API로 승격하지 않습니다. DB `datfrozenxid`는 모든 표본에서 `744`였고 `postgres`의 age는 각 전후 구간에서 `14→15`, `63→63`, `70→71`, `72→73`이었습니다. 이번 결과는 DB 전체 freeze 기준점의 전진이나 wraparound 방지를 검증한 실험이 아닙니다.
+
+실습은 새 DB 생성, fixture 삽입·삭제, prepared transaction, slot 생성·삭제, VACUUM, 로컬 standby 강제 종료를 수행했습니다. 전용 임시 클러스터의 관리 권한으로만 실행했으며 운영 DB용 수집 SQL이 아닙니다. 성공한 실행은 소유 프로세스와 임시 데이터 디렉터리를 정리했습니다. DrvFs의 mode 제약 때문에 데이터 디렉터리만 Linux native 임시 경로를 사용한 예외와 실패 경로 보완은 [재현 절차](#chapter-docs-cross-domain-reproducible-labs)에 설명합니다.
+
+<a id="chapter-docs-database-postgresql-operations--읽기-전용-수집-sql과-권한"></a>
+
+### 읽기 전용 수집 SQL과 권한
+
+다음은 **PostgreSQL 18용 미실행 예시**입니다. 대상 DB에 연결할 권한과 각 catalog/view의 읽기 권한이 필요합니다. 전체 세션 정보를 보려면 관리자가 승인한 `pg_read_all_stats` 등의 범위를 확인합니다. DB 상태를 변경하거나 VACUUM을 실행하지 않지만, catalog·통계 조회도 객체·세션 수에 비례한 부하가 있습니다. 하나의 짧은 수집 transaction 또는 autocommit으로 읽고 장기간 transaction을 유지하지 않습니다.
+
+```sql
+SELECT statement_timestamp() AS sampled_at, datname,
+       age(datfrozenxid) AS xid_age,
+       mxid_age(datminmxid) AS multixact_age
+FROM pg_database;
+
+SELECT statement_timestamp() AS sampled_at, pid, datname, backend_type, state,
+       age(backend_xid) AS backend_xid_age,
+       age(backend_xmin) AS backend_xmin_age, xact_start
+FROM pg_stat_activity
+WHERE backend_type <> 'walsender';
+
+SELECT statement_timestamp() AS sampled_at, gid, database, prepared,
+       age(transaction) AS prepared_xid_age
+FROM pg_prepared_xacts;
+
+SELECT statement_timestamp() AS sampled_at, slot_name, slot_type, active,
+       age(xmin) AS xmin_age, age(catalog_xmin) AS catalog_xmin_age,
+       restart_lsn, inactive_since
+FROM pg_replication_slots;
+
+SELECT statement_timestamp() AS sampled_at, pid, application_name,
+       age(backend_xmin) AS feedback_xmin_age
+FROM pg_stat_replication;
+```
+
+`statement_timestamp()`는 정확히는 client의 가장 최근 command message를 받은 시각입니다. 여러 SELECT를 하나의 simple Query 메시지로 보내면 같은 값이 나올 수 있습니다. 같은 timestamp가 여러 view의 원자적 snapshot을 보장하지는 않습니다. 위 SQL은 walsender를 activity 목록에서 제외해 복제 목록과의 중복 표시를 피합니다. 사용자 쿼리 본문은 이 예시에 포함하지 않았습니다. `pg_monitor`는 `pg_read_all_settings`, `pg_read_all_stats`, `pg_stat_scan_tables`를 포함하므로 단순 통계 읽기보다 넓습니다. 마지막 역할은 table lock을 수반할 수 있는 진단 함수도 허용합니다. `pg_read_all_stats`가 업무 테이블 전체 SELECT 권한을 주는 것은 아닙니다. [사전 정의 역할](https://www.postgresql.org/docs/18/predefined-roles.html), [시각 함수](https://www.postgresql.org/docs/18/functions-datetime.html)
+
+<a id="chapter-docs-database-postgresql-operations--통계가-멈춰-보이는-transaction"></a>
+
+### 통계가 멈춰 보이는 transaction
+
+18의 `stats_fetch_consistency` 기본값은 `cache`입니다. 한 transaction에서 처음 읽은 객체의 누적 통계가 재사용되므로 같은 연결에서 BEGIN 후 계속 조회하면 값이 고정돼 보일 수 있습니다. `snapshot`은 현재 DB에서 접근 가능한 누적 통계들을 함께 캐시하며, `none`은 접근마다 다시 읽습니다. 공식 문서는 한 번씩 읽는 모니터링에 `none`을 적합한 선택으로 설명합니다. [통계 설정](https://www.postgresql.org/docs/18/runtime-config-statistics.html#GUC-STATS-FETCH-CONSISTENCY)
+
+제품 적용 제안은 짧은 수집 transaction과 목적에 맞는 일관성 정책입니다. `none`도 원천 backend의 통계 보고 지연이나 여러 view 사이의 원자성을 해결하지는 않습니다. `pg_stat_clear_snapshot()`은 현재 transaction의 통계 캐시를 버리는 함수이며 서버의 누적 통계 counter를 초기화하는 함수와 다릅니다. 설정 변경·함수 호출 예제는 이번에 실행하지 않았습니다. [누적 통계 시스템](https://www.postgresql.org/docs/18/monitoring-stats.html)
+
+<a id="chapter-docs-database-postgresql-operations--어댑터의-버전-분기-표"></a>
+
+### 어댑터의 버전 분기 표
+
+아래는 **각 major에 맞는 bundled extension 정의**를 기준으로 한 차이입니다. 서버 major만 검사하지 말고 `server_version_num`, 설치된 extension의 `extversion`, 실제 view·컬럼 존재도 확인합니다. 과거 버전의 표는 호환성 설명이며 지원 종료 버전을 새로 배포하라는 권장이 아닙니다.
+
+| 경계 | 확인한 변경 | 수집 설계 |
+| --- | --- | --- |
+| PostgreSQL 16 | `pg_stat_io` 도입 | 15 이하는 view 부재를 장애·0으로 처리하지 않음. [16 릴리스](https://www.postgresql.org/docs/16/release-16.html) |
+| 16–17 → 18 | `read_bytes`, `write_bytes`, `extend_bytes` 추가, `op_bytes` 제거; `object=wal` 등의 WAL I/O 행 추가 | 16–17의 연산 수×`op_bytes` 계산과 18 byte 컬럼을 분기. backend/object/context 차원 보존. [18 릴리스](https://www.postgresql.org/docs/18/release-18.html) |
+| 16 → 17 | checkpointer를 별도 view로 분리; `checkpoints_timed/req` → `num_timed/requested`, `checkpoint_write_time/sync_time` → `write_time/sync_time`, `buffers_checkpoint` → `buffers_written` | `buffers_backend`·`buffers_backend_fsync`는 이동이 아니라 제거; 관련 I/O는 `pg_stat_io`로 관측. [17 릴리스](https://www.postgresql.org/docs/17/release-17.html), [17 view](https://www.postgresql.org/docs/17/monitoring-stats.html#MONITORING-PG-STAT-CHECKPOINTER-VIEW) |
+| 17 → 18 checkpointer | `num_done`, `slru_written` 추가 | `num_timed`·`num_requested`는 생략된 checkpoint도 셈. 완료 횟수는 `num_done`으로 구분. [18 view](https://www.postgresql.org/docs/18/monitoring-stats.html#MONITORING-PG-STAT-CHECKPOINTER-VIEW) |
+| 17 → 18 | `pg_stat_wal`의 `wal_write`, `wal_sync`, `wal_write_time`, `wal_sync_time` 제거 | WAL 생성량 필드와 WAL I/O 시간 필드를 분리하고 후자는 `pg_stat_io` 경로 사용. [18 릴리스](https://www.postgresql.org/docs/18/release-18.html) |
+| pg_stat_statements 12 → 13 | 실행 시간 `total_time`을 `total_exec_time`으로 이름 변경; 계획 시간 `total_plan_time`을 새로 선택 수집 | **실행 시간 의미는 직접 매핑**. 계획 시간을 더해 과거 실행 시간과 비교하지 않음. `track_planning` 기본 off일 때 계획 통계는 0. [13 릴리스](https://www.postgresql.org/docs/13/release-13.html), [13 확장 정의](https://www.postgresql.org/docs/13/pgstatstatements.html) |
+| 14 | `pg_stat_statements_info.dealloc`·`stats_reset` | 추적 항목 축출과 통계 reset을 함께 수집. [14 정의](https://www.postgresql.org/docs/14/pgstatstatements.html) |
+| 16 → 17 | `blk_read_time`/`blk_write_time` → `shared_blk_read_time`/`shared_blk_write_time`; local I/O 시간 분리, `stats_since`, `minmax_stats_since` 추가 | statement 항목의 수명과 min/max 재설정 시각을 구분. [17 정의](https://www.postgresql.org/docs/17/pgstatstatements.html) |
+| 16 → 17 progress vacuum | `max_dead_tuples` → `max_dead_tuple_bytes`, `num_dead_tuples` → `num_dead_item_ids`, `dead_tuple_bytes`·`indexes_total`·`indexes_processed` 추가 | 인덱스 수의 진행은 index vacuum/cleanup phase에서 읽음. [17 진행 view](https://www.postgresql.org/docs/17/progress-reporting.html#VACUUM-PROGRESS-REPORTING) |
+| 17 → 18 progress vacuum | `delay_time` 추가, ms | `track_cost_delay_timing` 활성 시 비용 지연 sleep 합; 비활성 0을 무대기로 해석하지 않음. [18 진행 view](https://www.postgresql.org/docs/18/progress-reporting.html#VACUUM-PROGRESS-REPORTING) |
+| 16 → 17 replication slot | `inactive_since` 추가 | ID age와 비활성 경과 시간을 분리; 동기화 slot의 별도 의미 확인. [17 slot view](https://www.postgresql.org/docs/17/view-pg-replication-slots.html) |
+
+I/O 시간은 `track_io_timing`·`track_wal_io_timing` 설정을 함께 수집합니다. 비활성화 때문에 0인 시간과 I/O가 없어서 0인 시간을 구분합니다. `dealloc`은 덜 실행된 statement 항목들을 축출한 **횟수**이며 사라진 개별 쿼리 수와 같지 않습니다. 확장 설치·preload 설정·통계 reset은 이 장의 읽기 수집 범위에 포함하지 않습니다. [18 통계 설정](https://www.postgresql.org/docs/18/runtime-config-statistics.html), [18 pg_stat_statements](https://www.postgresql.org/docs/18/pgstatstatements.html)
+
+<a id="chapter-docs-database-postgresql-operations--제품-적용-제안과-이해-확인"></a>
+
+### 제품 적용 제안과 이해 확인
+
+장기 보존 원인 목록은 세션·prepared·slot·standby를 PID·slot 기준으로 중복 제거해 같은 화면에서 보여 주되 XID age, 경과 시간, WAL byte 지연을 별도 열로 둡니다. 자동으로 slot을 삭제하거나 prepared transaction을 rollback하는 조치는 통계 수집과 분리합니다. 각각 복제·업무 transaction의 의미를 알아야 결정할 수 있습니다.
+
+1. XID age 1억은 1억 초인가? **아니다. transaction ID 공간의 거리다.**
+2. 실행 중인 장기 쿼리가 없으면 vacuum 회수 방해 요인도 없는가? **prepared transaction·slot·standby feedback이 남을 수 있다.**
+3. `dealloc=10`이면 정확히 쿼리 10개가 사라졌는가? **항목 축출 작업 횟수이며 제거 항목 수와 다르다.**
+4. 18에서 `op_bytes`가 없으면 설치 오류인가? **버전 변경이며 byte 컬럼을 사용하는 분기가 필요하다.**
+
+<a id="chapter-docs-database-postgresql-operations--함께-읽기"></a>
+
+### 함께 읽기
+
+[DB 수집 계약](#chapter-docs-database-collection-contracts) · [PostgreSQL 실습](#chapter-docs-database-postgresql-concurrency-lab) · [복제와 복구](#chapter-docs-database-replication-and-recovery)
 
 [통합 목차로](#book-top)
 
@@ -7042,7 +7867,7 @@ InfluxDB OSS 2는 measurement, tag set, field, timestamp 등의 데이터 요소
 
 ## DB 수집 명세: 읽기 전용 쿼리, 단위, 권한과 통계 수명
 
-> 상태: 검토됨 · 적용 범위: PostgreSQL 18·MySQL 8.4의 원천 필드와 수집 설계 · 검토일: 2026-10-04 · PostgreSQL 수집 SQL은 18.6에서 실행, MySQL SQL은 문서 검토
+> 상태: 검토됨 · 적용 범위: PostgreSQL 18·MySQL 8.4의 원천 필드와 수집 설계 · 검토일: 2026-10-04 · PostgreSQL 수집 SQL은 18.6에서 실행, MySQL SQL은 문서 검토 · statement_timestamp 의미 재검토: 2026-10-05
 
 버전 상태: MySQL 사례는 8.4 LTS 문서에 고정했습니다. 9.7 LTS와 이후 YY.M 번호 체계가 존재하며, 새 계열의 모든 동작을 검증한 설명은 아닙니다. 9.7.3은 Docker image 전용 보안 패치입니다. [버전별 기준과 지원 상태](#chapter-docs-coverage--교차-검토-시점의-버전-상태)
 
@@ -7068,7 +7893,7 @@ WHERE datid <> 0;
 COMMIT;
 ```
 
-`collected_at`은 이 예시에서 **각 행의 표현식을 평가할 때 읽은 시각**입니다. `clock_timestamp()`는 같은 문장 안에서도 달라질 수 있고 실제 결과의 행들에서도 달랐습니다. 한 문장에 공통인 시작 시각이 목적이면 `statement_timestamp()`를 선택합니다. 어느 쪽도 DB 전체의 원자적 수집 완료 시각이라는 뜻은 아닙니다. 이번에는 실행 입력·hash를 유지하고 행별 시각이라는 계약을 명시했습니다. [PostgreSQL 현재 시각 함수](https://www.postgresql.org/docs/18/functions-datetime.html#FUNCTIONS-DATETIME-CURRENT)
+`collected_at`은 이 예시에서 **각 행의 표현식을 평가할 때 읽은 시각**입니다. `clock_timestamp()`는 같은 문장 안에서도 달라질 수 있고 실제 결과의 행들에서도 달랐습니다. client의 command message 수신 시각을 공통 표본 시각으로 쓰려면 `statement_timestamp()`를 선택합니다. 여러 문장을 하나의 simple Query 메시지로 보낼 때도 같은 값일 수 있습니다. 어느 쪽도 DB 전체의 원자적 수집 완료 시각이라는 뜻은 아닙니다. 이번에는 실행 입력·hash를 유지하고 행별 시각이라는 계약을 명시했습니다. [PostgreSQL 현재 시각 함수](https://www.postgresql.org/docs/18/functions-datetime.html#FUNCTIONS-DATETIME-CURRENT)
 
 위 SQL은 [고정된 입력 파일](labs/postgresql/collect-database.sql)로 보존해 PostgreSQL 18.6의 임시 인스턴스에서 실행했습니다. 누적값이 존재해도 `stats_reset`이 NULL인 행이 반환됐습니다. 이 필드를 항상 존재하는 reset 시각으로 가정하지 않습니다. 권한·통계 snapshot·오류 후 연결 상태는 [실제 동시성 실습](#chapter-docs-database-postgresql-concurrency-lab)에서 설명합니다.
 
@@ -7419,7 +8244,7 @@ RDB는 시점 스냅샷 방식이고 AOF는 변경 명령 기록을 사용하는
 
 ## Kafka: 파티션, offset, lag와 처리 보장
 
-> 상태: 검토됨 · 적용 범위: Apache Kafka 4.3, 일반 consumer group · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: Apache Kafka 4.3, 일반 consumer group · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (4.3 broker·KRaft·share group)
 
 <a id="chapter-docs-middleware-kafka--먼저-이해할-것"></a>
 
@@ -7492,6 +8317,35 @@ Kafka 트랜잭션으로 관련 Kafka 작업을 묶는 보장과 외부 DB·HTTP
 
 lag가 증가하고 broker는 여유롭다면 consumer 처리 시간, DB 호출, 재시도와 할당 변화를 봅니다. 반대로 producer 지연과 복제 상태 변화가 함께 나타나면 broker·저장소·복제 경로를 조사합니다. 네트워크 byte rate만으로 어느 단계인지 단정하지 않습니다.
 
+<a id="chapter-docs-middleware-kafka--broker와-controller의-건강을-따로-관측한다"></a>
+
+### broker와 controller의 건강을 따로 관측한다
+
+소비자 lag가 늘었을 때 소비 코드가 느린 것인지, 복제·leader 문제로 데이터를 읽거나 쓰지 못하는지 구분해야 합니다. **Kafka 4.3 공식 문서, 2026-10-05 확인** 기준의 주요 gauge는 다음과 같습니다. [monitoring 정의](https://kafka.apache.org/43/operations/monitoring/)
+
+| MBean의 name | 수집 위치·단위 | 의미와 해석 |
+| --- | --- | --- |
+| `UnderReplicatedPartitions` | broker `ReplicaManager`, partition 수 | ISR 수가 전체 replica 수보다 적음; 곧바로 쓰기 불가라는 뜻은 아님 |
+| `UnderMinIsrPartitionCount` | broker `ReplicaManager`, partition 수 | ISR 수가 `min.insync.replicas`보다 적음; `acks=all` 쓰기 조건과 함께 해석 |
+| `ActiveControllerCount` | `KafkaController`, 노드별 0/1 | active controller 여부; 정상 안정 상태에서 해당 controller 집합의 합이 1인지 확인 |
+| `OfflinePartitionsCount` | `KafkaController`, partition 수 | controller가 관측한 offline partition; broker의 offline replica 수와 구분 |
+
+앞 두 이름의 prefix는 `kafka.server:type=ReplicaManager,name=`, 뒤 두 이름은 `kafka.controller:type=KafkaController,name=`입니다. KRaft에서 controller 전용 노드를 구성하면 broker만 scrape해서 controller 지표가 안 보일 수 있습니다. 이 이름들이 모두 KRaft 전용이라는 뜻도 아닙니다. 4.0부터 ZooKeeper 모드는 제거됐지만 이전 계열에서 존재하던 지표와 새로운 KRaft metadata/quorum 지표를 구분합니다. [4.0 업그레이드](https://kafka.apache.org/40/getting-started/upgrade/)
+
+**예시:** replication factor=3, min ISR=2, 현재 ISR=2인 partition은 under-replicated지만 under-min-ISR은 아닙니다. ISR=1로 줄면 두 조건에 모두 해당합니다. 두 gauge를 더해 “장애 partition 총수”를 만들면 중복됩니다. 단발적인 controller 0 관측은 leader 전환·수집 시차·누락과 함께 조사합니다. [UnderMinIsr 도입 정의](https://cwiki.apache.org/confluence/spaces/KAFKA/pages/70257093/KIP-164-%2BAdd%2BUnderMinIsrPartitionCount%2Band%2Bper-partition%2BUnderMinIsr%2Bmetrics)
+
+Kafka 4.3.0 KRaft의 `ControllerServer`는 각 controller에 metadata 지표 publisher를 등록합니다. `OfflinePartitionsCount`는 각 controller가 적용한 metadata의 클러스터 전체 offline partition 수이므로 controller별 값을 더하면 중복됩니다. **제품 적용 제안:** 같은 클러스터의 active controller 값을 우선 사용하고, 여러 replica의 최댓값을 보조 신호로 표시할 때도 수집 시각·metadata 적용 지연을 남깁니다. 최댓값이 언제나 최신 상태라는 보장은 없습니다. [publisher 등록](https://github.com/apache/kafka/blob/4.3.0/core/src/main/scala/kafka/server/ControllerServer.scala#L378), [offline 계정](https://github.com/apache/kafka/blob/4.3.0/metadata/src/main/java/org/apache/kafka/controller/metrics/ControllerMetadataMetricsPublisher.java)
+
+<a id="chapter-docs-middleware-kafka--share-group은-committed-offset-한-개로-설명하지-않는다"></a>
+
+### share group은 committed offset 한 개로 설명하지 않는다
+
+KIP-932의 share group은 한 partition을 여러 consumer가 협력해 읽고 개별 record를 acknowledge할 수 있는 모델입니다. 공식 릴리스는 **4.2에서 production-ready**라고 명시하며, 4.0의 early access 설명을 4.3의 상태로 사용하지 않습니다. record를 가져오면 시간 제한 acquisition lock이 생기고, 처리 결과의 acknowledge·release·재전달을 구분합니다. [4.2 릴리스](https://kafka.apache.org/blog/2026/02/17/apache-kafka-4.2.0-release-announcement/), [KafkaShareConsumer](https://kafka.apache.org/43/javadoc/org/apache/kafka/clients/consumer/KafkaShareConsumer.html)
+
+일반 consumer group의 연속 committed offset과 달리 share partition 안에는 available·acquired·acknowledged·archived 상태가 섞입니다. KIP-1226의 lag 모델은 시작 offset 이후의 범위에서 이미 terminal 상태로 처리된 항목을 제외합니다. 따라서 단순 `끝 offset−start offset`만으로 계산하면 이미 처리한 항목까지 남은 것으로 셀 수 있습니다. compacted/control record의 간극은 확인 전에는 lag에 포함될 수 있으므로 이것도 정확한 남은 업무 건수와 항상 같지는 않습니다. [Share partition lag 설계](https://cwiki.apache.org/confluence/spaces/KAFKA/pages/390761228/KIP-1226%2BIntroducing%2BShare%2BPartition%2BLag%2BPersistence%2Band%2BRetrieval), [4.3 운영 조회](https://kafka.apache.org/43/operations/basic-kafka-operations/)
+
+제품 적용 제안은 `group type`, lag 원천 API·버전·start offset, acquisition·acknowledge·release 관측을 함께 저장하는 것입니다. Kafka의 acknowledge도 외부 DB 업무 결과와 원자적으로 연결했는지까지 증명하지 않습니다. JMX·Admin API 조회에는 대상 인증·인가가 필요하고 전체 topic/partition의 고빈도 조회는 비용이 커집니다. 이 절에서는 broker·JMX·CLI를 실행하거나 원격 JMX를 활성화하지 않았습니다.
+
 <a id="chapter-docs-middleware-kafka--이해-확인"></a>
 
 ### 이해 확인
@@ -7499,6 +8353,8 @@ lag가 증가하고 broker는 여유롭다면 consumer 처리 시간, DB 호출,
 1. position 기준 lag와 commit 기준 lag는 같은가? **참조 위치가 다릅니다.**
 2. 최대 lag를 더하면 모든 partition의 합계인가? **집계 의미가 다릅니다.**
 3. broker 기록 성공이면 후속 업무가 완료됐는가? **소비와 업무 결과를 따로 확인해야 합니다.**
+4. UnderReplicated와 UnderMinIsr를 더하면 장애 partition 총수인가? **두 조건이 겹칠 수 있습니다.**
+5. share group lag를 consumer committed offset 차이로 대체해도 되는가? **개별 획득·확인·terminal 상태를 다루는 별도 모델입니다.**
 
 다음: [메시지 큐](#chapter-docs-middleware-message-queues) · [미들웨어 목차](#chapter-docs-middleware-readme)
 
@@ -7957,7 +8813,7 @@ EC2 API는 페이지화된 조회에서 다음 토큰으로 이어서 결과를 
 
 ## 클라우드 지표의 기간, 통계와 정규화
 
-> 상태: 검토됨 · 적용 범위: CloudWatch·Azure Monitor·Cloud Monitoring · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: CloudWatch·Azure Monitor·Cloud Monitoring · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (공급자별 보존·집계·조회 한도)
 
 <a id="chapter-docs-cloud-provider-metrics--먼저-이해할-것"></a>
 
@@ -7976,6 +8832,35 @@ CloudWatch에서는 namespace·metric name·dimension을 구분하고 period에 
 Azure Monitor의 time granularity와 aggregation은 시간 구간의 데이터를 요약하는 방식을 결정합니다. 합·평균·최대 등은 서로 다른 질문이며 null과 0의 해석도 구분해야 합니다. [Azure Metrics Aggregation](https://learn.microsoft.com/en-us/azure/azure-monitor/metrics/metrics-aggregation-explained)
 
 Google Cloud Monitoring은 GAUGE·DELTA·CUMULATIVE의 metric kind와 값의 유형을 구분합니다. 단순 숫자와 distribution도 같은 저장 형태가 아닙니다. [Google Cloud Metric Kinds and Types](https://docs.cloud.google.com/monitoring/api/v3/kinds-and-types)
+
+<a id="chapter-docs-cloud-provider-metrics--해상도-보존-기간과-조회량은-서로-다르다"></a>
+
+### 해상도, 보존 기간과 조회량은 서로 다르다
+
+2026-10-05 확인한 CloudWatch GetMetricData 계약은 다음과 같습니다. 오래된 고해상도 표본은 더 굵은 기간으로 집계됩니다. 나중에 조회 period를 짧게 지정한다고 원래의 세밀한 표본을 복원할 수는 없습니다. [GetMetricData 보존·조회 규약](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html)
+
+| 원천 표본의 해상도 | 해당 해상도로 보존되는 기간 |
+| --- | --- |
+| 60초 미만: StorageResolution=1인 고해상도 사용자 지표 | 3시간 |
+| 60초 | 15일 |
+| 300초 | 63일 |
+| 3,600초 | 455일 |
+
+GetMetricData 한 요청의 `MetricDataQueries`는 최대 500개이며, 응답의 데이터 포인트 수는 `MaxDatapoints`로 제한합니다. 기본값은 100,800입니다. query 항목에는 metric math 식도 들어가므로 모두 독립된 원천 metric이라고 세지 않습니다. 나머지 결과는 응답 최상위 `NextToken`으로 이어 받으며, 요청당 한도와 계정·리전의 초당 API·데이터 포인트 quota를 따로 관리해야 합니다. [GetMetricData](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html), [CloudWatch 서비스 quota](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_limits.html)
+
+EC2 basic monitoring의 일반 지표는 5분, detailed monitoring은 1분 주기입니다. 다만 **상태 검사 지표는 basic에서도 1분**입니다. detailed monitoring에는 추가 요금이 적용되며, 이를 켠다고 게스트 OS의 모든 메모리·프로세스 지표가 생기는 것도 아닙니다. [EC2 모니터링 구분](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/manage-detailed-monitoring.html)
+
+<a id="chapter-docs-cloud-provider-metrics--azure의-빈-구간과-google-cloud의-게시-지연"></a>
+
+### Azure의 빈 구간과 Google Cloud의 게시 지연
+
+Azure Monitor의 플랫폼 지표 집계 설명에서는 최소 time grain을 1분으로 설명합니다. 실제 지표가 지원하는 기간·집계는 해당 resource type의 지표 정의로 확인합니다. 이 설명을 모든 로그 쿼리나 사용자 정의 관측 데이터의 최소 간격으로 일반화하지 않습니다. `NULL`과 0은 집계에서 다르게 처리됩니다. 다만 **플랫폼 지표는 무수신 구간을 0 또는 NULL 중 무엇으로 기록할지 resource provider가 결정**하므로 숫자 0을 항상 실제 관측된 0으로 확정할 수 없습니다. 사용자 정의 지표의 무수신은 NULL로 처리됩니다. provider·지표별 결측 정책을 보존합니다. [Azure 집계와 NULL](https://learn.microsoft.com/en-us/azure/azure-monitor/metrics/metrics-aggregation-explained), [리소스별 지표 참조](https://learn.microsoft.com/en-us/azure/azure-monitor/reference/metrics-index)
+
+**합성 예시:** 같은 가중치의 세 구간이 `[10, NULL, 20]`이면 존재하는 두 값의 평균은 `(10+20)/2=15`입니다. 빈 구간을 0으로 채운 `(10+0+20)/3=10`은 다른 질문의 답입니다. 결측을 숨기지 않도록 평균과 관측 구간 수를 함께 표시하는 방식을 제안합니다.
+
+Google Cloud 지표 참조에는 metric kind·단위와 함께 sampling 주기, 표본이 보이기까지의 지연이 지표별로 기재됩니다. “몇 초마다 측정하는가”와 “측정 후 언제 조회할 수 있는가”를 별도 필드로 저장합니다. 모든 Google Cloud 지표를 동일한 60초 주기나 동일한 게시 지연으로 취급하지 않습니다. [지표별 참조 표기](https://docs.cloud.google.com/monitoring/api/metrics), [지연과 보존](https://docs.cloud.google.com/monitoring/api/v3/latency-n-retention)
+
+이 장에서는 cloud API를 호출하거나 유료 monitoring 설정을 변경하지 않았습니다. 실제 수집기에는 조회 권한과 quota, 조회 비용, 표본의 시간 범위를 함께 명세하도록 제안합니다.
 
 <a id="chapter-docs-cloud-provider-metrics--두-번-미분하지-않는다"></a>
 
@@ -8038,6 +8923,8 @@ period와 statistic 또는 aligner/reducer
 1. 분당 Sum을 다음 분 Sum과 차분하면 요청률인가? **각 구간 건수라면 기간으로 나눠야 합니다.**
 2. 표본 수가 다른 평균을 같은 가중치로 합쳐도 되는가? **표본 수가 필요합니다.**
 3. 공급자 지표와 에이전트 지표는 자동으로 동일한가? **범위·구간·정의를 비교해야 합니다.**
+4. EC2 basic의 모든 지표는 5분마다 나오는가? **상태 검사 지표는 1분이라는 예외가 있습니다.**
+5. sampling 주기가 짧으면 최신 표본을 즉시 조회할 수 있는가? **게시·수집 지연은 별도입니다.**
 
 다음: [관리형·서버리스](#chapter-docs-cloud-managed-and-serverless) · [클라우드 목차](#chapter-docs-cloud-readme)
 
@@ -8173,7 +9060,7 @@ Azure의 null과 0, 시간 집계의 의미를 확인하고 Google Cloud의 alig
 
 ## 관리형 서비스와 서버리스 관측
 
-> 상태: 검토됨 · 적용 범위: 관리형 관측 모델, AWS Lambda·Google Cloud Run 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: 관리형 관측 모델, AWS Lambda·Google Cloud Run 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (Lambda INIT·Errors 시각)
 
 <a id="chapter-docs-cloud-managed-and-serverless--먼저-이해할-것"></a>
 
@@ -8205,6 +9092,20 @@ Lambda Invocations는 함수 코드가 호출된 횟수이며 throttled 요청 �
 ```
 
 둘 중 하나만 보면 다른 실패를 놓칠 수 있습니다. 실제 전체 요청의 결과를 합칠 때는 재시도·중복·다른 오류 유형도 확인합니다.
+
+<a id="chapter-docs-cloud-managed-and-serverless--초기화-시간-과금-시간과-오류-시각"></a>
+
+### 초기화 시간, 과금 시간과 오류 시각
+
+Lambda 초기화의 관측 출처를 먼저 구분합니다. cold start의 `Init Duration`은 REPORT 로그에서 확인할 수 있으며, Telemetry API의 `platform.initReport`는 초기화 보고 이벤트와 `metrics.durationMs`를 제공합니다. invoke 실패 뒤 suppressed init은 CloudWatch Logs에 추가 INIT 단계로 명시되지 않으면서 **REPORT의 Duration에 INIT+INVOKE 시간이 포함**될 수 있습니다. Telemetry API의 `phase=invoke` 초기화 이벤트로 구분할 수 있으므로 “Init Duration 필드가 없으면 초기화가 없었다”고 결론 내리지 않습니다. [실행 환경 수명과 suppressed init](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html), [Telemetry API 이벤트 스키마](https://docs.aws.amazon.com/lambda/latest/dg/telemetry-schema-reference.html)
+
+기본 on-demand Init의 10초 제한을 넘으면 첫 호출 시 함수 timeout 범위에서 Init을 다시 시도하는 경로도 있습니다. 이는 invoke 실패 뒤 suppressed init과 구분합니다. REPORT 로그에서 확인한 시간 포함 관계를 CloudWatch `Duration` 지표에도 그대로 적용하지 않습니다. 공식 지표 설명은 cold start 제외를 명시하지만 suppressed init과의 세부 대응은 이 장에서 실측하지 않았습니다. [Init 실패·재시도](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html), [Duration 지표 정의](https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics-types.html)
+
+2025-08-01부터 managed runtime·ZIP·on-demand 함수의 INIT 단계도 과금 대상이 되었습니다. 다른 실행·배포 방식에서는 이미 적용되던 과금과 구분해야 합니다. **과금 규칙의 변경은 CloudWatch `Duration` 지표에 cold start가 포함된다는 뜻이 아닙니다.** 원천 지표, 로그의 Duration·Init Duration·Billed Duration을 각각의 정의로 읽습니다. [AWS INIT 과금 변경 공지](https://aws.amazon.com/blogs/compute/aws-lambda-standardizes-billing-for-init-phase/)
+
+표준 Lambda `Errors`의 timestamp는 오류가 발생하거나 실행이 끝난 시각이 아니라 **호출이 시작된 시각**입니다. 오래 실행된 호출의 실패가 앞 구간의 지표를 늦게 바꿀 수 있습니다. 제품은 로그·trace의 실제 오류 시각과 지표의 귀속 구간을 구분하고 [재조회 정책](#chapter-docs-cloud-late-data-and-reconciliation)으로 연결하도록 제안합니다. [Lambda 지표 유형](https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics-types.html)
+
+이 내용은 문서 대조이며 함수 호출·배포·설정 변경을 실행하지 않았습니다. Telemetry API는 실행 환경의 extension이 구독하는 경로입니다. 원격 지표 API 조회와 같지 않으며 extension의 처리·메모리 비용도 설계에 포함합니다. [Telemetry API](https://docs.aws.amazon.com/lambda/latest/dg/telemetry-api.html)
 
 <a id="chapter-docs-cloud-managed-and-serverless--동시성과-확장"></a>
 
@@ -8241,6 +9142,8 @@ Cloud Run 요청 timeout은 응답 기한을 넘기면 연결을 닫고 504를 �
 1. Errors/Invocations가 모든 진입 요청의 실패율인가? **throttle 등 빠지는 범주가 있습니다.**
 2. Lambda Duration에 cold start가 포함되는가? **해당 지표의 정의에서는 포함하지 않습니다.**
 3. Cloud Run 504면 코드 실행도 종료됐는가? **그렇다고 보장되지 않습니다.**
+4. Errors의 표본 시각은 에러 로그가 기록된 시각인가? **표준 Lambda Errors는 호출 시작 시각에 귀속됩니다.**
+5. INIT 과금이 시작되면 Duration 지표도 자동으로 같은 시간이 되는가? **과금·지표·로그의 계약을 각각 확인해야 합니다.**
 
 다음: [클라우드 네트워크](#chapter-docs-cloud-networking) · [클라우드 목차](#chapter-docs-cloud-readme)
 
@@ -8254,7 +9157,7 @@ Cloud Run 요청 timeout은 응답 기한을 넘기면 연결을 닫고 504를 �
 
 ## 클라우드 네트워크: 경로, 정책과 흐름 로그
 
-> 상태: 검토됨 · 적용 범위: 공통 조사 모델과 AWS VPC 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: 공통 조사 모델과 AWS VPC 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (VPC Flow Logs 집계·예외)
 
 <a id="chapter-docs-cloud-networking--먼저-이해할-것"></a>
 
@@ -8295,6 +9198,25 @@ VPC Flow Logs는 ACCEPT·REJECT 같은 흐름 결과와 로그 상태를 제공�
 
 따라서 로그가 없다는 사실을 언제나 트래픽 0으로 바꾸지 않습니다. ACCEPT도 HTTP 성공이나 업무 완료를 의미하지 않으며 실제 상위 계층 결과를 추가 확인해야 합니다.
 
+<a id="chapter-docs-cloud-networking--흐름-로그의-집계-간격과-사각지대"></a>
+
+### 흐름 로그의 집계 간격과 사각지대
+
+2026-10-05 확인한 VPC Flow Logs의 최대 집계 간격 기본값은 10분이며 1분을 선택할 수 있습니다. Nitro 기반 인스턴스에 연결된 네트워크 인터페이스는 설정과 관계없이 1분 이하로 집계합니다. 이는 로그가 그 시간 안에 목적지에 도착한다는 보장이 아닙니다. 집계와 게시 지연을 구분해야 합니다. [흐름 로그 레코드와 집계](https://docs.aws.amazon.com/vpc/latest/userguide/flow-log-records.html)
+
+다음은 기록되지 않는 트래픽의 **주요 예**입니다. 전체 예외는 공식 목록을 적용 대상별로 확인합니다. [Flow Logs 제한](https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs-limitations.html)
+
+| 예외 | 관측상 주의점 |
+| --- | --- |
+| Amazon 제공 DNS 서버와의 통신 | 자체 DNS 서버와의 통신까지 모두 제외된다는 뜻은 아님 |
+| 인스턴스 메타데이터 `169.254.169.254` | 로그 부재로 metadata 접근이 없었다고 증명하지 못함 |
+| Amazon Time Sync `169.254.169.123`, DHCP, ARP | 시간 동기화·주소 설정·인접 탐색의 성공을 flow log만으로 판단하지 않음 |
+| Windows 라이선스 활성화, VPC 예약 라우터 주소 관련 트래픽 | 일반 앱 흐름과 수집 범위가 다름 |
+| traffic mirroring의 원본 트래픽 | mirror 대상에서 관측한 기록과 혼동하지 않음 |
+| endpoint ENI와 Network Load Balancer ENI 사이 | 다른 구간의 기록으로 그 구간을 보았다고 단정하지 않음 |
+
+제품 적용 제안은 “패킷을 모두 기록한 증거”가 아니라 **정해진 범위에서 집계한 흐름 증거**로 표시하는 것입니다. flow log 구독·저장 비용, IAM 조회 권한, 집계 설정을 수집 명세에 남깁니다. 이 장에서 flow log를 활성화하거나 cloud 질의를 실행하지 않았습니다.
+
 <a id="chapter-docs-cloud-networking--가상-장애-분석"></a>
 
 ### 가상 장애 분석
@@ -8316,6 +9238,7 @@ VPC Flow Logs는 ACCEPT·REJECT 같은 흐름 결과와 로그 상태를 제공�
 1. security group과 NACL은 모두 같은 상태 추적을 하는가? **AWS에서는 stateful과 stateless 차이가 있습니다.**
 2. ACCEPT 로그면 DB 쿼리가 성공했는가? **전송·인증·업무 결과를 더 확인해야 합니다.**
 3. SKIPDATA를 트래픽 0으로 저장해도 되는가? **관측 누락을 잘못 표현합니다.**
+4. 최대 집계 간격이 1분이면 1분 내 조회가 보장되는가? **게시·전달 지연은 별도입니다.**
 
 관련: [네트워크 관측](#chapter-docs-network-network-metrics) · [클라우드 목차](#chapter-docs-cloud-readme)
 
@@ -8898,9 +9821,9 @@ CPU·오류율·요청률을 0으로 채우면 업무가 조용하거나 정상�
 
 ## 재현 실습: 계산, 실제 엔진, 운영 검증의 경계
 
-> 상태: 검토됨 · 적용 범위: Windows 로컬 실행, Python 3.11.9·SQLite 3.45.1·promtool 3.5.0 · 실행일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: Windows·WSL 로컬 실습과 아래 고정 버전·입력 · 기존 실행일: 2026-10-04 · WSL 2라운드 추가 실행: 2026-10-05
 
-버전 상태: promtool 3.5.0은 이 기록의 고정 실행 파일입니다. Prometheus 3.5 LTS는 2026-07-31 지원이 끝났고, 검토 시점 LTS는 3.13.4, 최신 안정 릴리스는 3.15.0입니다. [릴리스·지원 표](#chapter-docs-coverage--교차-검토-시점의-버전-상태)를 참고하며 이 실습을 현재 권장 설치 버전으로 읽지 않습니다.
+버전 상태: promtool 3.5.0은 기존 기록의 고정 실행 파일입니다. Prometheus 3.5 LTS는 2026-07-31 지원이 끝났고, 검토 시점 LTS 3.13.4와 최신 안정 3.15.0의 별도 실행을 이번에 추가했습니다. [릴리스·지원 표](#chapter-docs-coverage--교차-검토-시점의-버전-상태)를 참고하며 과거 재현 버전을 현재 권장 설치 버전으로 읽지 않습니다.
 
 공식 설명을 읽는 것과 실제 프로그램에서 같은 동작을 보는 것은 서로 보완합니다. 이 장은 작성 환경에서 직접 실행한 실습입니다. 운영 서버나 사용자의 DB를 사용하지 않았고, 로컬 임시 DB와 loopback HTTP, 읽기 전용 Win32 API, 합성 PromQL 입력을 사용했습니다.
 
@@ -8919,6 +9842,59 @@ CPU·오류율·요청률을 0으로 채우면 업무가 조용하거나 정상�
 | [HTTP/1.1 연결](#chapter-docs-network-dns-and-connection-lifecycle) | 2 | 요청 수·연결 수·본문 완료가 어떻게 다른가? |
 
 Linux의 기존 cgroup 읽기는 별도 관측으로 기록했으며 위 4개 실험 수에 추가하지 않았습니다. [검증 기록](#chapter-docs-validation)은 두 판의 근거와 실행하지 않은 범위를 함께 정리합니다.
+
+<a id="chapter-docs-cross-domain-reproducible-labs--2라운드에서-출판한-별도-실행"></a>
+
+### 2라운드에서 출판한 별도 실행
+
+2026-10-05 Claude가 WSL Ubuntu 24.04·Linux 6.18.33.2·Python 3.12.3에서 실행한 최종 JSON 네 개를 바이트 그대로 출판했습니다. Codex는 원시값·입력 hash·판정 조건을 대조했으며 이 샌드박스에서 Linux 서버를 다시 실행하지 않았습니다. [provenance](review/evidence-provenance.json)가 당시 입력과 출판 파일을 연결합니다. `supported`는 명시한 가설·버전·구성의 관측이고 제품 전체의 보장이 아닙니다.
+
+| 실습 | 고정 실행과 판정 | 출판 결과 |
+| --- | --- | --- |
+| Kubernetes | 1.34.1·1.37.0 × cache true/false, 16조건 중 supported 14·refuted 2 | [JSON](labs/results/1.1-r2-kubernetes.json) |
+| promtool | 3.13.4·3.15.0, 두 버전 모두 check rules·test rules 성공 | [JSON](labs/results/1.1-r2-prometheus.json) |
+| Collector | 0.162.0, 내부 관측·queue 경계·이름 수용 14조건 supported | [JSON](labs/results/1.1-r2-otel.json) |
+| PostgreSQL | 18.6, prepared·catalog_xmin·feedback·physical xmin 네 조건 supported | [JSON](labs/results/1.1-r2-postgresql.json) |
+
+Kubernetes 실행 patch는 검토 시 최신 1.34.12·1.37.1이 아닙니다. cache-on의 과거 Exact LIST 200은 “compaction 뒤 반드시 410” 가설을 반박하며 오류 결과를 숨기기 위해 통과로 고치지 않았습니다. Collector는 내부 거절 로그·최종 실패 계수·비동기 응답 경계를, PostgreSQL은 회수 기준점을 해제하기 전후의 실제 행 회수를 관측했습니다. [Kubernetes 해석](#chapter-docs-kubernetes-inventory-consistency), [Collector 해석](#chapter-docs-product-telemetry-delivery-contracts), [PostgreSQL 해석](#chapter-docs-database-postgresql-operations)
+
+promtool 두 버전은 기존 `labs/prometheus/rules.yml`·`tests.yml`을 변경 없이 다시 평가했습니다. 각 버전에서 기존 표현식 8개·알림 5개의 fixture가 성공했으며, 최초 3.5.0 결과와 새 실행을 모두 보존합니다. exemplar·created timestamp·TSDB 저장·Alertmanager 전송은 이 규칙 검사에 포함되지 않습니다.
+
+<a id="chapter-docs-cross-domain-reproducible-labs--경로권한정리-범위"></a>
+
+#### 경로·권한·정리 범위
+
+공식 자산과 추출 도구는 `.tools/`, 출력 JSON·일반 작업 파일은 `.lab-runs/`에 제한합니다. 시스템 패키지 설치·sudo·서비스 등록·cloud 호출 없이 일반 Linux 사용자의 일회성 loopback 프로세스만 사용합니다. 다운로드 URL·공식 SHA256 pin은 [공통 manifest](labs/review-r2/assets.json)와 [Kubernetes manifest](labs/review-r2/kubernetes-assets.json)에 있습니다. `.tools/pg18`은 기존 검증 도구를 재사용합니다.
+
+**PostgreSQL 데이터 디렉터리 예외:** metadata 옵션 없는 WSL DrvFs에서는 필요한 0700 권한이 유지되지 않아 최초 initdb가 실패했습니다. 최종 실행은 `mkdtemp`가 만든 Linux native 임시 디렉터리(해당 기록에서는 `/tmp/dk-r2-pgdata-*`)의 실제 mode 0700을 검사하고 primary·standby 데이터를 그 아래에 뒀습니다. 경로·사유·mode·정리 완료가 JSON에 남으며, 소유 프로세스를 멈춘 뒤 그 디렉터리만 제거합니다. 미리 존재한 DB나 사용자가 지정한 외부 경로로 연결하지 않습니다. PostgreSQL 실습 자체는 fixture·slot·prepared transaction·VACUUM 등 상태를 변경하므로 운영 DB에서 실행하는 수집 명령과 다릅니다. [실행기](scripts/run_postgres_r2_lab.py)
+
+2d 검토에서는 native 디렉터리의 resolve/chmod/stat 검사 **이전**에 소유권을 등록하도록 보완했습니다. 삭제 실패를 exit code·status에도 반영하고 로그 읽기 실패가 데이터 정리 시도까지 막지 않게 했습니다. 프로세스 종료에 실패하면 사용 중일 수 있는 디렉터리는 보존합니다. 성공한 네 실행에 쓰인 [당시 공통 모듈](labs/archive/lab_r2_common_2026_10_05.py)은 그대로 보존했으므로 새 helper의 실패 경로 보완 때문에 옛 수치를 현재 코드의 실행 결과로 바꿔 쓰지 않습니다. Windows에서는 저장소 내부 fixture로 여섯 실패 경로를 검사했으며, 수정한 native 성공 경로의 Linux 재실행은 아래 smoke 명령으로 별도 확인합니다.
+
+최초 initdb 실패 `postgresql.json`, 입력 hash 변경으로 대체한 `prometheus.json`·`otel.json`·`postgresql-2.json`·`prometheus-2.json`·`otel-2.json`이 있었다는 사실은 기록에 남깁니다. 해당 중간 실행은 출판 근거로 채택하지 않았습니다. [2d 검토 기록](review/claude-codex-r2.md)
+
+<a id="chapter-docs-cross-domain-reproducible-labs--2라운드-후속-재현-명령"></a>
+
+#### 2라운드 후속 재현 명령
+
+PowerShell의 저장소 루트에서 실행하는 **후속 재현 예시**입니다. 이미 존재하는 출력은 덮어쓰지 않으므로 같은 명령을 반복할 때는 새 파일명을 사용합니다. 아래는 2d에서 실행한 명령 목록이 아닙니다. Linux 서버 재현에는 해당 배포판 공유 라이브러리와 기존 PostgreSQL 도구가 필요합니다.
+
+```powershell
+python -X utf8 -B scripts/get_review_r2_assets.py --which all
+python -X utf8 -B scripts/run_kubernetes_r2_lab.py --prepare-assets
+wsl -d Ubuntu --cd /mnt/c/project/Domain-Knowledge -- python3 -B scripts/run_kubernetes_r2_lab.py --output .lab-runs/r2/repeat-kubernetes.json
+wsl -d Ubuntu --cd /mnt/c/project/Domain-Knowledge -- python3 -B scripts/run_prometheus_r2_lab.py --output .lab-runs/r2/repeat-prometheus.json
+wsl -d Ubuntu --cd /mnt/c/project/Domain-Knowledge -- python3 -B scripts/run_otel_r2_lab.py --output .lab-runs/r2/repeat-otel.json
+wsl -d Ubuntu --cd /mnt/c/project/Domain-Knowledge -- python3 -B scripts/run_postgres_r2_lab.py --output .lab-runs/r2/repeat-postgresql.json
+python -X utf8 -B scripts/verify_review_r2.py --result .lab-runs/r2/repeat-kubernetes.json --result .lab-runs/r2/repeat-prometheus.json --result .lab-runs/r2/repeat-otel.json --result .lab-runs/r2/repeat-postgresql.json
+```
+
+실행 부하는 전용 API server·etcd 또는 Collector, 작은 primary·standby의 CPU·메모리·디스크와 로컬 요청입니다. 원시 JSON에 자원 최고 사용량은 없어 메모리 실측치를 주장하지 않습니다. 새 실습 없이 출판 증거만 확인하는 명령은 도구 cache 없이도 동작합니다. native smoke는 DB를 띄우지 않고 작은 임시 파일만 만들며, 이 Linux 명령은 Claude의 후속 실행 대상으로 남깁니다.
+
+```powershell
+python -X utf8 -B scripts/verify_review_r2.py --published
+python -X utf8 -B scripts/verify_lab_r2_cleanup.py
+wsl -d Ubuntu --cd /mnt/c/project/Domain-Knowledge -- python3 -B scripts/verify_lab_r2_cleanup.py --native-output .lab-runs/r2/native-cleanup-r2d.json
+```
 
 <a id="chapter-docs-cross-domain-reproducible-labs--실행-자료와-재현"></a>
 
@@ -9555,9 +10531,9 @@ Collector의 persistent sending queue는 디스크에 보관해 프로세스 재
 
 ## 관측 데이터 전송 계약: 부분 성공, 재시도와 중복
 
-> 상태: 검토됨 · 적용 범위: OTLP 1.11.0 문서, Collector 0.137.0의 OTLP/HTTP JSON 로컬 실험 · 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: OTLP 1.11.0 문서, Collector 0.137.0·0.162.0의 OTLP/HTTP JSON 로컬 실험 · 검토일: 2026-10-05
 
-버전 상태: OTLP 문서 1.11.0·Collector 0.137.0을 고정한 실험입니다. 검토 시점 원천 릴리스는 OTLP 1.11.1·Collector 0.162.0이며 새 버전으로 실행한 결과로 바꾸지 않습니다. [고정·최신·지원 상태](#chapter-docs-coverage--교차-검토-시점의-버전-상태)
+버전 상태: 기존 0.137.0 실행을 보존하고 2라운드에서 0.162.0의 내부 로그·metric과 queue on/off 결과를 추가했습니다. OTLP 웹 문서 1.11.0과 원천 릴리스 1.11.1도 구분합니다. [고정·최신·지원 상태](#chapter-docs-coverage--교차-검토-시점의-버전-상태)
 
 <a id="chapter-docs-product-telemetry-delivery-contracts--먼저-이해할-것"></a>
 
@@ -9567,9 +10543,9 @@ Collector의 persistent sending queue는 디스크에 보관해 프로세스 재
 
 이 장은 [수집 파이프라인](#chapter-docs-product-collection-pipelines)을 실제 Collector 동작으로 보강합니다. 테스트 목적지는 응답을 통제하는 임시 서버입니다. 영속 저장이나 검색은 구현하지 않았으므로 “저장 성공”을 측정한 실험으로 표시하지 않습니다.
 
-<a id="chapter-docs-product-telemetry-delivery-contracts--실험-경로와-고정-조건"></a>
+<a id="chapter-docs-product-telemetry-delivery-contracts--기존-01370-실험-경로와-고정-조건"></a>
 
-### 실험 경로와 고정 조건
+### 기존 0.137.0 실험 경로와 고정 조건
 
 ```mermaid
 flowchart LR
@@ -9639,7 +10615,7 @@ OTLP/HTTP 규약이 재시도 대상으로 열거한 상태는 429·502·503·50
 
 Collector 0.137.0의 exporterhelper는 `queue → 관측 → retry → timeout → exporter` 순서로 호출을 감쌉니다. `send_failed_*`는 내부 retry가 오류를 반환한 뒤 관측 계층에서 항목 수를 기록합니다. 일시 실패 후 같은 retry 호출 안에서 성공하면 그 중간 시도마다 이 실패 계수가 증가하는 구조가 아닙니다. [호출 구성](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/exporterhelper/internal/base_exporter.go#L66-L102), [실패 계수 기록](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/exporterhelper/internal/obs_report_sender.go#L86-L141)
 
-따라서 이 버전의 계수 증가를 “그 exporter의 동일한 내부 재시도가 아직 진행 중”이라고 풀이하지 않습니다. queue 경로에서는 최종 반환 오류에 대해 dropping 로그를 기록합니다. 다만 상류의 별도 재전송이나 다른 목적지의 성공까지 이 계수 하나로 알 수는 없어 종단 간 영구 유실 수와도 동일하지 않습니다. enqueue 실패, exporter 최종 실패, 목적지 부분 거절, 고유 저장 항목 수를 구분합니다. 이 설명은 코드 검토이며 이번 실험의 내부 metric 관측 결과가 아닙니다. [QueueSender](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/exporterhelper/internal/queue_sender.go#L38-L49), [일반 관측 안내](https://opentelemetry.io/docs/collector/internal-telemetry/)
+따라서 이 버전의 계수 증가를 “그 exporter의 동일한 내부 재시도가 아직 진행 중”이라고 풀이하지 않습니다. queue 경로에서는 최종 반환 오류에 대해 dropping 로그를 기록합니다. 다만 상류의 별도 재전송이나 다른 목적지의 성공까지 이 계수 하나로 알 수는 없어 종단 간 영구 유실 수와도 동일하지 않습니다. enqueue 실패, exporter 최종 실패, 목적지 부분 거절, 고유 저장 항목 수를 구분합니다. 이 설명은 코드 검토이며 0.137.0 실험의 내부 metric 관측 결과가 아닙니다. 0.162.0의 별도 실측은 다음 절에 있습니다. [QueueSender](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.137.0/exporter/exporterhelper/internal/queue_sender.go#L38-L49), [일반 관측 안내](https://opentelemetry.io/docs/collector/internal-telemetry/)
 
 다음은 **제품 적용 제안**입니다.
 
@@ -9653,6 +10629,27 @@ Collector 0.137.0의 exporterhelper는 `queue → 관측 → retry → timeout �
 
 필터와 sampling이 있는 파이프라인에서 입력 수와 출력 수를 단순히 빼서 전부 “장애 유실”로 부르지 않습니다. 의도된 제거와 비의도적 유실을 같은 단위·시간 구간에서 각각 설명해야 합니다.
 
+<a id="chapter-docs-product-telemetry-delivery-contracts--01620에서-내부-관측과-큐-경계를-다시-확인하기"></a>
+
+### 0.162.0에서 내부 관측과 큐 경계를 다시 확인하기
+
+**2026-10-05 실행:** 공식 core Collector 0.162.0, OTLP/HTTP JSON, loopback 목적지, debug 로그·detailed 내부 metric을 사용했습니다. `sending_queue.enabled`를 true/false로 나누고 `wait_for_result=false`, consumer 1개, 요청 단위 queue 10, 짧은 retry 한도를 고정했습니다. 프로세스마다 준비 요청(primer)으로 실패 계수를 만든 뒤 실험 요청 span 2개를 보냈습니다. 이 때문에 아래 시작값은 0이 아니라 **2**입니다. [원시 config·로그·metric](labs/results/1.1-r2-otel.json), [실행기](scripts/run_otel_r2_lab.py)
+
+| 실험 요청의 결과 | queue | `send_failed_spans` 기준 → 종료 | upstream HTTP·완료 경계 |
+| --- | --- | --- | --- |
+| 정상 성공 | off / on | 각각 `2→2`, 증가 0 | 200 |
+| 부분 거절 1개 | off / on | 각각 `2→2`, 증가 0 | 200, 빈 `partialSuccess` |
+| 재시도 후 성공 | off / on | 각각 `2→2`, 증가 0 | off는 목적지 차단 해제 뒤 200, on은 해제 전 200 |
+| 재시도 소진 | off / on | 각각 `2→4`, 증가 2 | off는 해제 뒤 503, on은 해제 전 200 |
+
+**Collector 0.162.0의 이 구성에서는 재시도 진행 중 관측한 send_failed_spans가 기준값 2에 머물렀고, 재시도 소진 뒤 4로 증가해 실패한 span 2개를 계수했습니다.** 성공한 재시도에는 증가가 없었습니다. 마지막 목적지 시도 이전의 증가 표본은 없었으며 증가 시각은 metric polling의 관측 구간으로만 한정합니다. 실시간의 모든 순간을 계측한 것은 아닙니다. 이 결과는 1라운드에서 코드로 확인한 “내부 retry가 최종 오류를 반환한 뒤 항목 수를 기록”한다는 설명을 해당 새 버전·구성에서 지지합니다.
+
+부분 성공에서는 목적지의 고유 사유 `r2-partial-rejected-one`과 `dropped_spans: 1`을 담은 warn 로그가 두 queue 구성 모두에 남았습니다. 준비 요청을 제외한 목적지 요청은 각각 1회였고 `send_failed_spans` 증가는 0이었습니다. **부분 거절을 Collector가 로그로 인지했다는 근거는 생겼지만, 이 실패 계수가 거절된 span 1개를 세지는 않았습니다.** upstream 응답도 거절 수를 보존하지 않았으므로 그 성공만으로 종단 간 수용률을 계산할 수 없습니다.
+
+**`wait_for_result=false`인 queue를 켠 경우 upstream은 목적지 차단 해제 전에 200을 받았고, 끈 경우에는 차단 해제 뒤 exporter 결과를 받았습니다.** 이는 메모리 queue 수용 경계의 관측입니다. 재시작·영속 queue·실제 저장소의 commit을 시험한 결과로 확대하지 않습니다. 재시도 횟수와 ms 단위 지연은 재실행마다 달라질 수 있습니다.
+
+`otlp_http`와 기존 `otlphttp` 이름은 모두 `validate`에서 수용됐습니다. 실제 전송 실험은 `otlp_http/lab`으로 수행했으므로 옛 별칭의 전체 전송 동작을 따로 실행했다고 표시하지 않습니다. core exporter 이름 변경은 0.144.0 릴리스부터 확인되며, 이름 수용 여부와 향후 alias 제거 정책은 별도입니다. [0.144.0 릴리스](https://github.com/open-telemetry/opentelemetry-collector/releases/tag/v0.144.0), [구성 검증 결과](labs/results/1.1-r2-otel.json)
+
 <a id="chapter-docs-product-telemetry-delivery-contracts--재현"></a>
 
 ### 재현
@@ -9664,6 +10661,8 @@ python3 scripts/get_runtime_lab_assets.py --which otelcol
 python3 scripts/run_otel_lab.py
 ```
 
+2라운드 실행의 공식 자산 pin·새 결과 경로·재현 명령은 [공통 재현 절차](#chapter-docs-cross-domain-reproducible-labs)에 있습니다.
+
 <a id="chapter-docs-product-telemetry-delivery-contracts--이해-확인"></a>
 
 ### 이해 확인
@@ -9671,7 +10670,7 @@ python3 scripts/run_otel_lab.py
 1. HTTP 500이면 OTLP/HTTP에서 언제나 재시도하는가? **열거된 재시도 코드를 따라야 하며 이번 500은 한 번만 전송됐습니다.**
 2. 부분 성공의 거절 수가 1이면 어느 span인지 반드시 아는가? **개수만으로 개별 항목을 식별할 수 없습니다.**
 3. 재시도에서 같은 span ID가 다시 왔다면 새 업무가 하나 더 발생했는가? **같은 관측의 중복 전송일 수 있습니다.**
-4. 이 결과로 영속 큐의 무손실을 보장하는가? **큐를 끈 HTTP 전송 실험이며 영속 큐 장애 검증은 별도입니다.**
+4. 이 결과로 영속 큐의 무손실을 보장하는가? **기존 queue-off와 새 메모리 queue on/off 관측이며 영속 큐 장애 검증은 별도입니다.**
 
 [통합 목차로](#book-top)
 
@@ -9789,7 +10788,7 @@ PromQL의 조회 평가 시각은 실제 수집 시각과 독립적입니다. In
 
 ## 알림 조건, 상태, 통지와 장애 사건
 
-> 상태: 검토됨 · 범위: Prometheus·Alertmanager 개념과 제품 설계 제안 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 범위: Prometheus·Alertmanager 개념과 제품 설계 제안 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (Alertmanager 지연·resolved 규약)
 
 <a id="chapter-docs-product-alerts-and-incidents--먼저-이해할-것"></a>
 
@@ -9870,6 +10869,26 @@ Alertmanager는 알림의 중복 제거·그룹화·수신처 라우팅을 수�
 
 호스트 장애 때문에 그 위의 Pod 알림을 묶는 것은 유용하지만, 호스트가 원인임을 자동으로 증명하지는 않습니다. 관계와 시간·실제 증거가 맞는지 [도메인 간 분석](#chapter-docs-cross-domain-readme)에서 확인해야 합니다.
 
+<a id="chapter-docs-product-alerts-and-incidents--조건-발생부터-첫-통지까지의-지연"></a>
+
+### 조건 발생부터 첫 통지까지의 지연
+
+문제가 시작됐어도 scrape가 아직 안 왔고, 다음 평가를 기다린 뒤 `for`와 통지 그룹 대기까지 거칠 수 있습니다. **2026-10-05 확인** Alertmanager route 기본값은 `group_wait=30s`, `group_interval=5m`, `repeat_interval=4h`입니다. 상위 route에서 상속하거나 하위에서 변경할 수 있으므로 활성 설정을 저장합니다. [Alertmanager configuration](https://prometheus.io/docs/alerting/latest/configuration/#route)
+
+| 설정 | 기다리는 대상 | 혼동하면 안 되는 값 |
+| --- | --- | --- |
+| `group_wait` | 새 그룹의 첫 통지 전 모으는 시간 | 모든 firing 알림에 매번 더해지는 시간 아님 |
+| `group_interval` | 기존 그룹의 새 firing·resolved 등 변화 통지 확인 주기 | 원천 metric 수집 간격 아님 |
+| `repeat_interval` | 변화 없는 firing 통지 반복 간격 | 장애 판정의 지속 시간 아님; group interval·보존 설정과 상호작용 |
+
+**단순 모델:** 새 그룹이며 정상 전송인 경우 `관측 가능해질 때까지 + 다음 평가 대기 + for 충족 및 평가 정렬 + group_wait + 통지 전달`로 지연을 나눕니다. 흔히 쓰는 `수집 + 평가 간격 + for + group_wait`는 각 단계의 지연을 요약한 근사식입니다. 발생 위상에 따라 수집·평가 대기는 전체 주기보다 짧을 수 있고 `for` 종료도 평가 시점에 맞춰집니다. query window의 평활화, cloud 지연, 기존 그룹 합류, silence·inhibition·재시도는 별도로 추가됩니다. [규칙 평가](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/)
+
+**예시:** 이상이 실제로 발생한 뒤 10초에 표본이 준비되고 그로부터 20초 후 첫 참 평가가 이루어졌다고 가정합니다. 평가 간격 30초, `for=120초`, 계속 참, 새 그룹 `group_wait=30초`, 전송 지연 무시라면 첫 통지는 `10+20+120+30=180초` 뒤입니다. 첫 통지 지연이 언제나 180초라는 성능 보장이 아닙니다.
+
+resolved는 조건 평가의 복귀와 수신처 통지를 나누어 기록합니다. 알림이 첫 group_wait 전에 해소되면 통지가 아예 없을 수 있습니다. receiver별 `send_resolved` 설정·기본값이 다르고, 기존 그룹의 resolved 통지도 group interval과 전송 경로를 거칩니다. `keep_firing_for`를 설정했다면 rule의 firing 유지 시간도 포함합니다. 모든 수신처의 `send_resolved`가 같은 기본값이라고 가정하지 않습니다. [통지 설정](https://prometheus.io/docs/alerting/latest/configuration/)
+
+제품 적용 제안은 발생 추정·원천 표본·첫 참 평가·firing·Alertmanager 수신·통지 성공·업무 회복의 timestamp를 나눠 저장하는 것입니다. 이 절에서는 Alertmanager 서버나 수신처를 호출하지 않았고 예시의 시간 합만 검증합니다.
+
 <a id="chapter-docs-product-alerts-and-incidents--장애-사건-모델-제안"></a>
 
 ### 장애 사건 모델 제안
@@ -9881,6 +10900,8 @@ Alertmanager는 알림의 중복 제거·그룹화·수신처 라우팅을 수�
 <a id="chapter-docs-product-alerts-and-incidents--이해-확인"></a>
 
 ### 이해 확인
+
+추가 질문: group_wait=30초면 모든 장애 알림이 30초 안에 도착하는가? **수집·평가·for·그룹 대기·전달 지연을 각각 확인해야 합니다.**
 
 1. 5분 평균을 2분 동안 평가하면 7분 평균인가? **아니다. 5분 window의 계산 결과가 각 평가에서 2분 동안 조건을 유지하는 것이다.**
 2. Silence 상태면 장애가 해결되었는가? **통지가 억제된 상태일 뿐이다.**
@@ -10102,7 +11123,7 @@ histogram에는 bucket 경계와 count·sum 등의 일관성이 필요합니다.
 
 ## 어댑터를 지원한다고 말하기 전에: 필드 계약과 검증 근거
 
-> 상태: 검토됨 · 적용 범위: 이 책의 제품 설계 제안과 연결된 원천 규약·실험 · 검토일: 2026-10-04 · 사용자 제품의 지원 인증을 뜻하지 않음
+> 상태: 검토됨 · 적용 범위: 이 책의 제품 설계 제안과 연결된 원천 규약·실험 · 검토일: 2026-10-04 · 2라운드 실행 근거 반영: 2026-10-05 · 사용자 제품의 지원 인증을 뜻하지 않음
 
 <a id="chapter-docs-product-compatibility-and-acceptance--먼저-이해할-것"></a>
 
@@ -10186,9 +11207,9 @@ OTel의 resource·metric 유형·temporality와 source의 식별 의미를 보�
 | 대상 | 공식 자료 검토 | 실제 실행 | 남는 경계 |
 | --- | --- | --- | --- |
 | Linux | procfs·cgroup v2 | WSL2의 자기 프로세스·기존 cgroup 읽기 | 물리 Linux 전체·OOM·다른 배포판 |
-| PostgreSQL | 18 규약 | 18.6 동시성·권한·수집 SQL | replication·HA·상용 확장 |
-| Kubernetes | 1.35 이상과 이전 규약의 경계 | 1.34.1 API server·etcd, watch cache 비활성화 | 1.35–1.37 서버·cache 활성화·kubelet·CNI·CSI |
-| OTLP | 1.11.0 고정 문서, 1.11.1 릴리스 존재 확인 | Collector 0.137.0 HTTP JSON, 내부 metric 비활성화 | Collector 0.162.0 실행·내부 거절 계수·gRPC·persistent queue·tail sampling |
+| PostgreSQL | 18 규약 | 18.6 동시성·권한·수집 SQL와 prepared transaction·slot·standby의 회수 기준점 | 운영 replication 부하·HA 전환·상용 확장 |
+| Kubernetes | 1.35 이상과 이전 규약의 경계 | 1.34.1·1.37.0 API server·etcd, 각각 watch cache true/false | 최신 patch·1.35/1.36 서버·kubelet·CNI·CSI |
+| OTLP | 1.11.0 고정 문서, 1.11.1 릴리스 존재 확인 | 0.137.0 HTTP JSON 기록 보존; 0.162.0 내부 로그의 부분 거절·최종 실패 지표·queue 수락 경계 | gRPC·persistent queue·tail sampling·목적지 영속 저장 |
 | HTTP | RFC·Python 문서 | loopback HTTP/1.1 | DNS·TLS·HTTP/2·외부 proxy |
 
 고정 실행 버전, 검토 시점 최신 버전, 종료 일정은 [버전 상태 표](#chapter-docs-coverage--교차-검토-시점의-버전-상태)에 따로 기록했습니다. 최신 릴리스 존재 확인을 그 릴리스의 동작 실험으로 표시하지 않습니다.
@@ -10492,6 +11513,29 @@ OTLP의 성공·partial success·retry 규약을 제품 내부 영속성 보장�
 | Backfill / 재조회 | 과거 구간의 자료를 뒤늦게 확보·보완하는 처리; 중복 집계 정책 필요 | [Cloud 재조회](#chapter-docs-cloud-late-data-and-reconciliation) |
 | Capability | 버전·설정·권한 등을 고려해 실제 사용할 수 있는 기능 | [필드 수용 기준](#chapter-docs-product-compatibility-and-acceptance) |
 
+<a id="chapter-docs-glossary--원천-통계와-제어-정책을-구분하는-용어"></a>
+
+### 원천 통계와 제어 정책을 구분하는 용어
+
+| 용어 | 의미·구분 | 상세 |
+| --- | --- | --- |
+| Exemplar | 집계 지표에서 선택한 개별 관측 사건과 trace 등의 연결 정보 | [지표 문맥](#chapter-docs-foundations-metric-context-and-start-time) |
+| Counter start time | counter 집계가 시작된 시각; 최초 수집 시각과 다름 | [시작 시각](#chapter-docs-foundations-metric-context-and-start-time) |
+| Adjusted count | 알려진 포함 확률의 역수인 추정 가중치; 실제 건수의 확정값 아님 | [Sampling 확률](#chapter-docs-application-trace-sampling-and-context) |
+| Semantic conventions | 지표·속성 등의 이름·단위·의미를 공유하는 규약 | [안정 이름](#chapter-docs-application-semantic-conventions) |
+| CurrEstab / RetransSegs | 현재 TCP 연결 gauge / namespace의 누적 재전송 세그먼트 계정 | [Linux 스택](#chapter-docs-network-linux-stack-counters) |
+| RTO / cwnd | TCP 재전송 timeout / 혼잡 윈도; 복구 목표 RTO와 다른 문맥 | [소켓 통계](#chapter-docs-network-linux-stack-counters) |
+| Pod QoS class | 자원 명세에 따른 Guaranteed·Burstable·BestEffort 분류; 네트워크 QoS와 구분 | [압박과 종료](#chapter-docs-kubernetes-pressure-and-termination) |
+| WatchList | watch에서 초기 상태를 합성 이벤트로 전달하는 Kubernetes 기능 | [수집](#chapter-docs-kubernetes-collection) |
+| Freeze / XID age | 오래된 행 XID를 정리하는 처리 / ID 공간의 거리; 경과 초와 다름 | [PostgreSQL 운영](#chapter-docs-database-postgresql-operations) |
+| MultiXact | 여러 transaction의 행 잠금 구성원을 가리키는 별도 ID 체계 | [PostgreSQL 운영](#chapter-docs-database-postgresql-operations) |
+| xmin horizon | 아직 필요한 행 버전의 회수를 막는 기준점; slot의 WAL 위치와 구분 | [회수 기준점](#chapter-docs-database-postgresql-operations) |
+| Prepared transaction | 2단계 commit의 준비 상태로 남은 transaction; prepared statement와 다름 | [PostgreSQL 운영](#chapter-docs-database-postgresql-operations) |
+| Share group | Kafka 레코드를 획득·확인·재전달하는 소비 모델; consumer group offset과 다른 진행 모델 | [Kafka](#chapter-docs-middleware-kafka) |
+| FLUSH / FUA | 장치 캐시의 선행 쓰기 반영 / 해당 쓰기의 지속성 완료를 요청하는 동작 | [쓰기 경로](#chapter-docs-storage-write-path-and-durability) |
+| PMTUD / DPLPMTUD | 경로 MTU 탐색 / datagram packetization layer의 MTU 탐색 | [MTU](#chapter-docs-network-layers-and-routing) |
+| Time grain / Ingestion delay | 집계 구간 크기 / 측정 후 조회 가능해지기까지의 지연 | [Cloud 시간 축](#chapter-docs-cloud-provider-metrics) |
+
 용어의 짧은 정의는 학습을 돕는 요약입니다. 실제 판정과 계산은 연결된 원천·버전·조건을 따릅니다.
 
 [통합 목차로](#book-top)
@@ -10579,6 +11623,35 @@ OTLP의 성공·partial success·retry 규약을 제품 내부 영속성 보장�
 
 비율을 여러 대상으로 합칠 때는 분자·분모의 합으로 다시 계산합니다. 누적값은 같은 실행 수명에서 rate를 구한 뒤 합치고, 분포는 원천 분포의 호환성을 확인합니다. 0 분모, reset, 미지원, 누락, 늦은 도착은 모두 정상 숫자와 구분해서 처리해야 합니다.
 
+<a id="chapter-docs-metric-catalog--원천-필드와-시간버전의-연결"></a>
+
+### 원천 필드와 시간·버전의 연결
+
+아래는 2026-10-05 보강한 대표 필드입니다. 수집을 실행했다는 목록이 아니며, 원천 정의와 버전별 지원 범위는 연결된 장을 따릅니다.
+
+| 원천 필드·개념 | 단위·형태 | 해석 경계 | 상세 |
+| --- | --- | --- | --- |
+| `Tcp.CurrEstab` | 연결 수 gauge | ESTABLISHED·CLOSE-WAIT, namespace 단위 | [Linux 스택](#chapter-docs-network-linux-stack-counters) |
+| `Tcp.RetransSegs / Tcp.OutSegs`의 구간 차분 비 | ratio 또는 % | 제어·반복 전송 포함 범위; 손실률 아님 | [Linux 스택](#chapter-docs-network-linux-stack-counters) |
+| `Udp.InErrors`, `Udp.RcvbufErrors` | 누적 횟수 | 겹치는 실패를 합산하지 않음 | [Linux 스택](#chapter-docs-network-linux-stack-counters) |
+| `TcpExt.ListenOverflows/ListenDrops` | 누적 횟수 | 대기열·LISTEN 경로; 같은 drop이 겹칠 수 있음 | [Linux 스택](#chapter-docs-network-linux-stack-counters) |
+| eviction `memory.available` | byte·capacity 비율 | capacity−node working set; MemAvailable과 구분 | [Kubernetes 압박](#chapter-docs-kubernetes-pressure-and-termination) |
+| `memory.events.oom_group_kill` | group OOM 횟수 | 종료 프로세스 수·재시작 수와 다름 | [Kubernetes 압박](#chapter-docs-kubernetes-pressure-and-termination) |
+| `containerStatuses[].resources` | CPU·memory 자원 명세 | spec 희망값과 실제 적용 분모 구분 | [resize](#chapter-docs-kubernetes-pressure-and-termination) |
+| `age(datfrozenxid)`, `mxid_age(datminmxid)` | 각각 XID·MultiXact 거리 | 초·실행 SQL 수 아님; 별도 한도 | [PostgreSQL 운영](#chapter-docs-database-postgresql-operations) |
+| slot `xmin`·`catalog_xmin`, sender `backend_xmin` | ID·age | 행 보존·catalog 보존·feedback; LSN과 구분 | [회수 기준점](#chapter-docs-database-postgresql-operations) |
+| `pg_stat_io.read_bytes/write_bytes` | PostgreSQL 18 누적 byte | 16–17 op_bytes 계산과 분기 | [통계 호환성](#chapter-docs-database-postgresql-operations) |
+| exemplar | 개별 관측 값·시각·문맥 | 일반 metric label이나 모든 사건의 목록 아님 | [지표 문맥](#chapter-docs-foundations-metric-context-and-start-time) |
+| `StartTimeUnixNano` / `_created` | epoch ns / epoch s | 원천 시작·수명 정보; 첫 수집 시각과 다름 | [시작 시각](#chapter-docs-foundations-metric-context-and-start-time) |
+| `http.server.request.duration` | Histogram, s, Stable | 구 ms 규약과 변환·중복 제거 | [안정 이름](#chapter-docs-application-semantic-conventions) |
+| `jvm.memory.used/committed/limit` | UpDownCounter, By, Stable | used·확보·최대·미정 분모 | [JVM 규약](#chapter-docs-application-semantic-conventions) |
+| `jvm.gc.duration` / `dotnet.gc.pause.time` | Histogram s / Counter s, Stable | GC action 분포 / 누적 정지 시간 | [런타임 규약](#chapter-docs-application-semantic-conventions) |
+| Kafka UnderReplicated·UnderMinIsr | partition 수 gauge | RF 대비 / min ISR 미만을 구분 | [Kafka](#chapter-docs-middleware-kafka) |
+| Windows Processor Time / Utility | % | 점유 시간 / 성능 상태 보정; 100% 상한 가정 금지 | [Windows](#chapter-docs-host-windows) |
+| CloudWatch `Errors` (Lambda) | 기간별 오류 수 | 호출 시작 시각 귀속, 완료 시각 아님 | [서버리스](#chapter-docs-cloud-managed-and-serverless) |
+| 인증서 `notAfter−현재 시각` | 남은 초·일 | 발급일별 BR 한도·갱신·배포 상태 확인 | [TLS](#chapter-docs-network-tls-http) |
+| SNMP `ifSpeed` / `ifHighSpeed` | bit/s / 백만 bit/s | Gauge32 포화와 속도 분모 | [SNMP](#chapter-docs-network-snmp-and-device-models) |
+
 <a id="chapter-docs-metric-catalog--비슷한-이름이-다른-값을-뜻하는-경우"></a>
 
 ### 비슷한 이름이 다른 값을 뜻하는 경우
@@ -10608,24 +11681,44 @@ OTLP의 성공·partial success·retry 규약을 제품 내부 영속성 보장�
 
 ## 제1.1판의 분야별 범위
 
-2026-10-04 기준 **12개 분야, 상세 본문 92장**을 통합했습니다. 표는 읽을 수 있는 본문의 범위이며 사용자 제품의 지원 여부를 뜻하지 않습니다.
+판 기준일은 2026-10-04로 유지하며, 2026-10-05 보강 원고는 **12개 분야, 상세 본문 97장**입니다. 표는 읽을 수 있는 본문의 범위이며 사용자 제품의 지원 여부를 뜻하지 않습니다.
 
 | 분야 | 상세 장 | 이번 판에서 다루는 내용 |
 | --- | ---: | --- |
-| [공통 관측](#chapter-docs-foundations-readme) | 9 | 시스템 지도, 시계열·단위·분포·SLO·시간·trace·sampling, 성능 실험, 분산 시스템 |
+| [공통 관측](#chapter-docs-foundations-readme) | 10 | 시스템 지도, 시계열·단위·분포·SLO·시간·trace·sampling, 성능 실험, 분산 시스템 |
 | [호스트](#chapter-docs-host-readme) | 10 | Linux CPU·메모리·블록 I/O·프로세스, Windows API, VM·GPU, NUMA·압력·원천 필드 |
-| [네트워크](#chapter-docs-network-readme) | 8 | IP·DNS·TCP·UDP·QUIC·TLS·HTTP, 링크·MTU·BGP, SNMP·OSPF·EVPN·QoS |
+| [네트워크](#chapter-docs-network-readme) | 9 | IP·DNS·TCP·UDP·QUIC·TLS·HTTP, 링크·MTU·BGP, SNMP·OSPF·EVPN·QoS |
 | [스토리지](#chapter-docs-storage-readme) | 4 | 블록·파일·객체, 처리량·IOPS·지속성, 복제·snapshot·복구, RAID·LVM·SAN·NAS |
 | [컨테이너](#chapter-docs-containers-readme) | 5 | namespace·OCI 수명·image·COW·volume, cgroup v1/v2, Windows 격리 차이 |
-| [Kubernetes](#chapter-docs-kubernetes-readme) | 9 | API·Pod·request/limit·HPA·수집·Service·PV/PVC·workload·etcd, CNI·CSI·CRD·Operator |
-| [앱](#chapter-docs-application-readme) | 8 | 요청·queue·pool·deadline·retry, JVM·.NET·Go·Node.js·Python, RUM·계측·프로파일 |
-| [DB](#chapter-docs-database-readme) | 11 | transaction·MVCC·lock·index·plan·WAL·HA, 주요 엔진·분산·분석·시계열·그래프, 수집 SQL |
+| [Kubernetes](#chapter-docs-kubernetes-readme) | 10 | API·Pod·request/limit·HPA·수집·Service·PV/PVC·workload·etcd, CNI·CSI·CRD·Operator |
+| [앱](#chapter-docs-application-readme) | 9 | 요청·queue·pool·deadline·retry, JVM·.NET·Go·Node.js·Python, RUM·계측·프로파일 |
+| [DB](#chapter-docs-database-readme) | 12 | transaction·MVCC·lock·index·plan·WAL·HA, 주요 엔진·분산·분석·시계열·그래프, 수집 SQL |
 | [미들웨어](#chapter-docs-middleware-readme) | 6 | Redis·Memcached·Kafka·RabbitMQ·Pulsar·검색·프록시·mesh, Flink·Spark 처리 경계 |
 | [클라우드](#chapter-docs-cloud-readme) | 6 | AWS·Azure·Google Cloud 식별·API·기간 집계, 관리형·서버리스·VPC, quota·비용 |
 | [도메인 간 분석](#chapter-docs-cross-domain-readme) | 7 | 지연·자원·적체·관측 중단 사례, 실제 로컬 실습, 종합 연습과 해설 |
 | [제품 설계](#chapter-docs-product-readme) | 9 | 정체성·관계·수집·저장·질의·알림·tenant 접근·자체 관측, adapter 계약·용량 |
 
 추가한 장은 [측정과 비교](#chapter-docs-foundations-measurement-and-comparability), [Linux 실습](#chapter-docs-host-linux-observation-lab), [연결 수명](#chapter-docs-network-dns-and-connection-lifecycle), [쓰기 지속성](#chapter-docs-storage-write-path-and-durability), [메모리 계정](#chapter-docs-containers-memory-accounting-and-oom), [인벤토리](#chapter-docs-kubernetes-inventory-consistency), [sampling](#chapter-docs-application-trace-sampling-and-context), [PostgreSQL 실습](#chapter-docs-database-postgresql-concurrency-lab), [cloud 재조회](#chapter-docs-cloud-late-data-and-reconciliation), [분석 연습](#chapter-docs-cross-domain-investigation-workbook), [전송 계약](#chapter-docs-product-telemetry-delivery-contracts), [필드 수용 기준](#chapter-docs-product-compatibility-and-acceptance)입니다.
+
+<a id="chapter-docs-coverage--2026-10-05-원고-보강의-범위"></a>
+
+### 2026-10-05 원고 보강의 범위
+
+2라운드에서는 5장을 추가하고 기존 장을 보강했습니다. 2d에서 Claude가 실행한 네 묶음의 결과를 별도로 출판했습니다. 총 36개 판정은 가설 지지 34개·반증 2개이며, 반증은 cache를 켠 Kubernetes 두 버전에서 compaction만으로 Exact LIST의 410을 유발하지 못한 관측입니다. 판 번호와 과거 결과는 유지합니다. [실습 조건·원시 결과](#chapter-docs-cross-domain-reproducible-labs), [검증 기록](#chapter-docs-validation)
+
+| 요청 주제 | 읽을 본문 | 포함한 경계 |
+| --- | --- | --- |
+| G1 Linux 네트워크 스택 | [새 장](#chapter-docs-network-linux-stack-counters) | namespace·TCP/UDP·TcpExt·ss·재전송 비율 |
+| G2 Kubernetes 자원·수집 | [새 장](#chapter-docs-kubernetes-pressure-and-termination), [수집](#chapter-docs-kubernetes-collection) | QoS·eviction·OOM·resize·PSI·v1 상태·WatchList |
+| G3 PostgreSQL 운영 | [새 장](#chapter-docs-database-postgresql-operations) | XID/MultiXact·horizon·권한·통계 일관성·12–18 분기 |
+| G4 관측 데이터 문맥 | [새 장](#chapter-docs-foundations-metric-context-and-start-time), [sampling](#chapter-docs-application-trace-sampling-and-context) | exemplar·start time·created·th/rv·추정 조건 |
+| G5 OTel 이름 | [새 장](#chapter-docs-application-semantic-conventions) | SemConv 1.44.0의 명시한 Stable 항목, JVM/.NET 차이 |
+| G6–G7 broker·Windows | [Kafka](#chapter-docs-middleware-kafka), [Windows](#chapter-docs-host-windows) | ISR·controller·share group, PDH 실명·빌드별 표시 |
+| G8–G9 시간과 알림 | [cloud 지표](#chapter-docs-cloud-provider-metrics), [Lambda](#chapter-docs-cloud-managed-and-serverless), [flow log](#chapter-docs-cloud-networking), [알림](#chapter-docs-product-alerts-and-incidents) | 보존·sampling·게시·귀속 시각·평가·발송 |
+| G10 저장 경로 | [쓰기](#chapter-docs-storage-write-path-and-durability), [Ceph](#chapter-docs-storage-capacity-and-protection), [multipath](#chapter-docs-storage-raid-lvm-and-paths) | FLUSH/FUA·O_DIRECT·fsync 실패·min_size·경로 부재 |
+| G11–G12 프로토콜 | [HTTP/TLS](#chapter-docs-network-tls-http), [SNMP](#chapter-docs-network-snmp-and-device-models), [MTU](#chapter-docs-network-layers-and-routing) | framing·RTT·인증서 기간·Counter64·PMTUD |
+
+Kubernetes 후속 API 실습은 공식 envtest가 제공되는 **1.34.1·1.37.0**을 선택했습니다. 각 minor의 최신 patch 실행이 아닙니다(2026-10-05 검토 시 최신 **1.34.12·1.37.1**). watch cache true/false의 minor 규약 비교이며 결과는 [인벤토리 본문](#chapter-docs-kubernetes-inventory-consistency)에 반영했습니다. 특정 feature gate의 인과나 최신 patch의 회귀 검증으로 확장하지 않습니다. [전용 자산 pin](labs/review-r2/kubernetes-assets.json), [공식 patch 일정](https://kubernetes.io/releases/patch-releases/)
 
 <a id="chapter-docs-coverage--대표-적용-범위"></a>
 
@@ -10639,11 +11732,11 @@ OTLP의 성공·partial success·retry 규약을 제품 내부 영속성 보장�
 | Linux 6.12 코드·NUMA 문서, cgroup·procfs | 명시한 원천 필드의 의미와 차분·계층 처리 |
 | OCI 1.2.1, CNI 1.1.0, CSI 1.11.0 | 명세의 경계와 capability; 제품 plugin 버전과 구분 |
 | etcd 3.6, Kafka 4.3, RabbitMQ 4.3, Flink 1.20, Pulsar 4.0 | 해당 장의 적용 버전; 최신·유일 지원 버전 주장 아님 |
-| Kubernetes 1.35 이상과 이전 버전 | 비교 규약을 구분; API server 1.34.1·etcd 3.6.4 실제 실행, workload 실행은 제외 |
-| PostgreSQL 18.6 | 임시 인스턴스의 동시성·권한·수집 SQL 11개 시나리오 실행 |
+| Kubernetes 1.35 이상과 이전 버전 | 비교 규약을 구분; API server 1.34.1·1.37.0에서 cache true/false 실행, workload 실행은 제외 |
+| PostgreSQL 18.6 | 기존 동시성·권한·수집 SQL 11개와 prepared transaction·slot·standby 회수 기준점 4개 시나리오 실행 |
 | Linux 6.18.33.2·Python 3.12.3 | WSL2의 자기 프로세스와 기존 cgroup 읽기, HTTP/1.1 실습 |
-| OTLP 1.11.0·Collector 0.137.0 | 규약 검토와 HTTP JSON 전송 실험; gRPC·영속 큐 검증은 제외 |
-| Windows·SQLite 3.45.1·promtool 3.5.0 | 실제 실행 결과는 로컬 실습의 기록 범위 |
+| OTLP 1.11.0·Collector 0.137.0·0.162.0 | HTTP JSON 전송과 0.162.0 내부 로그·지표·메모리 queue 경계; gRPC·영속 큐 검증은 제외 |
+| Windows·SQLite 3.45.1·promtool 3.5.0·3.13.4·3.15.0 | 실제 실행 결과는 로컬 실습의 기록 범위; 새 promtool 두 버전은 기존 합성 규칙·테스트 평가 |
 | 버전을 고정하지 않은 공식 웹 문서 | 확인 날짜 기준; 구현 시 실제 버전과 대조 |
 
 개별 장의 범위가 이 요약보다 우선합니다. 다른 버전과 이름이 같더라도 필드·설정·수명·권한을 확인합니다.
@@ -10652,14 +11745,14 @@ OTLP의 성공·partial success·retry 규약을 제품 내부 영속성 보장�
 
 ### 교차 검토 시점의 버전 상태
 
-확인일은 **2026-10-04**입니다. “고정”은 문서·실습을 해석할 기준이며 현재 권장 설치 버전을 뜻하지 않습니다. 최신 릴리스 확인과 실제 재실행은 별개입니다. 종료일이 확인되지 않은 항목은 임의로 날짜를 만들지 않았습니다.
+릴리스·지원 상태 확인일은 **2026-10-04**이며 Kubernetes patch 선택은 10월 5일에도 확인했습니다. 실행 열에는 **2026-10-05의 2라운드 결과**를 추가했습니다. “고정”은 문서·실습을 해석할 기준이며 현재 권장 설치 버전을 뜻하지 않습니다. 최신 릴리스 확인과 실제 재실행은 별개입니다. 종료일이 확인되지 않은 항목은 임의로 날짜를 만들지 않았습니다.
 
 | 대상 | 책의 고정 기준 | 검토 시점 현재 | 지원·종료와 해석 |
 | --- | --- | --- | --- |
-| Kubernetes | API server 1.34.1, 전 시나리오 watch cache 비활성화 | 최신 1.37.1, 최신 3개 브랜치 1.35–1.37; 1.34 계열 패치 1.34.12 | 1.34는 2026-10-27 종료 전 유지보수 중. 최신 3개에서 제외됐다고 이미 지원 종료된 것은 아님. [릴리스](https://kubernetes.io/releases/), [일정](https://kubernetes.io/releases/patch-releases/) |
-| etcd | 3.6.4, Kubernetes 실습의 전용 인스턴스 | 최신 릴리스 3.7.2 | 이 검토에서는 3.6 계열의 종료일을 확정하지 않음. 새 버전으로 재실행하지 않음. [릴리스](https://github.com/etcd-io/etcd/releases/tag/v3.7.2) |
-| OTel Collector | 0.137.0 HTTP JSON 실험 | 0.162.0; core 9월 28일, 배포판 9월 29일 UTC 게시 | 고정 버전은 최신 아님. 해당 태그의 정해진 LTS 종료일은 확인하지 못함. [core](https://github.com/open-telemetry/opentelemetry-collector/releases/tag/v0.162.0), [배포판](https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.162.0) |
-| Prometheus/promtool | 3.5.0 | 최신 3.15.0, 현재 LTS 3.13.4 | 3.5 LTS는 2026-07-31 종료. 3.13 LTS 종료 예정일 2027-07-31. [다운로드](https://prometheus.io/download/), [지원 주기](https://prometheus.io/docs/introduction/release-cycle/) |
+| Kubernetes | 기존 1.34.1 cache 비활성화 기록 보존; 새 1.34.1·1.37.0 각각 cache true/false | 최신 1.37.1, 최신 3개 브랜치 1.35–1.37; 1.34 계열 패치 1.34.12 | 실행 버전은 최신 patch가 아님. 1.34는 2026-10-27 종료 전 유지보수 중. 최신 3개에서 제외됐다고 이미 지원 종료된 것은 아님. [릴리스](https://kubernetes.io/releases/), [일정](https://kubernetes.io/releases/patch-releases/) |
+| etcd | 기존 3.6.4 보존; 새 envtest에 포함된 3.6.4·3.7.0 전용 인스턴스 | 최신 릴리스 3.7.2 | 최신 patch 3.7.2는 실행하지 않음. 이 검토에서는 3.6 계열의 종료일을 확정하지 않음. [릴리스](https://github.com/etcd-io/etcd/releases/tag/v3.7.2) |
+| OTel Collector | 기존 0.137.0 보존; 새 0.162.0 HTTP JSON·내부 로그/지표·queue 경계 실행 | 0.162.0; core 9월 28일, 배포판 9월 29일 UTC 게시 | 새 실행은 검토 시점 현재 버전. 해당 태그의 정해진 LTS 종료일은 확인하지 못함. [core](https://github.com/open-telemetry/opentelemetry-collector/releases/tag/v0.162.0), [배포판](https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.162.0) |
+| Prometheus/promtool | 기존 3.5.0 보존; 새 3.13.4·3.15.0에서 규칙·테스트 평가 | 최신 3.15.0, 현재 LTS 3.13.4 | 3.5 LTS는 2026-07-31 종료. 3.13 LTS 종료 예정일 2027-07-31. 새 실행은 서버 수집·WAL·exemplar 실험을 포함하지 않음. [다운로드](https://prometheus.io/download/), [지원 주기](https://prometheus.io/docs/introduction/release-cycle/) |
 | MySQL | 8.4 LTS 문서, 서버 실습 없음 | 최신 LTS 계열 9.7; 9.7.2 일반 릴리스, 9.7.3 Docker image 전용 패치. 이후 YY.M 체계 | 새 LTS 등장만으로 8.4 지원 종료를 의미하지 않음. LTS는 Oracle 정책의 premier 5년·extended 3년 구분을 따르며 계약·배포판의 적용 조건 확인 필요. [정책](https://dev.mysql.com/doc/refman/9.7/en/mysql-releases.html), [9.7.2](https://dev.mysql.com/doc/relnotes/mysql/9.7/en/news-9-7-2.html), [9.7.3 범위](https://dev.mysql.com/doc/relnotes/mysql/9.7/en/news-9-7-3.html) |
 | Ceph | Squid 문서 | Tentacle 20.2.4, Squid 19.2.6 | 공식 표는 Squid 2026-10-31을 **예상** 종료일로 표시. Tentacle의 예상일은 2027-06-01. [릴리스 표](https://docs.ceph.com/en/latest/releases/) |
 | cAdvisor | 0.52.1 코드 | Kubernetes 1.37.1 의존성은 lib 0.60.5 | 해당 의존성의 working set 식을 코드 대조. cAdvisor 전체 최신 릴리스·고정 버전 종료일을 이 정보만으로 판정하지 않음. [의존성](https://github.com/kubernetes/kubernetes/blob/v1.37.1/go.mod), [계산 코드](https://github.com/google/cadvisor/blob/lib/v0.60.5/lib/container/libcontainer/handler.go) |
@@ -10670,7 +11763,7 @@ OTLP의 성공·partial success·retry 규약을 제품 내부 영속성 보장�
 | PostgreSQL | 18 규약·18.6 실제 실험 | 18.6 | 18 계열 지원 종료 예정일 2030-11-14. [정책](https://www.postgresql.org/support/versioning/) |
 | OTLP 원천 저장소 | 1.11.0 문서 | 원천 릴리스 1.11.1, 2026-09-29 게시; 공식 웹 문서 표시는 1.11.0 | 웹 문서의 판 표시와 원천 저장소의 최신 태그를 구분. 고정 규약의 전체 재검증이나 Collector의 지원 범위를 대신하지 않음. [릴리스](https://github.com/open-telemetry/opentelemetry-proto/releases/tag/v1.11.1), [웹 규약](https://opentelemetry.io/docs/specs/otlp/) |
 
-Linux 커널·WSL 배포판, Python·SQLite·브라우저·문서 renderer 버전은 [검증 기록](#chapter-docs-validation)의 실행 환경 식별자입니다. 이 표의 소프트웨어 릴리스와 동일한 지원 체계로 취급하지 않으며, 이번 라운드에서 그 환경을 최신 버전으로 교체하지 않았습니다. 현재 릴리스 실습의 범위·예상 비용은 [교차 검토 응답](review/claude-codex-r1.md)에 제안합니다.
+Linux 커널·WSL 배포판, Python·SQLite·브라우저·문서 renderer 버전은 [검증 기록](#chapter-docs-validation)의 실행 환경 식별자입니다. 이 표의 소프트웨어 릴리스와 동일한 지원 체계로 취급하지 않으며, 이번 라운드에서 그 환경을 최신 버전으로 교체하지 않았습니다. 새 실습의 관측과 한계는 [2라운드 검토 기록](review/claude-codex-r2.md)에 있습니다.
 
 <a id="chapter-docs-coverage--이-판을-사용하는-경계"></a>
 
@@ -10696,11 +11789,59 @@ Linux 커널·WSL 배포판, Python·SQLite·브라우저·문서 renderer 버�
 
 ## 제1.1판 검증 기록
 
-검증 기준일은 **2026-10-04**입니다. 공식 원천의 의미 검토, 자동 문서 검사, 실제 실행, 화면 확인의 범위를 나누어 기록합니다. 사용자 제품이나 운영 환경 전체의 지원 인증을 뜻하지 않습니다.
+판 기준일은 **2026-10-04**로 유지합니다. 2b 원고 보강과 2d 결과 반영·검사는 **2026-10-05**, 기존 실행·화면 기록은 각 기록의 날짜를 따릅니다. 공식 원천의 의미 검토, 자동 문서 검사, 실제 실행, 화면 확인의 범위를 나누어 기록합니다. 사용자 제품이나 운영 환경 전체의 지원 인증을 뜻하지 않습니다.
 
-<a id="chapter-docs-validation--문서계산화면-검사"></a>
+<a id="chapter-docs-validation--2d-결과-출판과-재검사"></a>
 
-### 문서·계산·화면 검사
+### 2d 결과 출판과 재검사
+
+Claude가 WSL Ubuntu 24.04·Linux 6.18.33.2·Python 3.12.3에서 실행한 네 최종 JSON을 byte 단위로 복사했습니다. 입력 hash와 원시 응답·로그·지표·SQL 결과를 대조했으며, 과거 1.1 실행 결과는 덮어쓰지 않았습니다. [출판·입력 연결](review/evidence-provenance.json), [항목별 사실 판정](review/claude-codex-r2.md)
+
+| 실행 근거 | 판정 | 확인한 범위 |
+| --- | --- | --- |
+| [Kubernetes 1.34.1·1.37.0](labs/results/1.1-r2-kubernetes.json) | supported 14·refuted 2 | 각 버전 cache true/false. cache-on Exact RV=1 LIST의 200·빈 목록 때문에 410 가설 2개 반증; 최신 patch·gate 인과는 미검증 |
+| [Collector 0.162.0](labs/results/1.1-r2-otel.json) | supported 14 | 내부 로그의 부분 거절, 재시도 소진 뒤 send_failed 증가, 메모리 queue의 upstream 수락 경계, exporter 이름 두 개의 구성 수용 |
+| [PostgreSQL 18.6](labs/results/1.1-r2-postgresql.json) | supported 4 | prepared transaction·logical catalog_xmin·slot 없는 standby feedback·단절 뒤 physical slot xmin의 회수 지연과 해제 |
+| [promtool 3.13.4·3.15.0](labs/results/1.1-r2-prometheus.json) | supported 2 | 각 버전에서 기존 규칙·합성 테스트 평가; 서버의 exemplar·WAL 기능 실행 아님 |
+
+36개 판정 중 지지 34개·반증 2개입니다. `supported`는 실행기의 좁은 가설이 관측과 부합했다는 뜻이며 보편적 지원 인증이 아닙니다. 2d의 Codex 작업은 저장 근거 검사와 원천 대조이며 이 샌드박스에서 Linux 서버를 재실행하지 않았습니다.
+
+| 검사 | 2d 확인 범위 |
+| --- | --- |
+| `check_docs` | 상세 97장의 UTF-8·구조·로컬 링크·목차·검토 hash |
+| `verify_examples` | 57개 원문의 산술·해석 170개; Ceph EC 4+2의 기본 min_size=5 예시 추가 |
+| `verify_contracts` | 기존 어댑터 경계 22개·원문 연결 계산 28개·보존 실습 hash |
+| `verify_revision` | 기존 31개 시나리오·12개 계산·Linux 시계 추가 근거에 새 36개 출판 판정의 hash·핵심 값 검사 추가 |
+| `verify_review_r2 --published` | 네 최종 결과의 입력·실행기·파일 hash, cache/queue/회수 경계 값과 판정 수; 도구 설치나 서버 실행 없음 |
+| `verify_lab_r2_cleanup` | 저장소 안의 합성 fixture로 resolve/chmod/mode·삭제·로그·프로세스 종료 실패의 여섯 경로 검사 |
+| 통합본 | 원문 119개에서 BOOK.md·BOOK.html 재생성, 두 `--check`로 생성 일치 검사 |
+
+PostgreSQL의 성공한 실행은 DrvFs 권한 제약 때문에 Linux native tempdir의 **전용 0700 디렉터리**를 사용했고 결과에 삭제 완료를 기록했습니다. 이 실행 당시 [공통 모듈](labs/archive/lab_r2_common_2026_10_05.py)을 보존한 뒤 실패 경로를 보완했습니다. 수정 helper의 Linux native 성공 경로 smoke와 이번 BOOK.html의 **화면 검사**는 Claude에게 넘깁니다. 자동 생성 일치 검사가 화면 검사를 대신하지 않습니다. [재현 명령·정리 범위](#chapter-docs-cross-domain-reproducible-labs)
+
+새 문서의 SQL 예시·PDH·cloud·SNMP·kubelet workload·runtime 계측 전체를 실행한 것은 아닙니다. 2c의 버전 소스·명세를 개별 확인했지만 전체 외부 URL 상태 파일을 전수 재조회하지 않았습니다. 중간 실패·입력 hash 불일치 실행은 존재 이력만 남기고 출판에서 제외했습니다.
+
+<a id="chapter-docs-validation--2b-원고-보강의-검사-범위"></a>
+
+### 2b 원고 보강의 검사 범위
+
+새 5장을 포함한 상세 97장을 목차·학습 안내·용어집·지표 참조표에 연결했습니다. G1–G12의 원천 확인·자체 수정·채택하지 않은 해석은 [2라운드 기록](review/claude-codex-r2.md), 변경·추가 상세 21장의 검토 초점과 본문 hash는 [장별 기록](review/chapter-review.json)에 있습니다.
+
+| 검사 | 2026-10-05 확인 범위 |
+| --- | --- |
+| `check_docs` | Markdown 121개, 상세 97장, UTF-8·구조·로컬 링크·목차·장별 hash |
+| `verify_examples` | 57개 원문의 산술·해석 169개; 이번 23개 추가 중 20개는 본문 결과 문자열도 대조 |
+| `verify_contracts` | 기존 어댑터 경계 22개·원문 연결 계산 28개·보존 실습 hash |
+| `verify_revision` | 기존 31개 시나리오·입력 hash·계산 12개, Linux 시계 추가 근거 4구간·idle 61표본 |
+| 통합본 | 원문 119개에서 BOOK.md·BOOK.html 재생성; 두 `--check`로 생성 일치 검사 |
+| Kubernetes 준비 | 1.34.1·1.37.0 전용 manifest·16개 조건 계획·receipt·binary hash·ELF 형식 확인; Linux 서버 실행 없음 |
+
+위 표는 **2b 당시 기록**입니다. 당시 새 실습 결과는 출판하지 않았습니다. 새 SQL·PDH·cloud·SNMP·kubelet workload·runtime 계측 명령도 실행하지 않았고, HTML 화면 검사를 다시 하지 않았습니다. 기존 HTML 화면 기록의 hash는 이전 파일에 해당하므로 이번 생성본의 표시 검증을 대신하지 않습니다. 새 외부 링크는 관련 사실을 직접 열람했지만 전체 URL 상태 파일을 갱신한 전수 재조회는 하지 않았습니다.
+
+공통 2a 실습 입력을 보존하기 위해 Kubernetes 전용 manifest를 분리했습니다. `.lab-runs/` 임시 fixture를 쓰는 `verify_review_r2.py`는 2b의 Codex 턴에 실행하지 않았으며 Claude의 결과 검증 명령으로 넘겼습니다. 2d에서 추가한 `--published`는 위 출판 파일을 읽기 전용으로 검사합니다. 준비와 결과 반영의 이력은 [Kubernetes 계획](review/claude-codex-r2.md)에 있습니다.
+
+<a id="chapter-docs-validation--1라운드-당시-문서계산화면-검사"></a>
+
+### 1라운드 당시 문서·계산·화면 검사
 
 | 검사 | 확인 결과 | 확인하지 않는 것 |
 | --- | --- | --- |
@@ -10766,7 +11907,7 @@ Kubernetes 실험은 API server·etcd만 띄웠습니다. 실제 업무 Pod·kub
 
 ### 실행하지 않은 범위
 
-물리 Linux 장비 전체와 모든 procfs 필드, cgroup 제한·OOM·eviction, Kubernetes 1.35 이상 서버·업무 workload·CNI·CSI, MySQL·SQL Server·Oracle 서버 질의, JVM·.NET 등 runtime agent 전수, 실제 DNS·TLS·HTTP/2, 상용 SNMP 장비, cloud 계정·비용 API, 분산 장애 전환·전원 장애·복구는 실행하지 않았습니다. 본문에서는 연결한 공식 원천의 적용 범위로 설명하며 해당 환경을 검증했다고 표시하지 않습니다.
+물리 Linux 장비 전체와 모든 procfs 필드, cgroup 제한·OOM·eviction, Kubernetes 최신 patch·1.35/1.36 서버·업무 workload·CNI·CSI, MySQL·SQL Server·Oracle 서버 질의, JVM·.NET 등 runtime agent 전수, 실제 DNS·TLS·HTTP/2, 상용 SNMP 장비, cloud 계정·비용 API, 분산 장애 전환·전원 장애·복구는 실행하지 않았습니다. 본문에서는 연결한 공식 원천의 적용 범위로 설명하며 해당 환경을 검증했다고 표시하지 않습니다.
 
 <a id="chapter-docs-validation--문서-검사-재현"></a>
 
@@ -10794,7 +11935,7 @@ python scripts/check_html.py
 
 ### Linux 실습 재현
 
-이번 교차 검토의 Linux CPU 진단은 Claude가 아래 첫 두 명령으로 실행·검증한 결과를 전달했고, 출판 경로에 보존한 뒤 다시 검사했습니다. 아래 명령은 후속 재현 방법이며, 나머지 서버 실험을 이번 1b에 재실행했다는 뜻은 아닙니다. 최신 버전 재실행은 2라운드 계획에 둡니다.
+1b의 Linux CPU 진단은 Claude가 아래 첫 두 명령으로 실행·검증한 결과를 전달했고, 출판 경로에 보존한 뒤 다시 검사했습니다. 아래는 과거 고정 버전의 후속 재현 방법입니다. 2d에서 출판한 별도 서버 실행의 명령·입력은 [2라운드 실습](#chapter-docs-cross-domain-reproducible-labs)에 있습니다.
 
 WSL을 포함한 Ubuntu 24.04 amd64의 일반 사용자로 **이 저장소의 Linux 경로**에서 실행합니다. Python 3, OpenSSL, dpkg-deb와 실행 파일의 공유 라이브러리가 필요합니다. PostgreSQL 도구는 Ubuntu 24.04 패키지의 의존성을 전제로 하므로 다른 배포판의 범용 설치기로 취급하지 않습니다. 다운로드 목록과 SHA256은 [PostgreSQL 패키지](labs/postgresql/packages.json), [runtime archive](labs/runtime-assets.json)에 고정했습니다.
 
@@ -10825,6 +11966,18 @@ python3 scripts/run_otel_lab.py
 ## 제1.1판의 검토와 수정 기록
 
 2026-10-04에 작성·자체 검토·공식 원천 대조·실제 실행을 반복한 보강판입니다. 제1.0판의 80장에서 **92장**으로 확장했습니다. 이번 검토는 작성자의 자체 검토이며 외부 전문가 감수를 의미하지 않습니다. 실행 환경과 자동 검사 결과는 [검증 기록](#chapter-docs-validation)에 있습니다.
+
+<a id="chapter-docs-review--claudecodex-교차-검토-2차-원고-보강과-실행-근거"></a>
+
+### Claude–Codex 교차 검토 2차: 원고 보강과 실행 근거
+
+2026-10-05에는 위 92장에 5장을 추가해 상세 97장으로 보강했습니다. G1–G5 필수 주제와 G6–G12를 공식 문서·명세·버전 소스에 대조했고, 2d에서는 Claude가 전달한 네 최종 실행 결과를 출판했습니다. 주제별 원천·위치·채택하지 않은 단서와 이유, 2c 지적 29개와 추가 단서의 판정은 [2라운드 기록](review/claude-codex-r2.md)에 있습니다. 과거 1.1 실행 결과·hash와 판 번호·판 기준일은 유지합니다.
+
+Windows Task Manager의 CPU를 모든 빌드에서 Utility로 단정하지 않고, EC2 basic의 상태 검사 1분 예외, datagram용 RFC 8899의 범위, SNMP RFC 내 650 Mbit/s 경계 표현 차이를 명시했습니다. 새 예시 산술을 기존 검사에 연결했으며 저장 근거 검사와 실제 서버 재실행을 계속 구분합니다.
+
+2c 대조에서는 PostgreSQL 12의 `total_time`이 이미 실행 시간이었다는 오류를 바로잡아 13의 `total_exec_time`과 의미를 연결했습니다. Linux PassiveOpens의 실제 증가 위치, CLOSE-WAIT 수정 포함 여부, UDP MemErrors, Kubernetes Burstable의 하한 3과 Pod-level QoS, OOM의 현재·이전 종료 상태를 보강했습니다. exemplar의 메모리 조회 창과 WAL 보존을 구분하고, Lambda suppressed init의 REPORT 관측을 CloudWatch 지표로 무리하게 확장하지 않았습니다.
+
+새 실행 36개 판정은 지지 34개·반증 2개입니다. Collector 0.162.0에서는 재시도 진행 중 유지되던 send_failed 값이 소진 뒤 증가했고, queue 활성화 시 upstream 수락이 목적지 해제보다 앞섰습니다. PostgreSQL 18.6에서는 네 회수 기준점의 유지·해제를 관측했으며 회수 성공을 freeze 전진으로 해석하지 않았습니다. [실습 원시 결과·한계](#chapter-docs-cross-domain-reproducible-labs)
 
 <a id="chapter-docs-review--claudecodex-교차-검토-1차"></a>
 
@@ -10886,7 +12039,7 @@ python3 scripts/run_otel_lab.py
 
 **Linux CPU 계정과 시계:** 최초 표본의 약 1.06은 MONOTONIC 분모를 사용한 관측입니다. 원시 기록과 원래 실행기를 보존하고 현재 실행기에 RAW·읽기 전용 adjtimex·스레드 수·품질 표시를 추가했습니다. Claude가 같은 WSL 환경에서 재실행한 [새 JSON](labs/results/1.1-linux-clock-r1.json)을 그대로 보존하고 Codex가 실행기 hash와 계산을 확인했습니다. busy 3개 구간의 프로세스 CPU clock/RAW는 약 0.99992–0.99995, MONOTONIC/RAW는 약 0.937이었으며 sleep·idle에서도 시계 속도 차이가 나타났습니다. adjtimex 조정값과도 부합하므로 이 재실행의 CPU/MONOTONIC > 1은 분모 시계의 주파수 조정으로 설명됩니다. 원래 표본에는 RAW·tick이 없어 같은 원인을 소급 확정하지 않으며, 조정 주체와 RAW의 외부 정확도도 확인하지 않았습니다. 기존 두 CPU 계정의 일치 검사는 경과 시간의 정확도를 검증하지 못한다는 정정을 유지합니다. [관측값과 한계](#chapter-docs-host-linux-observation-lab)에 idle 61개 표본의 비율·tick·freq 재계산과 표본 평균의 한계를 함께 적었습니다.
 
-**Kubernetes 과거 버전 조회:** 저장된 7개 시나리오는 모두 `--watch-cache=false` 조건입니다. 410 사례에는 전용 etcd의 physical compaction도 사용했습니다. 이전 원고에 적었던 “예비 시도에서 200”은 원시 증거가 보존되지 않아 검증된 결과에서 제외했습니다. `ListFromCacheSnapshot` 등 특정 기능을 그 원인으로 단정하지 않습니다. selector 이탈의 DELETED는 1.34.1의 etcd watcher와 cache watcher 코드 모두에서 확인했지만, cache를 켠 실행 증거는 이번 기록에 없습니다.
+**Kubernetes 과거 버전 조회:** 기존 7개 시나리오는 모두 `--watch-cache=false`였고, 당시 보존하지 않은 “예비 시도 200”은 계속 근거에서 제외합니다. 별도로 보존한 2d의 1.34.1·1.37.0 실행에서는 cache를 켜면 compaction 뒤 Exact RV=1 LIST가 200·빈 목록으로, 끄면 410으로 반환됐습니다. 따라서 compaction만으로 반드시 410을 얻는다는 가설은 두 cache-on 구성에서 반증됐습니다. `ListFromCacheSnapshot` 활성 상태는 기록했지만 gate를 분리 변경하지 않아 인과는 확정하지 않습니다. 빈 RV=1 목록과 새 etcd의 초기 상태가 부합한다는 것은 코드·실행 순서에 근거한 추론입니다. 네 구성의 selector 이탈도 DELETED 뒤 GET 200·동일 UID로 확인했습니다. [새 증거와 해석](#chapter-docs-kubernetes-inventory-consistency)
 
 <a id="chapter-docs-review--읽기-쉽게-바꾼-부분"></a>
 

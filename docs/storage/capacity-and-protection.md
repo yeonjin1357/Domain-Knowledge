@@ -1,6 +1,6 @@
 # 저장 용량, 복제, 스냅샷과 복구 가능성
 
-> 상태: 검토됨 · 적용 범위: 공통 용량 모델, Ceph Squid erasure coding·EBS snapshot 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: 공통 용량 모델, Ceph Squid erasure coding·EBS snapshot 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (Ceph Squid min_size·PG 상태)
 
 버전 상태: Ceph 설명은 Squid 문서에 고정했습니다. 공식 표의 Squid 예상 종료일은 2026-10-31이며 검토 시점 최신 계열은 Tentacle 20.2.x입니다. 확정 보증일과 예상 일정을 구분합니다. [버전 상태와 공식 근거](../coverage.md#교차-검토-시점의-버전-상태)
 
@@ -37,6 +37,16 @@ Ceph의 replicated pool은 객체 복사본을 유지하고 erasure-coded pool�
 
 후자가 이 계산에서 적은 공간을 쓰더라도 지연·복구 비용·작은 쓰기 특성까지 동일한 것은 아닙니다. “chunk 3개 손실 대응”과 “임의의 물리 호스트 3개 장애 대응”도 배치 조건 없이 같은 보장으로 바꾸지 않습니다.
 
+## Ceph의 복제 목표와 I/O 가능 기준
+
+복제본이 목표보다 줄어든 것과 I/O를 못 하는 것은 다릅니다. **Squid 문서, 2026-10-05 확인:** replicated pool의 `size`는 목표 복사본 수, `min_size`는 degraded 상태에서 I/O를 허용할 최소 복사본 수입니다. PG는 객체들을 함께 배치·복구하는 placement group입니다. `undersized`는 목표보다 사본이 적은 상태, `peered`이지만 active가 아닌 경우에는 min_size 부족으로 **읽기를 포함한 client I/O**를 제공하지 못하면서 복구가 진행될 수 있습니다. [pool](https://docs.ceph.com/en/squid/rados/operations/pools/), [PG 상태](https://docs.ceph.com/en/squid/rados/operations/pg-states/)
+
+**예시:** size=3, min_size=2인 replicated pool에서 유효 사본 2개라면 다른 조건이 충족될 때 degraded I/O가 가능하지만, 1개라면 min_size에 미달합니다. “OSD가 한 개 죽었으므로 모든 PG가 inactive”라는 결론도, “사본이 하나 있으므로 읽기는 항상 가능”이라는 결론도 나오지 않습니다. PG별 acting set·peering·다른 상태와 장애 영역을 확인합니다.
+
+Squid 19.2.3의 EC pool 생성 기본 계산은 `min_size = k + min(1, m−1)`입니다. **예시:** k=4, m=2이면 기본 min_size는 `4+min(1,1)=5`입니다. 복원에 필요한 k개 chunk가 남는 것과 client I/O 허용 조건은 다릅니다. 실제 pool에서 명시적으로 바꾼 `min_size`를 우선 읽으며, 이 식을 모든 Ceph 버전·복제 pool에 적용하지 않습니다. [고정 버전 생성 코드](https://github.com/ceph/ceph/blob/v19.2.3/src/mon/OSDMonitor.cc#L7773)
+
+제품 적용 제안은 목표 복제 수·최소 수·PG 상태·가용성 영향을 분리하는 것입니다. `min_size`를 낮추는 변경은 보호 수준을 바꾸므로 자동 복구용 수집 동작에 포함하지 않습니다. Ceph 명령이나 장애 주입은 이번에 실행하지 않았습니다.
+
 ## 스냅샷과 백업
 
 EBS snapshot은 증분 방식으로 이전 snapshot 이후 변경된 블록을 보존합니다. 이용자는 복원에 필요한 전체 논리 볼륨을 얻지만 snapshot별 실제 저장량을 볼륨 논리 크기의 단순 합으로 계산하면 안 됩니다. [EBS Snapshots](https://docs.aws.amazon.com/ebs/latest/userguide/ebs-snapshots.html)
@@ -61,6 +71,8 @@ EBS snapshot은 증분 방식으로 이전 snapshot 이후 변경된 블록을 �
 예상 30일을 보장 날짜로 표시하지 않고, 관측 구간·증가율·모델과 오차를 표시하는 것이 좋습니다.
 
 ## 이해 확인
+
+추가 질문: Ceph에서 size=3 중 두 사본만 남으면 반드시 I/O가 멈추는가? **min_size와 PG의 peering·active 상태 등 조건을 함께 봐야 합니다.**
 
 1. k=4, m=2의 이상화된 보호 공간 비율은? **1.5배입니다.**
 2. snapshot 10개가 논리 볼륨 10배의 실제 저장량인가? **증분·중복 구조를 확인해야 합니다.**

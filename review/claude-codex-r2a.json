@@ -1,0 +1,486 @@
+{
+  "prepared_on": "2026-10-05",
+  "completed_at_utc": "2026-10-05T12:11:59.451709+00:00",
+  "phase": "2a preparation only",
+  "branch": "review/claude-codex-r2",
+  "head": "7e1360f2e2d69ea354f24176037c1241bb54cfb6",
+  "execution": {
+    "wsl_invocations": 0,
+    "linux_binary_executions": 0,
+    "database_queries": 0,
+    "cloud_calls": 0,
+    "system_installs": 0,
+    "commit_push_branch_switch": false
+  },
+  "existing_tracked_files_unchanged": {
+    "count": 168,
+    "verification": "All tracked file bytes match SHA256 recorded before round 2a, including docs, book.json, BOOK.*, old runners/results/review ledgers."
+  },
+  "prepared_files_sha256": {
+    "scripts/get_review_r2_assets.py": "57f1db4fb200b76b5fff8cdfec20903a4f6c1937809d512d3f17efbd12b48366",
+    "scripts/lab_r2_common.py": "81ec52d8450511d0ed35ac3845954f555a86b20cf51d3fcb20974212c1ff0e4b",
+    "scripts/run_kubernetes_r2_lab.py": "1ae7c46db4c2899fbdf56ae76c80bfded6dabc995a779c12ec6469963278ca11",
+    "scripts/run_otel_r2_lab.py": "3a648e65da2866c5556b70141a7b811f5321ec8486a99b8c811f0fd439173738",
+    "scripts/run_postgres_r2_lab.py": "d9513c7f661e1d3585f57bfe014dc1c2dee7d81e32e80cb205a5ae100012b5e8",
+    "scripts/run_prometheus_r2_lab.py": "dcc9dec4ffa10a24d4f29d1101ea7f5f7422df1715738f590279f650cf1edc23",
+    "scripts/verify_review_r2.py": "8e22926e72b453454ae6581cf06615339b1c816fd6036def0a02bf53cebf787a",
+    "labs/review-r2/assets.json": "6859cca01bfcca358cb514f0bb16bc772cbc3c0fb1c30ef793e21dadd1e92555",
+    "labs/review-r2/postgresql-observe.sql": "7a02a28a83b7b2a18155c77ae18134b14c757abbc8cbf7c0c022497c5c354f98",
+    "review/claude-codex-r2a.md": "123f003275a5b12fe3def6b7176950200aee40d7fc99fe19cb7d95492c4e1710"
+  },
+  "assets": {
+    "prepared_on": "2026-10-05",
+    "platform": "Linux amd64",
+    "assets": [
+      {
+        "id": "envtest-1.34.12",
+        "suite": "kubernetes",
+        "version": "1.34.12",
+        "status": "unavailable",
+        "release_api": "https://api.github.com/repos/kubernetes-sigs/controller-tools/releases/tags/envtest-v1.34.12",
+        "checked_at_utc": "2026-10-05T11:46:31.281421+00:00",
+        "http_status": 404,
+        "sha256": null,
+        "reason": "Exact controller-tools envtest release tag returns HTTP 404. No substituted version or nonofficial asset.",
+        "expected_name": "envtest-v1.34.12-linux-amd64.tar.gz"
+      },
+      {
+        "id": "envtest-1.37.1",
+        "suite": "kubernetes",
+        "version": "1.37.1",
+        "status": "unavailable",
+        "release_api": "https://api.github.com/repos/kubernetes-sigs/controller-tools/releases/tags/envtest-v1.37.1",
+        "checked_at_utc": "2026-10-05T11:46:31.282426+00:00",
+        "http_status": 404,
+        "sha256": null,
+        "reason": "Exact controller-tools envtest release tag returns HTTP 404. No substituted version or nonofficial asset.",
+        "expected_name": "envtest-v1.37.1-linux-amd64.tar.gz"
+      },
+      {
+        "id": "collector-0.162.0",
+        "suite": "otel",
+        "version": "0.162.0",
+        "status": "available",
+        "name": "otelcol_0.162.0_linux_amd64.tar.gz",
+        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol_0.162.0_linux_amd64.tar.gz",
+        "sha256": "f99929987a915d3c6b2c9b15bc4938c5cea903a37a3f49e478024a0fa0772339",
+        "size": 37254744,
+        "release_api": "https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases/tags/v0.162.0",
+        "release_url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.162.0",
+        "release_tag": "v0.162.0",
+        "published_at": "2026-09-29T12:34:07Z",
+        "checked_at_utc": "2026-10-05T11:46:31.872233+00:00",
+        "checksum_url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol_0.162.0_linux_amd64.tar.gz.sha256",
+        "checksum_file_sha256": "b72ef7803079899fe9f08ec4c9addbf63e069ba13e5ec59ac637bb2c5d1e70db",
+        "verification": "GitHub release asset digest equals official checksum entry; verify archive SHA256 before extraction",
+        "destination": ".tools/r2/collector-0.162.0",
+        "members": [
+          "otelcol"
+        ]
+      },
+      {
+        "id": "prometheus-3.13.4",
+        "suite": "prometheus",
+        "version": "3.13.4",
+        "status": "available",
+        "name": "prometheus-3.13.4.linux-amd64.tar.gz",
+        "url": "https://github.com/prometheus/prometheus/releases/download/v3.13.4/prometheus-3.13.4.linux-amd64.tar.gz",
+        "sha256": "87f21a66f96c597a189cef8d640e8921b621fc17a9feff707c332c4f3b3ddd56",
+        "size": 104529619,
+        "release_api": "https://api.github.com/repos/prometheus/prometheus/releases/tags/v3.13.4",
+        "release_url": "https://github.com/prometheus/prometheus/releases/tag/v3.13.4",
+        "release_tag": "v3.13.4",
+        "published_at": "2026-10-02T14:46:21Z",
+        "checked_at_utc": "2026-10-05T11:46:31.589070+00:00",
+        "checksum_url": "https://github.com/prometheus/prometheus/releases/download/v3.13.4/sha256sums.txt",
+        "checksum_file_sha256": "f7a6d2afc0bfcb424395148f08b19b6140288475313f106b7f508c23ba332127",
+        "verification": "GitHub release asset digest equals official checksum entry; verify archive SHA256 before extraction",
+        "destination": ".tools/r2/prometheus-3.13.4",
+        "members": [
+          "promtool"
+        ]
+      },
+      {
+        "id": "prometheus-3.15.0",
+        "suite": "prometheus",
+        "version": "3.15.0",
+        "status": "available",
+        "name": "prometheus-3.15.0.linux-amd64.tar.gz",
+        "url": "https://github.com/prometheus/prometheus/releases/download/v3.15.0/prometheus-3.15.0.linux-amd64.tar.gz",
+        "sha256": "2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0",
+        "size": 111651578,
+        "release_api": "https://api.github.com/repos/prometheus/prometheus/releases/tags/v3.15.0",
+        "release_url": "https://github.com/prometheus/prometheus/releases/tag/v3.15.0",
+        "release_tag": "v3.15.0",
+        "published_at": "2026-09-25T08:56:22Z",
+        "checked_at_utc": "2026-10-05T11:46:31.596100+00:00",
+        "checksum_url": "https://github.com/prometheus/prometheus/releases/download/v3.15.0/sha256sums.txt",
+        "checksum_file_sha256": "023cab1e6b275ee1b8f5f64215a01d74bbb1b19c45183b7296ced4aa4532707b",
+        "verification": "GitHub release asset digest equals official checksum entry; verify archive SHA256 before extraction",
+        "destination": ".tools/r2/prometheus-3.15.0",
+        "members": [
+          "promtool"
+        ]
+      }
+    ],
+    "kubernetes_patch_source": "https://kubernetes.io/releases/patch-releases/",
+    "available_other_envtest_tags_observed": [
+      "envtest-v1.34.1",
+      "envtest-v1.37.0"
+    ],
+    "alternative_versions_authorized": false,
+    "postgresql": {
+      "version_family": "18",
+      "reuse": ".tools/pg18",
+      "package_manifest": "labs/postgresql/packages.json",
+      "downloads": "none; reuse existing verified extraction",
+      "expected_executables": [
+        "postgres",
+        "initdb",
+        "pg_basebackup"
+      ],
+      "expected_plugin": "usr/lib/postgresql/18/lib/pgoutput.so",
+      "file_sha256": {
+        "usr/lib/x86_64-linux-gnu/libpq.so.5.18": {
+          "sha256": "e6f752c5ad7005afab0d9ea2932b93d6ad2d863b4333a55aafa1cdd734e74bde",
+          "package": "libpq5",
+          "package_sha256": "b487c5ed2ceb9244c6a9d6ae65818ed6707c3c44a2e14488394ae4194c52c53b"
+        },
+        "usr/lib/postgresql/18/bin/initdb": {
+          "sha256": "8715d29eae8517fb108acc093c685a9ae370c4a623a1855faa6b6ab08995a1d1",
+          "package": "postgresql-18",
+          "package_sha256": "c0773357df8769abb70e92722196d9b53422d71c0f29a4f39c834b94276cfa3d"
+        },
+        "usr/lib/postgresql/18/bin/postgres": {
+          "sha256": "492c356851c073d65e77b8cc5d22d10e05a07d54699c6427dcb01d36567af7d5",
+          "package": "postgresql-18",
+          "package_sha256": "c0773357df8769abb70e92722196d9b53422d71c0f29a4f39c834b94276cfa3d"
+        },
+        "usr/lib/postgresql/18/lib/pgoutput.so": {
+          "sha256": "66aefe14c3a9fe93c34068dfa5369327befcf96ed18c1302e938ece44c4b3d64",
+          "package": "postgresql-18",
+          "package_sha256": "c0773357df8769abb70e92722196d9b53422d71c0f29a4f39c834b94276cfa3d"
+        },
+        "usr/lib/postgresql/18/bin/pg_basebackup": {
+          "sha256": "9fb32abac688991feebfb823cc76075a87592991e785838ae65fbc0d1537dc1f",
+          "package": "postgresql-client-18",
+          "package_sha256": "b9d10d99a73bf7aa375be2fe36626c40499cfdf553d0ad174674a88a1b256b43"
+        },
+        "usr/lib/postgresql/18/lib/libpqwalreceiver.so": {
+          "sha256": "9e10941f8f6a550b19b41129e10bcef5f6d88d69f0a83da26a3ce4acce0bde49",
+          "package": "postgresql-18",
+          "package_sha256": "c0773357df8769abb70e92722196d9b53422d71c0f29a4f39c834b94276cfa3d"
+        }
+      },
+      "verification": "Each pinned local file was matched byte-for-byte to its member in an existing .deb with the official package-manifest SHA256; no download, install or Linux execution."
+    },
+    "execution_status": "Preparation only; no Linux runtime result in round 2a"
+  },
+  "download_receipts": {
+    "collector-0.162.0": {
+      "asset_id": "collector-0.162.0",
+      "checked": {
+        "utc": "2026-10-05T11:49:43.584543+00:00",
+        "monotonic_ns": 558824093000000
+      },
+      "archive_sha256": "f99929987a915d3c6b2c9b15bc4938c5cea903a37a3f49e478024a0fa0772339",
+      "archive": ".tools/r2/archives/otelcol_0.162.0_linux_amd64.tar.gz",
+      "binaries": {
+        "otelcol": "910a66b1210e09143260914ef0634b4d234c789f23efc34bc9c7a3c0480324fa"
+      },
+      "execution": "not executed by downloader"
+    },
+    "prometheus-3.13.4": {
+      "asset_id": "prometheus-3.13.4",
+      "checked": {
+        "utc": "2026-10-05T11:49:46.496943+00:00",
+        "monotonic_ns": 558827000000000
+      },
+      "archive_sha256": "87f21a66f96c597a189cef8d640e8921b621fc17a9feff707c332c4f3b3ddd56",
+      "archive": ".tools/r2/archives/prometheus-3.13.4.linux-amd64.tar.gz",
+      "binaries": {
+        "promtool": "dd140e4eab2f93b854f0e6e8bd42c99f0a3d74cf97270e6937dbcdd89a5ba869"
+      },
+      "execution": "not executed by downloader"
+    },
+    "prometheus-3.15.0": {
+      "asset_id": "prometheus-3.15.0",
+      "checked": {
+        "utc": "2026-10-05T11:49:49.424624+00:00",
+        "monotonic_ns": 558829937000000
+      },
+      "archive_sha256": "2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0",
+      "archive": ".tools/r2/archives/prometheus-3.15.0.linux-amd64.tar.gz",
+      "binaries": {
+        "promtool": "c736d55d3ccd959fe48329965fb5cb671d45585a9483954766448035100ff75c"
+      },
+      "execution": "not executed by downloader"
+    }
+  },
+  "plans": [
+    {
+      "runner": "run_kubernetes_r2_lab",
+      "plan": {
+        "versions": [
+          "1.34.12",
+          "1.37.1"
+        ],
+        "watch_cache": [
+          true,
+          false
+        ],
+        "contracts": {
+          "selector_exit": [
+            "선택 집합 이탈은 DELETED로 관측되며 객체 자체는 남아 있다.",
+            "DELETED 수신, 직접 GET 200, UID 동일, label 변경 확인.",
+            "watch가 정상 연결·완료됐지만 해당 DELETED가 없거나 직접 GET/UID가 가정과 다르다."
+          ],
+          "pagination": [
+            "continue로 이은 페이지들은 첫 목록 snapshot을 유지한다.",
+            "3개 원래 이름·같은 collection RV, 중간 생성 항목은 fresh LIST에서만 나타남.",
+            "성공한 페이지에 중간 생성 항목 포함, 원래 항목 누락/중복 또는 collection RV 변화."
+          ],
+          "history_expiry": [
+            "이 실험의 compaction 뒤 Exact RV=1 조회는 410이고 fresh LIST는 성공한다.",
+            "Exact 조회 HTTP 410과 fresh LIST HTTP 200.",
+            "Exact 조회 HTTP 200. 이는 이 조건에서 만료가 유발되지 않았다는 반증이며 API 규약 위반을 뜻하지 않는다."
+          ],
+          "resource_version": [
+            "같은 클러스터·core/v1 ConfigMap의 순차 변경에서 RV가 증가한다.",
+            "각 RV가 십진 정수 문자열이며 순차 변경마다 int 비교 증가.",
+            "완료된 순차 변경에서 수치가 증가하지 않음. 1.34의 비수치 RV는 opaque 규약상 허용되므로 관측 불충분으로 분리."
+          ]
+        },
+        "assets": [
+          {
+            "id": "envtest-1.34.12",
+            "suite": "kubernetes",
+            "version": "1.34.12",
+            "status": "unavailable",
+            "release_api": "https://api.github.com/repos/kubernetes-sigs/controller-tools/releases/tags/envtest-v1.34.12",
+            "checked_at_utc": "2026-10-05T11:46:31.281421+00:00",
+            "http_status": 404,
+            "sha256": null,
+            "reason": "Exact controller-tools envtest release tag returns HTTP 404. No substituted version or nonofficial asset.",
+            "expected_name": "envtest-v1.34.12-linux-amd64.tar.gz"
+          },
+          {
+            "id": "envtest-1.37.1",
+            "suite": "kubernetes",
+            "version": "1.37.1",
+            "status": "unavailable",
+            "release_api": "https://api.github.com/repos/kubernetes-sigs/controller-tools/releases/tags/envtest-v1.37.1",
+            "checked_at_utc": "2026-10-05T11:46:31.282426+00:00",
+            "http_status": 404,
+            "sha256": null,
+            "reason": "Exact controller-tools envtest release tag returns HTTP 404. No substituted version or nonofficial asset.",
+            "expected_name": "envtest-v1.37.1-linux-amd64.tar.gz"
+          }
+        ]
+      }
+    },
+    {
+      "runner": "run_otel_r2_lab",
+      "plan": {
+        "version": "0.162.0",
+        "cases": [
+          "success",
+          "partial_success",
+          "retry_success",
+          "retry_exhausted"
+        ],
+        "queue": [
+          false,
+          true
+        ],
+        "contracts": {
+          "partial_success": [
+            "목적지의 부분 거절을 Collector 내부 관측에서 확인할 수 있다.",
+            "목적지의 rejectedSpans=1 응답과 고유 거절 문구를 포함한 Collector 로그, 또는 대응하는 내부 계수 증가.",
+            "목적지 응답 이후 충분히 수집한 로그·metric에 거절 관측이 없으면 이 구성의 가시성 가설이 성립하지 않는다. 수신 여부 자체를 부정하지는 않는다."
+          ],
+          "retry_timing": [
+            "send_failed_spans는 진행 중인 개별 재시도마다 증가하지 않고 최종 실패에서 증가한다.",
+            "primer로 존재를 확인한 counter가 2번째 요청 보류 중 유지되고, 재시도 성공 후 유지 / 소진 후 2 증가.",
+            "보류 중 counter 증가 또는 소진 뒤 다른 증가량. metric 누락이나 보류 구간 미관측은 반증 대신 관측 불충분."
+          ],
+          "queue_boundary": [
+            "wait_for_result=false인 queue는 목적지의 완료 전에 upstream에 응답할 수 있다.",
+            "queue on에서 보류 요청 해제 전 upstream 200, queue off에서 upstream 응답은 해제 뒤.",
+            "같은 보류 조건에서 응답 순서가 가정과 다름; 구간 경계가 겹치거나 보류가 없으면 관측 불충분."
+          ]
+        },
+        "probe": "two spans; separate permanent-error primer makes the failure counter observable",
+        "config": {
+          "receivers": {
+            "otlp": {
+              "protocols": {
+                "http": {
+                  "endpoint": "127.0.0.1:4318"
+                }
+              }
+            }
+          },
+          "exporters": {
+            "otlp_http/lab": {
+              "endpoint": "http://127.0.0.1:14318",
+              "encoding": "json",
+              "compression": "none",
+              "timeout": "2s",
+              "sending_queue": {
+                "enabled": true,
+                "num_consumers": 1,
+                "queue_size": 10,
+                "sizer": "requests",
+                "wait_for_result": false
+              },
+              "retry_on_failure": {
+                "enabled": true,
+                "initial_interval": "200ms",
+                "max_interval": "400ms",
+                "max_elapsed_time": "3s"
+              }
+            }
+          },
+          "service": {
+            "telemetry": {
+              "logs": {
+                "level": "debug",
+                "encoding": "json"
+              },
+              "metrics": {
+                "level": "detailed",
+                "readers": [
+                  {
+                    "pull": {
+                      "exporter": {
+                        "prometheus": {
+                          "host": "127.0.0.1",
+                          "port": 18888,
+                          "without_type_suffix": true,
+                          "without_units": true
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "pipelines": {
+              "traces": {
+                "receivers": [
+                  "otlp"
+                ],
+                "exporters": [
+                  "otlp_http/lab"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "runner": "run_prometheus_r2_lab",
+      "plan": {
+        "versions": [
+          "3.13.4",
+          "3.15.0"
+        ],
+        "inputs": [
+          "scripts/run_prometheus_r2_lab.py",
+          "scripts/get_review_r2_assets.py",
+          "labs/prometheus/rules.yml",
+          "labs/prometheus/tests.yml"
+        ],
+        "success": "check rules and test rules both exit 0",
+        "refutation": "promtool accepts the fixture but reports a rule/expression/alert mismatch",
+        "failure_distinction": "missing binary, unsupported invocation or startup error is an error, not a semantic refutation"
+      }
+    },
+    {
+      "runner": "run_postgres_r2_lab",
+      "plan": {
+        "version_family": "18",
+        "reuse": ".tools/pg18",
+        "contracts": {
+          "prepared_transaction": [
+            "prepared transaction의 XID가 일반 테이블의 회수 기준점을 붙잡는다.",
+            "prepared XID 존재 중 DELETE한 128행이 VACUUM에서 제거 불가; ROLLBACK PREPARED 뒤 제거 불가 0.",
+            "prepared 상태와 작업 순서를 확인했는데 제거 불가 행이 유지되지 않거나 해제 후에도 남음."
+          ],
+          "logical_catalog_xmin": [
+            "비활성 logical slot의 catalog_xmin이 카탈로그 튜플 회수를 제한한다.",
+            "pgoutput slot의 catalog_xmin 존재, catalog churn 후 pg_class에 제거 불가 행 존재; slot 삭제 뒤 0.",
+            "전제 조건이 갖춰졌는데 카탈로그 보존/해제 차이가 없음. logical slot xmin의 NULL은 반증이 아니다."
+          ],
+          "standby_feedback": [
+            "slot 없는 standby 질의의 hot_standby_feedback이 primary의 회수를 제한한다.",
+            "standby RR snapshot과 primary walsender backend_xmin 확인; DELETE 행 보존 후 질의 종료·feedback 전진 시 제거 가능.",
+            "feedback·snapshot·작업 순서가 확인됐는데 보존/해제 차이가 없음."
+          ],
+          "physical_slot_xmin": [
+            "physical slot에 전달된 xmin은 standby 연결이 끊겨도 회수를 제한할 수 있다.",
+            "연결 중 feedback xmin을 확보한 slot이 비활성화 후 xmin을 유지하며 행 보존; slot 삭제 뒤 제거 불가 0.",
+            "연결 중 xmin·비활성 전환을 확인했는데 slot이 xmin을 유지하지 않거나 보존/해제 차이가 없음."
+          ]
+        },
+        "rows": 128,
+        "catalog_ddl_pairs": 24,
+        "skip_standby": false,
+        "limits": "No XID wraparound acceleration; n_dead_tup is estimated; datfrozenxid need not move after a table-only vacuum."
+      }
+    }
+  ],
+  "validation": [
+    {
+      "command": "python -X utf8 -B scripts/check_docs.py",
+      "returncode": 0,
+      "output": "PASS: 116 Markdown files; 92 detailed chapters; 1725 local links; 348 distinct external URLs\nChecked: UTF-8, headings, fences, local paths/anchors, manifest coverage, chapter indexing\nExternal URLs are inventoried, not automatically revalidated by this script\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/verify_examples.py",
+      "returncode": 0,
+      "output": "PASS: 146 arithmetic/interpretation checks across 51 source documents\nNo production diagnostic command or database query was executed\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/verify_contracts.py",
+      "returncode": 0,
+      "output": "PASS: 22 adapter edge cases; 28 source-bound calculations; recorded lab hashes and statuses\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/verify_revision.py",
+      "returncode": 0,
+      "output": "PASS: published Linux clock evidence SHA256, runner hash, 4 intervals, 61 idle samples and chapter values\nIdle MONO/RAW: 0.9363740129706928 sample mean tick/10000: 0.9363754098360656 freq ppm range: -49.82659912109375 40.45188903808594\nPASS: 31 recorded scenarios in 5 suites; all evidence input hashes; SQL excerpt; 12 calculations and timestamp-value pairing\nHistorical inputs include the byte-identical archived Linux runner. Its CPU passed flag did not validate wall-clock calibration.\nSaved execution evidence was checked; servers and source facts were not re-executed by this command\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/build_book.py --check",
+      "returncode": 0,
+      "output": "PASS: BOOK.md matches 114 source documents\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/build_html.py --check",
+      "returncode": 0,
+      "output": "PASS: BOOK.html matches source documents and pinned renderer\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/verify_review_r2.py",
+      "returncode": 0,
+      "output": "PASS: 7 Python files parsed; path boundary, exception cleanup/no-overwrite, missing/NaN metric, retry counter and vacuum verdict cases\nPASS: 3 official archives and extracted Linux amd64 tools; reused PostgreSQL file hashes\nUNAVAILABLE (not executed): envtest-1.34.12, envtest-1.37.1\nPREPARATION ONLY: no Linux experiments executed or runtime outcomes asserted.\n"
+    }
+  ],
+  "semantic_sources": [
+    "https://kubernetes.io/releases/patch-releases/",
+    "https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions",
+    "https://github.com/open-telemetry/opentelemetry-collector/blob/v0.162.0/CHANGELOG.md#v1500v01440",
+    "https://github.com/open-telemetry/opentelemetry-collector/blob/v0.162.0/exporter/otlphttpexporter/internal/metadata/generated_status.go",
+    "https://github.com/open-telemetry/opentelemetry-collector/blob/v0.162.0/exporter/exporterhelper/README.md",
+    "https://opentelemetry.io/docs/collector/internal-telemetry/",
+    "https://www.postgresql.org/docs/18/view-pg-replication-slots.html",
+    "https://www.postgresql.org/docs/18/runtime-config-replication.html#GUC-HOT-STANDBY-FEEDBACK",
+    "https://www.postgresql.org/docs/18/routine-vacuuming.html",
+    "https://github.com/postgres/postgres/blob/REL_18_6/src/backend/access/heap/vacuumlazy.c#L956-L970"
+  ],
+  "remaining_decision": "Exact envtest 1.34.12 and 1.37.1 releases unavailable. Decide whether to wait or explicitly change comparison versions to official 1.34.1 and 1.37.0. No alternative downloaded.",
+  "runtime_validation_limit": "Collector validate, SQL, cache behavior and actual program cleanup are not Linux-tested. Preparation tests check syntax, pure decisions, local failure-file cleanup, asset bytes and hashes."
+}

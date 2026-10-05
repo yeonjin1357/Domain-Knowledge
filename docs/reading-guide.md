@@ -38,6 +38,21 @@
 | 알림 구현 | [데이터 품질](foundations/time-and-data-quality.md) → [SLO](foundations/service-level-objectives.md) → [알림](product/alerts-and-incidents.md) → [PromQL 실습](cross-domain/reproducible-labs.md) |
 | 용량 계획 | [성능과 통계](foundations/performance-and-statistics.md) → [보존과 질의](product/storage-and-query.md) → [용량과 손실 예산](product/capacity-and-loss-budgets.md) |
 
+## 원천 필드까지 이해하려는 두 번째 읽기
+
+2026-10-05 보강 원고는 다음 경로로 이어집니다. 모두 필드 이름을 외우기보다 **같은 이름으로 합치면 틀리는 경계**를 확인하는 학습입니다. 2d에서 출판한 새 실습은 [재현 방법과 결과](cross-domain/reproducible-labs.md)에 연결했습니다. kubelet 자원 압박·새 PDH 조회·cloud 호출처럼 실행하지 않은 항목은 원천 검토 범위로 남습니다.
+
+| 출발 상황 | 읽을 장 | 스스로 확인할 것 |
+| --- | --- | --- |
+| NIC는 정상인데 연결을 놓침 | [Linux 스택 카운터](network/linux-stack-counters.md) | namespace·소켓 범위, 재전송 비율과 손실률의 차이 |
+| Pod 종료·사용률 급변 | [자원 압박과 종료](kubernetes/pressure-and-termination.md) → [수집](kubernetes/collection.md) | OOM/eviction 증거, resize의 실제 분모, 수집 endpoint |
+| DB 정리가 안 되거나 업그레이드 후 지표 누락 | [PostgreSQL 운영 관측](database/postgresql-operations.md) | ID 나이·회수 기준점·통계 view 버전·권한 |
+| 지표에서 trace로 이동하거나 첫 counter 해석 | [exemplar와 시작 시각](foundations/metric-context-and-start-time.md) → [sampling](application/trace-sampling-and-context.md) | 사건 연결과 모집단 추정은 어떻게 다른가 |
+| 계측기 교체 뒤 이름·단위가 변함 | [Semantic conventions](application/semantic-conventions.md) | Stable 상태, s/ms, 현재값/마지막 GC, 누적/분포 |
+| 화면과 알림이 늦거나 다르게 보임 | [cloud 시간 축](cloud/provider-metrics.md) → [알림 지연](product/alerts-and-incidents.md) | 측정·게시·평가·발송의 각 시간 |
+
+Kafka broker·share group은 [Kafka](middleware/kafka.md), Windows의 PDH와 CPU 표시는 [Windows](host/windows.md), 저장 완료는 [쓰기 경로](storage/write-path-and-durability.md), 프로토콜의 세부 경계는 [TLS·HTTP](network/tls-http.md)와 [SNMP](network/snmp-and-device-models.md)를 찾아봅니다.
+
 ## 개념을 배운 뒤 실제 결과와 연결하기
 
 | 읽은 개념 | 다음에 읽을 실습·해설 | 집중할 질문 |

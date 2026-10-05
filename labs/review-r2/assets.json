@@ -1,0 +1,148 @@
+{
+  "prepared_on": "2026-10-05",
+  "platform": "Linux amd64",
+  "assets": [
+    {
+      "id": "envtest-1.34.12",
+      "suite": "kubernetes",
+      "version": "1.34.12",
+      "status": "unavailable",
+      "release_api": "https://api.github.com/repos/kubernetes-sigs/controller-tools/releases/tags/envtest-v1.34.12",
+      "checked_at_utc": "2026-10-05T11:46:31.281421+00:00",
+      "http_status": 404,
+      "sha256": null,
+      "reason": "Exact controller-tools envtest release tag returns HTTP 404. No substituted version or nonofficial asset.",
+      "expected_name": "envtest-v1.34.12-linux-amd64.tar.gz"
+    },
+    {
+      "id": "envtest-1.37.1",
+      "suite": "kubernetes",
+      "version": "1.37.1",
+      "status": "unavailable",
+      "release_api": "https://api.github.com/repos/kubernetes-sigs/controller-tools/releases/tags/envtest-v1.37.1",
+      "checked_at_utc": "2026-10-05T11:46:31.282426+00:00",
+      "http_status": 404,
+      "sha256": null,
+      "reason": "Exact controller-tools envtest release tag returns HTTP 404. No substituted version or nonofficial asset.",
+      "expected_name": "envtest-v1.37.1-linux-amd64.tar.gz"
+    },
+    {
+      "id": "collector-0.162.0",
+      "suite": "otel",
+      "version": "0.162.0",
+      "status": "available",
+      "name": "otelcol_0.162.0_linux_amd64.tar.gz",
+      "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol_0.162.0_linux_amd64.tar.gz",
+      "sha256": "f99929987a915d3c6b2c9b15bc4938c5cea903a37a3f49e478024a0fa0772339",
+      "size": 37254744,
+      "release_api": "https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases/tags/v0.162.0",
+      "release_url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.162.0",
+      "release_tag": "v0.162.0",
+      "published_at": "2026-09-29T12:34:07Z",
+      "checked_at_utc": "2026-10-05T11:46:31.872233+00:00",
+      "checksum_url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol_0.162.0_linux_amd64.tar.gz.sha256",
+      "checksum_file_sha256": "b72ef7803079899fe9f08ec4c9addbf63e069ba13e5ec59ac637bb2c5d1e70db",
+      "verification": "GitHub release asset digest equals official checksum entry; verify archive SHA256 before extraction",
+      "destination": ".tools/r2/collector-0.162.0",
+      "members": [
+        "otelcol"
+      ]
+    },
+    {
+      "id": "prometheus-3.13.4",
+      "suite": "prometheus",
+      "version": "3.13.4",
+      "status": "available",
+      "name": "prometheus-3.13.4.linux-amd64.tar.gz",
+      "url": "https://github.com/prometheus/prometheus/releases/download/v3.13.4/prometheus-3.13.4.linux-amd64.tar.gz",
+      "sha256": "87f21a66f96c597a189cef8d640e8921b621fc17a9feff707c332c4f3b3ddd56",
+      "size": 104529619,
+      "release_api": "https://api.github.com/repos/prometheus/prometheus/releases/tags/v3.13.4",
+      "release_url": "https://github.com/prometheus/prometheus/releases/tag/v3.13.4",
+      "release_tag": "v3.13.4",
+      "published_at": "2026-10-02T14:46:21Z",
+      "checked_at_utc": "2026-10-05T11:46:31.589070+00:00",
+      "checksum_url": "https://github.com/prometheus/prometheus/releases/download/v3.13.4/sha256sums.txt",
+      "checksum_file_sha256": "f7a6d2afc0bfcb424395148f08b19b6140288475313f106b7f508c23ba332127",
+      "verification": "GitHub release asset digest equals official checksum entry; verify archive SHA256 before extraction",
+      "destination": ".tools/r2/prometheus-3.13.4",
+      "members": [
+        "promtool"
+      ]
+    },
+    {
+      "id": "prometheus-3.15.0",
+      "suite": "prometheus",
+      "version": "3.15.0",
+      "status": "available",
+      "name": "prometheus-3.15.0.linux-amd64.tar.gz",
+      "url": "https://github.com/prometheus/prometheus/releases/download/v3.15.0/prometheus-3.15.0.linux-amd64.tar.gz",
+      "sha256": "2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0",
+      "size": 111651578,
+      "release_api": "https://api.github.com/repos/prometheus/prometheus/releases/tags/v3.15.0",
+      "release_url": "https://github.com/prometheus/prometheus/releases/tag/v3.15.0",
+      "release_tag": "v3.15.0",
+      "published_at": "2026-09-25T08:56:22Z",
+      "checked_at_utc": "2026-10-05T11:46:31.596100+00:00",
+      "checksum_url": "https://github.com/prometheus/prometheus/releases/download/v3.15.0/sha256sums.txt",
+      "checksum_file_sha256": "023cab1e6b275ee1b8f5f64215a01d74bbb1b19c45183b7296ced4aa4532707b",
+      "verification": "GitHub release asset digest equals official checksum entry; verify archive SHA256 before extraction",
+      "destination": ".tools/r2/prometheus-3.15.0",
+      "members": [
+        "promtool"
+      ]
+    }
+  ],
+  "kubernetes_patch_source": "https://kubernetes.io/releases/patch-releases/",
+  "available_other_envtest_tags_observed": [
+    "envtest-v1.34.1",
+    "envtest-v1.37.0"
+  ],
+  "alternative_versions_authorized": false,
+  "postgresql": {
+    "version_family": "18",
+    "reuse": ".tools/pg18",
+    "package_manifest": "labs/postgresql/packages.json",
+    "downloads": "none; reuse existing verified extraction",
+    "expected_executables": [
+      "postgres",
+      "initdb",
+      "pg_basebackup"
+    ],
+    "expected_plugin": "usr/lib/postgresql/18/lib/pgoutput.so",
+    "file_sha256": {
+      "usr/lib/x86_64-linux-gnu/libpq.so.5.18": {
+        "sha256": "e6f752c5ad7005afab0d9ea2932b93d6ad2d863b4333a55aafa1cdd734e74bde",
+        "package": "libpq5",
+        "package_sha256": "b487c5ed2ceb9244c6a9d6ae65818ed6707c3c44a2e14488394ae4194c52c53b"
+      },
+      "usr/lib/postgresql/18/bin/initdb": {
+        "sha256": "8715d29eae8517fb108acc093c685a9ae370c4a623a1855faa6b6ab08995a1d1",
+        "package": "postgresql-18",
+        "package_sha256": "c0773357df8769abb70e92722196d9b53422d71c0f29a4f39c834b94276cfa3d"
+      },
+      "usr/lib/postgresql/18/bin/postgres": {
+        "sha256": "492c356851c073d65e77b8cc5d22d10e05a07d54699c6427dcb01d36567af7d5",
+        "package": "postgresql-18",
+        "package_sha256": "c0773357df8769abb70e92722196d9b53422d71c0f29a4f39c834b94276cfa3d"
+      },
+      "usr/lib/postgresql/18/lib/pgoutput.so": {
+        "sha256": "66aefe14c3a9fe93c34068dfa5369327befcf96ed18c1302e938ece44c4b3d64",
+        "package": "postgresql-18",
+        "package_sha256": "c0773357df8769abb70e92722196d9b53422d71c0f29a4f39c834b94276cfa3d"
+      },
+      "usr/lib/postgresql/18/bin/pg_basebackup": {
+        "sha256": "9fb32abac688991feebfb823cc76075a87592991e785838ae65fbc0d1537dc1f",
+        "package": "postgresql-client-18",
+        "package_sha256": "b9d10d99a73bf7aa375be2fe36626c40499cfdf553d0ad174674a88a1b256b43"
+      },
+      "usr/lib/postgresql/18/lib/libpqwalreceiver.so": {
+        "sha256": "9e10941f8f6a550b19b41129e10bcef5f6d88d69f0a83da26a3ce4acce0bde49",
+        "package": "postgresql-18",
+        "package_sha256": "c0773357df8769abb70e92722196d9b53422d71c0f29a4f39c834b94276cfa3d"
+      }
+    },
+    "verification": "Each pinned local file was matched byte-for-byte to its member in an existing .deb with the official package-manifest SHA256; no download, install or Linux execution."
+  },
+  "execution_status": "Preparation only; no Linux runtime result in round 2a"
+}

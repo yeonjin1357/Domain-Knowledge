@@ -1,6 +1,6 @@
 # Kafka: 파티션, offset, lag와 처리 보장
 
-> 상태: 검토됨 · 적용 범위: Apache Kafka 4.3, 일반 consumer group · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: Apache Kafka 4.3, 일반 consumer group · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (4.3 broker·KRaft·share group)
 
 ## 먼저 이해할 것
 
@@ -59,10 +59,37 @@ Kafka 트랜잭션으로 관련 Kafka 작업을 묶는 보장과 외부 DB·HTTP
 
 lag가 증가하고 broker는 여유롭다면 consumer 처리 시간, DB 호출, 재시도와 할당 변화를 봅니다. 반대로 producer 지연과 복제 상태 변화가 함께 나타나면 broker·저장소·복제 경로를 조사합니다. 네트워크 byte rate만으로 어느 단계인지 단정하지 않습니다.
 
+## broker와 controller의 건강을 따로 관측한다
+
+소비자 lag가 늘었을 때 소비 코드가 느린 것인지, 복제·leader 문제로 데이터를 읽거나 쓰지 못하는지 구분해야 합니다. **Kafka 4.3 공식 문서, 2026-10-05 확인** 기준의 주요 gauge는 다음과 같습니다. [monitoring 정의](https://kafka.apache.org/43/operations/monitoring/)
+
+| MBean의 name | 수집 위치·단위 | 의미와 해석 |
+| --- | --- | --- |
+| `UnderReplicatedPartitions` | broker `ReplicaManager`, partition 수 | ISR 수가 전체 replica 수보다 적음; 곧바로 쓰기 불가라는 뜻은 아님 |
+| `UnderMinIsrPartitionCount` | broker `ReplicaManager`, partition 수 | ISR 수가 `min.insync.replicas`보다 적음; `acks=all` 쓰기 조건과 함께 해석 |
+| `ActiveControllerCount` | `KafkaController`, 노드별 0/1 | active controller 여부; 정상 안정 상태에서 해당 controller 집합의 합이 1인지 확인 |
+| `OfflinePartitionsCount` | `KafkaController`, partition 수 | controller가 관측한 offline partition; broker의 offline replica 수와 구분 |
+
+앞 두 이름의 prefix는 `kafka.server:type=ReplicaManager,name=`, 뒤 두 이름은 `kafka.controller:type=KafkaController,name=`입니다. KRaft에서 controller 전용 노드를 구성하면 broker만 scrape해서 controller 지표가 안 보일 수 있습니다. 이 이름들이 모두 KRaft 전용이라는 뜻도 아닙니다. 4.0부터 ZooKeeper 모드는 제거됐지만 이전 계열에서 존재하던 지표와 새로운 KRaft metadata/quorum 지표를 구분합니다. [4.0 업그레이드](https://kafka.apache.org/40/getting-started/upgrade/)
+
+**예시:** replication factor=3, min ISR=2, 현재 ISR=2인 partition은 under-replicated지만 under-min-ISR은 아닙니다. ISR=1로 줄면 두 조건에 모두 해당합니다. 두 gauge를 더해 “장애 partition 총수”를 만들면 중복됩니다. 단발적인 controller 0 관측은 leader 전환·수집 시차·누락과 함께 조사합니다. [UnderMinIsr 도입 정의](https://cwiki.apache.org/confluence/spaces/KAFKA/pages/70257093/KIP-164-%2BAdd%2BUnderMinIsrPartitionCount%2Band%2Bper-partition%2BUnderMinIsr%2Bmetrics)
+
+Kafka 4.3.0 KRaft의 `ControllerServer`는 각 controller에 metadata 지표 publisher를 등록합니다. `OfflinePartitionsCount`는 각 controller가 적용한 metadata의 클러스터 전체 offline partition 수이므로 controller별 값을 더하면 중복됩니다. **제품 적용 제안:** 같은 클러스터의 active controller 값을 우선 사용하고, 여러 replica의 최댓값을 보조 신호로 표시할 때도 수집 시각·metadata 적용 지연을 남깁니다. 최댓값이 언제나 최신 상태라는 보장은 없습니다. [publisher 등록](https://github.com/apache/kafka/blob/4.3.0/core/src/main/scala/kafka/server/ControllerServer.scala#L378), [offline 계정](https://github.com/apache/kafka/blob/4.3.0/metadata/src/main/java/org/apache/kafka/controller/metrics/ControllerMetadataMetricsPublisher.java)
+
+## share group은 committed offset 한 개로 설명하지 않는다
+
+KIP-932의 share group은 한 partition을 여러 consumer가 협력해 읽고 개별 record를 acknowledge할 수 있는 모델입니다. 공식 릴리스는 **4.2에서 production-ready**라고 명시하며, 4.0의 early access 설명을 4.3의 상태로 사용하지 않습니다. record를 가져오면 시간 제한 acquisition lock이 생기고, 처리 결과의 acknowledge·release·재전달을 구분합니다. [4.2 릴리스](https://kafka.apache.org/blog/2026/02/17/apache-kafka-4.2.0-release-announcement/), [KafkaShareConsumer](https://kafka.apache.org/43/javadoc/org/apache/kafka/clients/consumer/KafkaShareConsumer.html)
+
+일반 consumer group의 연속 committed offset과 달리 share partition 안에는 available·acquired·acknowledged·archived 상태가 섞입니다. KIP-1226의 lag 모델은 시작 offset 이후의 범위에서 이미 terminal 상태로 처리된 항목을 제외합니다. 따라서 단순 `끝 offset−start offset`만으로 계산하면 이미 처리한 항목까지 남은 것으로 셀 수 있습니다. compacted/control record의 간극은 확인 전에는 lag에 포함될 수 있으므로 이것도 정확한 남은 업무 건수와 항상 같지는 않습니다. [Share partition lag 설계](https://cwiki.apache.org/confluence/spaces/KAFKA/pages/390761228/KIP-1226%2BIntroducing%2BShare%2BPartition%2BLag%2BPersistence%2Band%2BRetrieval), [4.3 운영 조회](https://kafka.apache.org/43/operations/basic-kafka-operations/)
+
+제품 적용 제안은 `group type`, lag 원천 API·버전·start offset, acquisition·acknowledge·release 관측을 함께 저장하는 것입니다. Kafka의 acknowledge도 외부 DB 업무 결과와 원자적으로 연결했는지까지 증명하지 않습니다. JMX·Admin API 조회에는 대상 인증·인가가 필요하고 전체 topic/partition의 고빈도 조회는 비용이 커집니다. 이 절에서는 broker·JMX·CLI를 실행하거나 원격 JMX를 활성화하지 않았습니다.
+
 ## 이해 확인
 
 1. position 기준 lag와 commit 기준 lag는 같은가? **참조 위치가 다릅니다.**
 2. 최대 lag를 더하면 모든 partition의 합계인가? **집계 의미가 다릅니다.**
 3. broker 기록 성공이면 후속 업무가 완료됐는가? **소비와 업무 결과를 따로 확인해야 합니다.**
+4. UnderReplicated와 UnderMinIsr를 더하면 장애 partition 총수인가? **두 조건이 겹칠 수 있습니다.**
+5. share group lag를 consumer committed offset 차이로 대체해도 되는가? **개별 획득·확인·terminal 상태를 다루는 별도 모델입니다.**
 
 다음: [메시지 큐](message-queues.md) · [미들웨어 목차](README.md)
