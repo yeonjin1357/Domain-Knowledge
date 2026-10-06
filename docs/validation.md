@@ -1,6 +1,23 @@
-# 제1.1판 검증 기록
+# 제1.2판 검증 기록
 
-판 기준일은 **2026-10-04**로 유지합니다. 3f 결과 반영·검사는 **2026-10-06**, 기존 실행·화면 기록은 각 기록의 날짜를 따릅니다. 공식 원천의 의미 검토, 자동 문서 검사, 실제 실행, 화면 확인의 범위를 나누어 기록합니다. 사용자 제품이나 운영 환경 전체의 지원 인증을 뜻하지 않습니다.
+판 기준일은 **2026-10-06**입니다. 제1.2판은 상세 100장·통합 원문 122개로 구성됩니다. 과거 실행·원천 확인·화면 기록은 각각의 날짜와 적용 파일을 보존합니다. 아래 발행 검사와 이어지는 라운드별 이력을 구분하며 사용자 제품의 운영 지원 인증을 뜻하지 않습니다.
+
+## 제1.2판 발행 검사 — 2026-10-06
+
+발행 작업은 현재 판 표기·변경 요약·검증 안내를 갱신하고 BOOK.md·BOOK.html을 재생성했습니다. 제1.1판의 기존 31개 시나리오와 세 라운드에서 출판한 실행 결과·verdict·입력 hash는 변경하지 않았습니다. [판별 변경 요약과 라운드별 묶음 수](review.md#제12판에서-달라진-내용), [보존 근거 연결](../review/evidence-provenance.json)
+
+| 기본 검사 | 1.2판 결과와 범위 |
+| --- | --- |
+| `check_docs.py` | PASS: 상세 100장, UTF-8·구조·목차·로컬 링크·장별 검토 hash |
+| `verify_examples.py` | PASS: 60개 원문에 연결한 산술·해석 185개 |
+| `verify_contracts.py` | PASS: 어댑터 경계 22개·본문 계산 28개·저장 실습 hash |
+| `verify_revision.py` | PASS: 기존 31개 시나리오·추가 계산 12개·1라운드 시계·2라운드 36개 판정·3라운드 27개 판정/525 gzip의 저장 근거 |
+| `build_book.py --check` | PASS: 제1.2판·2026-10-06 표기의 BOOK.md가 원문 122개와 일치 |
+| `build_html.py --check` | PASS: BOOK.html이 동일 원문·판 정보·고정 renderer와 일치 |
+
+Windows Python에서 아래 여섯 기본 검사를 실행했습니다. 판 표기·장 수를 목차와 대조했고 보존 실습 파일 및 상세 라운드 기록이 변경되지 않았음도 확인했습니다. 검증 스크립트의 성공을 새 실습 실행이나 모든 문장의 자동 사실 판정으로 해석하지 않습니다.
+
+이번 발행에서는 Linux/DB 실습·외부 URL 전수 조회·브라우저 화면 검사를 새로 실행하지 않았습니다. 기존 [화면 검사 기록](../review/html-check.json)은 이전 3f 통합본의 hash에 해당하며 1.2판 생성본의 화면 PASS가 아닙니다. HTML 자동 생성 일치와 브라우저 표시 검사를 구분합니다. 아래 3f·3e 등의 절은 당시 결과와 제한의 이력입니다.
 
 ## 3f MySQL r2 출판과 3라운드 검증
 
@@ -189,23 +206,27 @@ MySQL은 위 8.4.11·9.7.2 r1·r2의 소유 임시 인스턴스에서 실행했�
 
 ## 문서 검사 재현
 
-저장소 루트에서 실행합니다. HTML 생성 의존성만 별도 설치합니다.
+저장소 루트에서 실행합니다. HTML 생성에는 `requirements-docs.txt`의 고정 의존성이 필요하며 이미 설치되어 있으면 설치를 반복하지 않습니다. 다음은 1.2판 발행에서 실행한 재생성 두 명령과 기본 검사 여섯 명령입니다. 실습 서버를 띄우거나 기존 결과를 덮어쓰지 않습니다.
 
 ```powershell
-python -m pip install -r requirements-docs.txt
-python scripts/build_book.py
-python scripts/build_html.py
-python scripts/check_docs.py
-python scripts/verify_examples.py
-python scripts/verify_contracts.py
-python scripts/verify_revision.py
-python scripts/verify_review_r1.py
-python scripts/build_book.py --check
-python scripts/build_html.py --check
-python scripts/check_html.py
+python -X utf8 -B scripts/build_book.py
+python -X utf8 -B scripts/build_html.py
+python -X utf8 -B scripts/check_docs.py
+python -X utf8 -B scripts/verify_examples.py
+python -X utf8 -B scripts/verify_contracts.py
+python -X utf8 -B scripts/verify_revision.py
+python -X utf8 -B scripts/build_book.py --check
+python -X utf8 -B scripts/build_html.py --check
 ```
 
-`check_html.py`는 Node 22 이상과 Chrome을 사용합니다. Windows 기본 경로 외의 Chromium은 `--browser`로 지정합니다. URL 상태를 다시 확인하려면 `python scripts/check_sources.py`를 실행합니다. 상태는 출판 때와 달라질 수 있습니다.
+저장된 라운드별 증거만 별도로 확인하려면 아래 명령을 사용합니다. `verify_revision.py`의 출판 근거 검사에도 이 범위가 포함됩니다.
+
+```powershell
+python -X utf8 -B scripts/verify_review_r2.py --published
+python -X utf8 -B scripts/verify_review_r3.py --published
+```
+
+선택적인 화면 검사는 `python -X utf8 -B scripts/check_html.py`이며 Node 22 이상과 Chrome을 사용합니다. Windows 기본 경로 외 Chromium은 `--browser`로 지정합니다. URL 접근 상태 재조회는 `python -X utf8 -B scripts/check_sources.py`입니다. 두 작업은 이번 발행에서 실행하지 않았으며, URL 접근 성공이 문장의 사실성을 판정하지 않습니다.
 
 ## Linux 실습 재현
 

@@ -2,7 +2,7 @@
 
 # 통합 모니터링 도메인 지식서
 
-> 제1.1판 · 기준일: 2026-10-04 · 상세 본문 100장
+> 제1.2판 · 기준일: 2026-10-06 · 상세 본문 100장
 
 통합 모니터링 제품을 설계·구현하는 개발자를 위한 지식서입니다. 공식 자료로 확인한 설명, 가상 계산, 설계 제안을 구분합니다.
 
@@ -12,7 +12,7 @@
 
 - **시작하기**
   - [이 지식서를 읽는 방법](#chapter-docs-reading-guide)
-  - [제1판의 범위와 사실 확인 원칙](#chapter-docs-scope)
+  - [제1.2판의 범위와 사실 확인 원칙](#chapter-docs-scope)
 - **공통 관측**
   - [모니터링 공통 개념](#chapter-docs-foundations-readme)
   - [처음 읽는 시스템 지도: 요청 하나가 지나가는 길](#chapter-docs-foundations-system-map)
@@ -140,9 +140,9 @@
 - **참조와 검증**
   - [통합 모니터링 용어집](#chapter-docs-glossary)
   - [단위와 대표 지표의 해석 참조표](#chapter-docs-metric-catalog)
-  - [제1.1판의 분야별 범위](#chapter-docs-coverage)
-  - [제1.1판 검증 기록](#chapter-docs-validation)
-  - [제1.1판의 검토와 수정 기록](#chapter-docs-review)
+  - [제1.2판의 분야별 범위](#chapter-docs-coverage)
+  - [제1.2판 검증 기록](#chapter-docs-validation)
+  - [제1.2판의 검토와 수정 기록](#chapter-docs-review)
   - [문서 작성 가이드](#chapter-contributing)
   - [주제 문서 작성 템플릿](#chapter-templates-topic)
   - [지표 명세 작성 템플릿](#chapter-templates-metric)
@@ -155,7 +155,7 @@
 
 ## 이 지식서를 읽는 방법
 
-이 책은 통합 모니터링 제품을 만드는 개발자가 도메인 지식을 처음부터 익히도록 구성한 제1.1판입니다. 낯선 용어가 나와도 외부 문서를 모두 읽어야 다음으로 넘어가도록 구성하지 않았습니다. 핵심 설명은 본문에 두고 출처는 그 설명을 확인할 근거로 연결했습니다.
+이 책은 통합 모니터링 제품을 만드는 개발자가 도메인 지식을 처음부터 익히도록 구성한 제1.2판입니다. 낯선 용어가 나와도 외부 문서를 모두 읽어야 다음으로 넘어가도록 구성하지 않았습니다. 핵심 설명은 본문에 두고 출처는 그 설명을 확인할 근거로 연결했습니다.
 
 <a id="chapter-docs-reading-guide--한-파일로-읽기"></a>
 
@@ -276,17 +276,17 @@ Kafka broker·share group은 [Kafka](#chapter-docs-middleware-kafka), Windows의
 
 <a id="chapter-docs-scope"></a>
 
-<a id="chapter-docs-scope--제1판의-범위와-사실-확인-원칙"></a>
+<a id="chapter-docs-scope--제12판의-범위와-사실-확인-원칙"></a>
 
-## 제1판의 범위와 사실 확인 원칙
+## 제1.2판의 범위와 사실 확인 원칙
 
-이 지식서는 통합 모니터링 제품을 설계·구현하는 개발자를 위한 제1.1판입니다. 도메인 지식이 많지 않은 독자가 **개념 → 동작 → 관측 → 해석 → 장애 분석 → 제품 설계**를 한 권에서 따라가도록 작성했습니다. 특정 OS·클라우드·DB 하나만 지원하는 제품으로 가정하지 않습니다.
+이 지식서는 통합 모니터링 제품을 설계·구현하는 개발자를 위한 제1.2판입니다. 판 기준일은 **2026-10-06**입니다. 도메인 지식이 많지 않은 독자가 **개념 → 동작 → 관측 → 해석 → 장애 분석 → 제품 설계**를 한 권에서 따라가도록 작성했습니다. 특정 OS·클라우드·DB 하나만 지원하는 제품으로 가정하지 않습니다.
 
 <a id="chapter-docs-scope--완성판의-범위"></a>
 
 ### 완성판의 범위
 
-12개 분야의 개요와 92개 상세 장, 용어·지표 참조, 실제 실습과 검증 기록을 제공합니다. CPU·메모리·I/O·네트워크부터 컨테이너·Kubernetes·앱·DB·미들웨어·클라우드, 그리고 제품 자체의 데이터 처리를 연결합니다. 개요 파일이나 링크 목록만으로 상세 장 수를 늘리지 않았습니다.
+12개 분야의 개요와 100개 상세 장, 용어·지표 참조, 실제 실습과 검증 기록을 제공합니다. CPU·메모리·I/O·네트워크부터 컨테이너·Kubernetes·앱·DB·미들웨어·클라우드, 그리고 제품 자체의 데이터 처리를 연결합니다. 개요 파일이나 링크 목록만으로 상세 장 수를 늘리지 않았습니다.
 
 이 판의 완성은 정한 학습 범위의 원고·예시·연결·검토를 갖추었다는 의미입니다. 모든 제조사의 모든 API 필드를 열거한 사전이나, 아직 주어지지 않은 사용자 제품의 실제 연동 인증을 의미하지 않습니다. 버전별 모든 조합을 실제로 실행한 것으로 표시하지 않습니다.
 
@@ -310,7 +310,7 @@ Kafka broker·share group은 [Kafka](#chapter-docs-middleware-kafka), Windows의
 
 ### 확인 날짜와 버전
 
-장은 해당 설명을 검토한 날짜와 범위를 표시합니다. 기존 장의 출처 확인일 2026-10-03과 편집 검토일 2026-10-04는 서로 다른 기록입니다. 제1.1판에서 다시 대조한 주요 주장과 수정 이유는 별도의 사실 검토 기록에 남겼습니다. 확인일이 제품의 출시일을 뜻하지도 않습니다.
+장은 해당 설명을 검토한 날짜와 범위를 표시합니다. 기존 장의 출처 확인일 2026-10-03과 편집 검토일 2026-10-04는 서로 다른 기록입니다. 제1.1판에서 다시 대조한 주요 주장과 수정 이유는 별도의 사실 검토 기록에 남겼습니다. 제1.2판은 이후 세 라운드의 교차 검토와 새 실습을 반영했습니다. 판 기준일을 올렸다고 모든 장의 원천을 그날 다시 확인하거나 모든 실습을 재실행한 것은 아닙니다. 확인일이 제품의 출시일을 뜻하지도 않습니다.
 
 고정 버전 문서와 `latest` 문서는 구분합니다. 실습 버전은 재현을 위해 고정했으며 최신 버전 추천을 의미하지 않습니다. 실제 제품 어댑터는 대상에서 OS·엔진·runtime·API 버전과 capability를 확인해야 합니다.
 
@@ -320,7 +320,7 @@ Kafka broker·share group은 [Kafka](#chapter-docs-middleware-kafka), Windows의
 
 - **문서 검토:** 설명·단위·범위·가상 예시·제안의 구분을 확인합니다.
 - **자동 문서·코드 검사:** 구조·로컬 링크·목차·대표 계산·계약 입력·생성본 일치를 확인합니다.
-- **실제 실행:** 명시한 로컬 환경에서 SQLite·HTTP·Windows API·PromQL과 Linux procfs·PostgreSQL·Kubernetes API·OTel Collector 동작을 확인합니다. 도구를 실행한 사실과 각 시나리오의 검증 범위를 구분합니다.
+- **실제 실행:** 명시한 로컬 환경에서 SQLite·HTTP·Windows API·PromQL과 Linux procfs·PostgreSQL·MySQL·Kubernetes API·OTel Collector 동작을 확인합니다. 도구를 실행한 사실과 각 시나리오의 검증 범위를 구분합니다.
 
 외부 URL의 HTTP 조회는 접근 상태 검사이며 문장별 사실 판정과 다릅니다. 실제 운영 클러스터·상용 장비·cloud 계정에서 실행하지 않은 항목은 실행 완료로 표시하지 않습니다. 세부 증거는 [검증 기록](#chapter-docs-validation)과 [검토 기록](#chapter-docs-review)에 있습니다.
 
@@ -12480,11 +12480,11 @@ OTLP의 성공·partial success·retry 규약을 제품 내부 영속성 보장�
 
 <a id="chapter-docs-coverage"></a>
 
-<a id="chapter-docs-coverage--제11판의-분야별-범위"></a>
+<a id="chapter-docs-coverage--제12판의-분야별-범위"></a>
 
-## 제1.1판의 분야별 범위
+## 제1.2판의 분야별 범위
 
-판 기준일은 2026-10-04로 유지하며, 2026-10-06 3f 반영 원고는 **12개 분야, 상세 본문 100장**입니다. 표는 읽을 수 있는 본문의 범위이며 사용자 제품의 지원 여부를 뜻하지 않습니다.
+판 기준일은 **2026-10-06**이며, 세 라운드의 교차 검토를 반영한 제1.2판은 **12개 분야, 상세 본문 100장**입니다. 표는 읽을 수 있는 본문의 범위이며 사용자 제품의 지원 여부를 뜻하지 않습니다.
 
 | 분야 | 상세 장 | 이번 판에서 다루는 내용 |
 | --- | ---: | --- |
@@ -12501,13 +12501,15 @@ OTLP의 성공·partial success·retry 규약을 제품 내부 영속성 보장�
 | [도메인 간 분석](#chapter-docs-cross-domain-readme) | 7 | 지연·자원·적체·관측 중단 사례, 실제 로컬 실습, 종합 연습과 해설 |
 | [제품 설계](#chapter-docs-product-readme) | 9 | 정체성·관계·수집·저장·질의·알림·tenant 접근·자체 관측, adapter 계약·용량 |
 
-추가한 장은 [측정과 비교](#chapter-docs-foundations-measurement-and-comparability), [Linux 실습](#chapter-docs-host-linux-observation-lab), [연결 수명](#chapter-docs-network-dns-and-connection-lifecycle), [쓰기 지속성](#chapter-docs-storage-write-path-and-durability), [메모리 계정](#chapter-docs-containers-memory-accounting-and-oom), [인벤토리](#chapter-docs-kubernetes-inventory-consistency), [sampling](#chapter-docs-application-trace-sampling-and-context), [PostgreSQL 실습](#chapter-docs-database-postgresql-concurrency-lab), [cloud 재조회](#chapter-docs-cloud-late-data-and-reconciliation), [분석 연습](#chapter-docs-cross-domain-investigation-workbook), [전송 계약](#chapter-docs-product-telemetry-delivery-contracts), [필드 수용 기준](#chapter-docs-product-compatibility-and-acceptance)입니다.
+제1.1판에서 추가했던 12개 장은 [측정과 비교](#chapter-docs-foundations-measurement-and-comparability), [Linux 실습](#chapter-docs-host-linux-observation-lab), [연결 수명](#chapter-docs-network-dns-and-connection-lifecycle), [쓰기 지속성](#chapter-docs-storage-write-path-and-durability), [메모리 계정](#chapter-docs-containers-memory-accounting-and-oom), [인벤토리](#chapter-docs-kubernetes-inventory-consistency), [sampling](#chapter-docs-application-trace-sampling-and-context), [PostgreSQL 실습](#chapter-docs-database-postgresql-concurrency-lab), [cloud 재조회](#chapter-docs-cloud-late-data-and-reconciliation), [분석 연습](#chapter-docs-cross-domain-investigation-workbook), [전송 계약](#chapter-docs-product-telemetry-delivery-contracts), [필드 수용 기준](#chapter-docs-product-compatibility-and-acceptance)입니다.
+
+제1.2판은 그 92장에 교차 검토 2·3라운드의 **8장**을 더했습니다. [새 장과 변경 요약](#chapter-docs-review--제12판에서-달라진-내용)에 분야별 질문을 정리했고, 아래에는 당시 보강·실습 이력을 보존합니다.
 
 <a id="chapter-docs-coverage--2026-10-05-원고-보강의-범위"></a>
 
 ### 2026-10-05 원고 보강의 범위
 
-2라운드에서는 5장을 추가하고 기존 장을 보강했습니다. 2d에서 Claude가 실행한 네 묶음의 결과를 별도로 출판했습니다. 총 36개 판정은 가설 지지 34개·반증 2개이며, 반증은 cache를 켠 Kubernetes 두 버전에서 compaction만으로 Exact LIST의 410을 유발하지 못한 관측입니다. 판 번호와 과거 결과는 유지합니다. [실습 조건·원시 결과](#chapter-docs-cross-domain-reproducible-labs), [검증 기록](#chapter-docs-validation)
+2라운드에서는 5장을 추가하고 기존 장을 보강했습니다. 2d에서 Claude가 실행한 네 묶음의 결과를 별도로 출판했습니다. 총 36개 판정은 가설 지지 34개·반증 2개이며, 반증은 cache를 켠 Kubernetes 두 버전에서 compaction만으로 Exact LIST의 410을 유발하지 못한 관측입니다. 그 라운드 당시 판 번호와 과거 결과는 유지했습니다. [실습 조건·원시 결과](#chapter-docs-cross-domain-reproducible-labs), [검증 기록](#chapter-docs-validation)
 
 | 요청 주제 | 읽을 본문 | 포함한 경계 |
 | --- | --- | --- |
@@ -12609,11 +12611,30 @@ Linux 커널·WSL 배포판, Python·SQLite·브라우저·문서 renderer 버�
 
 <a id="chapter-docs-validation"></a>
 
-<a id="chapter-docs-validation--제11판-검증-기록"></a>
+<a id="chapter-docs-validation--제12판-검증-기록"></a>
 
-## 제1.1판 검증 기록
+## 제1.2판 검증 기록
 
-판 기준일은 **2026-10-04**로 유지합니다. 3f 결과 반영·검사는 **2026-10-06**, 기존 실행·화면 기록은 각 기록의 날짜를 따릅니다. 공식 원천의 의미 검토, 자동 문서 검사, 실제 실행, 화면 확인의 범위를 나누어 기록합니다. 사용자 제품이나 운영 환경 전체의 지원 인증을 뜻하지 않습니다.
+판 기준일은 **2026-10-06**입니다. 제1.2판은 상세 100장·통합 원문 122개로 구성됩니다. 과거 실행·원천 확인·화면 기록은 각각의 날짜와 적용 파일을 보존합니다. 아래 발행 검사와 이어지는 라운드별 이력을 구분하며 사용자 제품의 운영 지원 인증을 뜻하지 않습니다.
+
+<a id="chapter-docs-validation--제12판-발행-검사--2026-10-06"></a>
+
+### 제1.2판 발행 검사 — 2026-10-06
+
+발행 작업은 현재 판 표기·변경 요약·검증 안내를 갱신하고 BOOK.md·BOOK.html을 재생성했습니다. 제1.1판의 기존 31개 시나리오와 세 라운드에서 출판한 실행 결과·verdict·입력 hash는 변경하지 않았습니다. [판별 변경 요약과 라운드별 묶음 수](#chapter-docs-review--제12판에서-달라진-내용), [보존 근거 연결](review/evidence-provenance.json)
+
+| 기본 검사 | 1.2판 결과와 범위 |
+| --- | --- |
+| `check_docs.py` | PASS: 상세 100장, UTF-8·구조·목차·로컬 링크·장별 검토 hash |
+| `verify_examples.py` | PASS: 60개 원문에 연결한 산술·해석 185개 |
+| `verify_contracts.py` | PASS: 어댑터 경계 22개·본문 계산 28개·저장 실습 hash |
+| `verify_revision.py` | PASS: 기존 31개 시나리오·추가 계산 12개·1라운드 시계·2라운드 36개 판정·3라운드 27개 판정/525 gzip의 저장 근거 |
+| `build_book.py --check` | PASS: 제1.2판·2026-10-06 표기의 BOOK.md가 원문 122개와 일치 |
+| `build_html.py --check` | PASS: BOOK.html이 동일 원문·판 정보·고정 renderer와 일치 |
+
+Windows Python에서 아래 여섯 기본 검사를 실행했습니다. 판 표기·장 수를 목차와 대조했고 보존 실습 파일 및 상세 라운드 기록이 변경되지 않았음도 확인했습니다. 검증 스크립트의 성공을 새 실습 실행이나 모든 문장의 자동 사실 판정으로 해석하지 않습니다.
+
+이번 발행에서는 Linux/DB 실습·외부 URL 전수 조회·브라우저 화면 검사를 새로 실행하지 않았습니다. 기존 [화면 검사 기록](review/html-check.json)은 이전 3f 통합본의 hash에 해당하며 1.2판 생성본의 화면 PASS가 아닙니다. HTML 자동 생성 일치와 브라우저 표시 검사를 구분합니다. 아래 3f·3e 등의 절은 당시 결과와 제한의 이력입니다.
 
 <a id="chapter-docs-validation--3f-mysql-r2-출판과-3라운드-검증"></a>
 
@@ -12826,23 +12847,27 @@ MySQL은 위 8.4.11·9.7.2 r1·r2의 소유 임시 인스턴스에서 실행했�
 
 ### 문서 검사 재현
 
-저장소 루트에서 실행합니다. HTML 생성 의존성만 별도 설치합니다.
+저장소 루트에서 실행합니다. HTML 생성에는 `requirements-docs.txt`의 고정 의존성이 필요하며 이미 설치되어 있으면 설치를 반복하지 않습니다. 다음은 1.2판 발행에서 실행한 재생성 두 명령과 기본 검사 여섯 명령입니다. 실습 서버를 띄우거나 기존 결과를 덮어쓰지 않습니다.
 
 ```powershell
-python -m pip install -r requirements-docs.txt
-python scripts/build_book.py
-python scripts/build_html.py
-python scripts/check_docs.py
-python scripts/verify_examples.py
-python scripts/verify_contracts.py
-python scripts/verify_revision.py
-python scripts/verify_review_r1.py
-python scripts/build_book.py --check
-python scripts/build_html.py --check
-python scripts/check_html.py
+python -X utf8 -B scripts/build_book.py
+python -X utf8 -B scripts/build_html.py
+python -X utf8 -B scripts/check_docs.py
+python -X utf8 -B scripts/verify_examples.py
+python -X utf8 -B scripts/verify_contracts.py
+python -X utf8 -B scripts/verify_revision.py
+python -X utf8 -B scripts/build_book.py --check
+python -X utf8 -B scripts/build_html.py --check
 ```
 
-`check_html.py`는 Node 22 이상과 Chrome을 사용합니다. Windows 기본 경로 외의 Chromium은 `--browser`로 지정합니다. URL 상태를 다시 확인하려면 `python scripts/check_sources.py`를 실행합니다. 상태는 출판 때와 달라질 수 있습니다.
+저장된 라운드별 증거만 별도로 확인하려면 아래 명령을 사용합니다. `verify_revision.py`의 출판 근거 검사에도 이 범위가 포함됩니다.
+
+```powershell
+python -X utf8 -B scripts/verify_review_r2.py --published
+python -X utf8 -B scripts/verify_review_r3.py --published
+```
+
+선택적인 화면 검사는 `python -X utf8 -B scripts/check_html.py`이며 Node 22 이상과 Chrome을 사용합니다. Windows 기본 경로 외 Chromium은 `--browser`로 지정합니다. URL 접근 상태 재조회는 `python -X utf8 -B scripts/check_sources.py`입니다. 두 작업은 이번 발행에서 실행하지 않았으며, URL 접근 성공이 문장의 사실성을 판정하지 않습니다.
 
 <a id="chapter-docs-validation--linux-실습-재현"></a>
 
@@ -12874,11 +12899,66 @@ python3 scripts/run_otel_lab.py
 
 <a id="chapter-docs-review"></a>
 
-<a id="chapter-docs-review--제11판의-검토와-수정-기록"></a>
+<a id="chapter-docs-review--제12판의-검토와-수정-기록"></a>
 
-## 제1.1판의 검토와 수정 기록
+## 제1.2판의 검토와 수정 기록
 
-2026-10-04에 작성·자체 검토·공식 원천 대조·실제 실행을 반복한 보강판입니다. 제1.0판의 80장에서 **92장**으로 확장했습니다. 이번 검토는 작성자의 자체 검토이며 외부 전문가 감수를 의미하지 않습니다. 실행 환경과 자동 검사 결과는 [검증 기록](#chapter-docs-validation)에 있습니다.
+제1.2판의 기준일은 **2026-10-06**입니다. 제1.1판의 **92장에 8장을 더해 100장**으로 확장하고 Claude–Codex 교차 검토 세 라운드의 정정·실행 근거를 반영했습니다. 두 AI의 교차 검토와 명시된 로컬 환경의 실행이며 **외부 전문가 감수나 모든 운영 환경의 지원 인증은 아닙니다.** 발행 검사는 [검증 기록](#chapter-docs-validation)에 있습니다.
+
+<a id="chapter-docs-review--제12판에서-달라진-내용"></a>
+
+### 제1.2판에서 달라진 내용
+
+<a id="chapter-docs-review--새로-추가한-8장"></a>
+
+#### 새로 추가한 8장
+
+| 장 | 독자가 배울 내용 | 추가 라운드 |
+| --- | --- | --- |
+| [Linux 네트워크 스택 카운터](#chapter-docs-network-linux-stack-counters) | TCP·UDP·namespace 범위, 재전송 비율과 원천 필드의 한계 | 2 |
+| [Kubernetes 자원 압박과 종료](#chapter-docs-kubernetes-pressure-and-termination) | QoS·eviction·OOM 증거와 실제 자원 한도의 변화 | 2 |
+| [PostgreSQL 운영 관측](#chapter-docs-database-postgresql-operations) | 오래된 XID·회수 기준점·권한·버전별 통계 view | 2 |
+| [지표 문맥과 카운터 시작 시각](#chapter-docs-foundations-metric-context-and-start-time) | exemplar의 trace 연결, 시작 시각과 첫 증가분 | 2 |
+| [OpenTelemetry 이름·단위·안정성](#chapter-docs-application-semantic-conventions) | HTTP·JVM·.NET 지표 이름을 적용 버전과 함께 해석 | 2 |
+| [메모리 회수와 OOM](#chapter-docs-host-reclaim-and-oom) | 회수·swap·OOM 원천의 모집단과 종료 증거 | 3 |
+| [MySQL 잠금·커밋·복제](#chapter-docs-database-mysql-operations) | gap/next-key 잠금, 지속성 설정, GTID와 복제 표시의 완료 시점 | 3 |
+| [분포 저장 형식](#chapter-docs-foundations-histogram-storage) | exponential/native histogram·sketch의 해상도·병합·보간 | 3 |
+
+기존 장에도 PSI·프로세스 메모리·시계 동기화·SQL Server·Oracle·런타임·로그 손실·HAProxy·GPU를 보강했습니다. 새 장은 쉬운 상황 설명에서 시작해 원천 정의, 단위·계산, 해석 함정, 제품 적용 제안, 이해 확인으로 이어집니다.
+
+<a id="chapter-docs-review--세-라운드의-주요-정정"></a>
+
+#### 세 라운드의 주요 정정
+
+| 라운드 | 바로잡거나 범위를 명확히 한 내용 | 상세 판단·원천 |
+| --- | --- | --- |
+| 1 | CPU 계정과 MONOTONIC 분모를 구분하고 RAW·adjtimex 관측을 추가. diskstats wrap, StatefulSet 순서, DB 회수 기준점, DNS 응답 귀속 등을 정정. Kubernetes 비교 규약과 고정 실습 버전의 상태를 분리 | [1라운드 기록](review/claude-codex-r1.md) |
+| 2 | Collector의 재시도 중/소진 뒤 실패 계수와 queue 응답 경계를 실측. cache-on Kubernetes의 과거 Exact LIST 200을 반증으로 보존. PostgreSQL 12→13 실행 시간 매핑, Linux TCP·Kubernetes QoS/종료·지표 문맥의 버전 경계를 정정 | [2라운드 기록](review/claude-codex-r2.md) |
+| 3 | Linux 회수 계수의 모집단, zswap/zram 계정, OOM 작업·희생자를 구분. native histogram 안정화·변환 규약과 런타임·로그 지표의 도입 범위를 보완. MySQL sys 가시성과 GTID/coordinator/SBS 완료를 혼동한 실습 조건을 고치고 r2로 재확인 | [3라운드 기록](review/claude-codex-r3.md) |
+
+<a id="chapter-docs-review--새로-보존한-실습과-판정"></a>
+
+#### 새로 보존한 실습과 판정
+
+| 라운드 | 출판 묶음 | 원래 기록의 판정 | 무엇을 확인했는가 |
+| --- | ---: | --- | --- |
+| 1 | 1 | passed 3·observed 2 | [Linux 재관측](labs/results/1.1-linux-clock-r1.json): 파싱·메모리·I/O 검사와 CPU/cgroup 관측. CPU 4구간·idle 61표본을 포함하며 외부 시간 교정 인증은 아님 |
+| 2 | 4 | supported 34·refuted 2, 합계 36 | Kubernetes cache 두 구성·두 버전, Collector 내부 관측, PostgreSQL 회수 기준점, promtool 규칙 재평가 |
+| 3 | 7 | supported 23·refuted 4, 합계 27 | 메모리·분포·시계와 MySQL 두 버전의 r1·r2. gzip 원자료 525개 보존 |
+
+서로 다른 실행기의 판정 형식과 반복 실행을 구분합니다. 3라운드의 최종 채택 실행은 메모리·분포·시계·MySQL r2의 17개 supported 조건이며, 표의 27에는 설계 전제를 반증한 MySQL r1도 포함합니다. 이를 모두 독립적인 제품 기능 시험으로 합산하지 않습니다. 결과와 입력 hash는 [provenance](review/evidence-provenance.json), 실행 조건은 [실습 해설](#chapter-docs-cross-domain-reproducible-labs)에 연결했습니다.
+
+제1.1판에서 실행한 5묶음·31개 시나리오, `1.1-*` 결과 파일 이름, 실행 당시 verdict·버전·시각·hash는 그대로입니다. 이번 발행은 원고와 현재 판 안내를 1.2로 올리는 작업이며 새 Linux/DB 실습을 수행한 것이 아닙니다.
+
+<a id="chapter-docs-review--남은-미확인과-실행-범위"></a>
+
+#### 남은 미확인과 실행 범위
+
+- Lambda suppressed init의 REPORT 설명을 CloudWatch Duration 포함 여부로 확장할 직접적인 공식 문장은 확인하지 못했습니다.
+- WSL tick 설정 주체·RAW의 외부 정확도, MySQL r1의 내부 clock_diff와 SBS 13의 정확한 산술 원인은 미확인입니다. 최초 CPU 1.06 표본의 원인도 기록에 없던 RAW·tick으로 소급 확정하지 않습니다.
+- Kubernetes cache-on의 Exact LIST 200은 관측했지만 특정 feature gate를 분리 변경하지 않아 그 기능의 인과까지 확정하지 않았습니다.
+
+운영 클러스터·cloud 계정·상용 장비·전원 장애와 모든 버전 조합을 실행하지 않았습니다. 판 기준일 변경을 모든 원천의 재확인 날짜로 사용하지 않으며, 각 장의 확인일·고정 버전과 [범위 원칙](#chapter-docs-scope)을 따릅니다. 아래에는 판 번호를 유지하며 작업했던 교차 검토와 제1.1판의 작성 이력을 보존합니다.
 
 <a id="chapter-docs-review--claudecodex-교차-검토-3차-원고-보강과-3f-결과-확정"></a>
 
@@ -12898,7 +12978,7 @@ Kubernetes v1.37.0 코드에서 hugepage 보정이 Summary API의 node.memory.av
 
 ### Claude–Codex 교차 검토 2차: 원고 보강과 실행 근거
 
-2026-10-05에는 위 92장에 5장을 추가해 상세 97장으로 보강했습니다. G1–G5 필수 주제와 G6–G12를 공식 문서·명세·버전 소스에 대조했고, 2d에서는 Claude가 전달한 네 최종 실행 결과를 출판했습니다. 주제별 원천·위치·채택하지 않은 단서와 이유, 2c 지적 29개와 추가 단서의 판정은 [2라운드 기록](review/claude-codex-r2.md)에 있습니다. 과거 1.1 실행 결과·hash와 판 번호·판 기준일은 유지합니다.
+2026-10-05에는 위 92장에 5장을 추가해 상세 97장으로 보강했습니다. G1–G5 필수 주제와 G6–G12를 공식 문서·명세·버전 소스에 대조했고, 2d에서는 Claude가 전달한 네 최종 실행 결과를 출판했습니다. 주제별 원천·위치·채택하지 않은 단서와 이유, 2c 지적 29개와 추가 단서의 판정은 [2라운드 기록](review/claude-codex-r2.md)에 있습니다. 그 라운드 당시 과거 1.1 실행 결과·hash와 판 번호·판 기준일을 유지했습니다.
 
 Windows Task Manager의 CPU를 모든 빌드에서 Utility로 단정하지 않고, EC2 basic의 상태 검사 1분 예외, datagram용 RFC 8899의 범위, SNMP RFC 내 650 Mbit/s 경계 표현 차이를 명시했습니다. 새 예시 산술을 기존 검사에 연결했으며 저장 근거 검사와 실제 서버 재실행을 계속 구분합니다.
 
@@ -12911,6 +12991,12 @@ Windows Task Manager의 CPU를 모든 빌드에서 Utility로 단정하지 않�
 ### Claude–Codex 교차 검토 1차
 
 동일한 제1.1판에 A·B·C 정정을 반영했습니다. [항목별 판정과 직접 확인한 원천](review/claude-codex-r1.md)에 수용 범위, 다른 수정 방식을 택한 이유, 1b에서 이어 받은 Linux 재실행 근거를 기록했습니다. AI 간 교차 검토이며 외부 전문가 인증은 아닙니다. 판 번호와 기준일, 과거 실행 원시 결과는 유지했습니다. 최신 버전으로 실행하지 않은 항목은 [버전 상태 표](#chapter-docs-coverage--교차-검토-시점의-버전-상태)에서 구분합니다.
+
+<a id="chapter-docs-review--제11판-작성-당시의-기록"></a>
+
+### 제1.1판 작성 당시의 기록
+
+2026-10-04에 작성·자체 검토·공식 원천 대조·실제 실행을 반복한 보강판입니다. 제1.0판의 80장에서 **92장**으로 확장했습니다. 이번 검토는 작성자의 자체 검토이며 외부 전문가 감수를 의미하지 않습니다. 실행 환경과 자동 검사 결과는 [검증 기록](#chapter-docs-validation)에 있습니다.
 
 <a id="chapter-docs-review--보강을-결정한-이유"></a>
 

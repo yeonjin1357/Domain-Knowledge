@@ -1,6 +1,6 @@
-# 제1.1판의 분야별 범위
+# 제1.2판의 분야별 범위
 
-판 기준일은 2026-10-04로 유지하며, 2026-10-06 3f 반영 원고는 **12개 분야, 상세 본문 100장**입니다. 표는 읽을 수 있는 본문의 범위이며 사용자 제품의 지원 여부를 뜻하지 않습니다.
+판 기준일은 **2026-10-06**이며, 세 라운드의 교차 검토를 반영한 제1.2판은 **12개 분야, 상세 본문 100장**입니다. 표는 읽을 수 있는 본문의 범위이며 사용자 제품의 지원 여부를 뜻하지 않습니다.
 
 | 분야 | 상세 장 | 이번 판에서 다루는 내용 |
 | --- | ---: | --- |
@@ -17,11 +17,13 @@
 | [도메인 간 분석](cross-domain/README.md) | 7 | 지연·자원·적체·관측 중단 사례, 실제 로컬 실습, 종합 연습과 해설 |
 | [제품 설계](product/README.md) | 9 | 정체성·관계·수집·저장·질의·알림·tenant 접근·자체 관측, adapter 계약·용량 |
 
-추가한 장은 [측정과 비교](foundations/measurement-and-comparability.md), [Linux 실습](host/linux-observation-lab.md), [연결 수명](network/dns-and-connection-lifecycle.md), [쓰기 지속성](storage/write-path-and-durability.md), [메모리 계정](containers/memory-accounting-and-oom.md), [인벤토리](kubernetes/inventory-consistency.md), [sampling](application/trace-sampling-and-context.md), [PostgreSQL 실습](database/postgresql-concurrency-lab.md), [cloud 재조회](cloud/late-data-and-reconciliation.md), [분석 연습](cross-domain/investigation-workbook.md), [전송 계약](product/telemetry-delivery-contracts.md), [필드 수용 기준](product/compatibility-and-acceptance.md)입니다.
+제1.1판에서 추가했던 12개 장은 [측정과 비교](foundations/measurement-and-comparability.md), [Linux 실습](host/linux-observation-lab.md), [연결 수명](network/dns-and-connection-lifecycle.md), [쓰기 지속성](storage/write-path-and-durability.md), [메모리 계정](containers/memory-accounting-and-oom.md), [인벤토리](kubernetes/inventory-consistency.md), [sampling](application/trace-sampling-and-context.md), [PostgreSQL 실습](database/postgresql-concurrency-lab.md), [cloud 재조회](cloud/late-data-and-reconciliation.md), [분석 연습](cross-domain/investigation-workbook.md), [전송 계약](product/telemetry-delivery-contracts.md), [필드 수용 기준](product/compatibility-and-acceptance.md)입니다.
+
+제1.2판은 그 92장에 교차 검토 2·3라운드의 **8장**을 더했습니다. [새 장과 변경 요약](review.md#제12판에서-달라진-내용)에 분야별 질문을 정리했고, 아래에는 당시 보강·실습 이력을 보존합니다.
 
 ## 2026-10-05 원고 보강의 범위
 
-2라운드에서는 5장을 추가하고 기존 장을 보강했습니다. 2d에서 Claude가 실행한 네 묶음의 결과를 별도로 출판했습니다. 총 36개 판정은 가설 지지 34개·반증 2개이며, 반증은 cache를 켠 Kubernetes 두 버전에서 compaction만으로 Exact LIST의 410을 유발하지 못한 관측입니다. 판 번호와 과거 결과는 유지합니다. [실습 조건·원시 결과](cross-domain/reproducible-labs.md), [검증 기록](validation.md)
+2라운드에서는 5장을 추가하고 기존 장을 보강했습니다. 2d에서 Claude가 실행한 네 묶음의 결과를 별도로 출판했습니다. 총 36개 판정은 가설 지지 34개·반증 2개이며, 반증은 cache를 켠 Kubernetes 두 버전에서 compaction만으로 Exact LIST의 410을 유발하지 못한 관측입니다. 그 라운드 당시 판 번호와 과거 결과는 유지했습니다. [실습 조건·원시 결과](cross-domain/reproducible-labs.md), [검증 기록](validation.md)
 
 | 요청 주제 | 읽을 본문 | 포함한 경계 |
 | --- | --- | --- |

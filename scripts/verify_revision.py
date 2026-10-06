@@ -1,4 +1,4 @@
-"""Check edition 1.1's published observations, input hashes and example arithmetic.
+"""Check published observations, historical input hashes and example arithmetic.
 
 This reads saved evidence; it does not rerun servers or automatically fact-check prose.
 """

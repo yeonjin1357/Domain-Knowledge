@@ -1,6 +1,51 @@
-# 제1.1판의 검토와 수정 기록
+# 제1.2판의 검토와 수정 기록
 
-2026-10-04에 작성·자체 검토·공식 원천 대조·실제 실행을 반복한 보강판입니다. 제1.0판의 80장에서 **92장**으로 확장했습니다. 이번 검토는 작성자의 자체 검토이며 외부 전문가 감수를 의미하지 않습니다. 실행 환경과 자동 검사 결과는 [검증 기록](validation.md)에 있습니다.
+제1.2판의 기준일은 **2026-10-06**입니다. 제1.1판의 **92장에 8장을 더해 100장**으로 확장하고 Claude–Codex 교차 검토 세 라운드의 정정·실행 근거를 반영했습니다. 두 AI의 교차 검토와 명시된 로컬 환경의 실행이며 **외부 전문가 감수나 모든 운영 환경의 지원 인증은 아닙니다.** 발행 검사는 [검증 기록](validation.md)에 있습니다.
+
+## 제1.2판에서 달라진 내용
+
+### 새로 추가한 8장
+
+| 장 | 독자가 배울 내용 | 추가 라운드 |
+| --- | --- | --- |
+| [Linux 네트워크 스택 카운터](network/linux-stack-counters.md) | TCP·UDP·namespace 범위, 재전송 비율과 원천 필드의 한계 | 2 |
+| [Kubernetes 자원 압박과 종료](kubernetes/pressure-and-termination.md) | QoS·eviction·OOM 증거와 실제 자원 한도의 변화 | 2 |
+| [PostgreSQL 운영 관측](database/postgresql-operations.md) | 오래된 XID·회수 기준점·권한·버전별 통계 view | 2 |
+| [지표 문맥과 카운터 시작 시각](foundations/metric-context-and-start-time.md) | exemplar의 trace 연결, 시작 시각과 첫 증가분 | 2 |
+| [OpenTelemetry 이름·단위·안정성](application/semantic-conventions.md) | HTTP·JVM·.NET 지표 이름을 적용 버전과 함께 해석 | 2 |
+| [메모리 회수와 OOM](host/reclaim-and-oom.md) | 회수·swap·OOM 원천의 모집단과 종료 증거 | 3 |
+| [MySQL 잠금·커밋·복제](database/mysql-operations.md) | gap/next-key 잠금, 지속성 설정, GTID와 복제 표시의 완료 시점 | 3 |
+| [분포 저장 형식](foundations/histogram-storage.md) | exponential/native histogram·sketch의 해상도·병합·보간 | 3 |
+
+기존 장에도 PSI·프로세스 메모리·시계 동기화·SQL Server·Oracle·런타임·로그 손실·HAProxy·GPU를 보강했습니다. 새 장은 쉬운 상황 설명에서 시작해 원천 정의, 단위·계산, 해석 함정, 제품 적용 제안, 이해 확인으로 이어집니다.
+
+### 세 라운드의 주요 정정
+
+| 라운드 | 바로잡거나 범위를 명확히 한 내용 | 상세 판단·원천 |
+| --- | --- | --- |
+| 1 | CPU 계정과 MONOTONIC 분모를 구분하고 RAW·adjtimex 관측을 추가. diskstats wrap, StatefulSet 순서, DB 회수 기준점, DNS 응답 귀속 등을 정정. Kubernetes 비교 규약과 고정 실습 버전의 상태를 분리 | [1라운드 기록](../review/claude-codex-r1.md) |
+| 2 | Collector의 재시도 중/소진 뒤 실패 계수와 queue 응답 경계를 실측. cache-on Kubernetes의 과거 Exact LIST 200을 반증으로 보존. PostgreSQL 12→13 실행 시간 매핑, Linux TCP·Kubernetes QoS/종료·지표 문맥의 버전 경계를 정정 | [2라운드 기록](../review/claude-codex-r2.md) |
+| 3 | Linux 회수 계수의 모집단, zswap/zram 계정, OOM 작업·희생자를 구분. native histogram 안정화·변환 규약과 런타임·로그 지표의 도입 범위를 보완. MySQL sys 가시성과 GTID/coordinator/SBS 완료를 혼동한 실습 조건을 고치고 r2로 재확인 | [3라운드 기록](../review/claude-codex-r3.md) |
+
+### 새로 보존한 실습과 판정
+
+| 라운드 | 출판 묶음 | 원래 기록의 판정 | 무엇을 확인했는가 |
+| --- | ---: | --- | --- |
+| 1 | 1 | passed 3·observed 2 | [Linux 재관측](../labs/results/1.1-linux-clock-r1.json): 파싱·메모리·I/O 검사와 CPU/cgroup 관측. CPU 4구간·idle 61표본을 포함하며 외부 시간 교정 인증은 아님 |
+| 2 | 4 | supported 34·refuted 2, 합계 36 | Kubernetes cache 두 구성·두 버전, Collector 내부 관측, PostgreSQL 회수 기준점, promtool 규칙 재평가 |
+| 3 | 7 | supported 23·refuted 4, 합계 27 | 메모리·분포·시계와 MySQL 두 버전의 r1·r2. gzip 원자료 525개 보존 |
+
+서로 다른 실행기의 판정 형식과 반복 실행을 구분합니다. 3라운드의 최종 채택 실행은 메모리·분포·시계·MySQL r2의 17개 supported 조건이며, 표의 27에는 설계 전제를 반증한 MySQL r1도 포함합니다. 이를 모두 독립적인 제품 기능 시험으로 합산하지 않습니다. 결과와 입력 hash는 [provenance](../review/evidence-provenance.json), 실행 조건은 [실습 해설](cross-domain/reproducible-labs.md)에 연결했습니다.
+
+제1.1판에서 실행한 5묶음·31개 시나리오, `1.1-*` 결과 파일 이름, 실행 당시 verdict·버전·시각·hash는 그대로입니다. 이번 발행은 원고와 현재 판 안내를 1.2로 올리는 작업이며 새 Linux/DB 실습을 수행한 것이 아닙니다.
+
+### 남은 미확인과 실행 범위
+
+- Lambda suppressed init의 REPORT 설명을 CloudWatch Duration 포함 여부로 확장할 직접적인 공식 문장은 확인하지 못했습니다.
+- WSL tick 설정 주체·RAW의 외부 정확도, MySQL r1의 내부 clock_diff와 SBS 13의 정확한 산술 원인은 미확인입니다. 최초 CPU 1.06 표본의 원인도 기록에 없던 RAW·tick으로 소급 확정하지 않습니다.
+- Kubernetes cache-on의 Exact LIST 200은 관측했지만 특정 feature gate를 분리 변경하지 않아 그 기능의 인과까지 확정하지 않았습니다.
+
+운영 클러스터·cloud 계정·상용 장비·전원 장애와 모든 버전 조합을 실행하지 않았습니다. 판 기준일 변경을 모든 원천의 재확인 날짜로 사용하지 않으며, 각 장의 확인일·고정 버전과 [범위 원칙](scope.md)을 따릅니다. 아래에는 판 번호를 유지하며 작업했던 교차 검토와 제1.1판의 작성 이력을 보존합니다.
 
 ## Claude–Codex 교차 검토 3차: 원고 보강과 3f 결과 확정
 
@@ -16,7 +61,7 @@ Kubernetes v1.37.0 코드에서 hugepage 보정이 Summary API의 node.memory.av
 
 ## Claude–Codex 교차 검토 2차: 원고 보강과 실행 근거
 
-2026-10-05에는 위 92장에 5장을 추가해 상세 97장으로 보강했습니다. G1–G5 필수 주제와 G6–G12를 공식 문서·명세·버전 소스에 대조했고, 2d에서는 Claude가 전달한 네 최종 실행 결과를 출판했습니다. 주제별 원천·위치·채택하지 않은 단서와 이유, 2c 지적 29개와 추가 단서의 판정은 [2라운드 기록](../review/claude-codex-r2.md)에 있습니다. 과거 1.1 실행 결과·hash와 판 번호·판 기준일은 유지합니다.
+2026-10-05에는 위 92장에 5장을 추가해 상세 97장으로 보강했습니다. G1–G5 필수 주제와 G6–G12를 공식 문서·명세·버전 소스에 대조했고, 2d에서는 Claude가 전달한 네 최종 실행 결과를 출판했습니다. 주제별 원천·위치·채택하지 않은 단서와 이유, 2c 지적 29개와 추가 단서의 판정은 [2라운드 기록](../review/claude-codex-r2.md)에 있습니다. 그 라운드 당시 과거 1.1 실행 결과·hash와 판 번호·판 기준일을 유지했습니다.
 
 Windows Task Manager의 CPU를 모든 빌드에서 Utility로 단정하지 않고, EC2 basic의 상태 검사 1분 예외, datagram용 RFC 8899의 범위, SNMP RFC 내 650 Mbit/s 경계 표현 차이를 명시했습니다. 새 예시 산술을 기존 검사에 연결했으며 저장 근거 검사와 실제 서버 재실행을 계속 구분합니다.
 
@@ -27,6 +72,10 @@ Windows Task Manager의 CPU를 모든 빌드에서 Utility로 단정하지 않�
 ## Claude–Codex 교차 검토 1차
 
 동일한 제1.1판에 A·B·C 정정을 반영했습니다. [항목별 판정과 직접 확인한 원천](../review/claude-codex-r1.md)에 수용 범위, 다른 수정 방식을 택한 이유, 1b에서 이어 받은 Linux 재실행 근거를 기록했습니다. AI 간 교차 검토이며 외부 전문가 인증은 아닙니다. 판 번호와 기준일, 과거 실행 원시 결과는 유지했습니다. 최신 버전으로 실행하지 않은 항목은 [버전 상태 표](coverage.md#교차-검토-시점의-버전-상태)에서 구분합니다.
+
+## 제1.1판 작성 당시의 기록
+
+2026-10-04에 작성·자체 검토·공식 원천 대조·실제 실행을 반복한 보강판입니다. 제1.0판의 80장에서 **92장**으로 확장했습니다. 이번 검토는 작성자의 자체 검토이며 외부 전문가 감수를 의미하지 않습니다. 실행 환경과 자동 검사 결과는 [검증 기록](validation.md)에 있습니다.
 
 ## 보강을 결정한 이유
 
