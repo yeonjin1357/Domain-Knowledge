@@ -2,6 +2,35 @@
 
 판 기준일은 **2026-10-06**입니다. 제1.2판은 상세 100장·통합 원문 122개로 구성됩니다. 과거 실행·원천 확인·화면 기록은 각각의 날짜와 적용 파일을 보존합니다. 아래 발행 검사와 이어지는 라운드별 이력을 구분하며 사용자 제품의 운영 지원 인증을 뜻하지 않습니다.
 
+## 수집 계약·재배치 후속 검토의 검사 — 2026-10-06
+
+현재 원고의 검사는 아래 명령으로 재현합니다. 과거 발행 검사 표는 당시 건수를 유지합니다. 이번 검사는 저장 근거의 무결성·문서 연결·참조 계약의 결과를 확인하며 서버나 cloud를 재실행하지 않습니다.
+
+```powershell
+python -X utf8 -B scripts/check_docs.py
+python -X utf8 -B scripts/verify_examples.py
+python -X utf8 -B scripts/verify_contracts.py
+python -X utf8 -B scripts/verify_revision.py
+python -X utf8 -B scripts/build_book.py --check
+python -X utf8 -B scripts/build_html.py --check
+python -X utf8 -B scripts/verify_field_catalog.py
+python -X utf8 -B scripts/build_adapter_fixtures.py --check
+python -X utf8 -B scripts/verify_adapter_fixtures.py
+```
+
+| 검사 대상 | 확인한 범위 |
+| --- | --- |
+| 문서·통합본 | 상세 100장, 목차·링크·앵커·장별 검토 hash, BOOK.md/BOOK.html 생성 일치 |
+| 가상 계산 | 62개 원문에 연결한 산술·해석 190개; 기존 중복 예 2개 제거·새 계산 7개 추가 |
+| 계약 참조 | 기존 22개 + 74개(실측 입력 29·가상 입력 44·mixed 1), 본문 계산 28개 |
+| 필드 카탈로그 | 87개, 본문 연결 38개, 잘못된 입력 거부 16개, 링크·근거 파일·hash |
+| fixture 재추출 | 고정 출처 21개를 유지하며 74개 입력·기대값 연결 재현 |
+| 보존 실습 | 기존 31개 시나리오, 추가 시계·API·DB·Collector·분포 기록, 압축 원문 525개 등 원래 검증 범위 |
+
+`build_book.py`, 이어서 `build_html.py`로 통합본을 재생성하고 위 검사를 실행했습니다. 참조 구현은 제품 전체의 parser·수집기·인증·저장 시스템이 아닙니다. 특히 PG replay_lag NULL·cloud·wrap 경계는 실제 장비/API 실측으로 표현하지 않습니다. [설계·판정 기록](../review/claude-codex-r4.md), [카탈로그 사용법](../catalog/README.md)
+
+후속 수정 전 BOOK.html은 검토자가 브라우저 검사 PASS를 전달했습니다. 이번에 재생성한 BOOK.html의 화면 검사는 아직 실행하지 않았으며 `html-check.json`은 전달받은 기록 그대로 보존합니다. 후속 화면 검사 명령은 `python -X utf8 -B scripts/check_html.py`입니다. 외부 URL 전수 재조회는 하지 않았습니다. 카탈로그에 추가된 21개 URL은 실제 HTTP GET 모두 200이었고 초기 39개 접근 기록은 그대로 유지했습니다. URL 접근 성공과 문장별 원천 확인은 별개입니다. 이전 계약 검사 56개에서 18개 가상 경계를 추가했고, 기존 SNMP 계산의 본문 연결 토큰만 34.36초에서 통일된 반올림 표기 34.4초로 바꿨습니다. 산술 입력·정확한 기대값은 유지했습니다.
+
 ## 제1.2판 발행 검사 — 2026-10-06
 
 발행 작업은 현재 판 표기·변경 요약·검증 안내를 갱신하고 BOOK.md·BOOK.html을 재생성했습니다. 제1.1판의 기존 31개 시나리오와 세 라운드에서 출판한 실행 결과·verdict·입력 hash는 변경하지 않았습니다. [판별 변경 요약과 라운드별 묶음 수](review.md#제12판에서-달라진-내용), [보존 근거 연결](../review/evidence-provenance.json)
@@ -62,7 +91,7 @@ Claude가 보낸 3d BOOK.html 화면 PASS는 [당시 receipt](../review/html-che
 
 ## 3d 당시 결과 출판과 재검사
 
-2026-10-05 Claude 실행의 Linux 메모리·histogram·시계 상태를 [세 요약 JSON](cross-domain/reproducible-labs.md#3라운드-메모리분포시계의-작은-실험)과 gzip 원자료 61개로 출판했습니다. supported는 각각 4·2·1개입니다. 요약 파일은 전달 파일과 byte 단위로 같고, gzip 전후 hash·입력 hash·정리 완료·단위 환산·비용 중앙값·실제 promtool 출력을 검사합니다. 현재 manifest와 달라진 실행 입력은 당시 사본을 보존해 [provenance](../review/evidence-provenance.json)에 연결했습니다.
+2026-10-05 Claude 실행의 Linux 메모리·histogram·시계 상태를 [세 요약 JSON](cross-domain/reproducible-labs.md#2026-10-05-메모리분포시계-실험)과 gzip 원자료 61개로 출판했습니다. supported는 각각 4·2·1개입니다. 요약 파일은 전달 파일과 byte 단위로 같고, gzip 전후 hash·입력 hash·정리 완료·단위 환산·비용 중앙값·실제 promtool 출력을 검사합니다. 현재 manifest와 달라진 실행 입력은 당시 사본을 보존해 [provenance](../review/evidence-provenance.json)에 연결했습니다.
 
 | 검사 | 3d 범위 |
 | --- | --- |
@@ -249,3 +278,5 @@ python3 scripts/run_otel_lab.py
 다운로드·실습은 별도 작업입니다. 기본 출력은 출판 기록을 덮지 않는 `.lab-runs/`입니다. `.tools/`, `.lab-runs/`, `.render-cache/`는 Git에서 제외합니다. 공식 archive·패키지와 기록된 checksum을 대조했으며 별도의 공급망 서명 검증을 수행한 것으로 표시하지 않습니다.
 
 이전 Windows 실습은 `python scripts/get_promtool.py` 후 `python scripts/run_labs.py --promtool .tools/prometheus-3.5.0/promtool.exe`로 재현합니다. 재실행 때 시각·PID·UID·지연·일부 통계·재시도 횟수는 달라질 수 있습니다. 현재 문서와 연결한 출판 결과를 바꿀 때는 실행·원문 해석·검토 기록을 함께 갱신합니다.
+
+이전: [제1.2판의 분야별 범위](coverage.md) · 다음: [제1.2판의 검토와 수정 기록](review.md)

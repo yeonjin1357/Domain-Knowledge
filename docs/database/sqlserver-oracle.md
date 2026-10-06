@@ -1,6 +1,8 @@
 # SQL Server와 Oracle: 대기와 실행 통계
 
-> 상태: 검토됨 · 적용 범위: SQL Server DMV·Query Store의 공통 의미, Oracle Database 19c · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 3d 원천 검토: 2026-10-06
+> 상태: 검토됨 · 적용 범위: SQL Server DMV·Query Store의 공통 의미, Oracle Database 19c · 원천 확인일: 2026-10-06 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
+
+용어 먼저: **DMV(Dynamic Management View)**는 엔진 상태 조회 view이고, **AG(Availability Group)**는 데이터베이스 가용성 그룹입니다. **ADR(Accelerated Database Recovery)**는 row versioning을 활용하는 복구 기능이며, 활성화 시 version store 위치·수명도 함께 확인합니다. SQL Server row versioning은 [PostgreSQL MVCC](transactions-and-locks.md)처럼 여러 버전을 읽기 일관성에 쓰지만 저장 위치·격리·정리 규약은 다릅니다. [ADR](https://learn.microsoft.com/en-us/sql/relational-databases/accelerated-database-recovery-concepts?view=sql-server-ver17)
 
 ## 먼저 이해할 것
 
@@ -103,4 +105,4 @@ Diagnostics Pack을 이용하지 않는 관측 경로로는 허용된 `V$SESSION
 5. AG redo queue 0은 전송 대기도 0이라는 뜻인가? **전송과 redo는 서로 다른 단계입니다.**
 6. ASH SELECT가 성공하면 Diagnostics Pack 사용 권리가 확인되는가? **조회 권한·기능 활성화와 계약상 사용 권리는 다릅니다.**
 
-다음: [복제와 복구](replication-and-recovery.md) · [DB 목차](README.md)
+이전: [MySQL과 MariaDB 관측](mysql-mariadb.md) · 다음: [문서형, 분산형, 분석형 DB의 관측](distributed-and-analytical.md) · [분야 목차](README.md)

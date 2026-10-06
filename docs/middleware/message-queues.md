@@ -1,12 +1,10 @@
 # 메시지 큐: 발행 확인, 전달, 처리와 재전달
 
-> 상태: 검토됨 · 적용 범위: RabbitMQ 4.3, AMQP 0-9-1의 주요 관측 개념 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: RabbitMQ 4.3, AMQP 0-9-1의 주요 관측 개념 · 원천 확인일: 2026-10-06 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
-메시지 broker가 발송을 수용한 것과 소비자가 업무를 끝낸 것은 별개의 확인입니다. 큐 안에서 전달을 기다리는 메시지와 이미 전달했지만 확인받지 못한 메시지를 나누어 봅니다. 재전달은 같은 업무를 다시 시도하는 것일 수 있어 전달 수를 고유 업무 수로 바꾸지 않습니다.
-
-메시지 시스템에는 생산자, broker, 소비자와 업무 저장소가 있습니다. 어느 단계의 확인인지 구분해야 손실·중복·지연을 해석할 수 있습니다.
+메시지 broker가 발송을 수용한 것과 소비자가 업무를 끝낸 것은 별개의 확인입니다. 큐 안에서 전달을 기다리는 메시지와 이미 전달했지만 확인받지 못한 메시지를 나누어 봅니다. 재전달은 같은 업무를 다시 시도하는 것일 수 있어 전달 수를 고유 업무 수로 바꾸지 않습니다. 제품은 생산자·broker·소비자·업무 저장소 중 누가 무엇을 확인했는지 남깁니다.
 
 ## 두 종류의 확인
 
@@ -27,7 +25,7 @@ ack와 업무 저장의 순서는 애플리케이션 설계에 달려 있습니�
 
 큐 관측에는 전달을 기다리는 메시지와 전달됐으나 아직 확인되지 않은 메시지가 있습니다. publish, deliver, acknowledge, redeliver 비율과 함께 봐야 처리 흐름을 알 수 있습니다. [RabbitMQ Monitoring](https://www.rabbitmq.com/docs/monitoring)
 
-합성 예에서 ready 800, unacknowledged 200이면 두 범주의 합은 1,000입니다. ready가 0이어도 미확인 200개가 남아 있으면 모든 업무가 완료됐다고 볼 수 없습니다. 반대로 재전달 횟수에는 같은 메시지의 반복 전달이 포함될 수 있으므로 고유 업무 건수와 같지 않습니다.
+가상 예시에서 ready 800, unacknowledged 200이면 두 범주의 합은 1,000입니다. ready가 0이어도 미확인 200개가 남아 있으면 모든 업무가 완료됐다고 볼 수 없습니다. 반대로 재전달 횟수에는 같은 메시지의 반복 전달이 포함될 수 있으므로 고유 업무 건수와 같지 않습니다.
 
 ## prefetch가 바꾸는 범위
 
@@ -49,10 +47,16 @@ quorum queue는 channel 전체에 하나의 제한을 거는 global QoS prefetch
 
 확인할 지표에는 큐 깊이 외에 메시지 나이, 소비자 수, 연결·channel 변화, confirm 지연과 broker의 메모리·디스크 압박을 포함하는 것이 좋습니다. 실제 제공되는 원천 필드는 버전과 플러그인에 따라 명세합니다.
 
+## Pulsar subscription의 관측 경계
+
+Pulsar의 **batching을 켠 경우 backlog size는 개별 메시지 수가 아니라 batch(entry) 수**입니다. 같은 batch에 여러 메시지가 들어가므로 backlog에 임의의 평균 batch 크기를 곱해 정확한 메시지 수라고 표시하지 않습니다. 단위는 구체적인 원천 지표마다 확인합니다. [Pulsar 4.1 batching](https://pulsar.apache.org/docs/4.1.x/concepts-messaging/#batching)
+
+Pulsar는 subscription 유형에 따라 메시지 전달과 공유 방식이 달라집니다. topic의 backlog와 특정 subscription의 미처리 상태를 구분하고, acknowledgment·redelivery·retention의 경계를 보존합니다. broker 하나의 건강 상태만으로 모든 subscription 처리를 설명하지 않습니다. [Pulsar 4.0 messaging](https://pulsar.apache.org/docs/4.0.x/concepts-messaging/)
+
 ## 이해 확인
 
 1. publisher confirm은 소비자 업무 완료인가? **broker와의 확인입니다.**
 2. ready 0이면 모든 메시지 처리가 끝났는가? **unacknowledged와 업무 상태를 추가 확인합니다.**
 3. prefetch 100이면 100개를 병렬 실행하는가? **전달 제한과 실제 병렬 처리는 다릅니다.**
 
-다음: [검색 엔진](search-engines.md) · [미들웨어 목차](README.md)
+이전: [Kafka: 파티션, offset, lag와 처리 보장](kafka.md) · 다음: [검색 엔진: 색인, 가시성, shard와 요청 지연](search-engines.md) · [분야 목차](README.md)

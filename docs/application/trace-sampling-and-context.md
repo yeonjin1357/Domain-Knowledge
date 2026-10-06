@@ -1,6 +1,6 @@
 # 트레이스를 읽는 전제: 문맥 전파, sampling과 모집단
 
-> 상태: 검토됨 · 적용 범위: W3C Trace Context, OpenTelemetry 개념·SDK 규약, tail sampling processor 0.137.0 문서 · 검토일: 2026-10-04 · sampling 수치는 가상 예시 · 2라운드 보강 확인: 2026-10-05 (probability sampling·W3C 문서 상태)
+> 상태: 검토됨 · 적용 범위: W3C Trace Context, OpenTelemetry 개념·SDK 규약, tail sampling processor 0.137.0 문서 · 원천 확인일: 2026-10-06 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 버전 상태: 0.137.0은 설명을 고정한 기준입니다. 검토 시점 Collector 배포판은 0.162.0이며 최신 버전에서 tail sampling을 재실행하지 않았습니다. [고정·최신·지원 상태](../coverage.md#교차-검토-시점의-버전-상태)
 
@@ -60,11 +60,17 @@ SDK에는 기록하지 않음, 기록만 함, 기록하고 sampled로 표시함�
 
 ## 확률을 전달하는 th·rv와 adjusted count
 
+확률 sampling은 선택 확률을 tracestate로 전달해 표본의 의미를 보존합니다. `rv`는 선택적 난수 표현, `th`는 거절 임계값(rejection threshold)이며, 알려진 최종 포함 확률 p의 **adjusted count=1/p**는 표본의 추정 가중치입니다. 제품은 아래 조건을 충족할 때만 이 가중치로 전체 건수를 추정합니다.
+
+안정성 범례는 [공통 관측의 규약 소개](../foundations/README.md)를 따릅니다. Development·Stable은 명세 단계, deprecated는 폐기 예정 표시라 Stable과 deprecated가 동시에 성립할 수 있습니다. [OTel 안정성 정책](https://opentelemetry.io/docs/specs/otel/versioning-and-stability/)
+
+`rv`는 **선택적인 explicit randomness**입니다. 존재하면 그 56-bit 값을, 없으면 TraceID의 하위 56bit를 randomness `R`로 사용합니다. `rv`가 없다는 이유만으로 잘못된 trace로 버리지는 않습니다. 다만 SDK의 randomness 추정 규칙과 실제 ID 생성기의 균등성·random flag 지원을 구분하고, 이를 검증하지 않은 데이터를 무조건 정확한 확률 표본이라고 표시하지 않습니다. [SDK randomness 규약](https://opentelemetry.io/docs/specs/otel/trace/sdk/#presumption-of-traceid-randomness)
+
 **2026-10-05 확인:** OTel의 probability sampling·tracestate 규약은 Development 상태입니다. `ot` tracestate 안의 `rv`는 56-bit randomness 값, `th`는 rejection threshold를 표현합니다. 같은 randomness `R`에 대해 `R ≥ T`인 항목을 선택하는 모델에서는 포함 확률이 `p=(2^56−T)/2^56`이고, adjusted count는 `1/p`입니다. `th`의 wire 표현은 축약된 16진 문자열 규칙이 있으므로 그대로 일반 정수 parser에 넘겨 전체 threshold라고 간주하지 않습니다. [probability sampling](https://opentelemetry.io/docs/specs/otel/trace/tracestate-probability-sampling/), [tracestate encoding](https://opentelemetry.io/docs/specs/otel/trace/tracestate-handling/)
 
 adjusted count는 해당 표본 하나가 대표하는 모집단 항목 수의 추정 가중치입니다. 같은 randomness를 쓰는 일관된 다단계 sampler는 적용된 최대 threshold로 유효 확률을 표현합니다. 독립적인 동전 던지기처럼 각 단계의 확률을 무조건 곱하지 않습니다. 중간 sampler가 정책을 바꾸면 이 문맥도 규약대로 갱신해야 합니다. non-probabilistic 선택이나 `th`가 없는 sampled span에 이 규약의 adjusted count가 정의된 것으로 간주하지 않습니다. [확률·threshold 전파](https://opentelemetry.io/docs/specs/otel/trace/tracestate-probability-sampling/)
 
-**예시:** 요청당 server span 하나를 집계하며 각 표본의 최종 포함 확률이 정확히 알려졌다고 가정합니다. `p=0.1`인 표본 90개와 `p=0.5`인 표본 20개라면 추정 요청 수는 `90/0.1 + 20/0.5 = 940건`입니다. 표본 110개에 임의의 공통 배수를 곱하지 않습니다. 940은 추정값이며 실제 요청 수의 확정값이 아닙니다.
+**가상 예시:** 요청당 server span 하나를 집계하며 각 표본의 최종 포함 확률이 정확히 알려졌다고 가정합니다. `p=0.1`인 표본 90개와 `p=0.5`인 표본 20개라면 추정 요청 수는 `90/0.1 + 20/0.5 = 940건`입니다. 표본 110개에 임의의 공통 배수를 곱하지 않습니다. 940은 추정값이며 실제 요청 수의 확정값이 아닙니다.
 
 | 추정에 필요한 조건 | 없을 때 생기는 문제 |
 | --- | --- |
@@ -76,11 +82,11 @@ adjusted count는 해당 표본 하나가 대표하는 모집단 항목 수의 �
 
 따라서 “sampled span이 있다”는 사실만으로 전체 요청 수 추정을 켜지 않습니다. 오류를 무조건 보존하는 규칙과 rate limit, 불완전 trace 폐기 등이 섞이면 실제 포함 확률을 먼저 입증해야 합니다. metric에서 trace를 여는 [exemplar](../foundations/metric-context-and-start-time.md)도 모집단 추정을 위한 가중치가 아닙니다.
 
-`rv`는 **선택적인 explicit randomness**입니다. 존재하면 그 56-bit 값을, 없으면 TraceID의 하위 56bit를 randomness `R`로 사용합니다. `rv`가 없다는 이유만으로 잘못된 trace로 버리지는 않습니다. 다만 SDK의 randomness 추정 규칙과 실제 ID 생성기의 균등성·random flag 지원을 구분하고, 이를 검증하지 않은 데이터를 무조건 정확한 확률 표본이라고 표시하지 않습니다. [SDK randomness 규약](https://opentelemetry.io/docs/specs/otel/trace/sdk/#presumption-of-traceid-randomness)
-
 ## sampler 폐기와 W3C 문서 단계
 
 확인 시점 SDK 규약에서 `TraceIdRatioBased` 절은 **Stable이면서 deprecated**입니다. 대체 방향인 `ProbabilitySampler`는 **Development**이고 SDK Sampler API를 직접 구현하는 **non-composable** 형태입니다. `CompositeSampler`와 조합하는 별도 형태의 이름은 `ComposableProbability`입니다. 이름·안정성·조합 방식을 섞어 소개하지 않습니다. 기존 `TraceIdRatioBased` 구현의 동작 변경·제거는 **최소 2027-01-01까지 금지**되므로 2026년 SDK에서 이름이 보이는 것 자체는 규약 위반이 아닙니다. 언어별 지원 릴리스를 확인하며, parent 결정을 존중하려면 `ParentBased` 등 별도 구성을 봅니다. [TraceIdRatioBased](https://opentelemetry.io/docs/specs/otel/trace/sdk/#traceidratiobased), [ProbabilitySampler와 조합형의 구분](https://opentelemetry.io/docs/specs/otel/trace/sdk/#probabilitysampler)
+
+### W3C Level 2의 문서 단계
 
 W3C Trace Context Level 2는 확인한 공개 판본이 **2024-03-28 Candidate Recommendation Draft**입니다. 최종 Recommendation으로 소개하지 않습니다. random trace ID flag는 sampled flag와 다른 bit이며 TraceID의 randomness 요구를 나타냅니다. 확률 자체나 요청의 성공·신뢰도를 뜻하지 않습니다. “random flag가 있으면 표본은 모두 같은 확률”이라는 결론도 나오지 않습니다. [W3C Level 2의 문서 상태와 flags](https://www.w3.org/TR/2024/CRD-trace-context-2-20240328/)
 
@@ -113,3 +119,5 @@ W3C Trace Context Level 2는 확인한 공개 판본이 **2024-03-28 Candidate R
 4. trace ID를 tenant 접근 권한으로 사용해도 되는가? **관측 연결 정보와 인증된 접근 범위를 분리합니다.**
 5. 10% head sampling 후 추가 tail 폐기가 있어도 열 배하면 되는가? **최종 포함 확률과 추가 유실을 알아야 한다.**
 6. `rv`는 sampling 비율인가? **randomness 값이다. 유효 확률은 threshold와 함께 해석한다.**
+
+이전: [계측을 넣는 위치: 자동 계측, 수동 span, eBPF와 프로파일](instrumentation-and-profiling.md) · 다음: [데이터베이스 도메인](../database/README.md) · [분야 목차](README.md)

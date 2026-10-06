@@ -1,6 +1,6 @@
 # 시간과 관측 데이터의 품질
 
-> 상태: 검토됨 · 범위: 수집 시각, 지연, 누락, 중복, 시계 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04 · 3d 원천·저장 증거 확인: 2026-10-06
+> 상태: 검토됨 · 적용 범위: 수집 시각, 지연, 누락, 중복, 시계 · 원천 확인일: 2026-10-06 · 실습 여부: 저장된 로컬 실행 근거 포함; 구성·한계는 본문
 
 ## 먼저 이해할 것
 
@@ -29,39 +29,11 @@ Linux의 `CLOCK_REALTIME`은 시스템의 실제 시각을 나타내며 설정 �
 
 역행하지 않는다는 것은 속도가 항상 일정하거나 실제 시간과 완전히 일치한다는 뜻은 아닙니다. `CLOCK_MONOTONIC`은 NTP 등의 주파수 조정을 받으며 `CLOCK_MONOTONIC_RAW`는 이 조정을 받지 않습니다. 둘 다 Linux에서는 suspend 시간을 포함하지 않습니다. RAW는 조정하지 않은 비교 기준이지, 별도 교정 없이 정확한 외부 시간으로 간주할 기준은 아닙니다. [시계별 규약](https://man7.org/linux/man-pages/man2/clock_gettime.2.html)
 
-**제품 적용 제안:** VM·WSL에서 CPU rate 등 경과 시간을 분모로 사용하는 값이 예상과 다르면 같은 구간의 MONOTONIC·RAW 차이, 스레드 수, 시간 조정 상태를 수집 품질 진단으로 기록합니다. 어느 시계를 분모로 썼는지도 보존합니다. 차이가 있다고 CPU 계정 오류나 특정 동기화 서비스의 책임을 곧바로 단정하지 않습니다. [Linux 관측 실습](../host/linux-observation-lab.md)의 재실행에서는 프로세스 CPU clock/RAW가 약 1인 busy 구간에도 MONOTONIC/RAW가 약 0.937이었고 sleep·idle에서도 시계 차이가 관측됐습니다. adjtimex와 함께 분모의 주파수 조정을 설명하는 근거로 사용하되, 과거 표본의 원인을 소급 확정하거나 RAW의 외부 정확도를 인증하는 자료로 사용하지 않습니다.
+**제품 적용 제안:** VM·WSL에서 CPU rate 등의 분모가 예상과 다르면 사용한 시계 종류, 같은 구간의 MONOTONIC·RAW, 스레드 수와 시간 조정 상태를 보존합니다. [Linux 시계 실습](../host/linux-observation-lab.md)은 분모 시계의 주파수 조정으로 CPU/MONOTONIC > 1이 나올 수 있음을 보여 줍니다. 시계 차이를 CPU 계정 오류나 특정 동기화 서비스의 책임으로 바로 바꾸지 않습니다.
 
 같은 프로세스에서 작업 시간을 재는 코드에는 경과 시간 측정에 적합한 시계를 사용하고, 사건을 다른 시스템과 연결할 때는 원천 시각과 시간 동기화 상태를 고려합니다. 이것은 OS 시계의 성질에 근거한 구현 제안입니다.
 
 가상 예시로 원천 시계가 수집기보다 5초 빠르면, 실제 전송에 1초가 걸려도 `수집 시각 - 원천 시각 = -4초`로 보일 수 있습니다. 음수 차이는 곧바로 전송 로직의 오류를 뜻하지 않습니다. 시계 차이와 필드 정의부터 확인합니다.
-
-## 동기화 상태를 측정한다: offset과 frequency는 다른 값이다
-
-서버 A의 로그가 서버 B보다 먼저 찍혔다는 이유만으로 A의 사건이 먼저였다고 할 수는 없습니다. 시계의 현재 차이인 **offset**과 시계가 빠르거나 느리게 흐르는 정도인 **frequency**를 구분해야 합니다. 이 절은 chrony 4.9·systemd 문서와 LinuxPTP v4.4 코드를 2026-10-06 확인했습니다. chrony 4.9는 2026-08-27 릴리스이며 아래 tracking 필드의 정의는 4.8과 같습니다. chrony·PTP 진단은 실행하지 않았고, timesyncd의 읽기 전용 상태 조회는 아래 저장 실습으로 구분합니다. [chrony 릴리스](https://chrony-project.org/news.html)
-
-| 원천 | 값·단위 | 해석 |
-| --- | --- | --- |
-| `chronyc tracking`: System time | 초, fast/slow 방향 | chronyd가 유지하는 NTP 시계와 시스템 시계 사이에 남은 차이 |
-| Last offset / RMS offset | 초 | 마지막 갱신의 추정 offset / 장기 offset 통계; System time과 같은 기준으로 혼합하지 않음 |
-| Frequency | ppm | 보정하지 않았다면 시스템 시계가 얼마나 빨리·느리게 갈지의 추정 |
-| Skew | ppm | 주파수 추정의 오차 범위; 현재 시각의 오차를 초로 나타낸 값이 아님 |
-| Root delay / dispersion, Leap status | 초 / 상태 | 기준 시계까지 경로·불확실성과 동기화 상태를 함께 확인 |
-
-`tracking`의 모든 offset이 곧 현재 시스템 시계 오차는 아닙니다. 참조 시계의 정확성·네트워크 비대칭·측정 경과 시간도 있어, “동기화됨”을 외부 정확도의 교정 증명으로 쓰지 않습니다. [chrony 4.9 tracking](https://chrony-project.org/doc/4.9/chronyc.html#tracking)
-
-`timedatectl timesync-status`와 `show-timesync`는 systemd-timesyncd의 상태를 읽습니다. chronyd나 외부 VM 시계 관리자의 상태를 모두 설명하는 공통 API가 아닙니다. 서비스 부재·D-Bus 접근 실패는 offset 0으로 저장하지 않습니다. [systemd timedatectl](https://www.freedesktop.org/software/systemd/man/latest/timedatectl.html)
-
-PTP 환경은 하드웨어 시계(PHC)와 시스템 시계의 경로를 구분합니다. LinuxPTP v4.4의 `ptp4l` slave 경로는 local 수신 시각 t2−master 전송 시각 t1에서 경로 delay를 뺀 값을 master_offset으로 계산해 offsetFromMaster와 로그에 사용합니다. 하드웨어 timestamp 모드에서는 해당 PHC 경로의 값이며, `phc2sys`는 시계 사이를 동기화합니다. 한쪽 offset이 작다고 다른 쪽도 정확하다고 볼 수 없습니다. phc2sys 요약의 offset·읽기 delay는 ns, frequency는 ppb입니다. UTC/PTP 시간 척도와 source→sink 방향도 남깁니다. [ptp4l 설정](https://www.linuxptp.org/documentation/ptp4l/), [v4.4 offset 계산](https://github.com/richardcochran/linuxptp/blob/v4.4/tsproc.c), [clock_synchronize·로그](https://github.com/richardcochran/linuxptp/blob/v4.4/clock.c), [phc2sys](https://www.linuxptp.org/documentation/phc2sys/)
-
-### Step·slew·leap smear
-
-step은 시계 값을 불연속적으로 바꾸고 slew는 시계 속도를 조정하여 차이를 줄입니다. `CLOCK_REALTIME`은 두 영향을 받을 수 있으며 REALTIME 두 시각의 차이를 무조건 경과 시간으로 쓰지 않습니다. leap smear는 윤초를 일정 구간에 분산해 시간 척도를 부드럽게 조정하는 정책입니다. 서로 다른 smear 정책이나 smear·비smear source를 섞으면 의도된 시각 차이를 장애로 오인할 수 있습니다. smear를 모든 NTP 동기화의 기본 동작으로 가정하지 않습니다. [clock_gettime](https://man7.org/linux/man-pages/man2/clock_gettime.2.html), [chrony 4.9 leap 정책](https://chrony-project.org/doc/4.9/chrony.conf.html#leapsecmode)
-
-읽기 전용 수집 예시는 `chronyc tracking`, `chronyc sources -v`, `timedatectl show-timesync --all`입니다. 해당 daemon·조회 socket 접근이 필요하며 상태 조회 자체는 시계를 조정하지 않습니다. 빈번한 호출 비용은 수집 주기로 제한합니다. PTP는 이미 동작 중인 서비스의 로그·관리 인터페이스 읽기를 설계하며, 모니터링 목적으로 ptp4l/phc2sys를 새로 실행하면 시계 제어가 발생할 수 있으므로 이 절의 읽기 예시에 포함하지 않습니다.
-
-**제품 적용 제안:** offset·frequency·불확실성·최근 갱신 시각·참조원·시간 척도·가용성을 데이터 품질에 연결합니다. 서로 다른 호스트의 시각 차이가 불확실성 범위 안이면 사건 순서를 확정하지 않습니다. 1라운드 MONOTONIC/RAW 관측은 경과 시계의 속도 차이를 보여 주며 NTP offset 하나와 같은 값이 아닙니다. tick을 설정한 주체는 그 근거 없이는 지정하지 않습니다.
-
-**저장된 실습 결과(2026-10-05 WSL2 Linux 6.18.33.2):** 2초 sleep 구간의 MONOTONIC은 2.000092274초, RAW는 2.076169165초로 비율은 약 0.963357이었습니다. 전후 adjtimex는 tick 9,634 µs, freq −42.834381 ppm으로 같았습니다. 이어진 timedatectl show는 NTPSynchronized=yes, timesync-status는 offset +873.315 ms를 보고했습니다. 서로 다른 시점·원천의 값이며, 동기화 상태 yes가 현재 offset 0이나 외부 정확도 인증을 의미하지 않습니다. 이 결과도 tick 설정 주체를 식별하지는 않습니다. [시계 요약과 원자료 hash](../../labs/results/1.1-r3/clock-state.json), [timesync-status 원문 gzip](../../labs/results/1.1-r3/clock-state.raw/command-003.gz)
 
 ## 0과 데이터 없음은 다르다
 
@@ -108,13 +80,44 @@ Prometheus의 즉시 조회에는 Lookback과 Staleness 규칙이 있습니다. 
 4. 데이터가 누락·중복·지연되었는지 조사합니다.
 5. 그 다음 시스템의 실제 변화에 대한 가설을 세웁니다.
 
+## 심화: 시계 동기화 진단
+
+서버 A의 로그가 서버 B보다 먼저 찍혔다는 이유만으로 A의 사건이 먼저였다고 할 수는 없습니다. 시계의 현재 차이인 **offset**과 시계가 빠르거나 느리게 흐르는 정도인 **frequency**를 구분해야 합니다. 이 절은 chrony 4.9·systemd 문서와 LinuxPTP v4.4 코드를 2026-10-06 확인했습니다. chrony·PTP 진단은 실행하지 않았고, timesyncd의 읽기 전용 상태 조회는 아래 저장 실습으로 구분합니다. [chrony 릴리스](https://chrony-project.org/news.html)
+
+| 원천 | 값·단위 | 해석 |
+| --- | --- | --- |
+| `chronyc tracking`: System time | 초, fast/slow 방향 | chronyd가 유지하는 NTP 시계와 시스템 시계 사이에 남은 차이 |
+| Last offset / RMS offset | 초 | 마지막 갱신의 추정 offset / 장기 offset 통계; System time과 같은 기준으로 혼합하지 않음 |
+| Frequency | ppm | 보정하지 않았다면 시스템 시계가 얼마나 빨리·느리게 갈지의 추정 |
+| Skew | ppm | 주파수 추정의 오차 범위; 현재 시각의 오차를 초로 나타낸 값이 아님 |
+| Root delay / dispersion, Leap status | 초 / 상태 | 기준 시계까지 경로·불확실성과 동기화 상태를 함께 확인 |
+
+`tracking`의 모든 offset이 곧 현재 시스템 시계 오차는 아닙니다. 참조 시계의 정확성·네트워크 비대칭·측정 경과 시간도 있어, “동기화됨”을 외부 정확도의 교정 증명으로 쓰지 않습니다. [chrony 4.9 tracking](https://chrony-project.org/doc/4.9/chronyc.html#tracking)
+
+`timedatectl timesync-status`와 `show-timesync`는 systemd-timesyncd의 상태를 읽습니다. chronyd나 외부 VM 시계 관리자의 상태를 모두 설명하는 공통 API가 아닙니다. 서비스 부재·D-Bus 접근 실패는 offset 0으로 저장하지 않습니다. [systemd timedatectl](https://www.freedesktop.org/software/systemd/man/latest/timedatectl.html)
+
+PTP 환경은 하드웨어 시계(PHC)와 시스템 시계의 경로를 구분합니다. LinuxPTP v4.4의 `ptp4l` slave 경로는 local 수신 시각 t2−master 전송 시각 t1에서 경로 delay를 뺀 값을 master_offset으로 계산해 offsetFromMaster와 로그에 사용합니다. 하드웨어 timestamp 모드에서는 해당 PHC 경로의 값이며, `phc2sys`는 시계 사이를 동기화합니다. 한쪽 offset이 작다고 다른 쪽도 정확하다고 볼 수 없습니다. phc2sys 요약의 offset·읽기 delay는 ns, frequency는 ppb입니다. UTC/PTP 시간 척도와 source→sink 방향도 남깁니다. [ptp4l 설정](https://www.linuxptp.org/documentation/ptp4l/), [v4.4 offset 계산](https://github.com/richardcochran/linuxptp/blob/v4.4/tsproc.c), [clock_synchronize·로그](https://github.com/richardcochran/linuxptp/blob/v4.4/clock.c), [phc2sys](https://www.linuxptp.org/documentation/phc2sys/)
+
+### Step·slew·leap smear
+
+step은 시계 값을 불연속적으로 바꾸고 slew는 시계 속도를 조정하여 차이를 줄입니다. `CLOCK_REALTIME`은 두 영향을 받을 수 있으며 REALTIME 두 시각의 차이를 무조건 경과 시간으로 쓰지 않습니다. leap smear는 윤초를 일정 구간에 분산해 시간 척도를 부드럽게 조정하는 정책입니다. 서로 다른 smear 정책이나 smear·비smear source를 섞으면 의도된 시각 차이를 장애로 오인할 수 있습니다. smear를 모든 NTP 동기화의 기본 동작으로 가정하지 않습니다. [clock_gettime](https://man7.org/linux/man-pages/man2/clock_gettime.2.html), [chrony 4.9 leap 정책](https://chrony-project.org/doc/4.9/chrony.conf.html#leapsecmode)
+
+읽기 전용 수집 예시는 `chronyc tracking`, `chronyc sources -v`, `timedatectl show-timesync --all`입니다. 해당 daemon·조회 socket 접근이 필요하며 상태 조회 자체는 시계를 조정하지 않습니다. 빈번한 호출 비용은 수집 주기로 제한합니다. PTP는 이미 동작 중인 서비스의 로그·관리 인터페이스 읽기를 설계하며, 모니터링 목적으로 ptp4l/phc2sys를 새로 실행하면 시계 제어가 발생할 수 있으므로 이 절의 읽기 예시에 포함하지 않습니다.
+
+**제품 적용 제안:** offset·frequency·불확실성·최근 갱신 시각·참조원·시간 척도·가용성을 데이터 품질에 연결합니다. 서로 다른 호스트의 시각 차이가 불확실성 범위 안이면 사건 순서를 확정하지 않습니다. MONOTONIC/RAW 관측은 경과 시계의 속도 차이를 보여 주며 NTP offset 하나와 같은 값이 아닙니다. tick을 설정한 주체는 그 근거 없이는 지정하지 않습니다.
+
+**저장된 실습 결과(2026-10-05 WSL2 Linux 6.18.33.2):** 2초 sleep 구간의 MONOTONIC은 2.000092274초, RAW는 2.076169165초로 비율은 약 0.963357이었습니다. 전후 adjtimex는 tick 9,634 µs, freq −42.834381 ppm으로 같았습니다. 이어진 timedatectl show는 NTPSynchronized=yes, timesync-status는 offset +873.315 ms를 보고했습니다. 서로 다른 시점·원천의 값이며, 동기화 상태 yes가 현재 offset 0이나 외부 정확도 인증을 의미하지 않습니다. 이 결과도 tick 설정 주체를 식별하지는 않습니다. [시계 요약과 원자료 hash](../../labs/results/1.1-r3/clock-state.json), [timesync-status 원문 gzip](../../labs/results/1.1-r3/clock-state.raw/command-003.gz)
+
+2026-10-04의 MONOTONIC/RAW 약 0.937과 이 실행의 약 0.963357은 다른 날짜·조정 상태의 표본입니다. 앞 실행의 idle tick은 9,353–9,371 µs, 뒤 실행은 9,634 µs였으므로 두 비율을 같은 조건의 상수로 비교하지 않습니다. 앞 실행의 세부 수치는 [Linux 시계 실습](../host/linux-observation-lab.md)에 모았습니다.
+
 ## 이해 확인
 
 - chrony Skew가 1 ppm이면 현재 시각이 1 ms 어긋났는가? **주파수 추정의 불확실성과 현재 시각 차이는 다른 값입니다.**
 - ptp4l의 offset만 작으면 시스템 CLOCK_REALTIME도 정확한가? **PHC·시스템 시계의 연결과 기준원·시간 척도를 함께 확인해야 합니다.**
-
-1. 전송 지연을 계산했더니 음수이면 데이터가 시간을 거슬러 이동했는가? **서로 다른 시계의 오차와 timestamp의 의미를 먼저 확인해야 한다.**
-2. 60초 동안 600건이면 매초 10건씩 처리했는가? **구간 평균은 10건/초지만 내부의 발생 분포는 알 수 없다.**
-3. 마지막 값이 화면에 보이면 최근에도 수집에 성공했는가? **조회 시각과 마지막 실제 표본 시각을 구분해야 한다.**
+- 전송 지연을 계산했더니 음수이면 데이터가 시간을 거슬러 이동했는가? **서로 다른 시계의 오차와 timestamp의 의미를 먼저 확인해야 한다.**
+- 60초 동안 600건이면 매초 10건씩 처리했는가? **구간 평균은 10건/초지만 내부의 발생 분포는 알 수 없다.**
+- 마지막 값이 화면에 보이면 최근에도 수집에 성공했는가? **조회 시각과 마지막 실제 표본 시각을 구분해야 한다.**
 
 관련: [시계열](time-series.md), [도메인 간 분석](../cross-domain/README.md), [제품 자체의 관측](../product/README.md)
+
+이전: [서비스 수준 지표와 오류 예산](service-level-objectives.md) · 다음: [숫자가 다를 때: 측정 경계, 시간 구간과 오차](measurement-and-comparability.md) · [분야 목차](README.md)

@@ -1,6 +1,6 @@
 # 클라우드 도메인
 
-> 상태: 검토됨 · 적용 범위: 공급자 공통 관점, OpenTelemetry 속성 예시 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: 공급자 공통 관점, OpenTelemetry 속성 예시 · 원천 확인일: 2026-10-03 · 실습 여부: 각 상세 장에 명시
 
 클라우드 영역에서는 자원의 소속과 위치, 관리형 서비스의 관측 범위, 공급자 API를 통한 수집을 정리합니다. 온프레미스와 클라우드에 걸친 대상을 하나의 제품에서 식별하고 탐색할 수 있도록 하는 것이 목적입니다.
 
@@ -42,3 +42,5 @@ OpenTelemetry의 클라우드 규약에는 공급자, 계정, 리전, 가용 영
 6. [클라우드 한도, 비용과 용량: 사용량만으로 보이지 않는 제약](quotas-cost-and-capacity.md)
 
 관련 문서: [호스트](../host/README.md), [네트워크](../network/README.md), [DB](../database/README.md), [제품 설계 관점](../product/README.md)
+
+이전: [스트림 처리: event time, watermark, checkpoint와 역압](../middleware/stream-processing.md) · 다음: [클라우드 자원 계층과 API 수집](resources-and-apis.md)

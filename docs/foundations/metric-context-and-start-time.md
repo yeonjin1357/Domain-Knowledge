@@ -1,6 +1,8 @@
 # 지표에 남겨야 할 문맥: exemplar와 카운터 시작 시각
 
-> 상태: 검토됨 · 적용 범위: OpenTelemetry Metrics Data Model, OpenMetrics 1.0, Prometheus 3.15.0 기능 문서 · 원천 확인일: 2026-10-05 · 기능 실행 미검증
+> 상태: 검토됨 · 적용 범위: OpenTelemetry Metrics Data Model, OpenMetrics 1.0, Prometheus 3.15.0 기능 문서 · 원천 확인일: 2026-10-05 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
+
+> **심화 안내:** 처음 읽을 때 건너뛰어도 됩니다. 선수: [시계열](time-series.md), [분포와 집계](distributions.md). 수집·저장 계약을 설계할 때 돌아오세요.
 
 ## 먼저 이해할 상황
 
@@ -31,7 +33,7 @@ OpenMetrics Counter의 선택적 Created 값은 Unix epoch 이후 **초** 단위
 
 ## 계산 예시: 첫 증가분을 어디까지 알 수 있는가
 
-**예시:** 프로세스가 상대 시각 0초에 counter=0으로 시작했고 10초에 7, 20초에 12를 노출했다고 가정합니다.
+**가상 예시:** 프로세스가 상대 시각 0초에 counter=0으로 시작했고 10초에 7, 20초에 12를 노출했다고 가정합니다.
 
 | 보존한 정보 | 말할 수 있는 것 | 말할 수 없는 것 |
 | --- | --- | --- |
@@ -40,6 +42,8 @@ OpenMetrics Counter의 선택적 Created 값은 Unix epoch 이후 **초** 단위
 | 10초에 발견했으므로 임의의 0을 삽입 | 새로운 가정을 추가한 것 | 0–10초의 실제 기록을 복구했다고 주장할 수 없음 |
 
 이는 두 점 차분의 설명입니다. 실제 PromQL `rate()`·`increase()`는 query window·외삽·reset·사용 기능에 영향을 받으므로 위 산술과 모든 조건에서 같은 값을 반환한다고 주장하지 않습니다. [시계열 계산](time-series.md)
+
+**구현 결론:** exemplar·시작 시각은 원천이 제공하고 전송 형식과 저장 설정이 지원해야 보존됩니다. 도구 이름만으로 연결·reset 처리가 자동 완성된다고 가정하지 않습니다. 아래는 구현자 참고입니다.
 
 ## Prometheus의 수용과 질의는 별도 확인한다
 
@@ -74,3 +78,5 @@ exemplar는 해당 tenant의 trace 조회로 연결하며 “표본 연결”, �
 ## 함께 읽기
 
 [시계열](time-series.md) · [분포](distributions.md) · [sampling 확률과 추정](../application/trace-sampling-and-context.md) · [전송 계약](../product/telemetry-delivery-contracts.md)
+
+이전: [시계열과 지표의 데이터 모델](time-series.md) · 다음: [평균과 백분위수 및 분포의 집계](distributions.md) · [분야 목차](README.md)

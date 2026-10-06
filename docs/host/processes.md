@@ -1,8 +1,6 @@
 # 프로세스와 스레드 및 파일 디스크립터
 
-> 상태: 검토됨 · 범위: Linux procfs와 프로세스 인터페이스 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04 · 3d 원천·저장 증거 확인: 2026-10-06
-
-> 3라운드 보강: Linux 6.12 상태·메모리 원천 확인, 2026-10-05
+> 상태: 검토됨 · 적용 범위: Linux procfs와 프로세스 인터페이스 · 원천 확인일: 2026-10-06 · 실습 여부: 저장된 로컬 실행 근거 포함; 구성·한계는 본문
 
 ## 먼저 이해할 것
 
@@ -35,6 +33,8 @@ Linux `status`에는 스레드 그룹·스레드 ID, 부모 ID, 상태와 스레
 
 Linux 6.12의 `TASK_IDLE`은 `TASK_UNINTERRUPTIBLE`과 `TASK_NOLOAD`를 결합하고 `I`로 노출합니다. 이 상태의 대기는 load average의 uninterruptible 기여에서 제외됩니다. 따라서 I를 D에 합쳐 load를 역산하지 않습니다. load average는 시간 평균이며 순간 상태 목록과도 같지 않습니다. [상태 정의](https://github.com/torvalds/linux/blob/v6.12/include/linux/sched.h), [sched_contributes_to_load](https://github.com/torvalds/linux/blob/v6.12/kernel/sched/core.c), [load 평균 계정](https://github.com/torvalds/linux/blob/v6.12/kernel/sched/loadavg.c)
 
+좀비는 계속 애플리케이션 코드를 실행하는 상태가 아닙니다. 부모가 종료 상태를 회수하지 않으면 필요한 프로세스 정보가 남을 수 있으므로, 좀비 증가에서는 부모의 회수 동작을 조사합니다. [Linux wait](https://man7.org/linux/man-pages/man2/wait.2.html)
+
 ## 먼저 저비용 메모리 원천을 읽고 상세 매핑으로 좁힌다
 
 수천 개 프로세스의 메모리를 매번 자세히 조사하면 수집기 자체가 부담을 만들 수 있습니다. 먼저 status/statm으로 변화한 대상을 찾고 필요할 때 smaps_rollup·smaps으로 내려가는 방식을 고려합니다. 이것은 비용을 제한하는 제품 제안이며 모든 프로세스에서 일정한 배수만큼 빠르다는 뜻은 아닙니다.
@@ -55,13 +55,13 @@ status/statm의 RSS 계정은 비동기 처리 등의 이유로 부정확할 수
 
 PSS는 공유 페이지의 비용을 공유자에게 나눠 귀속합니다. RSS와 PSS가 어떤 질문에 답하는지는 [메모리 장의 공유 페이지 예시](memory.md)를 봅니다. smaps_rollup은 smaps의 내용을 먼저 모두 출력해 사용자 공간에서 합산하는 비용을 줄이지만, 모든 메모리 변화의 무비용 계수기는 아닙니다. 페이지·매핑 수, 권한, 커널 구현과 읽기 빈도에 따라 비용을 평가합니다. [smaps·rollup 정의](https://docs.kernel.org/6.12/filesystems/proc.html#smaps)
 
-수집 시에는 PID·starttime을 전후 확인해 PID 재사용을 구분합니다. 대상 procfs를 읽을 권한과 ptrace 접근 검사·hidepid 같은 제한을 확인하고, 프로세스 종료·권한 부족·미지원은 0으로 채우지 않습니다. 명령 예시 `cat /proc/self/status`는 **cat 자신의 정보**를 읽습니다. 제품 대상 PID의 상태를 읽는 것과 구분하며, 상세 매핑 조회는 읽기 전용이어도 비용이 있습니다. 이 cat 명령은 별도로 실행하지 않았습니다. 아래 실습의 procfs 읽기와 구분합니다. [procfs 접근](https://man7.org/linux/man-pages/man5/proc.5.html), [smaps](https://man7.org/linux/man-pages/man5/proc_pid_smaps.5.html)
+수집 시에는 PID·starttime을 전후 확인해 PID 재사용을 구분합니다. 대상 procfs를 읽을 권한과 ptrace 접근 검사·hidepid 같은 제한을 확인하고, 프로세스 종료·권한 부족·미지원은 0으로 채우지 않습니다. 읽기 전용 명령 `cat /proc/self/status`는 **cat 자신의 정보**를 읽습니다. 제품 대상 PID의 상태를 읽는 것과 구분하며, 상세 매핑 조회는 읽기 전용이어도 비용이 있습니다. 이 cat 명령은 별도로 실행하지 않았습니다. 아래 실습의 procfs 읽기와 구분합니다. [procfs 접근](https://man7.org/linux/man-pages/man5/proc.5.html), [smaps](https://man7.org/linux/man-pages/man5/proc_pid_smaps.5.html)
 
-**저장된 실습 결과(Claude 실행 2026-10-05, WSL2 Linux 6.18.33.2):** 각각 8 MiB를 매핑하고 페이지를 만진 뒤, 익명·파일·memfd는 해당 `Pss_Anon`·`Pss_File`·`Pss_Shmem`이 각각 8,388,608 bytes 증가했습니다. 서로 다른 자식 프로세스의 전후 차이이며 일반적인 메모리 누수 판정 기준이 아닙니다. [요약과 모든 gzip 원자료의 hash](../../labs/results/1.1-r3/linux-memory.json)
+**저장된 실습 결과(실행 2026-10-05, WSL2 Linux 6.18.33.2):** 각각 8 MiB를 매핑하고 페이지를 만진 뒤, 익명·파일·memfd는 해당 `Pss_Anon`·`Pss_File`·`Pss_Shmem`이 각각 8,388,608 bytes 증가했습니다. 서로 다른 자식 프로세스의 전후 차이이며 일반적인 메모리 누수 판정 기준이 아닙니다. [요약과 모든 gzip 원자료의 hash](../../labs/results/1.1-r3/linux-memory.json)
 
 같은 실행의 익명 매핑 단계에서 statm resident는 7,320페이지였고, 페이지 크기 4 KiB를 곱한 29,280 KiB가 status의 `VmRSS`와 같았습니다. memfd 단계의 shared는 `4,709 × 4 = 18,836 KiB`로 `RssFile 10,644 + RssShmem 8,192 KiB`와 같았습니다. **이 표본에서의 일치**이며 status/statm의 근사성이나 순차 조회의 한계를 없애지는 않습니다. [resident 원자료](../../labs/results/1.1-r3/linux-memory.raw/anonymous-allocated-statm.gz), [memfd status](../../labs/results/1.1-r3/linux-memory.raw/memfd-allocated-status.gz)
 
-각 원천을 30회 읽은 경과 시간의 중앙값은 다음과 같습니다. `CLOCK_MONOTONIC_RAW`로 측정한 로컬 호출 비용이며 커널·매핑 수·캐시·스케줄링이 달라지면 결과도 달라집니다. 원천 간 고정 비용 배율로 사용하지 않습니다. 파싱된 값과 원자료, 표본의 중앙값 계산은 `verify_review_r3 --published`가 검사합니다.
+각 원천을 30회 읽은 경과 시간의 중앙값은 다음과 같습니다. `CLOCK_MONOTONIC_RAW`로 측정한 로컬 호출 비용이며 커널·매핑 수·캐시·스케줄링이 달라지면 결과도 달라집니다. 원천 간 고정 비용 배율로 사용하지 않습니다. 원자료와 비용 측정 검사는 [검증 기록](../validation.md)에 연결합니다.
 
 | 매핑 단계 | status | smaps_rollup | smaps |
 | --- | --- | --- | --- |
@@ -69,9 +69,7 @@ PSS는 공유 페이지의 비용을 공유자에게 나눠 귀속합니다. RSS
 | 파일 | 19.06 µs | 105.816 µs | 195.4055 µs |
 | memfd | 17.5295 µs | 105.3905 µs | 200.052 µs |
 
-메모리 분류의 이동을 누수라고 단정하기 전에 [회수와 OOM](reclaim-and-oom.md)을 연결해 봅니다.
-
-좀비는 계속 애플리케이션 코드를 실행하는 상태가 아닙니다. 부모가 종료 상태를 회수하지 않으면 필요한 프로세스 정보가 남을 수 있으므로, 좀비 증가에서는 부모의 회수 동작을 조사합니다. [Linux wait](https://man7.org/linux/man-pages/man2/wait.2.html)
+메모리 분류의 이동을 누수라고 단정하기 전에 [메모리 누수 판단](memory.md#장애-분석)을 연결해 봅니다.
 
 ## 파일 디스크립터는 파일만 가리키지 않는다
 
@@ -110,3 +108,5 @@ PSS는 공유 페이지의 비용을 공유자에게 나눠 귀속합니다. RSS
 - 상태 I인 kernel thread도 load average에 더하는가? **TASK_IDLE은 TASK_NOLOAD를 포함하므로 해당 대기 상태는 제외합니다.**
 
 관련: [CPU](cpu.md), [메모리](memory.md), [블록 I/O](disk-io.md), [컨테이너 격리](../containers/isolation-and-lifecycle.md)
+
+이전: [블록 I/O와 파일시스템 용량](disk-io.md) · 다음: [Windows의 CPU와 메모리 관측](windows.md) · [분야 목차](README.md)

@@ -1,6 +1,6 @@
 # 문서형, 분산형, 분석형 DB의 관측
 
-> 상태: 검토됨 · 적용 범위: MongoDB 8.0, Cassandra 공식 구조, DynamoDB 읽기, ClickHouse MergeTree · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: MongoDB 8.0, Cassandra 공식 구조, DynamoDB 읽기, ClickHouse MergeTree · 원천 확인일: 2026-10-03 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
@@ -22,13 +22,13 @@ MongoDB의 읽기는 read preference, read concern, 세션과 write concern의 �
 
 실행 계획에서는 반환 문서 수와 검사한 문서·인덱스 키 수를 비교할 수 있습니다. 이 값은 서로 다른 작업량이며 하나의 사용률로 대체하지 않습니다. [MongoDB Explain Results](https://www.mongodb.com/docs/v8.0/reference/explain-results/)
 
-합성 예로 문서 100,000개를 검사해 10개를 반환했다면 `10,000 검사 문서/반환 문서`입니다. 비용이 클 가능성을 조사할 단서지만 쿼리의 목적, 인덱스와 데이터 분포를 확인해야 하며 이 비율에 보편적인 장애 임계값을 두지 않습니다.
+가상 예시로 문서 100,000개를 검사해 10개를 반환했다면 `10,000 검사 문서/반환 문서`입니다. 비용이 클 가능성을 조사할 단서지만 쿼리의 목적, 인덱스와 데이터 분포를 확인해야 하며 이 비율에 보편적인 장애 임계값을 두지 않습니다.
 
 ## Cassandra: 복제 수와 응답 수
 
-Cassandra는 요청별 consistency level로 필요한 복제본 응답 수를 정합니다. 일반 쓰기는 consistency level과 관계없이 관련 복제본에 보내며 성공 응답에 필요한 수가 달라집니다. RF=3에서 QUORUM은 2개 응답을 요구합니다. [Cassandra Dynamo Architecture](https://cassandra.apache.org/doc/stable/cassandra/architecture/dynamo)
+Cassandra는 요청별 consistency level로 필요한 복제본 응답 수를 정합니다. 일반 쓰기는 consistency level과 관계없이 관련 복제본에 보내며 성공 응답에 필요한 수가 달라집니다. RF(replication factor, 복제본 수)=3에서 QUORUM은 2개 응답을 요구합니다. [Cassandra Dynamo Architecture](https://cassandra.apache.org/doc/stable/cassandra/architecture/dynamo)
 
-가상 집합 `{A,B,C}`에서 쓰기 응답 `{A,B}`와 읽기 응답 `{B,C}`는 B에서 겹칩니다. `R+W>N`은 이러한 교집합을 설명하지만 동시 쓰기, 실패한 쓰기, 시간표와 전체 트랜잭션의 모든 보장을 대신하지 않습니다. 원자적 조건부 변경에 쓰는 lightweight transaction은 별도 일관성 경로입니다. [Cassandra Guarantees](https://cassandra.apache.org/doc/latest/cassandra/architecture/guarantees.html)
+가상 집합 `{A,B,C}`에서 쓰기 응답 `{A,B}`와 읽기 응답 `{B,C}`는 B에서 겹칩니다. 여기서 N은 복제본 수, R은 읽기 응답 수, W는 쓰기 응답 수입니다. `R+W>N`은 이러한 교집합을 설명하지만 동시 쓰기, 실패한 쓰기, 시간표와 전체 트랜잭션의 모든 보장을 대신하지 않습니다. 원자적 조건부 변경에 쓰는 lightweight transaction은 별도 일관성 경로입니다. [Cassandra Guarantees](https://cassandra.apache.org/doc/latest/cassandra/architecture/guarantees.html)
 
 제품에는 coordinator와 replica의 지연, consistency level, 오류 종류, 대상 partition의 편중을 함께 기록하도록 제안합니다. 클러스터 평균만 보면 특정 partition의 과부하가 가려질 수 있습니다.
 
@@ -57,3 +57,5 @@ MergeTree는 정렬된 데이터 part와 백그라운드 병합을 사용하는 
 3. MergeTree primary key는 일반적인 유일성 제약인가? **같은 의미가 아닙니다.**
 
 관련: [캐시·메시징·검색](../middleware/README.md) · [스토리지](../storage/README.md) · [DB 목차](README.md)
+
+이전: [SQL Server와 Oracle: 대기와 실행 통계](sqlserver-oracle.md) · 다음: [시계열·그래프·문서·열 지향 DB를 비교하는 기준](specialized-data-models.md) · [분야 목차](README.md)

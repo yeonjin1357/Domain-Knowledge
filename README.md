@@ -37,29 +37,10 @@ Start-Process .\BOOK.html
 
 ## 제1.2판에서 보강한 내용
 
-제1.1판의 **92장에 8장을 더해 100장**으로 확장했습니다. Linux 네트워크·메모리 회수, Kubernetes 압박·종료, PostgreSQL·MySQL 운영, 지표 문맥·OpenTelemetry 이름·분포 저장을 새 장으로 정리했습니다.
-
-세 차례 Claude–Codex 교차 검토로 CPU 사용률의 시간 기준, Kubernetes watch cache, Collector의 전송 실패 집계 시점, DB 통계와 복제 완료 판단을 바로잡았습니다. 어려운 개념에는 상황 설명과 실제 관측을 덧붙였습니다.
-
-| 라운드 | 새 실습 묶음 | 기록된 판정 |
-| --- | ---: | --- |
-| 1 | 1 | passed 3·observed 2; CPU 시계 4구간·idle 61표본 포함 |
-| 2 | 4 | supported 34·refuted 2 |
-| 3 | 7 | supported 23·refuted 4; MySQL 재실행 이력 포함 |
-
-예상과 다른 결과도 원자료와 함께 보존했습니다. 위 판정은 정해진 실습 조건에 대한 기록입니다. **두 AI의 교차 검토와 로컬 실행이며 외부 전문가 감수나 모든 운영 환경의 지원 인증은 아닙니다.** Lambda의 suppressed init과 CloudWatch Duration의 관계, 일부 시계 보정의 원인 등은 미확인으로 남겼습니다.
-
-## 제1.1판에서 보강한 내용
-
-12개 장을 추가했습니다. 측정값의 비교, 컨테이너 메모리와 OOM, 쓰기 지속성, trace sampling, 클라우드 지표 재조회를 풀어 설명하고 제품의 필드 계약으로 연결했습니다. Linux·PostgreSQL·Kubernetes API·OTel Collector·HTTP/1.1에서는 **31개 실제 시나리오**를 추가 실행해 원시 결과와 재현 코드를 남겼습니다.
-
-Kubernetes의 `resourceVersion`은 1.35 이상 규약과 이전 버전·확장 API의 경계를 구분합니다. 교차 검토의 정정, 시계 차이의 재실행 근거와 해석 범위는 [검토 기록](docs/review.md), 고정 버전과 현재 릴리스의 차이는 [버전 상태](docs/coverage.md#교차-검토-시점의-버전-상태)에 적었습니다.
-
-## 2026-10-05 교차 검토 보강 이력
-
-당시에는 판 번호와 판 기준일을 유지했습니다. [Linux 스택 카운터](docs/network/linux-stack-counters.md), [Kubernetes 압박·종료](docs/kubernetes/pressure-and-termination.md), [PostgreSQL 운영 통계](docs/database/postgresql-operations.md), [exemplar·counter 시작](docs/foundations/metric-context-and-start-time.md), [OTel 안정 이름](docs/application/semantic-conventions.md) 5장을 추가했습니다. Kafka·Windows·cloud 시간·알림 지연·저장 지속성·HTTP/TLS·SNMP도 기존 장에서 보강했습니다.
-
-원천 확인과 채택하지 않은 단서는 [2라운드 검토 기록](review/claude-codex-r2.md)에 있습니다. Claude가 실행한 Kubernetes·Collector·PostgreSQL·promtool의 새 결과 36개 판정을 별도로 출판했습니다. 고정 버전·구성·반증과 실행하지 않은 범위는 [실습](docs/cross-domain/reproducible-labs.md)과 [검증 기록](docs/validation.md)에 적었습니다.
+제1.1판의 92장에 Linux·Kubernetes·DB 운영과 지표 문맥·분포 저장 8장을 더해 **100장**으로 확장했습니다.
+CPU 시간 기준, 객체 수집, 전송 실패, 복제 완료처럼 같은 숫자를 다르게 해석하기 쉬운 경계를 실제 로컬 관측과 함께 설명합니다.
+원천 지표에서 제품 구현으로 이어지는 [필드 카탈로그와 계약 테스트](docs/product/adapter-contracts.md)를 연결했습니다.
+두 AI의 교차 검토와 로컬 실행 범위이며, 변경 이력·미확인 사항은 [검토 기록](docs/review.md)에 있습니다.
 
 ## 근거와 검증
 
@@ -67,7 +48,7 @@ Kubernetes의 `resourceVersion`은 1.35 이상 규약과 이전 버전·확장 A
 
 제1.2판은 정한 학습 범위의 원고와 실행 근거를 갖춘 지식서입니다. 모든 제조사·모든 버전의 API 전수나 사용자 제품의 실제 지원 인증을 뜻하지 않습니다. 정확한 범위는 [범위 원칙](docs/scope.md)과 [분야별 범위](docs/coverage.md)를 따릅니다.
 
-교차 검토의 판단 근거와 채택하지 않은 해석은 [1라운드](review/claude-codex-r1.md)·[2라운드](review/claude-codex-r2.md)·[3라운드](review/claude-codex-r3.md)에 보존했습니다. 새 8장과 주요 정정의 목록은 [1.2판 변경 기록](docs/review.md#제12판에서-달라진-내용)에 있습니다.
+새 장과 주요 정정의 목록은 [1.2판 변경 기록](docs/review.md#제12판에서-달라진-내용)에 있습니다.
 
 ## 원문 수정과 재생성
 

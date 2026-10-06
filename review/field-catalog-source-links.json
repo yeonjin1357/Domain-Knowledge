@@ -1,0 +1,473 @@
+{
+  "checked_at_utc": "2026-10-06T00:56:01.941542+00:00",
+  "scope": "HTTP availability only; body prefix hash is not a preserved full source or semantic fact certification.",
+  "results": [
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.4/en/performance-schema-data-lock-waits-table.html",
+      "status": 403,
+      "error": "HTTP Error 403: Forbidden",
+      "alternate_read": {
+        "method": "web tool opened the official page",
+        "checked_on": "2026-10-06",
+        "scope": "Official page content available through web tool; original urllib HTTP 403 retained, not rewritten as 200."
+      }
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.4/en/performance-schema-data-locks-table.html",
+      "status": 403,
+      "error": "HTTP Error 403: Forbidden",
+      "alternate_read": {
+        "method": "web tool opened the official page",
+        "checked_on": "2026-10-06",
+        "scope": "Official page content available through web tool; original urllib HTTP 403 retained, not rewritten as 200."
+      }
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.4/en/performance-schema-replication-applier-status-by-worker-table.html",
+      "status": 403,
+      "error": "HTTP Error 403: Forbidden",
+      "alternate_read": {
+        "method": "web tool opened the official page",
+        "checked_on": "2026-10-06",
+        "scope": "Official page content available through web tool; original urllib HTTP 403 retained, not rewritten as 200."
+      }
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.4/en/performance-schema-replication-connection-status-table.html",
+      "status": 403,
+      "error": "HTTP Error 403: Forbidden",
+      "alternate_read": {
+        "method": "web tool opened the official page",
+        "checked_on": "2026-10-06",
+        "scope": "Official page content available through web tool; original urllib HTTP 403 retained, not rewritten as 200."
+      }
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.4/en/performance-schema-statement-summary-tables.html",
+      "status": 403,
+      "error": "HTTP Error 403: Forbidden",
+      "alternate_read": {
+        "method": "web tool opened the official page",
+        "checked_on": "2026-10-06",
+        "scope": "Official page content available through web tool; original urllib HTTP 403 retained, not rewritten as 200."
+      }
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/8.4/en/show-replica-status.html",
+      "status": 403,
+      "error": "HTTP Error 403: Forbidden",
+      "alternate_read": {
+        "method": "web tool opened the official page",
+        "checked_on": "2026-10-06",
+        "scope": "Official page content available through web tool; original urllib HTTP 403 retained, not rewritten as 200."
+      }
+    },
+    {
+      "url": "https://dev.mysql.com/doc/refman/9.7/en/show-replica-status.html",
+      "status": 403,
+      "error": "HTTP Error 403: Forbidden",
+      "alternate_read": {
+        "method": "web tool opened the official page",
+        "checked_on": "2026-10-06",
+        "scope": "Official page content available through web tool; original urllib HTTP 403 retained, not rewritten as 200."
+      }
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html",
+      "status": 200,
+      "final_url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "25a5b614909417e8c736810832061128e16ccb17988f2925a5571e925d1162e1"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataResult.html",
+      "status": 200,
+      "final_url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataResult.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "932b5441cfb9b04cd6f4550581446b38d1d6a3bf02b6fa658f84a4effb117ebf"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricStat.html",
+      "checked_at_utc": "2026-10-06T01:59:13.903132+00:00",
+      "status": 200,
+      "final_url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricStat.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "d9792736a9d259390f8f5eed238f9e4cf2f6337740aa57ed48d12539b71dd065"
+    },
+    {
+      "url": "https://docs.kernel.org/6.12/admin-guide/cgroup-v2.html",
+      "status": 200,
+      "final_url": "https://docs.kernel.org/6.12/admin-guide/cgroup-v2.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "78c3c74be030b536e63d4f27fba0289ca69b53a5eff4249bda2ea382fff94545"
+    },
+    {
+      "url": "https://docs.kernel.org/accounting/psi.html",
+      "status": 200,
+      "final_url": "https://docs.kernel.org/accounting/psi.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "3fda79064801b2e96bc190f066cc192a6bb9d6106f75025d0d1342fb0d24e571"
+    },
+    {
+      "url": "https://docs.kernel.org/admin-guide/iostats.html",
+      "status": 200,
+      "final_url": "https://docs.kernel.org/admin-guide/iostats.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "8093485873c45f6743dde6d7fcae43c304fe8834f9c6abc4d6bfc9eaf4a489bd"
+    },
+    {
+      "url": "https://docs.kernel.org/networking/snmp_counter.html",
+      "status": 200,
+      "final_url": "https://docs.kernel.org/networking/snmp_counter.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "c1bf628581de391deb1db50fca2d420eeb06a43187aae429d7c2606a2a25b128"
+    },
+    {
+      "url": "https://github.com/kubernetes/kubernetes/blob/v1.37.0/pkg/features/kube_features.go",
+      "checked_at_utc": "2026-10-06T01:59:13.903132+00:00",
+      "status": 200,
+      "final_url": "https://github.com/kubernetes/kubernetes/blob/v1.37.0/pkg/features/kube_features.go",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/kubernetes/kubernetes/blob/v1.37.0/pkg/kubelet/server/stats/summary.go",
+      "status": 200,
+      "final_url": "https://github.com/kubernetes/kubernetes/blob/v1.37.0/pkg/kubelet/server/stats/summary.go",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/postgres/postgres/blob/REL_18_6/src/backend/catalog/system_views.sql",
+      "checked_at_utc": "2026-10-06T01:59:13.903132+00:00",
+      "status": 200,
+      "final_url": "https://github.com/postgres/postgres/blob/REL_18_6/src/backend/catalog/system_views.sql",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/postgres/postgres/blob/REL_18_6/src/backend/replication/walsender.c",
+      "checked_at_utc": "2026-10-06T01:59:13.903132+00:00",
+      "status": 200,
+      "final_url": "https://github.com/postgres/postgres/blob/REL_18_6/src/backend/replication/walsender.c",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/postgres/postgres/blob/REL_18_6/src/backend/utils/adt/pgstatfuncs.c",
+      "checked_at_utc": "2026-10-06T01:59:13.903132+00:00",
+      "status": 200,
+      "final_url": "https://github.com/postgres/postgres/blob/REL_18_6/src/backend/utils/adt/pgstatfuncs.c",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/postgres/postgres/commit/f92c854c",
+      "checked_at_utc": "2026-10-06T01:59:13.903132+00:00",
+      "status": 200,
+      "final_url": "https://github.com/postgres/postgres/commit/f92c854c",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/torvalds/linux/blob/v6.10/net/ipv4/tcp.c",
+      "checked_at_utc": "2026-10-06T01:59:14.236867+00:00",
+      "status": 200,
+      "final_url": "https://github.com/torvalds/linux/blob/v6.10/net/ipv4/tcp.c",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/torvalds/linux/blob/v6.12/fs/proc/array.c",
+      "checked_at_utc": "2026-10-06T01:59:14.646756+00:00",
+      "status": 200,
+      "final_url": "https://github.com/torvalds/linux/blob/v6.12/fs/proc/array.c",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/torvalds/linux/blob/v6.12/include/net/udp.h",
+      "checked_at_utc": "2026-10-06T01:59:14.685723+00:00",
+      "status": 200,
+      "final_url": "https://github.com/torvalds/linux/blob/v6.12/include/net/udp.h",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/torvalds/linux/blob/v6.12/kernel/sched/cputime.c",
+      "checked_at_utc": "2026-10-06T01:59:14.709803+00:00",
+      "status": 200,
+      "final_url": "https://github.com/torvalds/linux/blob/v6.12/kernel/sched/cputime.c",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/torvalds/linux/blob/v6.12/mm/oom_kill.c",
+      "status": 200,
+      "final_url": "https://github.com/torvalds/linux/blob/v6.12/mm/oom_kill.c",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/torvalds/linux/blob/v6.12/mm/page_io.c",
+      "status": 200,
+      "final_url": "https://github.com/torvalds/linux/blob/v6.12/mm/page_io.c",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/torvalds/linux/blob/v6.12/mm/vmscan.c",
+      "status": 200,
+      "final_url": "https://github.com/torvalds/linux/blob/v6.12/mm/vmscan.c",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/torvalds/linux/blob/v6.12/net/ipv4/proc.c",
+      "checked_at_utc": "2026-10-06T01:59:14.750686+00:00",
+      "status": 200,
+      "final_url": "https://github.com/torvalds/linux/blob/v6.12/net/ipv4/proc.c",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/torvalds/linux/blob/v6.12/net/ipv4/udp.c",
+      "status": 200,
+      "final_url": "https://github.com/torvalds/linux/blob/v6.12/net/ipv4/udp.c",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/torvalds/linux/blob/v6.12/net/ipv6/proc.c",
+      "checked_at_utc": "2026-10-06T01:59:14.982602+00:00",
+      "status": 200,
+      "final_url": "https://github.com/torvalds/linux/blob/v6.12/net/ipv6/proc.c",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/torvalds/linux/blob/v6.13/mm/memcontrol.c",
+      "status": 200,
+      "final_url": "https://github.com/torvalds/linux/blob/v6.13/mm/memcontrol.c",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/torvalds/linux/blob/v6.15/mm/memcontrol.c",
+      "status": 200,
+      "final_url": "https://github.com/torvalds/linux/blob/v6.15/mm/memcontrol.c",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/torvalds/linux/blob/v6.15/mm/vmscan.c",
+      "checked_at_utc": "2026-10-06T01:59:16.029773+00:00",
+      "status": 200,
+      "final_url": "https://github.com/torvalds/linux/blob/v6.15/mm/vmscan.c",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/torvalds/linux/blob/v6.9/net/ipv4/tcp.c",
+      "checked_at_utc": "2026-10-06T01:59:16.045714+00:00",
+      "status": 200,
+      "final_url": "https://github.com/torvalds/linux/blob/v6.9/net/ipv4/tcp.c",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://github.com/torvalds/linux/commit/a46d0ea5c942",
+      "checked_at_utc": "2026-10-06T01:59:16.149440+00:00",
+      "status": 200,
+      "final_url": "https://github.com/torvalds/linux/commit/a46d0ea5c942",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "61fe3bf5993b80ff224fa6e27497be811074c7ca62b91bcae0abf350b339fce6"
+    },
+    {
+      "url": "https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/",
+      "status": 200,
+      "final_url": "https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "a954567da3665d7700895ee7ee5575179b073c14d31a77e4a04a1cd92291cd3c"
+    },
+    {
+      "url": "https://kubernetes.io/docs/reference/instrumentation/node-metrics/",
+      "status": 200,
+      "final_url": "https://kubernetes.io/docs/reference/instrumentation/node-metrics/",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "d6a94117e1c3eddce64ae11e9bad72eef2a5f6dac1df134f10550db8c6e52d7e"
+    },
+    {
+      "url": "https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions",
+      "status": 200,
+      "final_url": "https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "9618cde8a4410ae0a3eb01314c62cca10f68f2308660ed2fb8830d7665fb5d6e"
+    },
+    {
+      "url": "https://man7.org/linux/man-pages/man5/proc_meminfo.5.html",
+      "status": 200,
+      "final_url": "https://man7.org/linux/man-pages/man5/proc_meminfo.5.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "bf428614788c0a1848888fa25f45a8274a972490c10ffcd42a08c60e2fc45db1"
+    },
+    {
+      "url": "https://man7.org/linux/man-pages/man5/proc_pid_stat.5.html",
+      "status": 200,
+      "final_url": "https://man7.org/linux/man-pages/man5/proc_pid_stat.5.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "d46bcfde1a10014364f17782609f28d535831c14563043886d207a108f0ca194"
+    },
+    {
+      "url": "https://man7.org/linux/man-pages/man5/proc_stat.5.html",
+      "status": 200,
+      "final_url": "https://man7.org/linux/man-pages/man5/proc_stat.5.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "503a55e7e5a35901f810f5c31148c5ed6c65666c8fd2f340c0ae8b238f0eef3e"
+    },
+    {
+      "url": "https://opentelemetry.io/docs/collector/internal-telemetry/",
+      "status": 200,
+      "final_url": "https://opentelemetry.io/docs/collector/internal-telemetry/",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "4be88fc9e867717e0ce3098f44ba2449facf04fc553c531324535d1e0f2d1060"
+    },
+    {
+      "url": "https://opentelemetry.io/docs/specs/otel/metrics/data-model/",
+      "status": 200,
+      "final_url": "https://opentelemetry.io/docs/specs/otel/metrics/data-model/",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "2aba4549674263cea667f7485d35141689030e17cd5e0b4851b75cb0b6c7cae8"
+    },
+    {
+      "url": "https://opentelemetry.io/docs/specs/otlp/",
+      "status": 200,
+      "final_url": "https://opentelemetry.io/docs/specs/otlp/",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "25a92563f72c30d69fc0cdb7adecbab7eae85e08b2bbfeba5ca131ef8689192b"
+    },
+    {
+      "url": "https://protobuf.dev/programming-guides/json/",
+      "checked_at_utc": "2026-10-06T01:59:16.166890+00:00",
+      "status": 200,
+      "final_url": "https://protobuf.dev/programming-guides/json/",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "055a669483a2729ba191dc28d0041ac1c1f08cf63a0f2222fdaef7e698aadb3a"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/kubernetes/kubernetes/v1.37.0/staging/src/k8s.io/api/core/v1/types.go",
+      "status": 200,
+      "final_url": "https://raw.githubusercontent.com/kubernetes/kubernetes/v1.37.0/staging/src/k8s.io/api/core/v1/types.go",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "6902b65948af1f227dee9a36c88b52cc21ef62cf9593e875dc2285a2e8677c00"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/kubernetes/kubernetes/v1.37.0/staging/src/k8s.io/kubelet/pkg/apis/stats/v1alpha1/types.go",
+      "status": 200,
+      "final_url": "https://raw.githubusercontent.com/kubernetes/kubernetes/v1.37.0/staging/src/k8s.io/kubelet/pkg/apis/stats/v1alpha1/types.go",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "454dbf5af77d2c044d03cbeff3d370baff35e3b6a88818d7a9282ef6fe907cdc"
+    },
+    {
+      "url": "https://v1-35.docs.kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/",
+      "status": 200,
+      "final_url": "https://v1-35.docs.kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "0e84d6bdb25b524ad793b27c010d4106b798b2d2783d75ee1da4b1c588ab8d71"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/12/pgstatstatements.html",
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/12/pgstatstatements.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "5962998d5aa574cf26da5d0c9a58a1e9cb097abe8cc7c6746d19df0b468dba21"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/13/pgstatstatements.html",
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/13/pgstatstatements.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "743263f8db69b4a97a40c9bb867b99365299d0c92456ecb24151c1034b06519a"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/14/pgstatstatements.html",
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/14/pgstatstatements.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "27ad1b442684819b0f577a1701d28da3b7fad47141a0e9f067b015670101bd03"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/16/monitoring-stats.html",
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/16/monitoring-stats.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "a17ba1e6eee55bb9e1841df474f24dc6b490a96d4cdfeca05535e1ad4dd7d281"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/16/monitoring-stats.html#MONITORING-PG-STAT-IO-VIEW",
+      "checked_at_utc": "2026-10-06T01:59:16.370313+00:00",
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/16/monitoring-stats.html#MONITORING-PG-STAT-IO-VIEW",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "a17ba1e6eee55bb9e1841df474f24dc6b490a96d4cdfeca05535e1ad4dd7d281"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/17/monitoring-stats.html#MONITORING-PG-STAT-CHECKPOINTER-VIEW",
+      "checked_at_utc": "2026-10-06T01:59:16.443105+00:00",
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/17/monitoring-stats.html#MONITORING-PG-STAT-CHECKPOINTER-VIEW",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "ad0096e90954fa0fcbc958b2cdfd27466158ce9319abbdd3c72d65de49666d56"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/17/monitoring-stats.html#MONITORING-PG-STAT-IO-VIEW",
+      "checked_at_utc": "2026-10-06T01:59:16.459351+00:00",
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/17/monitoring-stats.html#MONITORING-PG-STAT-IO-VIEW",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "ad0096e90954fa0fcbc958b2cdfd27466158ce9319abbdd3c72d65de49666d56"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/17/pgstatstatements.html",
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/17/pgstatstatements.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "e0b301180068e9d8b4670cc01102427d0795548da2654f6607b414f53538d31e"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/18/monitoring-stats.html",
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/18/monitoring-stats.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "56d35655a0f8037ac10d7bd35dcf1ee3f311446c73124062d4b7e98d210d44d8"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/18/monitoring-stats.html#MONITORING-PG-STAT-IO-VIEW",
+      "checked_at_utc": "2026-10-06T01:59:17.376743+00:00",
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/18/monitoring-stats.html#MONITORING-PG-STAT-IO-VIEW",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "56d35655a0f8037ac10d7bd35dcf1ee3f311446c73124062d4b7e98d210d44d8"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/18/predefined-roles.html",
+      "checked_at_utc": "2026-10-06T01:59:17.502209+00:00",
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/18/predefined-roles.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "4698a99fc5c45270103dc93b032efbdf224f1ce069a42c4b24ec0e33eed7f113"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/18/view-pg-replication-slots.html",
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/18/view-pg-replication-slots.html",
+      "prefix_bytes": 4096,
+      "prefix_sha256": "e5da54f2014ffbf2a202532c3fc6aef5f970a3a49e2c9fb7e8f588954f24eef8"
+    }
+  ],
+  "additional_review": {
+    "checked_at_utc": "2026-10-06T01:59:18.564589+00:00",
+    "scope": "4d added source URLs only; original availability rows and their timestamps/status are retained",
+    "new_count": 21
+  }
+}

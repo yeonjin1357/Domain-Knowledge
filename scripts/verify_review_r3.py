@@ -364,7 +364,7 @@ def verify_published_review_r3():
         verify_mysql_r1_publication(records[f'mysql-{version}-r1-r3'])
         verify_mysql_r2_publication(records[f'mysql-{version}-r2-r3'])
     chapter = (ROOT/'docs/database/mysql-operations.md').read_text(encoding='utf-8')
-    for token in ('| baseline | Yes / Yes | 1073 / 1073 | 0 | 1–4 / 1–4 |',
+    for token in ('| 위치 일치 후(baseline) | Yes / Yes | 1073 / 1073 | 0 | 1–4 / 1–4 |',
                   '| io_stopped | No / Yes | 1073 / 1073 | NULL | 1–5 / 1–4 |',
                   '| sql_stopped | Yes / No | 1611 / 1342 | NULL | 1–6 / 1–5 |',
                   '| resumed | Yes / Yes | 1611 / 1611 | 0 | 1–6 / 1–6 |',

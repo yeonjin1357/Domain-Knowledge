@@ -1,6 +1,6 @@
 # 클라우드 지표의 기간, 통계와 정규화
 
-> 상태: 검토됨 · 적용 범위: CloudWatch·Azure Monitor·Cloud Monitoring · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (공급자별 보존·집계·조회 한도)
+> 상태: 검토됨 · 적용 범위: CloudWatch·Azure Monitor·Cloud Monitoring · 원천 확인일: 2026-10-05 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
@@ -35,7 +35,7 @@ EC2 basic monitoring의 일반 지표는 5분, detailed monitoring은 1분 주�
 
 Azure Monitor의 플랫폼 지표 집계 설명에서는 최소 time grain을 1분으로 설명합니다. 실제 지표가 지원하는 기간·집계는 해당 resource type의 지표 정의로 확인합니다. 이 설명을 모든 로그 쿼리나 사용자 정의 관측 데이터의 최소 간격으로 일반화하지 않습니다. `NULL`과 0은 집계에서 다르게 처리됩니다. 다만 **플랫폼 지표는 무수신 구간을 0 또는 NULL 중 무엇으로 기록할지 resource provider가 결정**하므로 숫자 0을 항상 실제 관측된 0으로 확정할 수 없습니다. 사용자 정의 지표의 무수신은 NULL로 처리됩니다. provider·지표별 결측 정책을 보존합니다. [Azure 집계와 NULL](https://learn.microsoft.com/en-us/azure/azure-monitor/metrics/metrics-aggregation-explained), [리소스별 지표 참조](https://learn.microsoft.com/en-us/azure/azure-monitor/reference/metrics-index)
 
-**합성 예시:** 같은 가중치의 세 구간이 `[10, NULL, 20]`이면 존재하는 두 값의 평균은 `(10+20)/2=15`입니다. 빈 구간을 0으로 채운 `(10+0+20)/3=10`은 다른 질문의 답입니다. 결측을 숨기지 않도록 평균과 관측 구간 수를 함께 표시하는 방식을 제안합니다.
+**가상 예시:** 같은 가중치의 세 구간이 `[10, NULL, 20]`이면 존재하는 두 값의 평균은 `(10+20)/2=15`입니다. 빈 구간을 0으로 채운 `(10+0+20)/3=10`은 다른 질문의 답입니다. 결측을 숨기지 않도록 평균과 관측 구간 수를 함께 표시하는 방식을 제안합니다.
 
 Google Cloud 지표 참조에는 metric kind·단위와 함께 sampling 주기, 표본이 보이기까지의 지연이 지표별로 기재됩니다. “몇 초마다 측정하는가”와 “측정 후 언제 조회할 수 있는가”를 별도 필드로 저장합니다. 모든 Google Cloud 지표를 동일한 60초 주기나 동일한 게시 지연으로 취급하지 않습니다. [지표별 참조 표기](https://docs.cloud.google.com/monitoring/api/metrics), [지연과 보존](https://docs.cloud.google.com/monitoring/api/v3/latency-n-retention)
 
@@ -43,7 +43,7 @@ Google Cloud 지표 참조에는 metric kind·단위와 함께 sampling 주기, 
 
 ## 두 번 미분하지 않는다
 
-합성 예로 제공 API가 60초 동안 발생한 요청의 Sum=1,200을 돌려줬다면 그 구간 평균 요청률은 20/s입니다. 다음 구간의 Sum=900과 차분해 `−300/60`을 요청률로 계산하면 틀립니다. 두 값은 각 구간의 건수이지 서버 시작 이후 누적 건수가 아니기 때문입니다.
+가상 예시로 제공 API가 60초 동안 발생한 요청의 Sum=1,200을 돌려줬다면 그 구간 평균 요청률은 20/s입니다. 다음 구간의 Sum=900과 차분해 `−300/60`을 요청률로 계산하면 틀립니다. 두 값은 각 구간의 건수이지 서버 시작 이후 누적 건수가 아니기 때문입니다.
 
 반면 원천이 시작 이후 누적 카운터라면 [초기화를 고려한 rate](../foundations/time-series.md)를 사용합니다. 이름에 count가 들어 있다는 이유만으로 유형을 정하지 않습니다.
 
@@ -93,4 +93,4 @@ period와 statistic 또는 aligner/reducer
 4. EC2 basic의 모든 지표는 5분마다 나오는가? **상태 검사 지표는 1분이라는 예외가 있습니다.**
 5. sampling 주기가 짧으면 최신 표본을 즉시 조회할 수 있는가? **게시·수집 지연은 별도입니다.**
 
-다음: [관리형·서버리스](managed-and-serverless.md) · [클라우드 목차](README.md)
+이전: [클라우드 자원 계층과 API 수집](resources-and-apis.md) · 다음: [늦게 도착하는 클라우드 지표: 재조회, 부분 결과와 중복 집계](late-data-and-reconciliation.md) · [분야 목차](README.md)

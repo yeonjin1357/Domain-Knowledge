@@ -48,12 +48,12 @@
       "chapters": [
         "docs/network/README.md",
         "docs/network/addressing-routing-dns.md",
+        "docs/network/layers-and-routing.md",
         "docs/network/tcp-and-udp.md",
         "docs/network/tls-http.md",
         "docs/network/dns-and-connection-lifecycle.md",
         "docs/network/network-metrics.md",
         "docs/network/linux-stack-counters.md",
-        "docs/network/layers-and-routing.md",
         "docs/network/snmp-and-device-models.md",
         "docs/network/routing-convergence-and-qos.md"
       ]
@@ -117,14 +117,14 @@
         "docs/database/transactions-and-locks.md",
         "docs/database/queries-and-indexes.md",
         "docs/database/postgresql.md",
-        "docs/database/postgresql-operations.md",
         "docs/database/mysql-mariadb.md",
-        "docs/database/mysql-operations.md",
         "docs/database/sqlserver-oracle.md",
-        "docs/database/replication-and-recovery.md",
-        "docs/database/high-availability.md",
         "docs/database/distributed-and-analytical.md",
         "docs/database/specialized-data-models.md",
+        "docs/database/replication-and-recovery.md",
+        "docs/database/high-availability.md",
+        "docs/database/postgresql-operations.md",
+        "docs/database/mysql-operations.md",
         "docs/database/collection-contracts.md",
         "docs/database/postgresql-concurrency-lab.md"
       ]

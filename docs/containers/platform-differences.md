@@ -1,6 +1,8 @@
 # 컨테이너 수집의 플랫폼 차이: cgroup v1·v2와 Windows
 
-> 상태: 검토됨 · 적용 범위: Linux cgroup 인터페이스, Windows 격리 모드의 공식 정의 · 검토일: 2026-10-04 · 플랫폼 간 실행 비교 없음
+> 상태: 검토됨 · 적용 범위: Linux cgroup 인터페이스, Windows 격리 모드의 공식 정의 · 원천 확인일: 2026-10-06 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
+
+선수 용어: **sandbox**는 Pod의 공유 실행 환경을 관리하는 런타임 경계입니다. [자원 설정·cgroup 계층](../kubernetes/resources-and-scheduling.md#설정이-linux-cgroup으로-이어지는-경로)에서 컨테이너와의 차이를 먼저 확인합니다.
 
 컨테이너라는 이름이 같아도 원천 계정은 다를 수 있습니다. Linux의 파일 경로를 Windows에서도 찾거나 cgroup v1의 값을 v2 단위로 읽으면 수집기는 실행되어도 틀린 숫자를 만듭니다. 먼저 OS, runtime, 격리 모드, 자원 제어 인터페이스를 식별합니다.
 
@@ -38,6 +40,10 @@ runtime의 컨테이너 ID, sandbox ID, Pod UID, 호스트 PID는 서로 다른 
 
 runtime 소켓 접근은 단순 지표 읽기 이상의 권한을 제공할 수 있어 실제 API 권한 범위를 확인합니다. 수집 실패를 우회하려고 광범위한 제어 API를 자동 활성화하는 방식으로 문서화하지 않습니다. 필요한 읽기 계약을 구체화하는 것이 우선입니다.
 
+## cgroup v1의 버전 상태
+
+cgroup v1은 [1.31부터 유지보수 상태](https://kubernetes.io/blog/2024/08/14/kubernetes-1-31-moving-cgroup-v1-support-maintenance-mode/)이며 **1.35부터 Deprecated**입니다. kubelet의 `failCgroupV1` 기본값도 **1.35부터 true**입니다. 1.37에서도 `false` override가 남아 있으므로 “v1 코드가 이미 제거됐다”와 “기본 설정으로 시작을 거부한다”를 구분합니다. [cgroup v1 상태](https://kubernetes.io/docs/concepts/architecture/cgroups/), [1.37 릴리스 설명](https://kubernetes.io/blog/2026/08/26/kubernetes-v1-37-release/), [1.37.0 failCgroupV1 기본값·override](https://github.com/kubernetes/kubernetes/blob/v1.37.0/staging/src/k8s.io/kubelet/config/v1beta1/types.go#L957)
+
 ## 제품 적용 제안과 이해 확인
 
 어댑터 capability에 OS·runtime 버전·cgroup 버전·격리 모드·지원 필드·원천 단위를 기록합니다. 같은 정규화 이름을 제공할 때도 원래 필드와 계산 정의를 조회할 수 있도록 유지합니다.
@@ -45,3 +51,5 @@ runtime 소켓 접근은 단순 지표 읽기 이상의 권한을 제공할 수 
 1. cpuacct.usage를 10⁶으로 나누면 초인가? **v1 해당 필드는 ns이므로 10⁹으로 나눕니다.**
 2. 컨테이너 메모리는 프로세스 RSS 합계와 같은가? **계정 범위가 달라질 수 있습니다.**
 3. Windows Hyper-V isolation도 호스트 커널을 그대로 공유하는가? **별도 VM 격리 경계를 사용합니다.**
+
+이전: [컨테이너 파일시스템, 쓰기 계층과 볼륨](filesystems.md) · 다음: [쿠버네티스 도메인](../kubernetes/README.md) · [분야 목차](README.md)

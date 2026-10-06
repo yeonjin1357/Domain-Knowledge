@@ -6,6 +6,7 @@ import math
 from pathlib import Path
 
 from adapter_contract import transform
+from verify_adapter_fixtures import verify as verify_measured_contracts
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -55,7 +56,7 @@ def main():
         ("docs/foundations/performance-and-statistics.md", "70건", 20+500-450, 70),
         ("docs/host/numa-and-pressure.md", "20%", 2000000/1000000/10*100, 20),
         ("docs/storage/raid-lvm-and-paths.md", "16TiB", (6-2)*4, 16),
-        ("docs/network/snmp-and-device-models.md", "34.36초", 2**32*8/10**9, 34.359738368),
+        ("docs/network/snmp-and-device-models.md", "34.4초", 2**32*8/10**9, 34.359738368),
         ("docs/network/snmp-and-device-models.md", "497.1일", 2**32/100/86400, 497.1026962962963),
         ("docs/application/servers-and-pools.md", "425ms", 300+150/2+50, 425),
         ("docs/database/specialized-data-models.md", "1,110", 10+100+1000, 1110),
@@ -85,6 +86,7 @@ def main():
         assert token in (ROOT / path).read_text(encoding="utf-8"), (path, token)
         assert math.isclose(actual, expected, rel_tol=1e-12), (path, actual)
     print(f"PASS: {len(cases)} adapter edge cases; {len(examples)} source-bound calculations; recorded lab hashes and statuses")
+    verify_measured_contracts()
 
 
 if __name__ == "__main__":

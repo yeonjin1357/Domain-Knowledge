@@ -1,6 +1,6 @@
 # 늦게 도착하는 클라우드 지표: 재조회, 부분 결과와 중복 집계
 
-> 상태: 검토됨 · 적용 범위: CloudWatch GetMetricData·PutMetricData, Azure·Google Cloud의 연결된 집계 규약 · 검토일: 2026-10-04 · 실제 cloud 계정 호출은 하지 않음
+> 상태: 검토됨 · 적용 범위: CloudWatch GetMetricData·PutMetricData, Azure·Google Cloud의 연결된 집계 규약 · 원천 확인일: 2026-10-06 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
@@ -22,6 +22,8 @@ CloudWatch GetMetricData 응답에는 여러 `MetricDataResult`가 들어갈 수
 `NextToken`은 개별 `MetricDataResult`의 필드가 아니라 **GetMetricData 응답 최상위의 요청 단위 token**입니다. 원래 요청의 다음 결과 묶음을 받는 데 사용하며 특정 metric만의 token으로 저장하지 않습니다. `Forbidden`은 이 API 문서에 유효 값으로 열거되어 있지만 구체적인 발생 원인이 정의되어 있지 않습니다. 권한 문제는 조사할 가설로 남기고 상태·Messages를 보존합니다. [GetMetricData 응답 구조](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html)
 
 PartialData에서 응답 최상위 NextToken으로 이어 받을 수 있지만 metric math 표현식 등에서는 token이 없는 경우도 있습니다. “token이 없으면 모든 결과가 완전하다”는 단일 규칙을 만들지 않습니다.
+
+**단위는 응답 숫자만으로 복원하지 않습니다.** `MetricDataResult`에는 `Unit` 필드가 없으며, GetMetricData에서 요청 Unit을 생략하면 게시된 여러 unit의 데이터가 반환될 수 있고 단위 변환도 수행하지 않습니다. **제품 적용 제안:** 직접 metric을 조회하는 `MetricStat.Unit`을 원하는 단위로 지정하고 요청 정의와 함께 보존합니다. API 자체에서 Unit은 선택 사항입니다. metric math는 식의 단위를 따로 정의해야 합니다. [GetMetricData 단위 규약](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html), [MetricDataResult 필드](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataResult.html)
 
 ## Timestamps와 Values는 쌍이다
 
@@ -91,3 +93,5 @@ Azure의 null과 0, 시간 집계의 의미를 확인하고 Google Cloud의 alig
 2. 같은 1분 Sum을 두 번 받으면 더하는가? **같은 구간을 갱신한 값이라면 중복 합산하지 않습니다.**
 3. 모든 원천 API의 EndTime은 제외되는가? **CloudWatch의 해당 API 규칙이며 원천마다 확인합니다.**
 4. 먼저 도착한 결과가 반드시 더 오래된 원천 상태인가? **요청·처리·전송 순서와 원천 revision을 구분해야 합니다.**
+
+이전: [클라우드 지표의 기간, 통계와 정규화](provider-metrics.md) · 다음: [관리형 서비스와 서버리스 관측](managed-and-serverless.md) · [분야 목차](README.md)

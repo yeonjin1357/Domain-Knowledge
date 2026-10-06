@@ -1,6 +1,6 @@
 # 프록시, 로드밸런서와 서비스 메시
 
-> 상태: 검토됨 · 적용 범위: NGINX·Envoy·Istio·HAProxy 3.2의 관측 경계 · 3d 원천 검토: 2026-10-06 · HAProxy stats 실습은 수행하지 않음
+> 상태: 검토됨 · 적용 범위: NGINX·Envoy·Istio·HAProxy 3.2의 관측 경계 · 원천 확인일: 2026-10-06 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
@@ -12,7 +12,7 @@
 
 NGINX stub_status의 Active connections에는 다음 요청을 기다리는 Waiting 연결도 포함됩니다. accepts·handled는 연결 누적량이고 requests는 요청 누적량입니다. 따라서 active 연결 수를 현재 실행 중인 업무 요청 수로 바꾸어 읽으면 안 됩니다. [NGINX stub_status](https://nginx.org/en/docs/http/ngx_http_stub_status_module.html)
 
-합성 예에서 100개 연결이 각각 요청 10개를 처리했다면 연결 100과 요청 1,000은 모두 올바른 관측입니다. HTTP 다중화와 재사용은 [HTTP 장](../network/tls-http.md)에서 설명합니다.
+가상 예시에서 100개 연결이 각각 요청 10개를 처리했다면 연결 100과 요청 1,000은 모두 올바른 관측입니다. HTTP 다중화와 재사용은 [HTTP 장](../network/tls-http.md)에서 설명합니다.
 
 ## upstream 연결 풀
 
@@ -24,7 +24,7 @@ NGINX upstream의 keepalive는 worker가 유지하는 유휴 연결 캐시와 �
 
 Envoy는 upstream 연결 풀 대기, timeout, retry와 retry 제한 초과 등을 별도 통계로 제공합니다. 이름과 지원 범위는 배포된 Envoy 버전의 API를 확인합니다. [Envoy Cluster Statistics](https://www.envoyproxy.io/docs/envoy/latest/configuration/upstream/cluster_manager/cluster_stats)
 
-합성 예에서 들어온 요청 100개 중 20개가 한 번씩 재시도되면 upstream 시도는 120개입니다. 100+120을 사용자 요청 220개로 보고하면 중복입니다. 재시도 실패와 최종 사용자 실패의 비율도 다릅니다.
+가상 예시에서 들어온 요청 100개 중 20개가 한 번씩 재시도되면 upstream 시도는 120개입니다. 100+120을 사용자 요청 220개로 보고하면 중복입니다. 재시도 실패와 최종 사용자 실패의 비율도 다릅니다.
 
 ## HAProxy stats: 대기·세션·응답 코드를 나눈다
 
@@ -63,3 +63,5 @@ Istio는 서비스·프록시·제어 평면의 지표와 로그·트레이스�
 4. HAProxy eresp와 hrsp_5xx를 같은 오류 수로 합쳐도 되는가? **처리 오류와 HTTP 코드라는 다른 분류이므로 중복·범위 차이를 확인해야 합니다.**
 
 관련: [재시도](../application/timeouts-and-retries.md) · [미들웨어 목차](README.md)
+
+이전: [검색 엔진: 색인, 가시성, shard와 요청 지연](search-engines.md) · 다음: [스트림 처리: event time, watermark, checkpoint와 역압](stream-processing.md) · [분야 목차](README.md)

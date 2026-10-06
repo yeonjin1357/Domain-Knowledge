@@ -1,14 +1,14 @@
 # DB 수집 명세: 읽기 전용 쿼리, 단위, 권한과 통계 수명
 
-> 상태: 검토됨 · 적용 범위: PostgreSQL 18·MySQL 8.4의 원천 필드와 수집 설계 · 검토일: 2026-10-04 · PostgreSQL 수집 SQL은 18.6에서 실행, MySQL SQL은 문서 검토 · statement_timestamp 의미 재검토: 2026-10-05
-
-버전 상태: MySQL 사례는 8.4 LTS 문서에 고정했습니다. 9.7 LTS와 이후 YY.M 번호 체계가 존재하며, 새 계열의 모든 동작을 검증한 설명은 아닙니다. 9.7.3은 Docker image 전용 보안 패치입니다. [버전별 기준과 지원 상태](../coverage.md#교차-검토-시점의-버전-상태)
+> 상태: 검토됨 · 적용 범위: PostgreSQL 18·MySQL 8.4의 원천 필드와 수집 설계 · 원천 확인일: 2026-10-05 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 DB 모니터링 쿼리도 DB가 실행하는 작업입니다. 작은 메타데이터 조회라도 빈도·행 수·권한을 관리해야 합니다. 문장 텍스트에 개인정보가 들어갈 수도 있습니다. 이 장의 쿼리는 수집 계약을 검토하기 위한 예시이며 사용자 환경에 적용한 배포 명세가 아닙니다.
 
 ## PostgreSQL에서 먼저 확인할 것
 
 접속 대상과 `server_version_num`, DB 이름, 인스턴스 수명, 계정 권한을 기록합니다. 일반 계정으로 다른 세션의 상세를 모두 볼 수 있는 것은 아닙니다. `pg_read_all_stats` 등 역할의 범위를 확인하고 실제 필요한 조회만 허용하는 배포 구성을 정합니다. [누적 통계와 권한](https://www.postgresql.org/docs/18/monitoring-stats.html), [기본 제공 역할](https://www.postgresql.org/docs/18/predefined-roles.html)
+
+**제품 적용 제안:** command message 수신 시각을 표본 시각으로 쓰려면 `statement_timestamp() AS sampled_at`을 선택합니다. 아래 SQL은 행마다 `clock_timestamp()`를 평가했던 **실습 고정 입력**이며 이를 권장 형태로 오인하지 않습니다.
 
 다음은 버전과 DB별 누적 통계를 읽는 예시입니다. 읽기 전용 트랜잭션과 statement timeout을 명시했습니다. 2초는 예시 설정이며 모든 환경의 권장값이 아닙니다. 일반 DB 접속 권한이 필요하고, 반환 행 수는 DB 수에 따라 달라집니다.
 
@@ -24,7 +24,7 @@ WHERE datid <> 0;
 COMMIT;
 ```
 
-`collected_at`은 이 예시에서 **각 행의 표현식을 평가할 때 읽은 시각**입니다. `clock_timestamp()`는 같은 문장 안에서도 달라질 수 있고 실제 결과의 행들에서도 달랐습니다. client의 command message 수신 시각을 공통 표본 시각으로 쓰려면 `statement_timestamp()`를 선택합니다. 여러 문장을 하나의 simple Query 메시지로 보낼 때도 같은 값일 수 있습니다. 어느 쪽도 DB 전체의 원자적 수집 완료 시각이라는 뜻은 아닙니다. 이번에는 실행 입력·hash를 유지하고 행별 시각이라는 계약을 명시했습니다. [PostgreSQL 현재 시각 함수](https://www.postgresql.org/docs/18/functions-datetime.html#FUNCTIONS-DATETIME-CURRENT)
+`collected_at`은 이 예시에서 **각 행의 표현식을 평가할 때 읽은 시각**입니다. `clock_timestamp()`는 같은 문장 안에서도 달라질 수 있고 실제 결과의 행들에서도 달랐습니다. client의 command message 수신 시각을 공통 표본 시각으로 쓰려면 `statement_timestamp()`를 선택합니다. 여러 SQL 문장을 한 번의 simple Query 프로토콜 메시지에 묶어 보낼 때도 같은 값일 수 있습니다. 어느 쪽도 DB 전체의 원자적 수집 완료 시각이라는 뜻은 아닙니다. 실습의 행별 시각과 제품이 원하는 공통 표본 시각은 별도 계약입니다. [PostgreSQL 현재 시각 함수](https://www.postgresql.org/docs/18/functions-datetime.html#FUNCTIONS-DATETIME-CURRENT)
 
 위 SQL은 [고정된 입력 파일](../../labs/postgresql/collect-database.sql)로 보존해 PostgreSQL 18.6의 임시 인스턴스에서 실행했습니다. 누적값이 존재해도 `stats_reset`이 NULL인 행이 반환됐습니다. 이 필드를 항상 존재하는 reset 시각으로 가정하지 않습니다. 권한·통계 snapshot·오류 후 연결 상태는 [실제 동시성 실습](postgresql-concurrency-lab.md)에서 설명합니다.
 
@@ -77,3 +77,11 @@ Performance Schema의 statement summary 시간 값은 ps 단위를 사용합니�
 1. blks_read 증가를 물리 디스크 읽기 수로 그대로 쓰는가? **OS 캐시 등 다른 층이 있으므로 DB 경계의 블록 읽기로 둡니다.**
 2. DB 연결에 성공하면 모든 통계가 보이는가? **필드와 view별 권한이 다릅니다.**
 3. SQL 오류 하나가 발생하면 모든 엔진이 전체 transaction을 자동 rollback하는가? **엔진·오류·클라이언트 동작에 따라 다르며 명시 처리해야 합니다. [SQLite 실습](../cross-domain/reproducible-labs.md)이 그 차이를 보여 줍니다.**
+
+## 검증 노트
+
+버전 상태: MySQL 사례는 8.4 LTS 문서에 고정했습니다. 9.7 LTS와 이후 YY.M 번호 체계가 존재하며, 새 계열의 모든 동작을 검증한 설명은 아닙니다. 9.7.3은 Docker image 전용 보안 패치입니다. [버전별 기준과 지원 상태](../coverage.md#교차-검토-시점의-버전-상태)
+
+8.4.11·9.7.2의 잠금·복제 로컬 실측 범위는 [MySQL 운영 관측](mysql-operations.md)에 있습니다. 원천 기준 버전과 실제 실행 patch를 구분합니다.
+
+이전: [MySQL: 잠금 대기, 커밋과 복제의 서로 다른 완료 지점](mysql-operations.md) · 다음: [PostgreSQL 실제 실습: 같은 값, 잠금 대기와 실패한 트랜잭션](postgresql-concurrency-lab.md) · [분야 목차](README.md)

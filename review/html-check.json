@@ -1,8 +1,8 @@
 {
-  "checked_at_utc": "2026-10-06T00:37:56.896Z",
+  "checked_at_utc": "2026-10-06T02:06:39.431Z",
   "browser": "Chrome/154.0.8037.58",
   "node": "v22.17.1",
-  "book_html_sha256": "3988cd7e7f1dc080a3ab61f090ef6b8f3ffda938e049212b7a793cc5a938eca7",
+  "book_html_sha256": "79990557e322dd3f20afd6946d88acd9129eafc9c0679241e7a8e6391f539f80",
   "network_mode": "offline via Network.emulateNetworkConditions",
   "expected_diagrams": 17,
   "pages": {
@@ -16,7 +16,7 @@
       "external_scripts": 0,
       "target_exists": true,
       "target_top": 64,
-      "body_text_length": 472158,
+      "body_text_length": 510255,
       "visible_heading": "이 지식서를 읽는 방법",
       "title_search_passed": true,
       "fragment": ""
@@ -30,8 +30,8 @@
       "missing_anchors": 0,
       "external_scripts": 0,
       "target_exists": true,
-      "target_top": 23.9375,
-      "body_text_length": 472158,
+      "target_top": 24.125,
+      "body_text_length": 510255,
       "visible_heading": "CPU 실행 시간과 스케줄링 대기",
       "title_search_passed": true,
       "fragment": "chapter-docs-host-cpu"
@@ -45,8 +45,8 @@
       "missing_anchors": 0,
       "external_scripts": 0,
       "target_exists": true,
-      "target_top": 24.09375,
-      "body_text_length": 472158,
+      "target_top": 24.03125,
+      "body_text_length": 510255,
       "visible_heading": "잠금 대기와 교착 상태",
       "title_search_passed": true,
       "fragment": "chapter-docs-database-transactions-and-locks--잠금-대기와-교착-상태"
@@ -60,8 +60,8 @@
       "missing_anchors": 0,
       "external_scripts": 0,
       "target_exists": true,
-      "target_top": 24.203125,
-      "body_text_length": 472158,
+      "target_top": 24.140625,
+      "body_text_length": 510255,
       "visible_heading": "처음 읽는 시스템 지도: 요청 하나가 지나가는 길",
       "title_search_passed": true,
       "fragment": "chapter-docs-foundations-system-map"
@@ -75,8 +75,8 @@
       "missing_anchors": 0,
       "external_scripts": 0,
       "target_exists": true,
-      "target_top": 23.90625,
-      "body_text_length": 472158,
+      "target_top": 24.046875,
+      "body_text_length": 510255,
       "visible_heading": "실습 3: active인데 CPU를 실행하고 있지 않다",
       "title_search_passed": true,
       "fragment": "chapter-docs-database-postgresql-concurrency-lab--실습-3-active인데-cpu를-실행하고-있지-않다"
@@ -90,8 +90,8 @@
       "missing_anchors": 0,
       "external_scripts": 0,
       "target_exists": true,
-      "target_top": 24.03125,
-      "body_text_length": 472158,
+      "target_top": 24.109375,
+      "body_text_length": 510255,
       "visible_heading": "Linux 필드의 구체적인 계약",
       "title_search_passed": true,
       "fragment": "chapter-docs-product-compatibility-and-acceptance--linux-필드의-구체적인-계약"

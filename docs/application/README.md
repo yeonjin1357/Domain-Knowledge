@@ -1,6 +1,6 @@
 # 애플리케이션 도메인
 
-> 상태: 검토됨 · 적용 범위: 언어·런타임 공통 관점 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: 언어·런타임 공통 관점, HTTP·JVM·.NET 의미 규약과 trace sampling · 원천 확인일: 2026-10-03 · 실습 여부: 각 상세 장에 명시
 
 애플리케이션 영역은 사용자 요청과 업무가 어떤 경로로 처리되고, 어디서 실패하거나 지연되는지 다룹니다. 런타임 내부 상태와 호스트·DB·외부 서비스의 영향을 연결해서 이해하는 것이 목적입니다.
 
@@ -10,7 +10,7 @@
 
 ## 구성 요소와 주요 관측 항목
 
-아래는 언어와 프레임워크별 상세 문서를 작성하기 위한 공통 관측 모델 제안입니다.
+아래 공통 관측 모델을 연결 풀, JVM·.NET·Go·Node·Python, 브라우저와 계측·sampling 장에서 구체화합니다. 런타임 API와 OTel 이름의 대응은 계측 규약을 확인한 뒤 적용하는 제품 제안입니다.
 
 | 영역 | 이해할 개념 | 주요 관측 항목 |
 | --- | --- | --- |
@@ -20,6 +20,8 @@
 | 외부 의존성 | DB·캐시·API 호출, 재시도 | 호출 수·실패·지연, 호출 상대, 재시도 횟수 |
 | 비동기·배치 | 작업 실행, 큐, 완료 조건 | 대기 작업, 처리량, 실행 시간, 마지막 성공 |
 | 사용자 접점 | 브라우저·모바일의 로딩과 요청 | 화면 로딩, 클라이언트 오류, 사용자 관측 지연 |
+
+| 계측과 규약 | 관측 지점·이름·단위·sampling | HTTP·JVM·.NET 지표, trace 문맥·추정 가능 범위 |
 
 서비스 이름, 실행 인스턴스, 배포 버전, 요청 경로를 어떤 기준으로 구분할지 함께 정의합니다. 특정 프로세스의 상태와 서비스 전체의 요청 결과를 각각 탐색할 수 있어야 합니다.
 
@@ -50,8 +52,10 @@
 4. [JVM과 .NET: 메모리, GC, 실행 자원](managed-runtimes.md)
 5. [OpenTelemetry 이름·단위·안정성으로 의미 연결하기](semantic-conventions.md)
 6. [Go, Node.js, Python의 동시성과 관측](async-runtimes.md)
-7. [브라우저, 실제 사용자 관측과 합성 검사](user-experience.md)
+7. [브라우저, 실제 사용자 관측과 합성 검사(synthetic monitoring)](user-experience.md)
 8. [계측을 넣는 위치: 자동 계측, 수동 span, eBPF와 프로파일](instrumentation-and-profiling.md)
 9. [트레이스를 읽는 전제: 문맥 전파, sampling과 모집단](trace-sampling-and-context.md)
 
 관련 문서: [공통 개념](../foundations/README.md), [DB](../database/README.md), [미들웨어](../middleware/README.md), [도메인 간 분석](../cross-domain/README.md)
+
+이전: [API 변경, CRD와 Operator를 관측하는 방법](../kubernetes/operators-and-api-lifecycle.md) · 다음: [요청, 동시성, 대기열과 연결 풀](requests-and-concurrency.md)

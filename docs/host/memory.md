@@ -1,12 +1,18 @@
 # 메모리와 가상 주소 공간 및 메모리 압력
 
-> 상태: 검토됨 · 범위: Linux 호스트·프로세스, Windows 비교의 기초 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04 · 3b 원천 검토: 2026-10-05 (새 실습 결과 미반영)
+> 상태: 검토됨 · 적용 범위: Linux 호스트·프로세스, Windows 비교의 기초 · 원천 확인일: 2026-10-06 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
 메모리는 실행 중인 코드와 데이터, 파일 캐시 등을 보관합니다. 파일 캐시는 다시 쓸 자료를 가까이 두는 용도라서, 남는 메모리가 적어 보이는 상황이 곧 부족을 뜻하지는 않습니다. 반대로 프로세스가 잡은 가상 주소 전체를 실제 RAM 사용량으로 더하면 과장됩니다. 예약·상주·공유·회수 가능 범위를 구분하는 것이 시작입니다.
 
 메모리 사용량은 하나의 숫자로 끝나지 않습니다. 운영체제가 사용할 수 있는 물리 메모리, 프로세스의 주소 공간, 현재 RAM에 올라온 페이지, 재사용 가능한 캐시, 컨테이너에 부과된 사용량을 구분해야 합니다.
+
+## 페이지에서 회수까지
+
+페이지는 OS가 메모리를 관리하는 단위이며 크기는 환경에서 확인합니다. **익명 메모리**는 일반 파일에 직접 대응하지 않는 힙·스택 등의 영역이고, **파일 메모리**는 파일 매핑·page cache와 연결됩니다. 파일 내용을 바꾼 **dirty 페이지**는 변경 내용을 저장해야 깨끗한 파일 페이지처럼 버리고 다시 읽을 수 있습니다. 전통적인 LRU의 active/inactive 분류는 회수 정책의 단서이지, 지금 실행 중인 코드와 쓸모없는 데이터의 구분이 아닙니다. MGLRU 등 회수 구현에 따라 세부는 달라집니다. [Linux proc 메모리 정의](https://docs.kernel.org/filesystems/proc.html#meminfo), [MGLRU](https://docs.kernel.org/admin-guide/mm/multigen_lru.html)
+
+**제품 적용 제안:** 총량·분류·회수 활동·대기 시간을 따로 보여 줍니다. 큰 캐시를 누수로 단정하거나 inactive 전체를 즉시 회수 가능한 양으로 빼지 않습니다.
 
 ## 주소 공간과 실제 사용량을 구분한다
 
@@ -32,6 +38,8 @@ RSS를 합하면 330 MiB이지만 이 예시의 고유 물리 페이지는 `50 +
 | MemAvailable | 스왑 없이 새 작업에 제공할 수 있는 메모리의 추정량 |
 | Cached | 파일 page cache와 tmpfs·shmem을 포함; SwapCached 제외 |
 | Shmem | shmem·tmpfs 사용량; Cached와 중복되는 범위 확인 |
+| AnonPages | 사용자 공간에 매핑된 익명 페이지의 계정; 프로세스 RSS 합과 동일하지 않음 |
+| Inactive(file) | 파일 계열 inactive LRU의 양; 즉시 회수 보장 아님 |
 | Dirty | 저장 장치에 써야 하는 변경된 메모리 |
 | Writeback | 현재 쓰기 작업이 진행 중인 메모리 |
 | SwapTotal·SwapFree | 스왑 총량과 남은 양 |
@@ -44,7 +52,7 @@ RSS를 합하면 330 MiB이지만 이 예시의 고유 물리 페이지는 `50 +
 
 메모리에 캐시가 많이 남아 있다는 사실만으로 누수라고 판단하지 않습니다. 반대로 캐시라는 이유만으로 즉시 전부 회수할 수 있다고 가정하지도 않습니다. 가용량, 회수·쓰기 동작, 실제 지연을 함께 봅니다.
 
-## 가용량 기준 사용 비율의 정의 예시
+## 가용량 기준 비가용 비율의 정의 예시
 
 ```text
 가용량 기준 비가용 비율 = 1 - MemAvailable / MemTotal
@@ -54,6 +62,19 @@ RSS를 합하면 330 MiB이지만 이 예시의 고유 물리 페이지는 `50 +
 
 제품에서는 원천 바이트 수를 보존하고 표시 단위만 변환하는 방식을 권합니다. `GiB=2³⁰ bytes`, `GB=10⁹ bytes`를 혼용하지 않습니다. 원천 인터페이스의 단위와 변환을 지표 명세에 기록합니다.
 
+`/proc/meminfo`의 `kB`는 이 인터페이스에서 **1024 B**입니다. SI kB=1000 B로 변환하지 않습니다. [v6.12 show_val_kb: 페이지 수를 PAGE_SHIFT−10으로 변환](https://github.com/torvalds/linux/blob/v6.12/fs/proc/meminfo.c#L30)
+
+### 이름이 비슷한 메모리 값을 비교하기
+
+| 이름 | 식·의미 | 원천 | 정본 장 |
+| --- | --- | --- | --- |
+| Linux MemAvailable | swap 없이 새 작업에 줄 수 있는 추정량 | `/proc/meminfo` | 이 장 |
+| kubelet memory.available | capacity − node working set; 1.37 gate의 hugepage 보정 확인 | eviction 신호·Summary | [노드 압박](../kubernetes/pressure-and-termination.md) |
+| Windows Available | 즉시 재사용 가능한 물리 메모리 범위 | OS API·성능 카운터 | [Windows](windows.md) |
+| cgroup memory.current / memory.max | 그룹 계정량 / 한도(`max`는 무제한 표식) | cgroup v2 | [컨테이너 메모리](../containers/memory-accounting-and-oom.md) |
+
+이 네 값을 하나의 “남은 메모리” 필드로 치환하지 않습니다. 식의 분모와 포함 범위가 다릅니다.
+
 ## 페이지 폴트와 스왑 활동
 
 회수·refault·OOM을 자세히 구분하려면 [메모리 회수와 OOM](reclaim-and-oom.md), 빠른 프로세스 메모리 원천과 상세 조사 비용은 [프로세스 장](processes.md)을 이어 읽습니다.
@@ -62,7 +83,7 @@ RSS를 합하면 330 MiB이지만 이 예시의 고유 물리 페이지는 `50 +
 
 스왑 사용량이 남아 있는 상태와 지금 스왑 읽기·쓰기가 활발한 상태는 다른 질문입니다. `/proc/vmstat`에는 `pswpin`, `pswpout` 등 VM 활동 계수기가 있습니다. 사용량과 해당 활동의 증가 추세를 나누어 관측합니다. [Linux proc_vmstat](https://man7.org/linux/man-pages/man5/proc_vmstat.5.html)
 
-메모리 PSI는 메모리 자원 때문에 작업이 멈추는 현상을 보는 데 쓰입니다. 가용량만으로 성능 영향을 확정하기보다 [CPU 장에서 설명한 PSI](cpu.md)와 페이지 폴트, 응답 지연을 함께 조사합니다.
+메모리 PSI는 메모리 자원 때문에 작업이 멈추는 현상을 보는 데 쓰입니다. 가용량만으로 성능 영향을 확정하기보다 [PSI의 정의와 범위](numa-and-pressure.md#psi를-읽는-정확한-방법)와 페이지 폴트, 응답 지연을 함께 조사합니다.
 
 ## 메모리 약속과 Overcommit
 
@@ -99,7 +120,7 @@ cat /proc/vmstat
 cat /proc/pressure/memory
 ```
 
-프로세스별로는 실제 PID의 `smaps` 또는 제공되는 `smaps_rollup` 인터페이스를 검토합니다. 수집 중 프로세스가 종료될 수 있으므로 읽기 실패를 메모리 0으로 변환하지 않습니다.
+프로세스별 기본 수집은 `status`·`statm`, 상세 조사는 `smaps_rollup`·`smaps`로 나눕니다. 정밀도·권한·비용과 PID 수명은 [프로세스 메모리 수집](processes.md)을 따릅니다. 읽기 실패를 메모리 0으로 변환하지 않습니다.
 
 ## 이해 확인
 
@@ -108,3 +129,5 @@ cat /proc/pressure/memory
 - 스왑 사용량이 높으면 현재도 스왑 I/O가 많은가? **현재 활동의 증가량을 별도로 봐야 한다.**
 
 관련: [CPU](cpu.md), [블록 I/O](disk-io.md), [컨테이너 자원 제어](../containers/resource-control.md), [Windows](windows.md)
+
+이전: [CPU 실행 시간과 스케줄링 대기](cpu.md) · 다음: [메모리 회수와 OOM: 부족해지는 과정과 종료의 증거](reclaim-and-oom.md) · [분야 목차](README.md)

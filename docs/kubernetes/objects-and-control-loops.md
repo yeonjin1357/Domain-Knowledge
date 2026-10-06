@@ -1,12 +1,10 @@
 # Kubernetes 객체와 제어 루프
 
-> 상태: 검토됨 · 적용 범위: Kubernetes API의 공통 객체 모델과 내장 컨트롤러 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 1.1판 resourceVersion 규약 재검토: 2026-10-04
+> 상태: 검토됨 · 적용 범위: Kubernetes API의 공통 객체 모델과 내장 컨트롤러 · 원천 확인일: 2026-10-04 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
-Kubernetes에서는 원하는 상태를 API 객체에 적고 controller가 실제 상태를 맞추려고 반복합니다. 복제 수 3을 요청했다는 것과 준비된 Pod가 3개라는 것은 다른 사실입니다. 이 반복 구조를 알아야 desired·current·ready 숫자의 차이를 바로 장애로 단정하지 않고 진행 상태로 해석할 수 있습니다.
-
-Kubernetes를 모니터링하려면 실행 중인 프로세스뿐 아니라 원하는 상태와 관측된 상태를 함께 이해해야 합니다. API 요청 성공은 요청한 컨테이너가 이미 준비되었다는 뜻이 아닙니다.
+Kubernetes에서는 원하는 상태를 API 객체에 적고 controller가 실제 상태를 맞추려고 반복합니다. 복제 수 3을 요청했다는 것과 준비된 Pod가 3개라는 것은 다른 사실입니다. 이 반복 구조를 알아야 desired·current·ready 숫자의 차이를 바로 장애로 단정하지 않고 진행 상태로 해석할 수 있습니다. 제품은 API 수용과 실제 실행·준비 완료를 별도로 표시합니다.
 
 ## 선언과 실행 사이의 단계
 
@@ -56,7 +54,7 @@ finalizer가 있는 객체에 삭제를 요청하면 `deletionTimestamp`가 기�
 
 한 번의 화면 갱신에서 Deployment와 Pod를 서로 다른 시각에 읽을 수 있습니다. 그 사이 조정이 진행되면 집계가 잠시 일치하지 않을 수 있습니다. 제품은 이를 즉시 데이터 손상으로 단정하지 말고 수집 시각과 캐시 동기화 상태를 확인해야 합니다.
 
-API의 `resourceVersion`은 변경 추적과 동시성 제어에 사용합니다. **비교 규약은 버전별로 다릅니다.** 1.34 이하의 규약에서는 동일성만 비교합니다. 1.35 이상(검토 시점 최신 3개 브랜치 1.35–1.37)에서는 정해진 조건 아래 같은 클러스터의 같은 API group·resource type의 값을 임의 정밀도 정수 순서로 비교할 수 있습니다. 이 순서 규약을 보장하지 않는 확장 API server의 값에는 동일성 비교만 사용합니다. 어느 경우에도 값의 차이를 경과 시간이나 객체 나이로 바꾸지 않습니다. [1.34 규약](https://v1-34.docs.kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions), [1.35 이상 현재 규약](https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions)
+`resourceVersion`의 비교는 응답한 API server의 버전·종류와 보장 규약을 기준으로 합니다. 문자열을 보존하고, [인벤토리의 비교·조회 계약](inventory-consistency.md#resourceversion-135-이상과-이전-버전의-경계)을 따릅니다.
 
 ## 이해 확인
 
@@ -64,4 +62,4 @@ API의 `resourceVersion`은 변경 추적과 동시성 제어에 사용합니다
 2. API가 Deployment 생성을 받아들이면 모든 Pod가 준비되었는가? **제어 루프와 실행 단계를 더 관측해야 합니다.**
 3. 소유 관계와 Service 선택 관계를 같은 간선으로 저장해도 되는가? **의미가 달라 별도 관계로 표현해야 합니다.**
 
-다음: [Pod의 상태와 검사](pod-lifecycle.md) · [Kubernetes 목차](README.md)
+이전: [쿠버네티스 도메인](README.md) · 다음: [Pod 수명, 컨테이너 상태와 건강 검사](pod-lifecycle.md) · [분야 목차](README.md)

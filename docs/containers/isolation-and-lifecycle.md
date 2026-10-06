@@ -1,6 +1,6 @@
 # 컨테이너의 격리와 실행 수명
 
-> 상태: 검토됨 · 범위: Linux namespaces, OCI Runtime Specification 1.2.1 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: Linux namespaces, OCI Runtime Specification 1.2.1 · 원천 확인일: 2026-10-03 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
@@ -80,3 +80,5 @@ Namespace inode나 PID만을 모든 호스트와 시간에 걸쳐 영구 고유�
 - OCI ID만으로 모든 호스트의 컨테이너를 구분할 수 있는가? **명세가 요구하는 고유성 범위는 호스트 내부이다.**
 
 관련: [자원 제어](resource-control.md), [프로세스](../host/processes.md), [쿠버네티스](../kubernetes/README.md)
+
+이전: [컨테이너 도메인](README.md) · 다음: [컨테이너 CPU와 메모리 자원 제어](resource-control.md) · [분야 목차](README.md)

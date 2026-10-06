@@ -1,6 +1,6 @@
 # 트레이스와 로그 및 프로파일의 연결
 
-> 상태: 검토됨 · 범위: OpenTelemetry 개념·명세, W3C Trace Context · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: OpenTelemetry 개념·명세, W3C Trace Context · 원천 확인일: 2026-10-03 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
@@ -73,14 +73,7 @@ Head sampling은 처리 초기에 표본 선택을 하고, Tail sampling은 수�
 
 ## 표본으로 전체 오류율을 계산하는 함정
 
-**가상 입력:** 전체 요청 10,000건 중 실패 100건입니다. 실패를 모두 저장하고 성공 9,900건 중 99건만 저장했다고 가정합니다.
-
-```text
-전체 오류율 = 100 / 10,000 = 1%
-저장된 Trace의 오류 비율 = 100 / (100 + 99) ≈ 50.25%
-```
-
-저장된 Trace의 오류 비율은 전체 서비스 오류율이 아닙니다. 표본 선택 확률과 포함 조건을 모르면 전체 비율을 복구할 수 없습니다. 서비스 수준 계산에는 그 목적에 맞게 계측된 전체 건수 또는 통계적으로 설명 가능한 추정 방식을 사용합니다. 확률을 역수 가중치로 사용하는 구체적인 규약은 [OTel TraceState Probability Sampling](https://opentelemetry.io/docs/specs/otel/trace/tracestate-probability-sampling/)의 adjusted count를 참고합니다. 이 명세는 검토 시점 Development이며, 알려진 포함 확률·적용 조건이 없는 편향 표본을 자동 복원하는 보장이 아닙니다.
+오류를 더 많이 보존한 trace 집합의 오류 비율은 전체 서비스 오류율과 다릅니다. 확률을 모르는 편향 표본을 자동으로 복원할 수는 없습니다. [샘플링 정본의 가상 계산·가중 추정 조건](../application/trace-sampling-and-context.md#오류를-더-많이-보존하면-오류율도-커-보인다)을 따릅니다.
 
 ## 프로파일은 자원 소비를 코드에 연결한다
 
@@ -106,3 +99,5 @@ CPU 프로파일에서 함수 A의 표본이 많다는 것은 선택한 수집 �
 - Heap 프로파일과 Allocation 프로파일은 같은 질문인가? **현재 보유량과 할당 활동은 다른 관점이다.**
 
 관련: [시간과 데이터 품질](time-and-data-quality.md), [애플리케이션](../application/README.md), [도메인 간 분석](../cross-domain/README.md)
+
+이전: [숫자가 다를 때: 측정 경계, 시간 구간과 오차](measurement-and-comparability.md) · 다음: [분산 시스템: 복제, 합의, 시간과 불확실한 결과](distributed-systems.md) · [분야 목차](README.md)

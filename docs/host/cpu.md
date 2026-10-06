@@ -1,6 +1,6 @@
 # CPU 실행 시간과 스케줄링 대기
 
-> 상태: 검토됨 · 범위: Linux CPU 관측, man-pages 6.19 및 Linux 6.12 회계 코드 확인 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: Linux CPU 관측, man-pages 6.19 및 Linux 6.12 회계 코드 확인 · 원천 확인일: 2026-10-03 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
@@ -45,6 +45,8 @@ Linux 6.12의 `account_user_time()`은 `task_nice(p) > 0`일 때 nice에, 그렇
 
 ## 사용률은 포함하는 시간의 정의가 필요하다
 
+아래 “비 idle” 식은 iowait와 steal을 포함하지만 실행 시간 식은 제외합니다. steal은 [가상화의 실행 기회 대기](virtualization.md)와 함께 해석합니다.
+
 서로 같은 구간의 증가량을 `Δ`로 표현하면, 위 표의 첫 여덟 항목을 사용해 다음과 같이 정의할 수 있습니다.
 
 ```text
@@ -75,6 +77,8 @@ Linux 6.12의 `account_user_time()`은 `task_nice(p) > 0`일 때 nice에, 그렇
 
 ## 프로세스의 100퍼센트는 호스트의 100퍼센트와 다를 수 있다
 
+**분모 주의:** 경과 초를 어떤 시계로 쟀는지 남깁니다. Linux MONOTONIC도 주파수 조정을 받으므로 [CPU clock·RAW 비교 실습](linux-observation-lab.md)을 참고합니다.
+
 `/proc/PID/stat`에는 사용자 시간 `utime`, 시스템 시간 `stime`, 시작 시각 `starttime` 등이 있습니다. 시간 단위를 확인해 프로세스의 CPU 사용 시간을 계산할 수 있습니다. [Linux proc_pid_stat](https://man7.org/linux/man-pages/man5/proc_pid_stat.5.html)
 
 다음은 자식 프로세스 시간을 제외한 프로세스 자체 시간을 사용하는 **정의 예시**입니다.
@@ -89,9 +93,9 @@ Linux 6.12의 `account_user_time()`은 `task_nice(p) > 0`일 때 nice에, 그렇
 
 ## Load average와 PSI
 
-Linux load average는 실행 가능 상태와 D 상태의 작업을 포함한 부하 평균입니다. `/proc/loadavg`는 1·5·15분 부하와 현재 실행 가능한 스케줄링 대상 수 등을 제공합니다. CPU 사용률 퍼센트가 아닙니다. [Linux proc_loadavg](https://man7.org/linux/man-pages/man5/proc_loadavg.5.html)
+Linux load average는 실행 가능 상태와 D 상태(인터럽트 불가 대기)의 작업을 포함한 부하 평균입니다. `/proc/loadavg`는 1·5·15분 부하와 현재 실행 가능한 스케줄링 대상 수 등을 제공합니다. CPU 사용률 퍼센트가 아닙니다. [Linux proc_loadavg](https://man7.org/linux/man-pages/man5/proc_loadavg.5.html)
 
-PSI는 자원 부족으로 작업이 멈춘 시간을 관측합니다. `some`은 일부 작업이 멈춘 시간의 비율이며, `avg10`, `avg60`, `avg300`은 각 시간 규모의 추이를 보여줍니다. `total`은 누적 정체 시간으로 마이크로초 단위입니다. CPU `full`은 시스템 전체 수준에서 의미가 정의되지 않으므로 일반적인 전 CPU 포화 지표처럼 쓰지 않습니다. [Linux PSI](https://docs.kernel.org/accounting/psi.html)
+PSI는 자원 부족으로 작업의 진행이 막힌 시간을 측정합니다. CPU 사용률과 달리 **진행하지 못한 시간**에 답하며, 시스템 CPU full의 무효 0을 전 CPU 포화율로 읽지 않습니다. 단위·가용성·trigger 계약은 [PSI 정본](numa-and-pressure.md)에 있습니다.
 
 **해석:** 사용률이 높아도 요청이 목표 시간 안에 처리되면 자원을 잘 활용하고 있을 수 있습니다. 반대로 호스트 평균이 낮아도 특정 CPU, 단일 스레드, affinity 또는 컨테이너 한도에서 병목이 생길 수 있습니다. 이 판단은 관측 범위와 서비스 지연을 함께 비교해야 한다는 분석 원칙입니다.
 
@@ -127,3 +131,5 @@ cat /proc/pressure/cpu
 - 프로세스 250%는 잘못된 값인가? **한 논리 CPU 기준이고 여러 스레드를 합쳤다면 가능한 값이다.**
 
 관련: [메모리](memory.md), [블록 I/O](disk-io.md), [컨테이너 자원 제어](../containers/resource-control.md)
+
+이전: [호스트 도메인](README.md) · 다음: [메모리와 가상 주소 공간 및 메모리 압력](memory.md) · [분야 목차](README.md)

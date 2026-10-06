@@ -1,0 +1,2799 @@
+{
+  "format_version": 1,
+  "scope": "Extracted observations and explicitly synthetic reference contracts; no new live collection.",
+  "sources": {
+    "labs/results/1.1-linux-clock-r1.json": {
+      "path": "labs/results/1.1-linux-clock-r1.json",
+      "sha256": "86bd2e990411d6c1db179a59df52000c8fc4bc6768542b6be52d3d8205cd4f58",
+      "bytes": 50807,
+      "encoding": "json"
+    },
+    "labs/results/1.1-r3/mysql-8.4.11-r2.json": {
+      "path": "labs/results/1.1-r3/mysql-8.4.11-r2.json",
+      "sha256": "981b612dd4adcd5fd6e3a3c02a6c98104298c90e026d02f379f95d4421a86034",
+      "bytes": 324817,
+      "encoding": "json"
+    },
+    "labs/results/1.1-r3/mysql-8.4.11-r2.raw/8.4.11-2-client-0-13.xml.gz": {
+      "path": "labs/results/1.1-r3/mysql-8.4.11-r2.raw/8.4.11-2-client-0-13.xml.gz",
+      "sha256": "872cc3cd42bdef5a51a6470557e1a08fd8d66b686f4c87020c511c427dca8a80",
+      "bytes": 886,
+      "encoding": "gzip-text",
+      "raw_sha256": "aabe0523001617d4af95c570d72e7f7482689479087fffe67ebf254db2477942",
+      "raw_bytes": 3264,
+      "manifest": "labs/results/1.1-r3/mysql-8.4.11-r2.json",
+      "artifact_key": "8.4.11-2-client-0-13.xml"
+    },
+    "labs/results/1.1-r3/mysql-8.4.11-r2.raw/8.4.11-2-client-0-24.xml.gz": {
+      "path": "labs/results/1.1-r3/mysql-8.4.11-r2.raw/8.4.11-2-client-0-24.xml.gz",
+      "sha256": "16f7a349e1537f6227840e52b016babf64bb1cb1ab7ca8153da93614ecf0cbbe",
+      "bytes": 878,
+      "encoding": "gzip-text",
+      "raw_sha256": "8ee0260e0066f0eff624f858a44b7f47e06cfa56be2bec00677af02e88e5de4e",
+      "raw_bytes": 3239,
+      "manifest": "labs/results/1.1-r3/mysql-8.4.11-r2.json",
+      "artifact_key": "8.4.11-2-client-0-24.xml"
+    },
+    "labs/results/1.1-r3/mysql-8.4.11-r2.raw/8.4.11-2-client-0-32.xml.gz": {
+      "path": "labs/results/1.1-r3/mysql-8.4.11-r2.raw/8.4.11-2-client-0-32.xml.gz",
+      "sha256": "b24a71f9bad311899d380c776ad9c5826f2bd90367a29886d8d2379b7f0db12b",
+      "bytes": 862,
+      "encoding": "gzip-text",
+      "raw_sha256": "c8a7a660c3511f5e7cc7268aeb4d8303b72896c2b007660a859f85ea00474bff",
+      "raw_bytes": 3214,
+      "manifest": "labs/results/1.1-r3/mysql-8.4.11-r2.json",
+      "artifact_key": "8.4.11-2-client-0-32.xml"
+    },
+    "labs/results/1.1-r3/mysql-8.4.11-r2.raw/8.4.11-2-client-0-45.xml.gz": {
+      "path": "labs/results/1.1-r3/mysql-8.4.11-r2.raw/8.4.11-2-client-0-45.xml.gz",
+      "sha256": "f37bf4abab22e6a0e2bdfa56b73e7122385c865c3ac13433808e0c79202d757f",
+      "bytes": 882,
+      "encoding": "gzip-text",
+      "raw_sha256": "de3951d6939899c20bef6fc4c356a4ada1bb0d5410fdbb3bf1f1bdd9ddfd83ec",
+      "raw_bytes": 3263,
+      "manifest": "labs/results/1.1-r3/mysql-8.4.11-r2.json",
+      "artifact_key": "8.4.11-2-client-0-45.xml"
+    },
+    "labs/results/1.1-r3/mysql-9.7.2-r2.json": {
+      "path": "labs/results/1.1-r3/mysql-9.7.2-r2.json",
+      "sha256": "647cc93e33b75a3afef6bf250a34ce2bc6537a3c2273570438e28a2a753a10e5",
+      "bytes": 324118,
+      "encoding": "json"
+    },
+    "labs/results/1.1-r3/mysql-9.7.2-r2.raw/9.7.2-2-client-0-13.xml.gz": {
+      "path": "labs/results/1.1-r3/mysql-9.7.2-r2.raw/9.7.2-2-client-0-13.xml.gz",
+      "sha256": "2f5d35e9040ef00bf33332660cfee475514647927825f77f756d1be71fedcef9",
+      "bytes": 884,
+      "encoding": "gzip-text",
+      "raw_sha256": "7c9b0321e1fa6d79a45e7985b631e7867ffaec4a6264eebf2488b2ed7933302a",
+      "raw_bytes": 3265,
+      "manifest": "labs/results/1.1-r3/mysql-9.7.2-r2.json",
+      "artifact_key": "9.7.2-2-client-0-13.xml"
+    },
+    "labs/results/1.1-r3/mysql-9.7.2-r2.raw/9.7.2-2-client-0-24.xml.gz": {
+      "path": "labs/results/1.1-r3/mysql-9.7.2-r2.raw/9.7.2-2-client-0-24.xml.gz",
+      "sha256": "4e773a137098cbb4058568f077b080cdbe0ed019ad0a7b65224a34c7971e7200",
+      "bytes": 875,
+      "encoding": "gzip-text",
+      "raw_sha256": "0c45ebc2822e59be8c992810f714e52c6a4de9106cd95afa1e2c7e88f4192a51",
+      "raw_bytes": 3240,
+      "manifest": "labs/results/1.1-r3/mysql-9.7.2-r2.json",
+      "artifact_key": "9.7.2-2-client-0-24.xml"
+    },
+    "labs/results/1.1-r3/mysql-9.7.2-r2.raw/9.7.2-2-client-0-32.xml.gz": {
+      "path": "labs/results/1.1-r3/mysql-9.7.2-r2.raw/9.7.2-2-client-0-32.xml.gz",
+      "sha256": "7a8b9b81cab0ad4b2a8b6d04cfe74a9dbda53474a17a3693b6a9f3eb25c88101",
+      "bytes": 861,
+      "encoding": "gzip-text",
+      "raw_sha256": "fd16fc864fa9ddae84cb40b53fb8408ba8ac2b3be30bf4af0af328e81264d029",
+      "raw_bytes": 3215,
+      "manifest": "labs/results/1.1-r3/mysql-9.7.2-r2.json",
+      "artifact_key": "9.7.2-2-client-0-32.xml"
+    },
+    "labs/results/1.1-r3/mysql-9.7.2-r2.raw/9.7.2-2-client-0-45.xml.gz": {
+      "path": "labs/results/1.1-r3/mysql-9.7.2-r2.raw/9.7.2-2-client-0-45.xml.gz",
+      "sha256": "599a81f900db2005399525459c9c24c698ffde0718798652a3056f93d76d9cc3",
+      "bytes": 879,
+      "encoding": "gzip-text",
+      "raw_sha256": "5ac36d363838ec8fe525f3dc9f131dc8b7b9cfa90c07830f7f06fe8f28927c0d",
+      "raw_bytes": 3264,
+      "manifest": "labs/results/1.1-r3/mysql-9.7.2-r2.json",
+      "artifact_key": "9.7.2-2-client-0-45.xml"
+    },
+    "labs/results/1.1-postgresql.json": {
+      "path": "labs/results/1.1-postgresql.json",
+      "sha256": "d111fa06f4f48875c6a711fa98d59ba91da6377839f52e8220b3207df3eb20ae",
+      "bytes": 3694,
+      "encoding": "json"
+    },
+    "labs/results/1.1-r2-postgresql.json": {
+      "path": "labs/results/1.1-r2-postgresql.json",
+      "sha256": "3409ea201ab70cc27ee895a1d531f2cb38937d613eef87743003f39c4cf06873",
+      "bytes": 297173,
+      "encoding": "json"
+    },
+    "labs/results/1.1-kubernetes.json": {
+      "path": "labs/results/1.1-kubernetes.json",
+      "sha256": "e7e70a15eb33c2709b00e19a532f578864430aa9757530e0938056c316e5b8c9",
+      "bytes": 2548,
+      "encoding": "json"
+    },
+    "labs/results/1.1-r2-otel.json": {
+      "path": "labs/results/1.1-r2-otel.json",
+      "sha256": "0f451a5e25da770c27ca812aaeaa3974fde9f84217bdc32b03dd6cf99717d64f",
+      "bytes": 12939306,
+      "encoding": "json"
+    },
+    "labs/results/1.1-otel.json": {
+      "path": "labs/results/1.1-otel.json",
+      "sha256": "41e780cba48eb557e2aaa6a71ef0984dfa683752f18ae0b73130242393227af1",
+      "bytes": 5336,
+      "encoding": "json"
+    },
+    "labs/results/1.1-r3/histograms.json": {
+      "path": "labs/results/1.1-r3/histograms.json",
+      "sha256": "e299135d7b4c93f935ec69db09765062d6598f37c756b4272ba4ea79d64de34d",
+      "bytes": 15374,
+      "encoding": "json"
+    },
+    "labs/results/1.1-r3/histograms.raw/command-003.gz": {
+      "path": "labs/results/1.1-r3/histograms.raw/command-003.gz",
+      "sha256": "f64e64e9a54d716f3279892d30d58889c1475a3beebcfdbb0df744896173e547",
+      "bytes": 364,
+      "encoding": "gzip-text",
+      "raw_sha256": "c666f47cfa04485c878ae591b34b2c9fd0bb6e7d5db8587fb60607c8f11be0b9",
+      "raw_bytes": 1132,
+      "manifest": "labs/results/1.1-r3/histograms.json",
+      "artifact_key": "command-003"
+    },
+    "labs/results/1.1-r3/histograms.raw/command-006.gz": {
+      "path": "labs/results/1.1-r3/histograms.raw/command-006.gz",
+      "sha256": "dcca96770da4c0666d7f10499b8f9c4f64c14bb6f2a0d4baacc9055e6e4b77ea",
+      "bytes": 363,
+      "encoding": "gzip-text",
+      "raw_sha256": "24b9130db9b8d19fe834089a164ffe94b3f2f6e3de9334399f2418ac83e2f0bd",
+      "raw_bytes": 1131,
+      "manifest": "labs/results/1.1-r3/histograms.json",
+      "artifact_key": "command-006"
+    },
+    "labs/results/1.1-r3/linux-memory.json": {
+      "path": "labs/results/1.1-r3/linux-memory.json",
+      "sha256": "7d895a7a30d10181f4a6426d83d78ba3ca4f8306beced0a0e72f814c5ddb3f83",
+      "bytes": 93009,
+      "encoding": "json"
+    },
+    "labs/results/1.1-r3/linux-memory.raw/psi-memory.gz": {
+      "path": "labs/results/1.1-r3/linux-memory.raw/psi-memory.gz",
+      "sha256": "680c7a71912ffb7afa90d9c7fa264b131f8e0ff836f00db451f887ee794a284f",
+      "bytes": 57,
+      "encoding": "gzip-text",
+      "raw_sha256": "412d920370f34151bf0ed4a09cb00c0495ef7d8f922049744e873bbc34c2f17f",
+      "raw_bytes": 94,
+      "manifest": "labs/results/1.1-r3/linux-memory.json",
+      "artifact_key": "psi-memory"
+    }
+  },
+  "cases": [
+    {
+      "id": "cpu-clock-0",
+      "contract": "cpu_clock",
+      "origin": "measured",
+      "field_ids": [
+        "linux.process.utime"
+      ],
+      "book": "docs/host/linux-observation-lab.md",
+      "limitation": "WSL single-thread samples; 1% quality threshold is reference policy; RAW external accuracy is not certified.",
+      "bindings": {
+        "before": {
+          "source": "labs/results/1.1-linux-clock-r1.json",
+          "pointer": "/experiments/cpu_accounting/intervals/0/before"
+        },
+        "after": {
+          "source": "labs/results/1.1-linux-clock-r1.json",
+          "pointer": "/experiments/cpu_accounting/intervals/0/after"
+        },
+        "thread_counts": {
+          "source": "labs/results/1.1-linux-clock-r1.json",
+          "pointer": "/experiments/cpu_accounting/intervals/0/thread_counts"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "before": "701bf7b07e2830fa38df1e1066b43eabea0db892fd6b6cd9c804b797a8bccf0f",
+        "after": "194ab9213e8be0eedad42e4c0de348810d874746e4ab80870bbdfad7d1f514d7",
+        "thread_counts": "e61b9f584dbe27741cef6e9ee440831d7d94470c0871b0871541f0308916efea"
+      },
+      "input": {
+        "before": {
+          "monotonic_ns": 423013700775401,
+          "process_cpu_ns": 37824411,
+          "raw_before_ns": 440624642309628,
+          "raw_after_ns": 440624642311808,
+          "raw_midpoint_ns": 440624642310718,
+          "read_bracket_ns": 2180
+        },
+        "after": {
+          "monotonic_ns": 423013900782753,
+          "process_cpu_ns": 251185017,
+          "raw_before_ns": 440624855686666,
+          "raw_after_ns": 440624855691675,
+          "raw_midpoint_ns": 440624855689170,
+          "read_bracket_ns": 5009
+        },
+        "thread_counts": [
+          1,
+          1
+        ]
+      },
+      "expected": {
+        "quality_flags": [
+          "single_thread_cpu_over_monotonic",
+          "monotonic_raw_rate_difference",
+          "clock_slew_suspected"
+        ]
+      }
+    },
+    {
+      "id": "cpu-clock-1",
+      "contract": "cpu_clock",
+      "origin": "measured",
+      "field_ids": [
+        "linux.process.utime"
+      ],
+      "book": "docs/host/linux-observation-lab.md",
+      "limitation": "WSL single-thread samples; 1% quality threshold is reference policy; RAW external accuracy is not certified.",
+      "bindings": {
+        "before": {
+          "source": "labs/results/1.1-linux-clock-r1.json",
+          "pointer": "/experiments/cpu_accounting/intervals/1/before"
+        },
+        "after": {
+          "source": "labs/results/1.1-linux-clock-r1.json",
+          "pointer": "/experiments/cpu_accounting/intervals/1/after"
+        },
+        "thread_counts": {
+          "source": "labs/results/1.1-linux-clock-r1.json",
+          "pointer": "/experiments/cpu_accounting/intervals/1/thread_counts"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "before": "27799ea1f62916a7885246ad44d8920ff10347970e494c44043bb6b8b8186076",
+        "after": "0d2139b9f5b2b12cf96ae8f0c5b1409282532a5c50e9e684e647ac06aa3d6c52",
+        "thread_counts": "e61b9f584dbe27741cef6e9ee440831d7d94470c0871b0871541f0308916efea"
+      },
+      "input": {
+        "before": {
+          "monotonic_ns": 423013901106538,
+          "process_cpu_ns": 251527154,
+          "raw_before_ns": 440624856032103,
+          "raw_after_ns": 440624856032893,
+          "raw_midpoint_ns": 440624856032498,
+          "read_bracket_ns": 790
+        },
+        "after": {
+          "monotonic_ns": 423014901108675,
+          "process_cpu_ns": 1318432870,
+          "raw_before_ns": 440625923017471,
+          "raw_after_ns": 440625923019111,
+          "raw_midpoint_ns": 440625923018291,
+          "read_bracket_ns": 1640
+        },
+        "thread_counts": [
+          1,
+          1
+        ]
+      },
+      "expected": {
+        "quality_flags": [
+          "single_thread_cpu_over_monotonic",
+          "monotonic_raw_rate_difference",
+          "clock_slew_suspected"
+        ]
+      }
+    },
+    {
+      "id": "cpu-clock-2",
+      "contract": "cpu_clock",
+      "origin": "measured",
+      "field_ids": [
+        "linux.process.utime"
+      ],
+      "book": "docs/host/linux-observation-lab.md",
+      "limitation": "WSL single-thread samples; 1% quality threshold is reference policy; RAW external accuracy is not certified.",
+      "bindings": {
+        "before": {
+          "source": "labs/results/1.1-linux-clock-r1.json",
+          "pointer": "/experiments/cpu_accounting/intervals/2/before"
+        },
+        "after": {
+          "source": "labs/results/1.1-linux-clock-r1.json",
+          "pointer": "/experiments/cpu_accounting/intervals/2/after"
+        },
+        "thread_counts": {
+          "source": "labs/results/1.1-linux-clock-r1.json",
+          "pointer": "/experiments/cpu_accounting/intervals/2/thread_counts"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "before": "089eefb8e42d770fb0b406ffcd1161ff630536643161699e50c5521fc56a70d6",
+        "after": "1175ad51c900ab4930d8aac3ef4ca0ff4b2a24790aa9a3a14e77c17e4cf2bc59",
+        "thread_counts": "e61b9f584dbe27741cef6e9ee440831d7d94470c0871b0871541f0308916efea"
+      },
+      "input": {
+        "before": {
+          "monotonic_ns": 423014901381275,
+          "process_cpu_ns": 1318722879,
+          "raw_before_ns": 440625923308352,
+          "raw_after_ns": 440625923309029,
+          "raw_midpoint_ns": 440625923308690,
+          "read_bracket_ns": 677
+        },
+        "after": {
+          "monotonic_ns": 423016901382580,
+          "process_cpu_ns": 3452781186,
+          "raw_before_ns": 440628057461526,
+          "raw_after_ns": 440628057465374,
+          "raw_midpoint_ns": 440628057463450,
+          "read_bracket_ns": 3848
+        },
+        "thread_counts": [
+          1,
+          1
+        ]
+      },
+      "expected": {
+        "quality_flags": [
+          "single_thread_cpu_over_monotonic",
+          "monotonic_raw_rate_difference",
+          "clock_slew_suspected"
+        ]
+      }
+    },
+    {
+      "id": "cpu-clock-3",
+      "contract": "cpu_clock",
+      "origin": "measured",
+      "field_ids": [
+        "linux.process.utime"
+      ],
+      "book": "docs/host/linux-observation-lab.md",
+      "limitation": "WSL single-thread samples; 1% quality threshold is reference policy; RAW external accuracy is not certified.",
+      "bindings": {
+        "before": {
+          "source": "labs/results/1.1-linux-clock-r1.json",
+          "pointer": "/experiments/cpu_accounting/intervals/3/before"
+        },
+        "after": {
+          "source": "labs/results/1.1-linux-clock-r1.json",
+          "pointer": "/experiments/cpu_accounting/intervals/3/after"
+        },
+        "thread_counts": {
+          "source": "labs/results/1.1-linux-clock-r1.json",
+          "pointer": "/experiments/cpu_accounting/intervals/3/thread_counts"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "before": "cd4204aea80e44e1aaf2e4221cadebc2a8de5e54905ef97380bd53b3885da06d",
+        "after": "590b560e8d1b0b61ec85adae03b60015b93a7212d689e619190fa639ab5c4d49",
+        "thread_counts": "e61b9f584dbe27741cef6e9ee440831d7d94470c0871b0871541f0308916efea"
+      },
+      "input": {
+        "before": {
+          "monotonic_ns": 423016901665729,
+          "process_cpu_ns": 3453081001,
+          "raw_before_ns": 440628057763648,
+          "raw_after_ns": 440628057764371,
+          "raw_midpoint_ns": 440628057764009,
+          "read_bracket_ns": 723
+        },
+        "after": {
+          "monotonic_ns": 423018901772919,
+          "process_cpu_ns": 3453137870,
+          "raw_before_ns": 440630192028218,
+          "raw_after_ns": 440630192033577,
+          "raw_midpoint_ns": 440630192030897,
+          "read_bracket_ns": 5359
+        },
+        "thread_counts": [
+          1,
+          1
+        ]
+      },
+      "expected": {
+        "quality_flags": [
+          "monotonic_raw_rate_difference"
+        ]
+      }
+    },
+    {
+      "id": "one-wrap",
+      "contract": "bounded_counter",
+      "origin": "synthetic",
+      "field_ids": [
+        "linux.disk.read_time"
+      ],
+      "book": "docs/host/collection-contracts.md",
+      "limitation": "Synthetic boundary; no observed diskstats/SNMP wrap. Continuity and maximum increment are explicit premises.",
+      "bindings": {},
+      "parameters": {
+        "previous": 4294967292,
+        "current": 6,
+        "bits": 32,
+        "continuity_proven": true,
+        "max_increment": 20
+      },
+      "extracted_sha256": {},
+      "input": {
+        "previous": 4294967292,
+        "current": 6,
+        "bits": 32,
+        "continuity_proven": true,
+        "max_increment": 20
+      },
+      "expected": {
+        "quality": "wrap_candidate",
+        "delta": 10
+      }
+    },
+    {
+      "id": "reset-marker",
+      "contract": "bounded_counter",
+      "origin": "synthetic",
+      "field_ids": [
+        "linux.disk.read_time"
+      ],
+      "book": "docs/host/collection-contracts.md",
+      "limitation": "Synthetic boundary; no observed diskstats/SNMP wrap. Continuity and maximum increment are explicit premises.",
+      "bindings": {},
+      "parameters": {
+        "previous": 4294967292,
+        "current": 6,
+        "bits": 32,
+        "continuity_proven": true,
+        "max_increment": 20,
+        "reset_changed": true
+      },
+      "extracted_sha256": {},
+      "input": {
+        "previous": 4294967292,
+        "current": 6,
+        "bits": 32,
+        "continuity_proven": true,
+        "max_increment": 20,
+        "reset_changed": true
+      },
+      "expected": {
+        "quality": "reset",
+        "delta": null
+      }
+    },
+    {
+      "id": "unknown-lifetime",
+      "contract": "bounded_counter",
+      "origin": "synthetic",
+      "field_ids": [
+        "linux.disk.read_time"
+      ],
+      "book": "docs/host/collection-contracts.md",
+      "limitation": "Synthetic boundary; no observed diskstats/SNMP wrap. Continuity and maximum increment are explicit premises.",
+      "bindings": {},
+      "parameters": {
+        "previous": 4294967292,
+        "current": 6,
+        "bits": 32,
+        "continuity_proven": false,
+        "max_increment": 20
+      },
+      "extracted_sha256": {},
+      "input": {
+        "previous": 4294967292,
+        "current": 6,
+        "bits": 32,
+        "continuity_proven": false,
+        "max_increment": 20
+      },
+      "expected": {
+        "quality": "continuity_unknown",
+        "delta": null
+      }
+    },
+    {
+      "id": "multiple-wrap-possible",
+      "contract": "bounded_counter",
+      "origin": "synthetic",
+      "field_ids": [
+        "linux.disk.read_time"
+      ],
+      "book": "docs/host/collection-contracts.md",
+      "limitation": "Synthetic boundary; no observed diskstats/SNMP wrap. Continuity and maximum increment are explicit premises.",
+      "bindings": {},
+      "parameters": {
+        "previous": 4294967292,
+        "current": 6,
+        "bits": 32,
+        "continuity_proven": true,
+        "max_increment": 4294967296
+      },
+      "extracted_sha256": {},
+      "input": {
+        "previous": 4294967292,
+        "current": 6,
+        "bits": 32,
+        "continuity_proven": true,
+        "max_increment": 4294967296
+      },
+      "expected": {
+        "quality": "wrap_count_unknown",
+        "delta": null
+      }
+    },
+    {
+      "id": "bound-violation",
+      "contract": "bounded_counter",
+      "origin": "synthetic",
+      "field_ids": [
+        "linux.disk.read_time"
+      ],
+      "book": "docs/host/collection-contracts.md",
+      "limitation": "Synthetic boundary; no observed diskstats/SNMP wrap. Continuity and maximum increment are explicit premises.",
+      "bindings": {},
+      "parameters": {
+        "previous": 4294967292,
+        "current": 6,
+        "bits": 32,
+        "continuity_proven": true,
+        "max_increment": 9
+      },
+      "extracted_sha256": {},
+      "input": {
+        "previous": 4294967292,
+        "current": 6,
+        "bits": 32,
+        "continuity_proven": true,
+        "max_increment": 9
+      },
+      "expected": {
+        "quality": "bound_violated",
+        "delta": null
+      }
+    },
+    {
+      "id": "increasing-still-ambiguous",
+      "contract": "bounded_counter",
+      "origin": "synthetic",
+      "field_ids": [
+        "linux.disk.read_time"
+      ],
+      "book": "docs/host/collection-contracts.md",
+      "limitation": "Synthetic boundary; no observed diskstats/SNMP wrap. Continuity and maximum increment are explicit premises.",
+      "bindings": {},
+      "parameters": {
+        "previous": 1,
+        "current": 2,
+        "bits": 32,
+        "continuity_proven": true,
+        "max_increment": null
+      },
+      "extracted_sha256": {},
+      "input": {
+        "previous": 1,
+        "current": 2,
+        "bits": 32,
+        "continuity_proven": true,
+        "max_increment": null
+      },
+      "expected": {
+        "quality": "wrap_count_unknown",
+        "delta": null
+      }
+    },
+    {
+      "id": "snmp-counter64",
+      "contract": "bounded_counter",
+      "origin": "synthetic",
+      "field_ids": [],
+      "book": "docs/network/snmp-and-device-models.md",
+      "limitation": "Synthetic boundary; no observed diskstats/SNMP wrap. Continuity and maximum increment are explicit premises.",
+      "bindings": {},
+      "parameters": {
+        "previous": 18446744073709551612,
+        "current": 6,
+        "bits": 64,
+        "continuity_proven": true,
+        "max_increment": 20
+      },
+      "extracted_sha256": {},
+      "input": {
+        "previous": 18446744073709551612,
+        "current": 6,
+        "bits": 64,
+        "continuity_proven": true,
+        "max_increment": 20
+      },
+      "expected": {
+        "quality": "wrap_candidate",
+        "delta": 10
+      }
+    },
+    {
+      "id": "diskstats-modern-layout",
+      "contract": "diskstats",
+      "origin": "synthetic",
+      "field_ids": [
+        "linux.disk.read_time"
+      ],
+      "book": "docs/host/collection-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "text": "8 0 sda 100 0 200 4294967292 10 0 50 20 0 10 20 0 0 0 0 0 0"
+      },
+      "extracted_sha256": {},
+      "input": {
+        "text": "8 0 sda 100 0 200 4294967292 10 0 50 20 0 10 20 0 0 0 0 0 0"
+      },
+      "expected": {
+        "major": 8,
+        "minor": 0,
+        "device": "sda",
+        "reads_completed": 100,
+        "sectors_read": 200,
+        "read_time_ms": 4294967292,
+        "in_flight": 0,
+        "io_time_ms": 10
+      }
+    },
+    {
+      "id": "diskstats-incomplete",
+      "contract": "diskstats",
+      "origin": "synthetic",
+      "field_ids": [],
+      "book": "docs/product/adapter-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "text": "8 0 sda 1 2 3"
+      },
+      "extracted_sha256": {},
+      "input": {
+        "text": "8 0 sda 1 2 3"
+      },
+      "expected": {
+        "raises": "ValueError"
+      }
+    },
+    {
+      "id": "snmp-header-order",
+      "contract": "snmp",
+      "origin": "synthetic",
+      "field_ids": [
+        "linux.tcp.curr_estab",
+        "linux.tcp.retrans_segs"
+      ],
+      "book": "docs/network/linux-stack-counters.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "text": "Tcp: OutSegs CurrEstab RetransSegs\nTcp: 100 3 2\n"
+      },
+      "extracted_sha256": {},
+      "input": {
+        "text": "Tcp: OutSegs CurrEstab RetransSegs\nTcp: 100 3 2\n"
+      },
+      "expected": {
+        "Tcp.CurrEstab": 3,
+        "Tcp.OutSegs": 100,
+        "Tcp.RetransSegs": 2
+      }
+    },
+    {
+      "id": "snmp-header-mismatch",
+      "contract": "snmp",
+      "origin": "synthetic",
+      "field_ids": [],
+      "book": "docs/product/adapter-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "text": "Tcp: CurrEstab OutSegs\nTcp: 2\n"
+      },
+      "extracted_sha256": {},
+      "input": {
+        "text": "Tcp: CurrEstab OutSegs\nTcp: 2\n"
+      },
+      "expected": {
+        "raises": "ValueError"
+      }
+    },
+    {
+      "id": "mysql-8.4.11-baseline",
+      "contract": "mysql_replica",
+      "origin": "measured",
+      "field_ids": [
+        "mysql.replica.seconds_behind",
+        "mysql.replica.io_running",
+        "mysql.replica.sql_running"
+      ],
+      "book": "docs/database/mysql-operations.md",
+      "limitation": "Parse actual gzip XML, preserving xsi:nil; matching receiver/coordinator positions does not prove source freshness.",
+      "bindings": {
+        "text": {
+          "source": "labs/results/1.1-r3/mysql-8.4.11-r2.raw/8.4.11-2-client-0-13.xml.gz",
+          "pointer": ""
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "text": "43180cdac450f21dd6c89927c72ab48847093036a8e5bb2cbacfa4072740a22c"
+      },
+      "input": {
+        "text": "<?xml version=\"1.0\"?>\n\n<resultset statement=\"SHOW REPLICA STATUS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <row>\n\t<field name=\"Replica_IO_State\">Waiting for source to send event</field>\n\t<field name=\"Source_Host\">127.0.0.1</field>\n\t<field name=\"Source_User\">r3_repl</field>\n\t<field name=\"Source_Port\">40590</field>\n\t<field name=\"Connect_Retry\">60</field>\n\t<field name=\"Source_Log_File\">binlog.000001</field>\n\t<field name=\"Read_Source_Log_Pos\">1073</field>\n\t<field name=\"Relay_Log_File\">relay.000002</field>\n\t<field name=\"Relay_Log_Pos\">1284</field>\n\t<field name=\"Relay_Source_Log_File\">binlog.000001</field>\n\t<field name=\"Replica_IO_Running\">Yes</field>\n\t<field name=\"Replica_SQL_Running\">Yes</field>\n\t<field name=\"Replicate_Do_DB\"></field>\n\t<field name=\"Replicate_Ignore_DB\"></field>\n\t<field name=\"Replicate_Do_Table\"></field>\n\t<field name=\"Replicate_Ignore_Table\"></field>\n\t<field name=\"Replicate_Wild_Do_Table\"></field>\n\t<field name=\"Replicate_Wild_Ignore_Table\"></field>\n\t<field name=\"Last_Errno\">0</field>\n\t<field name=\"Last_Error\"></field>\n\t<field name=\"Skip_Counter\">0</field>\n\t<field name=\"Exec_Source_Log_Pos\">1073</field>\n\t<field name=\"Relay_Log_Space\">1485</field>\n\t<field name=\"Until_Condition\">None</field>\n\t<field name=\"Until_Log_File\"></field>\n\t<field name=\"Until_Log_Pos\">0</field>\n\t<field name=\"Source_SSL_Allowed\">No</field>\n\t<field name=\"Source_SSL_CA_File\"></field>\n\t<field name=\"Source_SSL_CA_Path\"></field>\n\t<field name=\"Source_SSL_Cert\"></field>\n\t<field name=\"Source_SSL_Cipher\"></field>\n\t<field name=\"Source_SSL_Key\"></field>\n\t<field name=\"Seconds_Behind_Source\">0</field>\n\t<field name=\"Source_SSL_Verify_Server_Cert\">No</field>\n\t<field name=\"Last_IO_Errno\">0</field>\n\t<field name=\"Last_IO_Error\"></field>\n\t<field name=\"Last_SQL_Errno\">0</field>\n\t<field name=\"Last_SQL_Error\"></field>\n\t<field name=\"Replicate_Ignore_Server_Ids\"></field>\n\t<field name=\"Source_Server_Id\">1</field>\n\t<field name=\"Source_UUID\">d89aa776-c0d7-11f1-a919-e073e70afa49</field>\n\t<field name=\"Source_Info_File\">mysql.slave_master_info</field>\n\t<field name=\"SQL_Delay\">0</field>\n\t<field name=\"SQL_Remaining_Delay\" xsi:nil=\"true\" />\n\t<field name=\"Replica_SQL_Running_State\">Replica has read all relay log; waiting for more updates</field>\n\t<field name=\"Source_Retry_Count\">10</field>\n\t<field name=\"Source_Bind\"></field>\n\t<field name=\"Last_IO_Error_Timestamp\"></field>\n\t<field name=\"Last_SQL_Error_Timestamp\"></field>\n\t<field name=\"Source_SSL_Crl\"></field>\n\t<field name=\"Source_SSL_Crlpath\"></field>\n\t<field name=\"Retrieved_Gtid_Set\">d89aa776-c0d7-11f1-a919-e073e70afa49:1-4</field>\n\t<field name=\"Executed_Gtid_Set\">d89aa776-c0d7-11f1-a919-e073e70afa49:1-4</field>\n\t<field name=\"Auto_Position\">1</field>\n\t<field name=\"Replicate_Rewrite_DB\"></field>\n\t<field name=\"Channel_Name\"></field>\n\t<field name=\"Source_TLS_Version\"></field>\n\t<field name=\"Source_public_key_path\"></field>\n\t<field name=\"Get_Source_public_key\">1</field>\n\t<field name=\"Network_Namespace\"></field>\n  </row>\n</resultset>\n<?xml version=\"1.0\"?>\n\n<resultset statement=\"SELECT 'r3_done_f7378e3220ea4258a9483bd84912df13' AS r3_marker\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <row>\n\t<field name=\"r3_marker\">r3_done_f7378e3220ea4258a9483bd84912df13</field>\n  </row>\n</resultset>\n"
+      },
+      "expected": {
+        "lag": {
+          "quality": "known",
+          "value": 0
+        },
+        "io": "Yes",
+        "sql": "Yes",
+        "positions_match": true,
+        "source_freshness_proven": false
+      }
+    },
+    {
+      "id": "mysql-8.4.11-io_stopped",
+      "contract": "mysql_replica",
+      "origin": "measured",
+      "field_ids": [
+        "mysql.replica.seconds_behind",
+        "mysql.replica.io_running",
+        "mysql.replica.sql_running"
+      ],
+      "book": "docs/database/mysql-operations.md",
+      "limitation": "Parse actual gzip XML, preserving xsi:nil; matching receiver/coordinator positions does not prove source freshness.",
+      "bindings": {
+        "text": {
+          "source": "labs/results/1.1-r3/mysql-8.4.11-r2.raw/8.4.11-2-client-0-24.xml.gz",
+          "pointer": ""
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "text": "bd5d8bda68410219cf300c164e4d954602393cabdd57b50303bde390a7d83366"
+      },
+      "input": {
+        "text": "<?xml version=\"1.0\"?>\n\n<resultset statement=\"SHOW REPLICA STATUS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <row>\n\t<field name=\"Replica_IO_State\"></field>\n\t<field name=\"Source_Host\">127.0.0.1</field>\n\t<field name=\"Source_User\">r3_repl</field>\n\t<field name=\"Source_Port\">40590</field>\n\t<field name=\"Connect_Retry\">60</field>\n\t<field name=\"Source_Log_File\">binlog.000001</field>\n\t<field name=\"Read_Source_Log_Pos\">1073</field>\n\t<field name=\"Relay_Log_File\">relay.000002</field>\n\t<field name=\"Relay_Log_Pos\">1284</field>\n\t<field name=\"Relay_Source_Log_File\">binlog.000001</field>\n\t<field name=\"Replica_IO_Running\">No</field>\n\t<field name=\"Replica_SQL_Running\">Yes</field>\n\t<field name=\"Replicate_Do_DB\"></field>\n\t<field name=\"Replicate_Ignore_DB\"></field>\n\t<field name=\"Replicate_Do_Table\"></field>\n\t<field name=\"Replicate_Ignore_Table\"></field>\n\t<field name=\"Replicate_Wild_Do_Table\"></field>\n\t<field name=\"Replicate_Wild_Ignore_Table\"></field>\n\t<field name=\"Last_Errno\">0</field>\n\t<field name=\"Last_Error\"></field>\n\t<field name=\"Skip_Counter\">0</field>\n\t<field name=\"Exec_Source_Log_Pos\">1073</field>\n\t<field name=\"Relay_Log_Space\">1485</field>\n\t<field name=\"Until_Condition\">None</field>\n\t<field name=\"Until_Log_File\"></field>\n\t<field name=\"Until_Log_Pos\">0</field>\n\t<field name=\"Source_SSL_Allowed\">No</field>\n\t<field name=\"Source_SSL_CA_File\"></field>\n\t<field name=\"Source_SSL_CA_Path\"></field>\n\t<field name=\"Source_SSL_Cert\"></field>\n\t<field name=\"Source_SSL_Cipher\"></field>\n\t<field name=\"Source_SSL_Key\"></field>\n\t<field name=\"Seconds_Behind_Source\" xsi:nil=\"true\" />\n\t<field name=\"Source_SSL_Verify_Server_Cert\">No</field>\n\t<field name=\"Last_IO_Errno\">0</field>\n\t<field name=\"Last_IO_Error\"></field>\n\t<field name=\"Last_SQL_Errno\">0</field>\n\t<field name=\"Last_SQL_Error\"></field>\n\t<field name=\"Replicate_Ignore_Server_Ids\"></field>\n\t<field name=\"Source_Server_Id\">1</field>\n\t<field name=\"Source_UUID\">d89aa776-c0d7-11f1-a919-e073e70afa49</field>\n\t<field name=\"Source_Info_File\">mysql.slave_master_info</field>\n\t<field name=\"SQL_Delay\">0</field>\n\t<field name=\"SQL_Remaining_Delay\" xsi:nil=\"true\" />\n\t<field name=\"Replica_SQL_Running_State\">Replica has read all relay log; waiting for more updates</field>\n\t<field name=\"Source_Retry_Count\">10</field>\n\t<field name=\"Source_Bind\"></field>\n\t<field name=\"Last_IO_Error_Timestamp\"></field>\n\t<field name=\"Last_SQL_Error_Timestamp\"></field>\n\t<field name=\"Source_SSL_Crl\"></field>\n\t<field name=\"Source_SSL_Crlpath\"></field>\n\t<field name=\"Retrieved_Gtid_Set\">d89aa776-c0d7-11f1-a919-e073e70afa49:1-4</field>\n\t<field name=\"Executed_Gtid_Set\">d89aa776-c0d7-11f1-a919-e073e70afa49:1-4</field>\n\t<field name=\"Auto_Position\">1</field>\n\t<field name=\"Replicate_Rewrite_DB\"></field>\n\t<field name=\"Channel_Name\"></field>\n\t<field name=\"Source_TLS_Version\"></field>\n\t<field name=\"Source_public_key_path\"></field>\n\t<field name=\"Get_Source_public_key\">1</field>\n\t<field name=\"Network_Namespace\"></field>\n  </row>\n</resultset>\n<?xml version=\"1.0\"?>\n\n<resultset statement=\"SELECT 'r3_done_194491686f484b75a56addf6bead1b4c' AS r3_marker\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <row>\n\t<field name=\"r3_marker\">r3_done_194491686f484b75a56addf6bead1b4c</field>\n  </row>\n</resultset>\n"
+      },
+      "expected": {
+        "lag": {
+          "quality": "null",
+          "value": null
+        },
+        "io": "No",
+        "sql": "Yes",
+        "positions_match": true,
+        "source_freshness_proven": false
+      }
+    },
+    {
+      "id": "mysql-8.4.11-sql_stopped",
+      "contract": "mysql_replica",
+      "origin": "measured",
+      "field_ids": [
+        "mysql.replica.seconds_behind",
+        "mysql.replica.io_running",
+        "mysql.replica.sql_running"
+      ],
+      "book": "docs/database/mysql-operations.md",
+      "limitation": "Parse actual gzip XML, preserving xsi:nil; matching receiver/coordinator positions does not prove source freshness.",
+      "bindings": {
+        "text": {
+          "source": "labs/results/1.1-r3/mysql-8.4.11-r2.raw/8.4.11-2-client-0-32.xml.gz",
+          "pointer": ""
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "text": "11f97b6134d4f3d1e42e76b6eed8e652c73fbe0d823fe9b65e7b6be0e2f0c07e"
+      },
+      "input": {
+        "text": "<?xml version=\"1.0\"?>\n\n<resultset statement=\"SHOW REPLICA STATUS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <row>\n\t<field name=\"Replica_IO_State\">Waiting for source to send event</field>\n\t<field name=\"Source_Host\">127.0.0.1</field>\n\t<field name=\"Source_User\">r3_repl</field>\n\t<field name=\"Source_Port\">40590</field>\n\t<field name=\"Connect_Retry\">60</field>\n\t<field name=\"Source_Log_File\">binlog.000001</field>\n\t<field name=\"Read_Source_Log_Pos\">1611</field>\n\t<field name=\"Relay_Log_File\">relay.000003</field>\n\t<field name=\"Relay_Log_Pos\">722</field>\n\t<field name=\"Relay_Source_Log_File\">binlog.000001</field>\n\t<field name=\"Replica_IO_Running\">Yes</field>\n\t<field name=\"Replica_SQL_Running\">No</field>\n\t<field name=\"Replicate_Do_DB\"></field>\n\t<field name=\"Replicate_Ignore_DB\"></field>\n\t<field name=\"Replicate_Do_Table\"></field>\n\t<field name=\"Replicate_Ignore_Table\"></field>\n\t<field name=\"Replicate_Wild_Do_Table\"></field>\n\t<field name=\"Replicate_Wild_Ignore_Table\"></field>\n\t<field name=\"Last_Errno\">0</field>\n\t<field name=\"Last_Error\"></field>\n\t<field name=\"Skip_Counter\">0</field>\n\t<field name=\"Exec_Source_Log_Pos\">1342</field>\n\t<field name=\"Relay_Log_Space\">2318</field>\n\t<field name=\"Until_Condition\">None</field>\n\t<field name=\"Until_Log_File\"></field>\n\t<field name=\"Until_Log_Pos\">0</field>\n\t<field name=\"Source_SSL_Allowed\">No</field>\n\t<field name=\"Source_SSL_CA_File\"></field>\n\t<field name=\"Source_SSL_CA_Path\"></field>\n\t<field name=\"Source_SSL_Cert\"></field>\n\t<field name=\"Source_SSL_Cipher\"></field>\n\t<field name=\"Source_SSL_Key\"></field>\n\t<field name=\"Seconds_Behind_Source\" xsi:nil=\"true\" />\n\t<field name=\"Source_SSL_Verify_Server_Cert\">No</field>\n\t<field name=\"Last_IO_Errno\">0</field>\n\t<field name=\"Last_IO_Error\"></field>\n\t<field name=\"Last_SQL_Errno\">0</field>\n\t<field name=\"Last_SQL_Error\"></field>\n\t<field name=\"Replicate_Ignore_Server_Ids\"></field>\n\t<field name=\"Source_Server_Id\">1</field>\n\t<field name=\"Source_UUID\">d89aa776-c0d7-11f1-a919-e073e70afa49</field>\n\t<field name=\"Source_Info_File\">mysql.slave_master_info</field>\n\t<field name=\"SQL_Delay\">0</field>\n\t<field name=\"SQL_Remaining_Delay\" xsi:nil=\"true\" />\n\t<field name=\"Replica_SQL_Running_State\"></field>\n\t<field name=\"Source_Retry_Count\">10</field>\n\t<field name=\"Source_Bind\"></field>\n\t<field name=\"Last_IO_Error_Timestamp\"></field>\n\t<field name=\"Last_SQL_Error_Timestamp\"></field>\n\t<field name=\"Source_SSL_Crl\"></field>\n\t<field name=\"Source_SSL_Crlpath\"></field>\n\t<field name=\"Retrieved_Gtid_Set\">d89aa776-c0d7-11f1-a919-e073e70afa49:1-6</field>\n\t<field name=\"Executed_Gtid_Set\">d89aa776-c0d7-11f1-a919-e073e70afa49:1-5</field>\n\t<field name=\"Auto_Position\">1</field>\n\t<field name=\"Replicate_Rewrite_DB\"></field>\n\t<field name=\"Channel_Name\"></field>\n\t<field name=\"Source_TLS_Version\"></field>\n\t<field name=\"Source_public_key_path\"></field>\n\t<field name=\"Get_Source_public_key\">1</field>\n\t<field name=\"Network_Namespace\"></field>\n  </row>\n</resultset>\n<?xml version=\"1.0\"?>\n\n<resultset statement=\"SELECT 'r3_done_b0925ccdf984480a9fcd3c5cfbb50943' AS r3_marker\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <row>\n\t<field name=\"r3_marker\">r3_done_b0925ccdf984480a9fcd3c5cfbb50943</field>\n  </row>\n</resultset>\n"
+      },
+      "expected": {
+        "lag": {
+          "quality": "null",
+          "value": null
+        },
+        "io": "Yes",
+        "sql": "No",
+        "positions_match": false,
+        "source_freshness_proven": false
+      }
+    },
+    {
+      "id": "mysql-8.4.11-resumed",
+      "contract": "mysql_replica",
+      "origin": "measured",
+      "field_ids": [
+        "mysql.replica.seconds_behind",
+        "mysql.replica.io_running",
+        "mysql.replica.sql_running"
+      ],
+      "book": "docs/database/mysql-operations.md",
+      "limitation": "Parse actual gzip XML, preserving xsi:nil; matching receiver/coordinator positions does not prove source freshness.",
+      "bindings": {
+        "text": {
+          "source": "labs/results/1.1-r3/mysql-8.4.11-r2.raw/8.4.11-2-client-0-45.xml.gz",
+          "pointer": ""
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "text": "2fb92b05464180b2b1c5a504e15e4bc5ae0c21b63ef503719bd7702b3b30f34b"
+      },
+      "input": {
+        "text": "<?xml version=\"1.0\"?>\n\n<resultset statement=\"SHOW REPLICA STATUS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <row>\n\t<field name=\"Replica_IO_State\">Waiting for source to send event</field>\n\t<field name=\"Source_Host\">127.0.0.1</field>\n\t<field name=\"Source_User\">r3_repl</field>\n\t<field name=\"Source_Port\">40590</field>\n\t<field name=\"Connect_Retry\">60</field>\n\t<field name=\"Source_Log_File\">binlog.000001</field>\n\t<field name=\"Read_Source_Log_Pos\">1611</field>\n\t<field name=\"Relay_Log_File\">relay.000003</field>\n\t<field name=\"Relay_Log_Pos\">991</field>\n\t<field name=\"Relay_Source_Log_File\">binlog.000001</field>\n\t<field name=\"Replica_IO_Running\">Yes</field>\n\t<field name=\"Replica_SQL_Running\">Yes</field>\n\t<field name=\"Replicate_Do_DB\"></field>\n\t<field name=\"Replicate_Ignore_DB\"></field>\n\t<field name=\"Replicate_Do_Table\"></field>\n\t<field name=\"Replicate_Ignore_Table\"></field>\n\t<field name=\"Replicate_Wild_Do_Table\"></field>\n\t<field name=\"Replicate_Wild_Ignore_Table\"></field>\n\t<field name=\"Last_Errno\">0</field>\n\t<field name=\"Last_Error\"></field>\n\t<field name=\"Skip_Counter\">0</field>\n\t<field name=\"Exec_Source_Log_Pos\">1611</field>\n\t<field name=\"Relay_Log_Space\">2318</field>\n\t<field name=\"Until_Condition\">None</field>\n\t<field name=\"Until_Log_File\"></field>\n\t<field name=\"Until_Log_Pos\">0</field>\n\t<field name=\"Source_SSL_Allowed\">No</field>\n\t<field name=\"Source_SSL_CA_File\"></field>\n\t<field name=\"Source_SSL_CA_Path\"></field>\n\t<field name=\"Source_SSL_Cert\"></field>\n\t<field name=\"Source_SSL_Cipher\"></field>\n\t<field name=\"Source_SSL_Key\"></field>\n\t<field name=\"Seconds_Behind_Source\">0</field>\n\t<field name=\"Source_SSL_Verify_Server_Cert\">No</field>\n\t<field name=\"Last_IO_Errno\">0</field>\n\t<field name=\"Last_IO_Error\"></field>\n\t<field name=\"Last_SQL_Errno\">0</field>\n\t<field name=\"Last_SQL_Error\"></field>\n\t<field name=\"Replicate_Ignore_Server_Ids\"></field>\n\t<field name=\"Source_Server_Id\">1</field>\n\t<field name=\"Source_UUID\">d89aa776-c0d7-11f1-a919-e073e70afa49</field>\n\t<field name=\"Source_Info_File\">mysql.slave_master_info</field>\n\t<field name=\"SQL_Delay\">0</field>\n\t<field name=\"SQL_Remaining_Delay\" xsi:nil=\"true\" />\n\t<field name=\"Replica_SQL_Running_State\">Replica has read all relay log; waiting for more updates</field>\n\t<field name=\"Source_Retry_Count\">10</field>\n\t<field name=\"Source_Bind\"></field>\n\t<field name=\"Last_IO_Error_Timestamp\"></field>\n\t<field name=\"Last_SQL_Error_Timestamp\"></field>\n\t<field name=\"Source_SSL_Crl\"></field>\n\t<field name=\"Source_SSL_Crlpath\"></field>\n\t<field name=\"Retrieved_Gtid_Set\">d89aa776-c0d7-11f1-a919-e073e70afa49:1-6</field>\n\t<field name=\"Executed_Gtid_Set\">d89aa776-c0d7-11f1-a919-e073e70afa49:1-6</field>\n\t<field name=\"Auto_Position\">1</field>\n\t<field name=\"Replicate_Rewrite_DB\"></field>\n\t<field name=\"Channel_Name\"></field>\n\t<field name=\"Source_TLS_Version\"></field>\n\t<field name=\"Source_public_key_path\"></field>\n\t<field name=\"Get_Source_public_key\">1</field>\n\t<field name=\"Network_Namespace\"></field>\n  </row>\n</resultset>\n<?xml version=\"1.0\"?>\n\n<resultset statement=\"SELECT 'r3_done_c24827e4e11e4d29a66a0bd1653fbd32' AS r3_marker\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <row>\n\t<field name=\"r3_marker\">r3_done_c24827e4e11e4d29a66a0bd1653fbd32</field>\n  </row>\n</resultset>\n"
+      },
+      "expected": {
+        "lag": {
+          "quality": "known",
+          "value": 0
+        },
+        "io": "Yes",
+        "sql": "Yes",
+        "positions_match": true,
+        "source_freshness_proven": false
+      }
+    },
+    {
+      "id": "mysql-9.7.2-baseline",
+      "contract": "mysql_replica",
+      "origin": "measured",
+      "field_ids": [
+        "mysql.replica.seconds_behind",
+        "mysql.replica.io_running",
+        "mysql.replica.sql_running"
+      ],
+      "book": "docs/database/mysql-operations.md",
+      "limitation": "Parse actual gzip XML, preserving xsi:nil; matching receiver/coordinator positions does not prove source freshness.",
+      "bindings": {
+        "text": {
+          "source": "labs/results/1.1-r3/mysql-9.7.2-r2.raw/9.7.2-2-client-0-13.xml.gz",
+          "pointer": ""
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "text": "ba320d47f74435b2100106eabb4abfb0b3f21bcc234ca9434932042ae4f3cc17"
+      },
+      "input": {
+        "text": "<?xml version=\"1.0\"?>\n\n<resultset statement=\"SHOW REPLICA STATUS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <row>\n\t<field name=\"Replica_IO_State\">Waiting for source to send event</field>\n\t<field name=\"Source_Host\">127.0.0.1</field>\n\t<field name=\"Source_User\">r3_repl</field>\n\t<field name=\"Source_Port\">42472</field>\n\t<field name=\"Connect_Retry\">60</field>\n\t<field name=\"Source_Log_File\">binlog.000001</field>\n\t<field name=\"Read_Source_Log_Pos\">1073</field>\n\t<field name=\"Relay_Log_File\">relay.000002</field>\n\t<field name=\"Relay_Log_Pos\">1284</field>\n\t<field name=\"Relay_Source_Log_File\">binlog.000001</field>\n\t<field name=\"Replica_IO_Running\">Yes</field>\n\t<field name=\"Replica_SQL_Running\">Yes</field>\n\t<field name=\"Replicate_Do_DB\"></field>\n\t<field name=\"Replicate_Ignore_DB\"></field>\n\t<field name=\"Replicate_Do_Table\"></field>\n\t<field name=\"Replicate_Ignore_Table\"></field>\n\t<field name=\"Replicate_Wild_Do_Table\"></field>\n\t<field name=\"Replicate_Wild_Ignore_Table\"></field>\n\t<field name=\"Last_Errno\">0</field>\n\t<field name=\"Last_Error\"></field>\n\t<field name=\"Skip_Counter\">0</field>\n\t<field name=\"Exec_Source_Log_Pos\">1073</field>\n\t<field name=\"Relay_Log_Space\">1485</field>\n\t<field name=\"Until_Condition\">None</field>\n\t<field name=\"Until_Log_File\"></field>\n\t<field name=\"Until_Log_Pos\">0</field>\n\t<field name=\"Source_SSL_Allowed\">Yes</field>\n\t<field name=\"Source_SSL_CA_File\"></field>\n\t<field name=\"Source_SSL_CA_Path\"></field>\n\t<field name=\"Source_SSL_Cert\"></field>\n\t<field name=\"Source_SSL_Cipher\"></field>\n\t<field name=\"Source_SSL_Key\"></field>\n\t<field name=\"Seconds_Behind_Source\">0</field>\n\t<field name=\"Source_SSL_Verify_Server_Cert\">No</field>\n\t<field name=\"Last_IO_Errno\">0</field>\n\t<field name=\"Last_IO_Error\"></field>\n\t<field name=\"Last_SQL_Errno\">0</field>\n\t<field name=\"Last_SQL_Error\"></field>\n\t<field name=\"Replicate_Ignore_Server_Ids\"></field>\n\t<field name=\"Source_Server_Id\">1</field>\n\t<field name=\"Source_UUID\">f23d60ec-c0d7-11f1-8435-e073e70afa49</field>\n\t<field name=\"Source_Info_File\">mysql.slave_master_info</field>\n\t<field name=\"SQL_Delay\">0</field>\n\t<field name=\"SQL_Remaining_Delay\" xsi:nil=\"true\" />\n\t<field name=\"Replica_SQL_Running_State\">Replica has read all relay log; waiting for more updates</field>\n\t<field name=\"Source_Retry_Count\">10</field>\n\t<field name=\"Source_Bind\"></field>\n\t<field name=\"Last_IO_Error_Timestamp\"></field>\n\t<field name=\"Last_SQL_Error_Timestamp\"></field>\n\t<field name=\"Source_SSL_Crl\"></field>\n\t<field name=\"Source_SSL_Crlpath\"></field>\n\t<field name=\"Retrieved_Gtid_Set\">f23d60ec-c0d7-11f1-8435-e073e70afa49:1-4</field>\n\t<field name=\"Executed_Gtid_Set\">f23d60ec-c0d7-11f1-8435-e073e70afa49:1-4</field>\n\t<field name=\"Auto_Position\">1</field>\n\t<field name=\"Replicate_Rewrite_DB\"></field>\n\t<field name=\"Channel_Name\"></field>\n\t<field name=\"Source_TLS_Version\"></field>\n\t<field name=\"Source_public_key_path\"></field>\n\t<field name=\"Get_Source_public_key\">1</field>\n\t<field name=\"Network_Namespace\"></field>\n  </row>\n</resultset>\n<?xml version=\"1.0\"?>\n\n<resultset statement=\"SELECT 'r3_done_fb3924d6dc1c46e6ba94aea58001693e' AS r3_marker\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <row>\n\t<field name=\"r3_marker\">r3_done_fb3924d6dc1c46e6ba94aea58001693e</field>\n  </row>\n</resultset>\n"
+      },
+      "expected": {
+        "lag": {
+          "quality": "known",
+          "value": 0
+        },
+        "io": "Yes",
+        "sql": "Yes",
+        "positions_match": true,
+        "source_freshness_proven": false
+      }
+    },
+    {
+      "id": "mysql-9.7.2-io_stopped",
+      "contract": "mysql_replica",
+      "origin": "measured",
+      "field_ids": [
+        "mysql.replica.seconds_behind",
+        "mysql.replica.io_running",
+        "mysql.replica.sql_running"
+      ],
+      "book": "docs/database/mysql-operations.md",
+      "limitation": "Parse actual gzip XML, preserving xsi:nil; matching receiver/coordinator positions does not prove source freshness.",
+      "bindings": {
+        "text": {
+          "source": "labs/results/1.1-r3/mysql-9.7.2-r2.raw/9.7.2-2-client-0-24.xml.gz",
+          "pointer": ""
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "text": "813c006b852ca60552552dd84249fdd539ae784ab1da38c28a0c3eae94ae9b26"
+      },
+      "input": {
+        "text": "<?xml version=\"1.0\"?>\n\n<resultset statement=\"SHOW REPLICA STATUS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <row>\n\t<field name=\"Replica_IO_State\"></field>\n\t<field name=\"Source_Host\">127.0.0.1</field>\n\t<field name=\"Source_User\">r3_repl</field>\n\t<field name=\"Source_Port\">42472</field>\n\t<field name=\"Connect_Retry\">60</field>\n\t<field name=\"Source_Log_File\">binlog.000001</field>\n\t<field name=\"Read_Source_Log_Pos\">1073</field>\n\t<field name=\"Relay_Log_File\">relay.000002</field>\n\t<field name=\"Relay_Log_Pos\">1284</field>\n\t<field name=\"Relay_Source_Log_File\">binlog.000001</field>\n\t<field name=\"Replica_IO_Running\">No</field>\n\t<field name=\"Replica_SQL_Running\">Yes</field>\n\t<field name=\"Replicate_Do_DB\"></field>\n\t<field name=\"Replicate_Ignore_DB\"></field>\n\t<field name=\"Replicate_Do_Table\"></field>\n\t<field name=\"Replicate_Ignore_Table\"></field>\n\t<field name=\"Replicate_Wild_Do_Table\"></field>\n\t<field name=\"Replicate_Wild_Ignore_Table\"></field>\n\t<field name=\"Last_Errno\">0</field>\n\t<field name=\"Last_Error\"></field>\n\t<field name=\"Skip_Counter\">0</field>\n\t<field name=\"Exec_Source_Log_Pos\">1073</field>\n\t<field name=\"Relay_Log_Space\">1485</field>\n\t<field name=\"Until_Condition\">None</field>\n\t<field name=\"Until_Log_File\"></field>\n\t<field name=\"Until_Log_Pos\">0</field>\n\t<field name=\"Source_SSL_Allowed\">Yes</field>\n\t<field name=\"Source_SSL_CA_File\"></field>\n\t<field name=\"Source_SSL_CA_Path\"></field>\n\t<field name=\"Source_SSL_Cert\"></field>\n\t<field name=\"Source_SSL_Cipher\"></field>\n\t<field name=\"Source_SSL_Key\"></field>\n\t<field name=\"Seconds_Behind_Source\" xsi:nil=\"true\" />\n\t<field name=\"Source_SSL_Verify_Server_Cert\">No</field>\n\t<field name=\"Last_IO_Errno\">0</field>\n\t<field name=\"Last_IO_Error\"></field>\n\t<field name=\"Last_SQL_Errno\">0</field>\n\t<field name=\"Last_SQL_Error\"></field>\n\t<field name=\"Replicate_Ignore_Server_Ids\"></field>\n\t<field name=\"Source_Server_Id\">1</field>\n\t<field name=\"Source_UUID\">f23d60ec-c0d7-11f1-8435-e073e70afa49</field>\n\t<field name=\"Source_Info_File\">mysql.slave_master_info</field>\n\t<field name=\"SQL_Delay\">0</field>\n\t<field name=\"SQL_Remaining_Delay\" xsi:nil=\"true\" />\n\t<field name=\"Replica_SQL_Running_State\">Replica has read all relay log; waiting for more updates</field>\n\t<field name=\"Source_Retry_Count\">10</field>\n\t<field name=\"Source_Bind\"></field>\n\t<field name=\"Last_IO_Error_Timestamp\"></field>\n\t<field name=\"Last_SQL_Error_Timestamp\"></field>\n\t<field name=\"Source_SSL_Crl\"></field>\n\t<field name=\"Source_SSL_Crlpath\"></field>\n\t<field name=\"Retrieved_Gtid_Set\">f23d60ec-c0d7-11f1-8435-e073e70afa49:1-4</field>\n\t<field name=\"Executed_Gtid_Set\">f23d60ec-c0d7-11f1-8435-e073e70afa49:1-4</field>\n\t<field name=\"Auto_Position\">1</field>\n\t<field name=\"Replicate_Rewrite_DB\"></field>\n\t<field name=\"Channel_Name\"></field>\n\t<field name=\"Source_TLS_Version\"></field>\n\t<field name=\"Source_public_key_path\"></field>\n\t<field name=\"Get_Source_public_key\">1</field>\n\t<field name=\"Network_Namespace\"></field>\n  </row>\n</resultset>\n<?xml version=\"1.0\"?>\n\n<resultset statement=\"SELECT 'r3_done_918cc03e37964be8bcae342e248955ce' AS r3_marker\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <row>\n\t<field name=\"r3_marker\">r3_done_918cc03e37964be8bcae342e248955ce</field>\n  </row>\n</resultset>\n"
+      },
+      "expected": {
+        "lag": {
+          "quality": "null",
+          "value": null
+        },
+        "io": "No",
+        "sql": "Yes",
+        "positions_match": true,
+        "source_freshness_proven": false
+      }
+    },
+    {
+      "id": "mysql-9.7.2-sql_stopped",
+      "contract": "mysql_replica",
+      "origin": "measured",
+      "field_ids": [
+        "mysql.replica.seconds_behind",
+        "mysql.replica.io_running",
+        "mysql.replica.sql_running"
+      ],
+      "book": "docs/database/mysql-operations.md",
+      "limitation": "Parse actual gzip XML, preserving xsi:nil; matching receiver/coordinator positions does not prove source freshness.",
+      "bindings": {
+        "text": {
+          "source": "labs/results/1.1-r3/mysql-9.7.2-r2.raw/9.7.2-2-client-0-32.xml.gz",
+          "pointer": ""
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "text": "45941424bd292ba1fceec2c1f305770f9c2fe8052e31d9d259b02ea5f77899fe"
+      },
+      "input": {
+        "text": "<?xml version=\"1.0\"?>\n\n<resultset statement=\"SHOW REPLICA STATUS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <row>\n\t<field name=\"Replica_IO_State\">Waiting for source to send event</field>\n\t<field name=\"Source_Host\">127.0.0.1</field>\n\t<field name=\"Source_User\">r3_repl</field>\n\t<field name=\"Source_Port\">42472</field>\n\t<field name=\"Connect_Retry\">60</field>\n\t<field name=\"Source_Log_File\">binlog.000001</field>\n\t<field name=\"Read_Source_Log_Pos\">1611</field>\n\t<field name=\"Relay_Log_File\">relay.000003</field>\n\t<field name=\"Relay_Log_Pos\">722</field>\n\t<field name=\"Relay_Source_Log_File\">binlog.000001</field>\n\t<field name=\"Replica_IO_Running\">Yes</field>\n\t<field name=\"Replica_SQL_Running\">No</field>\n\t<field name=\"Replicate_Do_DB\"></field>\n\t<field name=\"Replicate_Ignore_DB\"></field>\n\t<field name=\"Replicate_Do_Table\"></field>\n\t<field name=\"Replicate_Ignore_Table\"></field>\n\t<field name=\"Replicate_Wild_Do_Table\"></field>\n\t<field name=\"Replicate_Wild_Ignore_Table\"></field>\n\t<field name=\"Last_Errno\">0</field>\n\t<field name=\"Last_Error\"></field>\n\t<field name=\"Skip_Counter\">0</field>\n\t<field name=\"Exec_Source_Log_Pos\">1342</field>\n\t<field name=\"Relay_Log_Space\">2318</field>\n\t<field name=\"Until_Condition\">None</field>\n\t<field name=\"Until_Log_File\"></field>\n\t<field name=\"Until_Log_Pos\">0</field>\n\t<field name=\"Source_SSL_Allowed\">Yes</field>\n\t<field name=\"Source_SSL_CA_File\"></field>\n\t<field name=\"Source_SSL_CA_Path\"></field>\n\t<field name=\"Source_SSL_Cert\"></field>\n\t<field name=\"Source_SSL_Cipher\"></field>\n\t<field name=\"Source_SSL_Key\"></field>\n\t<field name=\"Seconds_Behind_Source\" xsi:nil=\"true\" />\n\t<field name=\"Source_SSL_Verify_Server_Cert\">No</field>\n\t<field name=\"Last_IO_Errno\">0</field>\n\t<field name=\"Last_IO_Error\"></field>\n\t<field name=\"Last_SQL_Errno\">0</field>\n\t<field name=\"Last_SQL_Error\"></field>\n\t<field name=\"Replicate_Ignore_Server_Ids\"></field>\n\t<field name=\"Source_Server_Id\">1</field>\n\t<field name=\"Source_UUID\">f23d60ec-c0d7-11f1-8435-e073e70afa49</field>\n\t<field name=\"Source_Info_File\">mysql.slave_master_info</field>\n\t<field name=\"SQL_Delay\">0</field>\n\t<field name=\"SQL_Remaining_Delay\" xsi:nil=\"true\" />\n\t<field name=\"Replica_SQL_Running_State\"></field>\n\t<field name=\"Source_Retry_Count\">10</field>\n\t<field name=\"Source_Bind\"></field>\n\t<field name=\"Last_IO_Error_Timestamp\"></field>\n\t<field name=\"Last_SQL_Error_Timestamp\"></field>\n\t<field name=\"Source_SSL_Crl\"></field>\n\t<field name=\"Source_SSL_Crlpath\"></field>\n\t<field name=\"Retrieved_Gtid_Set\">f23d60ec-c0d7-11f1-8435-e073e70afa49:1-6</field>\n\t<field name=\"Executed_Gtid_Set\">f23d60ec-c0d7-11f1-8435-e073e70afa49:1-5</field>\n\t<field name=\"Auto_Position\">1</field>\n\t<field name=\"Replicate_Rewrite_DB\"></field>\n\t<field name=\"Channel_Name\"></field>\n\t<field name=\"Source_TLS_Version\"></field>\n\t<field name=\"Source_public_key_path\"></field>\n\t<field name=\"Get_Source_public_key\">1</field>\n\t<field name=\"Network_Namespace\"></field>\n  </row>\n</resultset>\n<?xml version=\"1.0\"?>\n\n<resultset statement=\"SELECT 'r3_done_fe80ce06975c4783ae3ef4424164fabf' AS r3_marker\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <row>\n\t<field name=\"r3_marker\">r3_done_fe80ce06975c4783ae3ef4424164fabf</field>\n  </row>\n</resultset>\n"
+      },
+      "expected": {
+        "lag": {
+          "quality": "null",
+          "value": null
+        },
+        "io": "Yes",
+        "sql": "No",
+        "positions_match": false,
+        "source_freshness_proven": false
+      }
+    },
+    {
+      "id": "mysql-9.7.2-resumed",
+      "contract": "mysql_replica",
+      "origin": "measured",
+      "field_ids": [
+        "mysql.replica.seconds_behind",
+        "mysql.replica.io_running",
+        "mysql.replica.sql_running"
+      ],
+      "book": "docs/database/mysql-operations.md",
+      "limitation": "Parse actual gzip XML, preserving xsi:nil; matching receiver/coordinator positions does not prove source freshness.",
+      "bindings": {
+        "text": {
+          "source": "labs/results/1.1-r3/mysql-9.7.2-r2.raw/9.7.2-2-client-0-45.xml.gz",
+          "pointer": ""
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "text": "eed01da42c84642260bacfa119c190f16a4ddf8136399558a4b71cb0f73e7728"
+      },
+      "input": {
+        "text": "<?xml version=\"1.0\"?>\n\n<resultset statement=\"SHOW REPLICA STATUS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <row>\n\t<field name=\"Replica_IO_State\">Waiting for source to send event</field>\n\t<field name=\"Source_Host\">127.0.0.1</field>\n\t<field name=\"Source_User\">r3_repl</field>\n\t<field name=\"Source_Port\">42472</field>\n\t<field name=\"Connect_Retry\">60</field>\n\t<field name=\"Source_Log_File\">binlog.000001</field>\n\t<field name=\"Read_Source_Log_Pos\">1611</field>\n\t<field name=\"Relay_Log_File\">relay.000003</field>\n\t<field name=\"Relay_Log_Pos\">991</field>\n\t<field name=\"Relay_Source_Log_File\">binlog.000001</field>\n\t<field name=\"Replica_IO_Running\">Yes</field>\n\t<field name=\"Replica_SQL_Running\">Yes</field>\n\t<field name=\"Replicate_Do_DB\"></field>\n\t<field name=\"Replicate_Ignore_DB\"></field>\n\t<field name=\"Replicate_Do_Table\"></field>\n\t<field name=\"Replicate_Ignore_Table\"></field>\n\t<field name=\"Replicate_Wild_Do_Table\"></field>\n\t<field name=\"Replicate_Wild_Ignore_Table\"></field>\n\t<field name=\"Last_Errno\">0</field>\n\t<field name=\"Last_Error\"></field>\n\t<field name=\"Skip_Counter\">0</field>\n\t<field name=\"Exec_Source_Log_Pos\">1611</field>\n\t<field name=\"Relay_Log_Space\">2318</field>\n\t<field name=\"Until_Condition\">None</field>\n\t<field name=\"Until_Log_File\"></field>\n\t<field name=\"Until_Log_Pos\">0</field>\n\t<field name=\"Source_SSL_Allowed\">Yes</field>\n\t<field name=\"Source_SSL_CA_File\"></field>\n\t<field name=\"Source_SSL_CA_Path\"></field>\n\t<field name=\"Source_SSL_Cert\"></field>\n\t<field name=\"Source_SSL_Cipher\"></field>\n\t<field name=\"Source_SSL_Key\"></field>\n\t<field name=\"Seconds_Behind_Source\">0</field>\n\t<field name=\"Source_SSL_Verify_Server_Cert\">No</field>\n\t<field name=\"Last_IO_Errno\">0</field>\n\t<field name=\"Last_IO_Error\"></field>\n\t<field name=\"Last_SQL_Errno\">0</field>\n\t<field name=\"Last_SQL_Error\"></field>\n\t<field name=\"Replicate_Ignore_Server_Ids\"></field>\n\t<field name=\"Source_Server_Id\">1</field>\n\t<field name=\"Source_UUID\">f23d60ec-c0d7-11f1-8435-e073e70afa49</field>\n\t<field name=\"Source_Info_File\">mysql.slave_master_info</field>\n\t<field name=\"SQL_Delay\">0</field>\n\t<field name=\"SQL_Remaining_Delay\" xsi:nil=\"true\" />\n\t<field name=\"Replica_SQL_Running_State\">Replica has read all relay log; waiting for more updates</field>\n\t<field name=\"Source_Retry_Count\">10</field>\n\t<field name=\"Source_Bind\"></field>\n\t<field name=\"Last_IO_Error_Timestamp\"></field>\n\t<field name=\"Last_SQL_Error_Timestamp\"></field>\n\t<field name=\"Source_SSL_Crl\"></field>\n\t<field name=\"Source_SSL_Crlpath\"></field>\n\t<field name=\"Retrieved_Gtid_Set\">f23d60ec-c0d7-11f1-8435-e073e70afa49:1-6</field>\n\t<field name=\"Executed_Gtid_Set\">f23d60ec-c0d7-11f1-8435-e073e70afa49:1-6</field>\n\t<field name=\"Auto_Position\">1</field>\n\t<field name=\"Replicate_Rewrite_DB\"></field>\n\t<field name=\"Channel_Name\"></field>\n\t<field name=\"Source_TLS_Version\"></field>\n\t<field name=\"Source_public_key_path\"></field>\n\t<field name=\"Get_Source_public_key\">1</field>\n\t<field name=\"Network_Namespace\"></field>\n  </row>\n</resultset>\n<?xml version=\"1.0\"?>\n\n<resultset statement=\"SELECT 'r3_done_a2108b04024f4426ab0350d76ff7492e' AS r3_marker\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <row>\n\t<field name=\"r3_marker\">r3_done_a2108b04024f4426ab0350d76ff7492e</field>\n  </row>\n</resultset>\n"
+      },
+      "expected": {
+        "lag": {
+          "quality": "known",
+          "value": 0
+        },
+        "io": "Yes",
+        "sql": "Yes",
+        "positions_match": true,
+        "source_freshness_proven": false
+      }
+    },
+    {
+      "id": "pg-visibility-before",
+      "contract": "pg_visibility",
+      "origin": "measured",
+      "field_ids": [
+        "pg.activity.state"
+      ],
+      "book": "docs/database/postgresql-concurrency-lab.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {
+        "row": {
+          "source": "labs/results/1.1-postgresql.json",
+          "pointer": "/experiments/statistics_privilege/before"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "row": "5f0988287a0ad2a6662455119a802a8eb2afb5c6700f3a7943daad5834d2473b"
+      },
+      "input": {
+        "row": {
+          "state": null,
+          "query": "<insufficient privilege>"
+        }
+      },
+      "expected": {
+        "visibility": "restricted",
+        "state": null
+      }
+    },
+    {
+      "id": "pg-visibility-after",
+      "contract": "pg_visibility",
+      "origin": "measured",
+      "field_ids": [
+        "pg.activity.state"
+      ],
+      "book": "docs/database/postgresql-concurrency-lab.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {
+        "row": {
+          "source": "labs/results/1.1-postgresql.json",
+          "pointer": "/experiments/statistics_privilege/after"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "row": "7c6282ee547bb4390eefee46e6b8130943b01f64c2284ba3d12321ff5e0cab08"
+      },
+      "input": {
+        "row": {
+          "state": "idle",
+          "query": "ROLLBACK"
+        }
+      },
+      "expected": {
+        "visibility": "visible",
+        "state": "idle"
+      }
+    },
+    {
+      "id": "pg-null-does-not-prove-permission",
+      "contract": "pg_visibility",
+      "origin": "synthetic",
+      "field_ids": [],
+      "book": "docs/product/adapter-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "row": {
+          "state": null,
+          "query": null
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "row": {
+          "state": null,
+          "query": null
+        }
+      },
+      "expected": {
+        "visibility": "unknown",
+        "state": null
+      }
+    },
+    {
+      "id": "pg-feedback-standby_feedback",
+      "contract": "nullable",
+      "origin": "measured",
+      "field_ids": [
+        "pg.replication.backend_xmin"
+      ],
+      "book": "docs/database/postgresql-operations.md",
+      "limitation": "Recorded backend_xmin only; replay_lag was not selected in this lab and remains synthetic below.",
+      "bindings": {
+        "value": {
+          "source": "labs/results/1.1-r2-postgresql.json",
+          "pointer": "/scenarios/standby_feedback/observations/before_delete/replication/0/backend_xmin"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "value": "8c4feecf90966af64f1d35663e3e5125cfb21c44d884291a6658fb361d85f97f"
+      },
+      "input": {
+        "value": "813"
+      },
+      "expected": {
+        "quality": "known",
+        "value": 813
+      }
+    },
+    {
+      "id": "pg-feedback-physical_slot_xmin",
+      "contract": "nullable",
+      "origin": "measured",
+      "field_ids": [
+        "pg.replication.backend_xmin"
+      ],
+      "book": "docs/database/postgresql-operations.md",
+      "limitation": "Recorded backend_xmin only; replay_lag was not selected in this lab and remains synthetic below.",
+      "bindings": {
+        "value": {
+          "source": "labs/results/1.1-r2-postgresql.json",
+          "pointer": "/scenarios/physical_slot_xmin/observations/before_delete/replication/0/backend_xmin"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "value": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b"
+      },
+      "input": {
+        "value": null
+      },
+      "expected": {
+        "quality": "null",
+        "value": null
+      }
+    },
+    {
+      "id": "pg-idle-replay-lag-null",
+      "contract": "nullable",
+      "origin": "synthetic",
+      "field_ids": [
+        "pg.replication.replay_lag"
+      ],
+      "book": "docs/database/replication-and-recovery.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "value": null
+      },
+      "extracted_sha256": {},
+      "input": {
+        "value": null
+      },
+      "expected": {
+        "quality": "null",
+        "value": null
+      }
+    },
+    {
+      "id": "kube-selector-exit",
+      "contract": "watch",
+      "origin": "measured",
+      "field_ids": [
+        "k8s.object.uid"
+      ],
+      "book": "docs/kubernetes/inventory-consistency.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {
+        "event_type": {
+          "source": "labs/results/1.1-kubernetes.json",
+          "pointer": "/experiments/selector_exit/watch_event"
+        },
+        "get_status": {
+          "source": "labs/results/1.1-kubernetes.json",
+          "pointer": "/experiments/selector_exit/get_after_event"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "event_type": "1693cdb25e1c866fbbd41e9e8391b84b1bbe53fcd08da98100eff8316e5dea86",
+        "get_status": "27badc983df1780b60c2b3fa9d3a19a00e46aac798451f0febdca52920faaddf"
+      },
+      "input": {
+        "event_type": "DELETED",
+        "get_status": 200
+      },
+      "expected": {
+        "selected_membership": "removed",
+        "object_state": "present_at_recheck",
+        "physical_deletion_proven": false
+      }
+    },
+    {
+      "id": "kube-name-reuse",
+      "contract": "uid",
+      "origin": "measured",
+      "field_ids": [
+        "k8s.object.uid"
+      ],
+      "book": "docs/kubernetes/inventory-consistency.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {
+        "previous_uid": {
+          "source": "labs/results/1.1-kubernetes.json",
+          "pointer": "/experiments/name_reuse/old_uid"
+        },
+        "current_uid": {
+          "source": "labs/results/1.1-kubernetes.json",
+          "pointer": "/experiments/name_reuse/new_uid"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "previous_uid": "e86daae3f9e744c26ab52984195a2d3d12c97ad9b60092729b8936a0a1e849aa",
+        "current_uid": "1a710ffec1827115bfc3d1e312b730a390e41f300c85200507866225fda1baf1"
+      },
+      "input": {
+        "previous_uid": "04726b1d-1692-4a20-868e-84d79014fa86",
+        "current_uid": "0af48c35-146e-4c67-a9c3-78b3e6f4e14c"
+      },
+      "expected": {
+        "identity": "replaced",
+        "remove_current": false
+      }
+    },
+    {
+      "id": "kube-404-recheck",
+      "contract": "watch",
+      "origin": "synthetic",
+      "field_ids": [],
+      "book": "docs/kubernetes/inventory-consistency.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "event_type": "DELETED",
+        "get_status": 404
+      },
+      "extracted_sha256": {},
+      "input": {
+        "event_type": "DELETED",
+        "get_status": 404
+      },
+      "expected": {
+        "selected_membership": "removed",
+        "object_state": "absent_at_recheck",
+        "physical_deletion_proven": false
+      }
+    },
+    {
+      "id": "kube-stale-delete",
+      "contract": "uid",
+      "origin": "synthetic",
+      "field_ids": [],
+      "book": "docs/kubernetes/inventory-consistency.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "previous_uid": "old",
+        "current_uid": "new",
+        "deleted_event_uid": "old"
+      },
+      "extracted_sha256": {},
+      "input": {
+        "previous_uid": "old",
+        "current_uid": "new",
+        "deleted_event_uid": "old"
+      },
+      "expected": {
+        "identity": "replaced",
+        "remove_current": false
+      }
+    },
+    {
+      "id": "cloud-partial-no-token",
+      "contract": "cloudwatch",
+      "origin": "synthetic",
+      "field_ids": [
+        "cloudwatch.result.status",
+        "cloudwatch.response.next_token"
+      ],
+      "book": "docs/cloud/late-data-and-reconciliation.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "response": {
+          "MetricDataResults": [
+            {
+              "Id": "requests",
+              "StatusCode": "PartialData",
+              "Timestamps": [
+                "10:02",
+                "10:00",
+                "10:01"
+              ],
+              "Values": [
+                30,
+                10,
+                20
+              ]
+            }
+          ]
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "response": {
+          "MetricDataResults": [
+            {
+              "Id": "requests",
+              "StatusCode": "PartialData",
+              "Timestamps": [
+                "10:02",
+                "10:00",
+                "10:01"
+              ],
+              "Values": [
+                30,
+                10,
+                20
+              ]
+            }
+          ]
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "id": "requests",
+            "status": "PartialData",
+            "points": [
+              [
+                "10:00",
+                10
+              ],
+              [
+                "10:01",
+                20
+              ],
+              [
+                "10:02",
+                30
+              ]
+            ],
+            "complete": false,
+            "messages": []
+          }
+        ],
+        "next_token": null
+      }
+    },
+    {
+      "id": "cloud-partial-token",
+      "contract": "cloudwatch",
+      "origin": "synthetic",
+      "field_ids": [
+        "cloudwatch.result.status",
+        "cloudwatch.response.next_token"
+      ],
+      "book": "docs/cloud/late-data-and-reconciliation.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "response": {
+          "MetricDataResults": [
+            {
+              "Id": "requests",
+              "StatusCode": "PartialData",
+              "Timestamps": [
+                "10:02",
+                "10:00",
+                "10:01"
+              ],
+              "Values": [
+                30,
+                10,
+                20
+              ]
+            }
+          ],
+          "NextToken": "next-page"
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "response": {
+          "MetricDataResults": [
+            {
+              "Id": "requests",
+              "StatusCode": "PartialData",
+              "Timestamps": [
+                "10:02",
+                "10:00",
+                "10:01"
+              ],
+              "Values": [
+                30,
+                10,
+                20
+              ]
+            }
+          ],
+          "NextToken": "next-page"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "id": "requests",
+            "status": "PartialData",
+            "points": [
+              [
+                "10:00",
+                10
+              ],
+              [
+                "10:01",
+                20
+              ],
+              [
+                "10:02",
+                30
+              ]
+            ],
+            "complete": false,
+            "messages": []
+          }
+        ],
+        "next_token": "next-page"
+      }
+    },
+    {
+      "id": "cloud-mismatched-arrays",
+      "contract": "cloudwatch",
+      "origin": "synthetic",
+      "field_ids": [],
+      "book": "docs/product/adapter-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "response": {
+          "MetricDataResults": [
+            {
+              "Id": "x",
+              "StatusCode": "Complete",
+              "Timestamps": [
+                1
+              ],
+              "Values": []
+            }
+          ]
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "response": {
+          "MetricDataResults": [
+            {
+              "Id": "x",
+              "StatusCode": "Complete",
+              "Timestamps": [
+                1
+              ],
+              "Values": []
+            }
+          ]
+        }
+      },
+      "expected": {
+        "raises": "ValueError"
+      }
+    },
+    {
+      "id": "cloud-forbidden-not-zero",
+      "contract": "cloudwatch",
+      "origin": "synthetic",
+      "field_ids": [],
+      "book": "docs/cloud/late-data-and-reconciliation.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "response": {
+          "MetricDataResults": [
+            {
+              "Id": "x",
+              "StatusCode": "Forbidden"
+            }
+          ]
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "response": {
+          "MetricDataResults": [
+            {
+              "Id": "x",
+              "StatusCode": "Forbidden"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "id": "x",
+            "status": "Forbidden",
+            "points": [],
+            "complete": false,
+            "messages": []
+          }
+        ],
+        "next_token": null
+      }
+    },
+    {
+      "id": "azure-null",
+      "contract": "azure",
+      "origin": "synthetic",
+      "field_ids": [],
+      "book": "docs/cloud/provider-metrics.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "value": null,
+        "present": true
+      },
+      "extracted_sha256": {},
+      "input": {
+        "value": null,
+        "present": true
+      },
+      "expected": {
+        "quality": "null",
+        "value": null,
+        "zero_proves_no_activity": false
+      }
+    },
+    {
+      "id": "azure-zero",
+      "contract": "azure",
+      "origin": "synthetic",
+      "field_ids": [],
+      "book": "docs/cloud/provider-metrics.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "value": 0,
+        "present": true
+      },
+      "extracted_sha256": {},
+      "input": {
+        "value": 0,
+        "present": true
+      },
+      "expected": {
+        "quality": "known",
+        "value": 0,
+        "zero_proves_no_activity": false
+      }
+    },
+    {
+      "id": "azure-absent",
+      "contract": "azure",
+      "origin": "synthetic",
+      "field_ids": [],
+      "book": "docs/cloud/provider-metrics.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "value": null,
+        "present": false
+      },
+      "extracted_sha256": {},
+      "input": {
+        "value": null,
+        "present": false
+      },
+      "expected": {
+        "quality": "absent",
+        "value": null,
+        "zero_proves_no_activity": false
+      }
+    },
+    {
+      "id": "otlp-destination-partial-false",
+      "contract": "otlp",
+      "origin": "measured",
+      "field_ids": [
+        "otlp.response.rejected_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {
+        "status": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/raw_cases/partial_success-queue-false/backend_attempts/1/response_code"
+        },
+        "body": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/raw_cases/partial_success-queue-false/backend_attempts/1/response_body"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "status": "27badc983df1780b60c2b3fa9d3a19a00e46aac798451f0febdca52920faaddf",
+        "body": "a7826283ceda91e8dd0313a2d6f86261f0cb47b8ab8a2c78b9096ea328cf608e"
+      },
+      "input": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": "1",
+            "errorMessage": "r2-partial-rejected-one"
+          }
+        }
+      },
+      "expected": {
+        "outcome": "partial_success",
+        "retryable": false,
+        "rejected_spans": 1,
+        "end_to_end_stored": null,
+        "warning": false,
+        "error_message": "r2-partial-rejected-one"
+      }
+    },
+    {
+      "id": "otlp-upstream-success-false",
+      "contract": "otlp_json",
+      "origin": "measured",
+      "field_ids": [],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {
+        "status": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/scenarios/partial_success-queue-false/observations/upstream/status"
+        },
+        "body_text": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/scenarios/partial_success-queue-false/observations/upstream/body"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "status": "27badc983df1780b60c2b3fa9d3a19a00e46aac798451f0febdca52920faaddf",
+        "body_text": "64ef92cf878b7f602f9ed7471e8fe992efe539690e4dae34e75211a47dcaa2a3"
+      },
+      "input": {
+        "status": 200,
+        "body_text": "{\"partialSuccess\":{}}"
+      },
+      "expected": {
+        "outcome": "hop_success",
+        "retryable": false,
+        "rejected_spans": 0,
+        "end_to_end_stored": null,
+        "warning": false,
+        "error_message": ""
+      }
+    },
+    {
+      "id": "collector-retry_success-queue-false",
+      "contract": "collector",
+      "origin": "measured",
+      "field_ids": [
+        "otlp.collector.send_failed_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Baseline, held retry and final snapshots in one exporter lifetime; exact increase instant and end-to-end loss not inferred.",
+      "bindings": {
+        "baseline": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/raw_cases/retry_success-queue-false/baseline_metrics/metrics",
+          "metric_lines": "otelcol_exporter_send_failed_spans"
+        },
+        "held": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/raw_cases/retry_success-queue-false/metric_samples/5/metrics",
+          "metric_lines": "otelcol_exporter_send_failed_spans"
+        },
+        "final": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/scenarios/retry_success-queue-false/observations/final_metrics/metrics",
+          "metric_lines": "otelcol_exporter_send_failed_spans"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "baseline": "f75a6a498eab26af7a1020797cd987768c68810e4d612f5fb0c3b8524643ca78",
+        "held": "f75a6a498eab26af7a1020797cd987768c68810e4d612f5fb0c3b8524643ca78",
+        "final": "f75a6a498eab26af7a1020797cd987768c68810e4d612f5fb0c3b8524643ca78"
+      },
+      "input": {
+        "baseline": "otelcol_exporter_send_failed_spans{error_permanent=\"true\",error_type=\"InvalidArgument\",exporter=\"otlp_http/lab\",server_address=\"127.0.0.1\",server_port=\"42362\",url_path=\"/v1/traces\"} 2",
+        "held": "otelcol_exporter_send_failed_spans{error_permanent=\"true\",error_type=\"InvalidArgument\",exporter=\"otlp_http/lab\",server_address=\"127.0.0.1\",server_port=\"42362\",url_path=\"/v1/traces\"} 2",
+        "final": "otelcol_exporter_send_failed_spans{error_permanent=\"true\",error_type=\"InvalidArgument\",exporter=\"otlp_http/lab\",server_address=\"127.0.0.1\",server_port=\"42362\",url_path=\"/v1/traces\"} 2"
+      },
+      "expected": {
+        "values": [
+          2.0,
+          2.0,
+          2.0
+        ],
+        "delta": 0.0,
+        "first_increase_index": null
+      }
+    },
+    {
+      "id": "collector-retry_exhausted-queue-false",
+      "contract": "collector",
+      "origin": "measured",
+      "field_ids": [
+        "otlp.collector.send_failed_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Baseline, held retry and final snapshots in one exporter lifetime; exact increase instant and end-to-end loss not inferred.",
+      "bindings": {
+        "baseline": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/raw_cases/retry_exhausted-queue-false/baseline_metrics/metrics",
+          "metric_lines": "otelcol_exporter_send_failed_spans"
+        },
+        "held": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/raw_cases/retry_exhausted-queue-false/metric_samples/5/metrics",
+          "metric_lines": "otelcol_exporter_send_failed_spans"
+        },
+        "final": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/scenarios/retry_exhausted-queue-false/observations/final_metrics/metrics",
+          "metric_lines": "otelcol_exporter_send_failed_spans"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "baseline": "e31df80a85f4f23c40bf001b3aa554eb5fa019c72c128461d8983b62845e935c",
+        "held": "e31df80a85f4f23c40bf001b3aa554eb5fa019c72c128461d8983b62845e935c",
+        "final": "745622d95bfc2af82a0780cc2974c7742aeada307e1379fb1d5e23dd376292b7"
+      },
+      "input": {
+        "baseline": "otelcol_exporter_send_failed_spans{error_permanent=\"true\",error_type=\"InvalidArgument\",exporter=\"otlp_http/lab\",server_address=\"127.0.0.1\",server_port=\"40732\",url_path=\"/v1/traces\"} 2",
+        "held": "otelcol_exporter_send_failed_spans{error_permanent=\"true\",error_type=\"InvalidArgument\",exporter=\"otlp_http/lab\",server_address=\"127.0.0.1\",server_port=\"40732\",url_path=\"/v1/traces\"} 2",
+        "final": "otelcol_exporter_send_failed_spans{error_permanent=\"false\",error_type=\"Unavailable\",exporter=\"otlp_http/lab\",server_address=\"127.0.0.1\",server_port=\"40732\",url_path=\"/v1/traces\"} 2\notelcol_exporter_send_failed_spans{error_permanent=\"true\",error_type=\"InvalidArgument\",exporter=\"otlp_http/lab\",server_address=\"127.0.0.1\",server_port=\"40732\",url_path=\"/v1/traces\"} 2"
+      },
+      "expected": {
+        "values": [
+          2.0,
+          2.0,
+          4.0
+        ],
+        "delta": 2.0,
+        "first_increase_index": 2
+      }
+    },
+    {
+      "id": "otlp-destination-partial-true",
+      "contract": "otlp",
+      "origin": "measured",
+      "field_ids": [
+        "otlp.response.rejected_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {
+        "status": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/raw_cases/partial_success-queue-true/backend_attempts/1/response_code"
+        },
+        "body": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/raw_cases/partial_success-queue-true/backend_attempts/1/response_body"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "status": "27badc983df1780b60c2b3fa9d3a19a00e46aac798451f0febdca52920faaddf",
+        "body": "a7826283ceda91e8dd0313a2d6f86261f0cb47b8ab8a2c78b9096ea328cf608e"
+      },
+      "input": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": "1",
+            "errorMessage": "r2-partial-rejected-one"
+          }
+        }
+      },
+      "expected": {
+        "outcome": "partial_success",
+        "retryable": false,
+        "rejected_spans": 1,
+        "end_to_end_stored": null,
+        "warning": false,
+        "error_message": "r2-partial-rejected-one"
+      }
+    },
+    {
+      "id": "otlp-upstream-success-true",
+      "contract": "otlp_json",
+      "origin": "measured",
+      "field_ids": [],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {
+        "status": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/scenarios/partial_success-queue-true/observations/upstream/status"
+        },
+        "body_text": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/scenarios/partial_success-queue-true/observations/upstream/body"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "status": "27badc983df1780b60c2b3fa9d3a19a00e46aac798451f0febdca52920faaddf",
+        "body_text": "64ef92cf878b7f602f9ed7471e8fe992efe539690e4dae34e75211a47dcaa2a3"
+      },
+      "input": {
+        "status": 200,
+        "body_text": "{\"partialSuccess\":{}}"
+      },
+      "expected": {
+        "outcome": "hop_success",
+        "retryable": false,
+        "rejected_spans": 0,
+        "end_to_end_stored": null,
+        "warning": false,
+        "error_message": ""
+      }
+    },
+    {
+      "id": "collector-retry_success-queue-true",
+      "contract": "collector",
+      "origin": "measured",
+      "field_ids": [
+        "otlp.collector.send_failed_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Baseline, held retry and final snapshots in one exporter lifetime; exact increase instant and end-to-end loss not inferred.",
+      "bindings": {
+        "baseline": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/raw_cases/retry_success-queue-true/baseline_metrics/metrics",
+          "metric_lines": "otelcol_exporter_send_failed_spans"
+        },
+        "held": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/raw_cases/retry_success-queue-true/metric_samples/4/metrics",
+          "metric_lines": "otelcol_exporter_send_failed_spans"
+        },
+        "final": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/scenarios/retry_success-queue-true/observations/final_metrics/metrics",
+          "metric_lines": "otelcol_exporter_send_failed_spans"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "baseline": "566bc027218e28f4ca9c555cd8bf43fa910cedb974944e4ea87c0f8ff7bae34c",
+        "held": "566bc027218e28f4ca9c555cd8bf43fa910cedb974944e4ea87c0f8ff7bae34c",
+        "final": "566bc027218e28f4ca9c555cd8bf43fa910cedb974944e4ea87c0f8ff7bae34c"
+      },
+      "input": {
+        "baseline": "otelcol_exporter_send_failed_spans{error_permanent=\"true\",error_type=\"InvalidArgument\",exporter=\"otlp_http/lab\",server_address=\"127.0.0.1\",server_port=\"40792\",url_path=\"/v1/traces\"} 2",
+        "held": "otelcol_exporter_send_failed_spans{error_permanent=\"true\",error_type=\"InvalidArgument\",exporter=\"otlp_http/lab\",server_address=\"127.0.0.1\",server_port=\"40792\",url_path=\"/v1/traces\"} 2",
+        "final": "otelcol_exporter_send_failed_spans{error_permanent=\"true\",error_type=\"InvalidArgument\",exporter=\"otlp_http/lab\",server_address=\"127.0.0.1\",server_port=\"40792\",url_path=\"/v1/traces\"} 2"
+      },
+      "expected": {
+        "values": [
+          2.0,
+          2.0,
+          2.0
+        ],
+        "delta": 0.0,
+        "first_increase_index": null
+      }
+    },
+    {
+      "id": "collector-retry_exhausted-queue-true",
+      "contract": "collector",
+      "origin": "measured",
+      "field_ids": [
+        "otlp.collector.send_failed_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Baseline, held retry and final snapshots in one exporter lifetime; exact increase instant and end-to-end loss not inferred.",
+      "bindings": {
+        "baseline": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/raw_cases/retry_exhausted-queue-true/baseline_metrics/metrics",
+          "metric_lines": "otelcol_exporter_send_failed_spans"
+        },
+        "held": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/raw_cases/retry_exhausted-queue-true/metric_samples/5/metrics",
+          "metric_lines": "otelcol_exporter_send_failed_spans"
+        },
+        "final": {
+          "source": "labs/results/1.1-r2-otel.json",
+          "pointer": "/scenarios/retry_exhausted-queue-true/observations/final_metrics/metrics",
+          "metric_lines": "otelcol_exporter_send_failed_spans"
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "baseline": "744f8434836de19f6a867bb17640990245d6cdfac8adad9ab5a65c30f46eb048",
+        "held": "744f8434836de19f6a867bb17640990245d6cdfac8adad9ab5a65c30f46eb048",
+        "final": "7a308eedbbf763c9ccbfddc055ba3fdd8b60d614ff395bb3a2c7a1c45d09572a"
+      },
+      "input": {
+        "baseline": "otelcol_exporter_send_failed_spans{error_permanent=\"true\",error_type=\"InvalidArgument\",exporter=\"otlp_http/lab\",server_address=\"127.0.0.1\",server_port=\"41084\",url_path=\"/v1/traces\"} 2",
+        "held": "otelcol_exporter_send_failed_spans{error_permanent=\"true\",error_type=\"InvalidArgument\",exporter=\"otlp_http/lab\",server_address=\"127.0.0.1\",server_port=\"41084\",url_path=\"/v1/traces\"} 2",
+        "final": "otelcol_exporter_send_failed_spans{error_permanent=\"false\",error_type=\"Unavailable\",exporter=\"otlp_http/lab\",server_address=\"127.0.0.1\",server_port=\"41084\",url_path=\"/v1/traces\"} 2\notelcol_exporter_send_failed_spans{error_permanent=\"true\",error_type=\"InvalidArgument\",exporter=\"otlp_http/lab\",server_address=\"127.0.0.1\",server_port=\"41084\",url_path=\"/v1/traces\"} 2"
+      },
+      "expected": {
+        "values": [
+          2.0,
+          2.0,
+          4.0
+        ],
+        "delta": 2.0,
+        "first_increase_index": 2
+      }
+    },
+    {
+      "id": "otlp-http-500",
+      "contract": "otlp",
+      "origin": "synthetic",
+      "field_ids": [],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "status": 500,
+        "body": {}
+      },
+      "extracted_sha256": {},
+      "input": {
+        "status": 500,
+        "body": {}
+      },
+      "expected": {
+        "outcome": "failure",
+        "retryable": false,
+        "rejected_spans": null,
+        "end_to_end_stored": null,
+        "warning": false,
+        "error_message": null
+      }
+    },
+    {
+      "id": "otlp-http-503",
+      "contract": "otlp",
+      "origin": "synthetic",
+      "field_ids": [],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "status": 503,
+        "body": {}
+      },
+      "extracted_sha256": {},
+      "input": {
+        "status": 503,
+        "body": {}
+      },
+      "expected": {
+        "outcome": "failure",
+        "retryable": true,
+        "rejected_spans": null,
+        "end_to_end_stored": null,
+        "warning": false,
+        "error_message": null
+      }
+    },
+    {
+      "id": "otlp-warning-string-zero",
+      "contract": "otlp",
+      "origin": "synthetic",
+      "field_ids": [
+        "otlp.response.rejected_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Synthetic OTLP 1.11/ProtoJSON response contract; no receiver execution.",
+      "bindings": {},
+      "parameters": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": "0",
+            "errorMessage": "advice"
+          }
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": "0",
+            "errorMessage": "advice"
+          }
+        }
+      },
+      "expected": {
+        "outcome": "partial_success",
+        "retryable": false,
+        "rejected_spans": 0,
+        "end_to_end_stored": null,
+        "warning": true,
+        "error_message": "advice"
+      }
+    },
+    {
+      "id": "otlp-warning-default-zero",
+      "contract": "otlp",
+      "origin": "synthetic",
+      "field_ids": [
+        "otlp.response.rejected_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Synthetic OTLP 1.11/ProtoJSON response contract; no receiver execution.",
+      "bindings": {},
+      "parameters": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "errorMessage": "advice"
+          }
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "errorMessage": "advice"
+          }
+        }
+      },
+      "expected": {
+        "outcome": "partial_success",
+        "retryable": false,
+        "rejected_spans": 0,
+        "end_to_end_stored": null,
+        "warning": true,
+        "error_message": "advice"
+      }
+    },
+    {
+      "id": "otlp-numeric-count",
+      "contract": "otlp",
+      "origin": "synthetic",
+      "field_ids": [
+        "otlp.response.rejected_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Synthetic OTLP 1.11/ProtoJSON response contract; no receiver execution.",
+      "bindings": {},
+      "parameters": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": 1
+          }
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": 1
+          }
+        }
+      },
+      "expected": {
+        "outcome": "partial_success",
+        "retryable": false,
+        "rejected_spans": 1,
+        "end_to_end_stored": null,
+        "warning": false,
+        "error_message": ""
+      }
+    },
+    {
+      "id": "otlp-int64-max",
+      "contract": "otlp",
+      "origin": "synthetic",
+      "field_ids": [
+        "otlp.response.rejected_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Synthetic OTLP 1.11/ProtoJSON response contract; no receiver execution.",
+      "bindings": {},
+      "parameters": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": "9223372036854775807"
+          }
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": "9223372036854775807"
+          }
+        }
+      },
+      "expected": {
+        "outcome": "partial_success",
+        "retryable": false,
+        "rejected_spans": 9223372036854775807,
+        "end_to_end_stored": null,
+        "warning": false,
+        "error_message": ""
+      }
+    },
+    {
+      "id": "otlp-exponent-count",
+      "contract": "otlp",
+      "origin": "synthetic",
+      "field_ids": [
+        "otlp.response.rejected_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Synthetic OTLP 1.11/ProtoJSON response contract; no receiver execution.",
+      "bindings": {},
+      "parameters": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": "1e2"
+          }
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": "1e2"
+          }
+        }
+      },
+      "expected": {
+        "outcome": "partial_success",
+        "retryable": false,
+        "rejected_spans": 100,
+        "end_to_end_stored": null,
+        "warning": false,
+        "error_message": ""
+      }
+    },
+    {
+      "id": "otlp-null-partial",
+      "contract": "otlp",
+      "origin": "synthetic",
+      "field_ids": [
+        "otlp.response.rejected_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Synthetic OTLP 1.11/ProtoJSON response contract; no receiver execution.",
+      "bindings": {},
+      "parameters": {
+        "status": 200,
+        "body": {
+          "partialSuccess": null
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "status": 200,
+        "body": {
+          "partialSuccess": null
+        }
+      },
+      "expected": {
+        "outcome": "hop_success",
+        "retryable": false,
+        "rejected_spans": 0,
+        "end_to_end_stored": null,
+        "warning": false,
+        "error_message": ""
+      }
+    },
+    {
+      "id": "otlp-null-count",
+      "contract": "otlp",
+      "origin": "synthetic",
+      "field_ids": [
+        "otlp.response.rejected_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Synthetic OTLP 1.11/ProtoJSON response contract; no receiver execution.",
+      "bindings": {},
+      "parameters": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": null
+          }
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": null
+          }
+        }
+      },
+      "expected": {
+        "outcome": "hop_success",
+        "retryable": false,
+        "rejected_spans": 0,
+        "end_to_end_stored": null,
+        "warning": false,
+        "error_message": ""
+      }
+    },
+    {
+      "id": "otlp-invalid-envelope",
+      "contract": "otlp",
+      "origin": "synthetic",
+      "field_ids": [
+        "otlp.response.rejected_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "status": 200,
+        "body": []
+      },
+      "extracted_sha256": {},
+      "input": {
+        "status": 200,
+        "body": []
+      },
+      "expected": {
+        "raises": "ValueError"
+      }
+    },
+    {
+      "id": "otlp-invalid-partial",
+      "contract": "otlp",
+      "origin": "synthetic",
+      "field_ids": [
+        "otlp.response.rejected_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "status": 200,
+        "body": {
+          "partialSuccess": []
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "status": 200,
+        "body": {
+          "partialSuccess": []
+        }
+      },
+      "expected": {
+        "raises": "ValueError"
+      }
+    },
+    {
+      "id": "otlp-negative-count",
+      "contract": "otlp",
+      "origin": "synthetic",
+      "field_ids": [
+        "otlp.response.rejected_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": "-1"
+          }
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": "-1"
+          }
+        }
+      },
+      "expected": {
+        "raises": "ValueError"
+      }
+    },
+    {
+      "id": "otlp-fractional-count",
+      "contract": "otlp",
+      "origin": "synthetic",
+      "field_ids": [
+        "otlp.response.rejected_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": "1.5"
+          }
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": "1.5"
+          }
+        }
+      },
+      "expected": {
+        "raises": "ValueError"
+      }
+    },
+    {
+      "id": "otlp-overflow-count",
+      "contract": "otlp",
+      "origin": "synthetic",
+      "field_ids": [
+        "otlp.response.rejected_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": "9223372036854775808"
+          }
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": "9223372036854775808"
+          }
+        }
+      },
+      "expected": {
+        "raises": "ValueError"
+      }
+    },
+    {
+      "id": "otlp-boolean-count",
+      "contract": "otlp",
+      "origin": "synthetic",
+      "field_ids": [
+        "otlp.response.rejected_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": true
+          }
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "rejectedSpans": true
+          }
+        }
+      },
+      "expected": {
+        "raises": "ValueError"
+      }
+    },
+    {
+      "id": "otlp-non-string-message",
+      "contract": "otlp",
+      "origin": "synthetic",
+      "field_ids": [
+        "otlp.response.rejected_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "errorMessage": false
+          }
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "status": 200,
+        "body": {
+          "partialSuccess": {
+            "errorMessage": false
+          }
+        }
+      },
+      "expected": {
+        "raises": "ValueError"
+      }
+    },
+    {
+      "id": "otlp-201-is-not-full-success",
+      "contract": "otlp",
+      "origin": "synthetic",
+      "field_ids": [
+        "otlp.response.rejected_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "status": 201,
+        "body": {}
+      },
+      "extracted_sha256": {},
+      "input": {
+        "status": 201,
+        "body": {}
+      },
+      "expected": {
+        "outcome": "failure",
+        "retryable": false,
+        "rejected_spans": null,
+        "end_to_end_stored": null,
+        "warning": false,
+        "error_message": null
+      }
+    },
+    {
+      "id": "collector-default-prometheus-name",
+      "contract": "collector_named",
+      "origin": "synthetic",
+      "field_ids": [
+        "otlp.collector.send_failed_spans"
+      ],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Synthetic default naming; measured fixtures retain the lab's without_type_suffix setting.",
+      "bindings": {},
+      "parameters": {
+        "snapshots": [
+          "otelcol_exporter_send_failed_spans_total{exporter=\"otlp\"} 2",
+          "otelcol_exporter_send_failed_spans_total{exporter=\"otlp\"} 2",
+          "otelcol_exporter_send_failed_spans_total{exporter=\"otlp\"} 4"
+        ]
+      },
+      "extracted_sha256": {},
+      "input": {
+        "snapshots": [
+          "otelcol_exporter_send_failed_spans_total{exporter=\"otlp\"} 2",
+          "otelcol_exporter_send_failed_spans_total{exporter=\"otlp\"} 2",
+          "otelcol_exporter_send_failed_spans_total{exporter=\"otlp\"} 4"
+        ]
+      },
+      "expected": {
+        "values": [
+          2.0,
+          2.0,
+          4.0
+        ],
+        "delta": 2.0,
+        "first_increase_index": 2
+      }
+    },
+    {
+      "id": "pg-io-definition-change",
+      "contract": "transform",
+      "origin": "synthetic",
+      "field_ids": [
+        "pg.io.reads",
+        "pg.io.read_requests"
+      ],
+      "book": "docs/database/postgresql-operations.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "previous": {
+          "collection_status": "ok",
+          "unit": "count",
+          "value": 8,
+          "time": 10,
+          "identity": "cluster/backend/object/context",
+          "epoch": "stats-reset-1",
+          "clock_epoch": "collector-boot-1",
+          "definition": "reads-blocks-pg16-17"
+        },
+        "current": {
+          "collection_status": "ok",
+          "unit": "count",
+          "value": 9,
+          "time": 20,
+          "identity": "cluster/backend/object/context",
+          "epoch": "stats-reset-1",
+          "clock_epoch": "collector-boot-1",
+          "definition": "reads-requests-pg18"
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "previous": {
+          "collection_status": "ok",
+          "unit": "count",
+          "value": 8,
+          "time": 10,
+          "identity": "cluster/backend/object/context",
+          "epoch": "stats-reset-1",
+          "clock_epoch": "collector-boot-1",
+          "definition": "reads-blocks-pg16-17"
+        },
+        "current": {
+          "collection_status": "ok",
+          "unit": "count",
+          "value": 9,
+          "time": 20,
+          "identity": "cluster/backend/object/context",
+          "epoch": "stats-reset-1",
+          "clock_epoch": "collector-boot-1",
+          "definition": "reads-requests-pg18"
+        }
+      },
+      "expected": {
+        "quality": "definition_changed",
+        "rate": null
+      }
+    },
+    {
+      "id": "pg-undefined-state-not-permission-proof",
+      "contract": "pg_visibility",
+      "origin": "synthetic",
+      "field_ids": [
+        "pg.activity.state"
+      ],
+      "book": "docs/database/postgresql-operations.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "row": {
+          "state": null,
+          "backend_type": "checkpointer",
+          "query": ""
+        }
+      },
+      "extracted_sha256": {},
+      "input": {
+        "row": {
+          "state": null,
+          "backend_type": "checkpointer",
+          "query": ""
+        }
+      },
+      "expected": {
+        "visibility": "unknown",
+        "state": null
+      }
+    },
+    {
+      "id": "otlp-repeated-span-ids",
+      "contract": "receipt_ids",
+      "origin": "mixed",
+      "field_ids": [],
+      "book": "docs/product/telemetry-delivery-contracts.md",
+      "limitation": "Raw run preserved span IDs but not full trace IDs at receiver. Fixed single-trace experiment context supplies scope; not a general dedup proof.",
+      "bindings": {
+        "attempts": {
+          "source": "labs/results/1.1-otel.json",
+          "pointer": "/experiments/response_lost/backend_attempts"
+        }
+      },
+      "parameters": {
+        "tenant": "local-lab",
+        "trace_scope": "single-fixed-trace-in-original-experiment"
+      },
+      "extracted_sha256": {
+        "attempts": "768eed6f23b22cd42234febefc6c4205920048b169c8ef90c29dcb544353bb93"
+      },
+      "input": {
+        "tenant": "local-lab",
+        "trace_scope": "single-fixed-trace-in-original-experiment",
+        "attempts": [
+          {
+            "path": "/v1/traces",
+            "span_ids": [
+              "0000000000000001",
+              "0000000000000002"
+            ],
+            "span_count": 2
+          },
+          {
+            "path": "/v1/traces",
+            "span_ids": [
+              "0000000000000001",
+              "0000000000000002"
+            ],
+            "span_count": 2
+          }
+        ]
+      },
+      "expected": {
+        "received_items": 4,
+        "unique_keys": 2,
+        "repeated_items": 2
+      }
+    },
+    {
+      "id": "otlp-same-span-other-trace",
+      "contract": "receipts",
+      "origin": "synthetic",
+      "field_ids": [],
+      "book": "docs/product/adapter-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "attempts": [
+          [
+            [
+              "tenant",
+              "trace-a",
+              "span-1"
+            ],
+            [
+              "tenant",
+              "trace-b",
+              "span-1"
+            ]
+          ]
+        ]
+      },
+      "extracted_sha256": {},
+      "input": {
+        "attempts": [
+          [
+            [
+              "tenant",
+              "trace-a",
+              "span-1"
+            ],
+            [
+              "tenant",
+              "trace-b",
+              "span-1"
+            ]
+          ]
+        ]
+      },
+      "expected": {
+        "received_items": 2,
+        "unique_keys": 2,
+        "repeated_items": 0
+      }
+    },
+    {
+      "id": "histogram-3.13.4",
+      "contract": "histogram_debug",
+      "origin": "measured",
+      "field_ids": [],
+      "book": "docs/foundations/histogram-storage.md",
+      "limitation": "Actual promtool debug output for synthetic input distribution, not measured request latencies; finite positive buckets only.",
+      "bindings": {
+        "text": {
+          "source": "labs/results/1.1-r3/histograms.raw/command-003.gz",
+          "pointer": ""
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "text": "c40adabd3b52cd44fb58f8c14183208b5c7c789985d58d937d0e2d6e20413497"
+      },
+      "input": {
+        "text": "DEBUG: Starting test classic-and-native-identical-input-distribution\nDEBUG: Dump of all data (input_series and rules) at 1m1s:\n{__name__=\"classic_bucket\", le=\"+Inf\"} =>\n4 @[60000]\n{__name__=\"classic_bucket\", le=\"1\"} =>\n0 @[60000]\n{__name__=\"classic_bucket\", le=\"2\"} =>\n2 @[60000]\n{__name__=\"classic_bucket\", le=\"4\"} =>\n4 @[60000]\n{__name__=\"classic_count\"} =>\n4 @[60000]\n{__name__=\"classic_sum\"} =>\n9 @[60000]\n{__name__=\"custom\"} =>\n{count:4, sum:9, (1,2]:2, (2,4]:2} @[60000]\n{__name__=\"native\"} =>\n{count:4, sum:9, (1,2]:2, (2,4]:2} @[60000]\n{__name__=\"r3:classic_count\"} =>\n4 @[60000]\n{__name__=\"r3:classic_count_ignored\"} =>\n0 @[60000]\n{__name__=\"r3:classic_fraction\"} =>\n0.25 @[60000]\n{__name__=\"r3:classic_q25\"} =>\n1.5 @[60000]\n{__name__=\"r3:custom_count\"} =>\n4 @[60000]\n{__name__=\"r3:custom_fraction\"} =>\n0.25 @[60000]\n{__name__=\"r3:custom_q25\"} =>\n1.5 @[60000]\n{__name__=\"r3:native_count\"} =>\n4 @[60000]\n{__name__=\"r3:native_fraction\"} =>\n0.29248125036057815 @[60000]\n{__name__=\"r3:native_q25\"} =>\n1.414213562373095 @[60000]\nDEBUG: Test classic-and-native-identical-input-distribution finished, took 162.203861ms\n  SUCCESS\n\n"
+      },
+      "expected": {
+        "linear": {
+          "count": 4,
+          "quantile": 1.5,
+          "fraction": 0.25
+        },
+        "exponential": {
+          "count": 4,
+          "quantile": 1.4142135623730951,
+          "fraction": 0.2924812503605781
+        }
+      }
+    },
+    {
+      "id": "histogram-3.15.0",
+      "contract": "histogram_debug",
+      "origin": "measured",
+      "field_ids": [],
+      "book": "docs/foundations/histogram-storage.md",
+      "limitation": "Actual promtool debug output for synthetic input distribution, not measured request latencies; finite positive buckets only.",
+      "bindings": {
+        "text": {
+          "source": "labs/results/1.1-r3/histograms.raw/command-006.gz",
+          "pointer": ""
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "text": "7a780348492b5c389344647fe4c55692c9d2474e8b787822e17f22908ef22355"
+      },
+      "input": {
+        "text": "DEBUG: Starting test classic-and-native-identical-input-distribution\nDEBUG: Dump of all data (input_series and rules) at 1m1s:\n{__name__=\"classic_bucket\", le=\"+Inf\"} =>\n4 @[60000]\n{__name__=\"classic_bucket\", le=\"1\"} =>\n0 @[60000]\n{__name__=\"classic_bucket\", le=\"2\"} =>\n2 @[60000]\n{__name__=\"classic_bucket\", le=\"4\"} =>\n4 @[60000]\n{__name__=\"classic_count\"} =>\n4 @[60000]\n{__name__=\"classic_sum\"} =>\n9 @[60000]\n{__name__=\"custom\"} =>\n{count:4, sum:9, (1,2]:2, (2,4]:2} @[60000]\n{__name__=\"native\"} =>\n{count:4, sum:9, (1,2]:2, (2,4]:2} @[60000]\n{__name__=\"r3:classic_count\"} =>\n4 @[60000]\n{__name__=\"r3:classic_count_ignored\"} =>\n0 @[60000]\n{__name__=\"r3:classic_fraction\"} =>\n0.25 @[60000]\n{__name__=\"r3:classic_q25\"} =>\n1.5 @[60000]\n{__name__=\"r3:custom_count\"} =>\n4 @[60000]\n{__name__=\"r3:custom_fraction\"} =>\n0.25 @[60000]\n{__name__=\"r3:custom_q25\"} =>\n1.5 @[60000]\n{__name__=\"r3:native_count\"} =>\n4 @[60000]\n{__name__=\"r3:native_fraction\"} =>\n0.29248125036057815 @[60000]\n{__name__=\"r3:native_q25\"} =>\n1.414213562373095 @[60000]\nDEBUG: Test classic-and-native-identical-input-distribution finished, took 77.909002ms\n  SUCCESS\n\n"
+      },
+      "expected": {
+        "linear": {
+          "count": 4,
+          "quantile": 1.5,
+          "fraction": 0.25
+        },
+        "exponential": {
+          "count": 4,
+          "quantile": 1.4142135623730951,
+          "fraction": 0.2924812503605781
+        }
+      }
+    },
+    {
+      "id": "psi-recorded-zero",
+      "contract": "psi",
+      "origin": "measured",
+      "field_ids": [
+        "linux.psi.memory.some_total",
+        "linux.psi.memory.some_avg10"
+      ],
+      "book": "docs/host/numa-and-pressure.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {
+        "text": {
+          "source": "labs/results/1.1-r3/linux-memory.raw/psi-memory.gz",
+          "pointer": ""
+        }
+      },
+      "parameters": {},
+      "extracted_sha256": {
+        "text": "772ffcfe52fd1c19e68d8745881cd7e52a5459486c93f833c4d0be8b30a93451"
+      },
+      "input": {
+        "text": "some avg10=0.00 avg60=0.00 avg300=0.00 total=0\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n"
+      },
+      "expected": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0
+        }
+      }
+    },
+    {
+      "id": "nullable-nan",
+      "contract": "nullable",
+      "origin": "synthetic",
+      "field_ids": [],
+      "book": "docs/product/adapter-contracts.md",
+      "limitation": "Reference policy at the recorded boundary; not a production certification.",
+      "bindings": {},
+      "parameters": {
+        "value": "NaN"
+      },
+      "extracted_sha256": {},
+      "input": {
+        "value": "NaN"
+      },
+      "expected": {
+        "raises": "ValueError"
+      }
+    }
+  ]
+}

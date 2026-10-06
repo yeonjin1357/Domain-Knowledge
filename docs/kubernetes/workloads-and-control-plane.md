@@ -1,12 +1,10 @@
 # 워크로드 종류와 제어 평면의 가용성
 
-> 상태: 검토됨 · 범위: Kubernetes workload controllers, etcd 3.6 문서 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: Kubernetes workload controllers, etcd 3.6 문서 · 원천 확인일: 2026-10-03 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
-Deployment·StatefulSet·DaemonSet·Job은 서로 다른 실행 요구를 표현합니다. 같은 Pod 수를 세더라도 모든 Node에 하나씩 필요한 작업과 정해진 완료 수가 필요한 작업의 정상 기준은 다릅니다. 제어 평면의 저장·합의 상태와 실제 업무 성공도 별도로 관측해야 합니다.
-
-Pod가 몇 개 실행 중인지 세는 것만으로 워크로드의 건강을 판단할 수 없습니다. 계속 실행되어야 하는 서버와 한 번 완료되어야 하는 배치의 성공 조건이 다르기 때문입니다. 또한 기존 Pod가 요청을 처리하는 능력과 새로운 Pod를 생성·배치하는 제어 평면의 능력을 구분해야 합니다.
+Deployment·StatefulSet·DaemonSet·Job은 서로 다른 실행 요구를 표현합니다. 같은 Pod 수를 세더라도 모든 Node에 하나씩 필요한 작업과 정해진 완료 수가 필요한 작업의 정상 기준은 다릅니다. 제어 평면의 저장·합의 상태와 실제 업무 성공도 별도로 관측해야 합니다. 제품은 실행 중인 업무의 건강과 새 작업을 생성·배치하는 제어 평면의 건강을 구분합니다.
 
 ## 컨트롤러별 원하는 결과
 
@@ -81,3 +79,5 @@ etcd의 상태 변경 합의에는 voting member의 과반수가 필요합니다
 3. etcd 3대 중 2대가 켜져 있으면 항상 상태 변경이 가능한가? **서로 통신하며 합의를 수행할 수 있는 등 추가 조건이 필요하다.**
 
 관련: [Pod 수명](pod-lifecycle.md), [수집 경로](collection.md), [DB 복제](../database/replication-and-recovery.md)
+
+이전: [Kubernetes 네트워크와 저장소의 연결 관계](network-and-storage.md) · 다음: [CNI와 CSI: Pod 연결과 볼륨 준비가 실패하는 위치](cni-csi-and-data-paths.md) · [분야 목차](README.md)

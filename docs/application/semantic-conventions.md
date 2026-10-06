@@ -1,6 +1,8 @@
 # OpenTelemetry 이름·단위·안정성으로 의미 연결하기
 
-> 상태: 검토됨 · 적용 범위: 공식 웹 Semantic Conventions 1.44.0, HTTP·JVM·.NET의 아래 항목 · 확인일: 2026-10-05 · 계측 실행 미검증
+> 상태: 검토됨 · 적용 범위: 공식 웹 Semantic Conventions 1.44.0, HTTP·JVM·.NET의 아래 항목 · 원천 확인일: 2026-10-05 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
+
+> **선수 안내:** [계측과 프로파일링](instrumentation-and-profiling.md), [시계열 종류](../foundations/time-series.md)를 먼저 읽어도 됩니다. `By`는 byte, `{collection}`은 회수 사건 수라는 단위 표기입니다. **UpDownCounter**는 증가·감소를 누적하는 계측 종류로, 현재량을 읽는 gauge와 생성 방식이 다릅니다. [OTel metric API](https://opentelemetry.io/docs/specs/otel/metrics/api/)
 
 ## 먼저 이해할 상황
 
@@ -19,7 +21,9 @@
 | `http.route` | 문자열 attribute | framework의 낮은 cardinality route template; 실제 URI path로 대신 채우지 않음 |
 | `http.server.request.duration` | Histogram, `s` | 서버 HTTP 요청 처리 시간의 분포 |
 
-**예시:** 같은 관측이 과거 표현에서 250 ms이고 안정 metric에서는 0.25 s이면 같은 시간입니다. `250 / 1000 = 0.25`로 값뿐 아니라 histogram bucket 경계·합계도 함께 변환해야 합니다. 기존 bucket 계정의 의미를 확인하지 않고 이름만 교체하면 잘못된 분포를 만듭니다.
+**가상 예시:** 같은 관측이 구 HTTP 규약의 `http.server.duration`에서 250 ms이고 안정 이름 `http.server.request.duration`에서는 0.25 s이면 같은 시간입니다. `250 / 1000 = 0.25`로 값뿐 아니라 histogram bucket 경계·합계도 함께 변환해야 합니다. 기존 bucket 계정의 의미를 확인하지 않고 이름만 교체하면 잘못된 분포를 만듭니다.
+
+[구 이름과 안정 이름의 대응](https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/)을 함께 확인합니다.
 
 이전 규약을 출력하던 instrumentation의 전환 규칙에는 `OTEL_SEMCONV_STABILITY_OPT_IN=http`와 `http/dup`이 있습니다. 전자는 안정 HTTP/networking 규약으로 전환하고, 후자는 구·신 규약을 함께 내보내 단계적으로 바꾸는 용도입니다. 모든 SDK의 모든 major에서 반드시 필요한 전역 switch라고 단정하지 않습니다. [HTTP migration](https://opentelemetry.io/docs/specs/semconv/non-normative/http-migration/)
 
@@ -75,3 +79,5 @@ JVM memory 원천은 `MemoryPoolMXBean.getUsage()`이고, GC duration은 GC 알�
 ## 함께 읽기
 
 [런타임 메모리와 GC](managed-runtimes.md) · [계측](instrumentation-and-profiling.md) · [시계열 문맥](../foundations/metric-context-and-start-time.md)
+
+이전: [JVM과 .NET: 메모리, GC, 실행 자원](managed-runtimes.md) · 다음: [Go, Node.js, Python의 동시성과 관측](async-runtimes.md) · [분야 목차](README.md)

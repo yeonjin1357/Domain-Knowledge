@@ -1,12 +1,24 @@
 # 링크, 오버레이, MTU와 경로 제어
 
-> 상태: 검토됨 · 범위: Ethernet의 주소 해석, IPv6 ND·PMTUD, VXLAN, 기본 BGP 관측 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (IPv4 PMTUD·DPLPMTUD)
+> 상태: 검토됨 · 적용 범위: Ethernet의 주소 해석, IPv6 ND·PMTUD, VXLAN, 기본 BGP 관측 · 원천 확인일: 2026-10-06 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
 같은 망의 다음 장치에 전달하는 문제와 멀리 있는 목적지까지 경로를 찾는 문제는 다릅니다. ARP·ND는 가까운 링크의 이웃 정보를, 라우팅은 다음 경로를 다룹니다. 터널은 원래 패킷에 바깥 포장을 추가하므로 보낼 수 있는 내부 크기도 달라집니다.
 
 IP 주소가 맞고 서버 포트가 열려 있어도 통신이 실패할 수 있습니다. 실제 패킷은 다음 홉의 링크 주소를 찾고, 터널 헤더를 포함한 크기 제한을 지키며, 설치된 경로를 따라 이동해야 합니다. 이 장에서는 네트워크 지표를 해석할 때 필요한 계층별 경계를 설명합니다.
+
+## 계층과 전달 단위부터 구분하기
+
+| 계층 | 전달 단위·주소 | 이 장에서 묻는 질문 |
+| --- | --- | --- |
+| L2 링크 | Ethernet frame·MAC | 같은 링크의 다음 장치에 어떻게 넘기는가 |
+| L3 인터넷 | IP packet·IP 주소 | 어느 다음 홉으로 보낼 것인가 |
+| L4 전송 | TCP segment / UDP datagram·port | 어느 통신 끝점에 전달하고 어떤 전송 규약을 쓰는가 |
+
+한 요청의 데이터가 TCP segment, IP packet, 링크 frame에 차례로 담깁니다. **MTU**는 여기서는 링크가 운반할 IP packet 크기의 경계이며 애플리케이션 payload 한도가 아닙니다. [인터넷 호스트 계층, RFC 1122](https://www.rfc-editor.org/rfc/rfc1122.html#section-1.3.3), [TCP, RFC 9293](https://www.rfc-editor.org/rfc/rfc9293.html#section-3.1)
+
+전달을 네 단계로 읽습니다: **① 목적지 IP의 경로 선택 → ② 다음 홉 링크 주소 해석 → ③ frame으로 전달 → ④ 수신 측에서 헤더를 해석해 IP·전송 끝점으로 전달**. 라우터를 지나면 링크 frame은 바뀔 수 있으며 목적지까지 같은 MAC으로 이동한다고 가정하지 않습니다. [RFC 1122의 링크·IP 경계](https://www.rfc-editor.org/rfc/rfc1122.html#section-2)
 
 ## 다음 홉의 주소 해석
 
@@ -55,9 +67,11 @@ VXLAN = 8 B
 
 이 1,450 B는 애플리케이션 payload 크기가 아닙니다. 내부 IP와 TCP·UDP 헤더가 더 들어갑니다. IPv6 외부 헤더, 다른 터널, 추가 태그·암호화가 있으면 다시 계산해야 합니다. 모든 Kubernetes Pod의 MTU가 1,450이라는 뜻도 아닙니다.
 
+**가상 예시를 TCP까지 확장하면:** 내부 IPv4와 TCP에 옵션이 없고 상대 MSS 등 다른 제한이 더 작지 않을 때 payload 상한은 `1,450 − 20 − 20 = 1,410 B`입니다. MSS(Maximum Segment Size)는 TCP 데이터 크기의 제한이며 옵션·경로·상대 수신 제한을 더 확인합니다. [RFC 9293 §3.7.1](https://www.rfc-editor.org/rfc/rfc9293.html#section-3.7.1)
+
 IPv6 PMTUD는 경로의 더 작은 MTU를 Packet Too Big 메시지 등을 통해 알아내도록 정의합니다. 필요한 메시지가 전달되지 않는 경로에서는 작은 요청은 성공하지만 큰 패킷 전송이 멈추는 문제를 조사해야 합니다. [RFC 8201](https://www.rfc-editor.org/rfc/rfc8201.txt)
 
-## IPv4 PMTUD와 탐색 패킷을 쓰는 방법
+## 심화: IPv4 PMTUD와 탐색 패킷을 쓰는 방법
 
 IPv4의 전통적인 PMTUD는 DF(Don't Fragment)를 설정한 패킷과 라우터의 ICMP fragmentation needed 응답을 이용합니다. 더 작은 경로 MTU를 알게 되면 송신 크기를 조절합니다. 필요한 ICMP가 차단되면 TCP 연결이나 작은 요청은 성공한 뒤 큰 데이터만 멈추는 black hole 현상이 생길 수 있습니다. IPv6의 Packet Too Big과 같은 이름·형식의 메시지로 저장하지 않습니다. [IPv4 PMTUD, RFC 1191](https://www.rfc-editor.org/rfc/rfc1191.html), [black hole 장애 양상, RFC 2923 §2.1](https://www.rfc-editor.org/rfc/rfc2923.html#section-2.1)
 
@@ -92,3 +106,5 @@ BGP는 경로 정보를 교환하며, 받은 경로·로컬에서 선택한 경�
 4. RFC 8899는 모든 TCP의 MTU 탐색 규약인가? **datagram용 DPLPMTUD이며 적용 전송과 구현을 확인해야 한다.**
 
 관련: [주소와 DNS](addressing-routing-dns.md), [인터페이스·흐름 지표](network-metrics.md), [Kubernetes 네트워크](../kubernetes/network-and-storage.md)
+
+이전: [주소, 경로, 이름 해석](addressing-routing-dns.md) · 다음: [TCP, UDP, 연결과 전송 속도](tcp-and-udp.md) · [분야 목차](README.md)

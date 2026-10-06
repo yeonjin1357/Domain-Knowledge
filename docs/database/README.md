@@ -1,6 +1,6 @@
 # 데이터베이스 도메인
 
-> 상태: 검토됨 · 적용 범위: DB 공통 관점, PostgreSQL 18 설명 예시 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: DB 공통 관점, PostgreSQL 18 설명 예시 · 원천 확인일: 2026-10-03 · 실습 여부: 각 상세 장에 명시
 
 데이터베이스 영역에서는 요청이 연결·쿼리 실행·트랜잭션·저장·복제를 거치며 처리되는 과정을 이해합니다. 공통 질문을 먼저 정리하고, 엔진마다 다른 구조와 통계의 의미를 상세 문서로 확장합니다.
 
@@ -44,15 +44,17 @@ PostgreSQL 18의 `pg_stat_activity`는 서버 프로세스의 현재 활동을 �
 1. [트랜잭션, 격리, MVCC와 잠금](transactions-and-locks.md)
 2. [쿼리, 인덱스, 실행 계획과 비용](queries-and-indexes.md)
 3. [PostgreSQL 관측: 활동, 누적 통계와 정리 작업](postgresql.md)
-4. [PostgreSQL 운영 관측: 오래된 ID, 회수 기준점, 통계 호환성](postgresql-operations.md)
-5. [MySQL과 MariaDB 관측](mysql-mariadb.md)
-6. [MySQL: 잠금 대기, 커밋과 복제의 서로 다른 완료 지점](mysql-operations.md)
-7. [SQL Server와 Oracle: 대기와 실행 통계](sqlserver-oracle.md)
+4. [MySQL과 MariaDB 관측](mysql-mariadb.md)
+5. [SQL Server와 Oracle: 대기와 실행 통계](sqlserver-oracle.md)
+6. [문서형, 분산형, 분석형 DB의 관측](distributed-and-analytical.md)
+7. [시계열·그래프·문서·열 지향 DB를 비교하는 기준](specialized-data-models.md)
 8. [로그, 지속성, 복제와 복구](replication-and-recovery.md)
 9. [DB 고가용성: 장애 전환, fencing과 복구 완료의 의미](high-availability.md)
-10. [문서형, 분산형, 분석형 DB의 관측](distributed-and-analytical.md)
-11. [시계열·그래프·문서·열 지향 DB를 비교하는 기준](specialized-data-models.md)
+10. [PostgreSQL 운영 관측: 오래된 ID, 회수 기준점, 통계 호환성](postgresql-operations.md)
+11. [MySQL: 잠금 대기, 커밋과 복제의 서로 다른 완료 지점](mysql-operations.md)
 12. [DB 수집 명세: 읽기 전용 쿼리, 단위, 권한과 통계 수명](collection-contracts.md)
 13. [PostgreSQL 실제 실습: 같은 값, 잠금 대기와 실패한 트랜잭션](postgresql-concurrency-lab.md)
 
 관련 문서: [애플리케이션](../application/README.md), [호스트](../host/README.md), [스토리지](../storage/README.md)
+
+이전: [트레이스를 읽는 전제: 문맥 전파, sampling과 모집단](../application/trace-sampling-and-context.md) · 다음: [트랜잭션, 격리, MVCC와 잠금](transactions-and-locks.md)

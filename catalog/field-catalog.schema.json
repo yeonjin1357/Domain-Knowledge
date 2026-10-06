@@ -1,0 +1,513 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Domain Knowledge field catalog 1.0",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "catalog_id",
+    "reviewed_on",
+    "book_edition",
+    "scope",
+    "excluded",
+    "version_policy",
+    "fields",
+    "book_checks"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "catalog_id": {
+      "type": "string",
+      "const": "domain-knowledge-fields-r4a"
+    },
+    "reviewed_on": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "book_edition": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "excluded": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "version_policy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fields": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/field"
+      },
+      "minItems": 1
+    },
+    "book_checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "field_id",
+          "pointer",
+          "expected",
+          "book",
+          "contains"
+        ],
+        "properties": {
+          "field_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "pointer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected": {
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "book": {
+            "type": "string",
+            "minLength": 1
+          },
+          "contains": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "field": {
+      "type": "object",
+      "required": [
+        "id",
+        "domain",
+        "record_basis",
+        "source",
+        "kind",
+        "temporality",
+        "value_type",
+        "unit",
+        "normalization",
+        "identity",
+        "reset",
+        "missing",
+        "permissions",
+        "availability",
+        "references",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z0-9_]+)+$"
+        },
+        "domain": {
+          "type": "string",
+          "enum": [
+            "linux",
+            "cgroup_v2",
+            "kubernetes",
+            "postgresql",
+            "mysql",
+            "otlp",
+            "cloudwatch"
+          ]
+        },
+        "record_basis": {
+          "type": "string",
+          "enum": [
+            "source_field",
+            "scoped_example"
+          ]
+        },
+        "source": {
+          "type": "object",
+          "required": [
+            "interface",
+            "locator",
+            "field",
+            "scope"
+          ],
+          "properties": {
+            "interface": {
+              "type": "string",
+              "enum": [
+                "file",
+                "sql",
+                "api"
+              ]
+            },
+            "locator": {
+              "type": "string",
+              "minLength": 1
+            },
+            "field": {
+              "type": "string",
+              "minLength": 1
+            },
+            "scope": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "counter",
+            "gauge",
+            "histogram",
+            "state",
+            "identifier",
+            "timestamp",
+            "dynamic"
+          ]
+        },
+        "temporality": {
+          "type": "string",
+          "enum": [
+            "cumulative",
+            "delta",
+            "instant",
+            "not_applicable",
+            "from_payload",
+            "from_query"
+          ]
+        },
+        "value_type": {
+          "type": "string",
+          "enum": [
+            "integer",
+            "number",
+            "string",
+            "object",
+            "array",
+            "integer_or_sentinel"
+          ]
+        },
+        "unit": {
+          "type": "object",
+          "required": [
+            "raw",
+            "normalized"
+          ],
+          "properties": {
+            "raw": {
+              "type": "string",
+              "enum": [
+                "USER_HZ",
+                "proc_kB",
+                "sector512",
+                "page",
+                "us",
+                "ms",
+                "ps",
+                "ns",
+                "By",
+                "By_or_max",
+                "count",
+                "ratio",
+                "percent",
+                "s",
+                "unix_ns",
+                "timestamp",
+                "interval",
+                "none",
+                "source_defined",
+                "k8s_quantity"
+              ]
+            },
+            "normalized": {
+              "type": "string",
+              "enum": [
+                "By",
+                "s",
+                "count",
+                "page",
+                "ratio",
+                "unix_ns",
+                "timestamp",
+                "none",
+                "source_defined"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "normalization": {
+          "type": "object",
+          "required": [
+            "mode",
+            "numerator",
+            "denominator",
+            "runtime_parameter"
+          ],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": [
+                "identity",
+                "rational",
+                "runtime",
+                "source_defined",
+                "not_applicable"
+              ]
+            },
+            "numerator": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "denominator": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "runtime_parameter": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "identity": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "reset": {
+          "type": "object",
+          "required": [
+            "markers",
+            "wrap_bits",
+            "policy"
+          ],
+          "properties": {
+            "markers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            },
+            "wrap_bits": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "enum": [
+                null,
+                32,
+                64
+              ]
+            },
+            "policy": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "missing": {
+          "type": "object",
+          "required": [
+            "absent",
+            "null",
+            "zero"
+          ],
+          "properties": {
+            "absent": {
+              "type": "string",
+              "minLength": 1
+            },
+            "null": {
+              "type": "string",
+              "minLength": 1
+            },
+            "zero": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "permissions": {
+          "type": "object",
+          "required": [
+            "required",
+            "mutates_target",
+            "cost"
+          ],
+          "properties": {
+            "required": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mutates_target": {
+              "type": "boolean",
+              "const": false
+            },
+            "cost": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "availability": {
+          "type": "object",
+          "required": [
+            "reviewed_versions",
+            "min_inclusive",
+            "max_exclusive",
+            "capability",
+            "introduced_in",
+            "removed_in",
+            "stable_since"
+          ],
+          "properties": {
+            "reviewed_versions": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            },
+            "min_inclusive": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^\\d+(?:\\.\\d+){0,2}$"
+            },
+            "max_exclusive": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^\\d+(?:\\.\\d+){0,2}$"
+            },
+            "capability": {
+              "type": "string",
+              "minLength": 1
+            },
+            "introduced_in": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^\\d+(?:\\.\\d+){0,2}$"
+            },
+            "removed_in": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^\\d+(?:\\.\\d+){0,2}$"
+            },
+            "stable_since": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^\\d+(?:\\.\\d+){0,2}$"
+            }
+          },
+          "additionalProperties": false
+        },
+        "references": {
+          "type": "object",
+          "required": [
+            "book",
+            "primary"
+          ],
+          "properties": {
+            "book": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            },
+            "primary": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "sha256",
+              "locator",
+              "scope",
+              "selector_kind"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "locator": {
+                "type": "string",
+                "minLength": 1
+              },
+              "scope": {
+                "type": "string",
+                "minLength": 1
+              },
+              "selector_kind": {
+                "type": "string",
+                "enum": [
+                  "json_pointer",
+                  "description"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "minItems": 0
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

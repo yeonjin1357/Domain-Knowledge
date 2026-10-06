@@ -1,6 +1,6 @@
 # 네트워크 도메인
 
-> 상태: 검토됨 · 적용 범위: 통신 관측의 공통 개요, TCP 예시 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: 통신 관측의 공통 개요, TCP 예시 · 원천 확인일: 2026-10-03 · 실습 여부: 각 상세 장에 명시
 
 네트워크 영역은 통신이 시작되고 목적지에 도달하며 데이터를 주고받는 과정을 다룹니다. 요청 실패나 지연을 조사할 때 어느 지점에서 무엇을 관측했는지 구분하는 것이 출발점입니다.
 
@@ -42,13 +42,15 @@ TCP에는 연결 상태, 확인 응답 ACK, 연결 초기화 RST, 재전송 같�
 ## 상세 본문
 
 1. [주소, 경로, 이름 해석](addressing-routing-dns.md)
-2. [TCP, UDP, 연결과 전송 속도](tcp-and-udp.md)
-3. [TLS, HTTP와 요청 단계별 시간](tls-http.md)
-4. [이름 조회에서 응답 본문까지: DNS, 연결 재사용과 실패 위치](dns-and-connection-lifecycle.md)
-5. [인터페이스, 장비, 흐름과 능동 검사](network-metrics.md)
-6. [Linux 네트워크 스택 카운터 읽기](linux-stack-counters.md)
-7. [링크, 오버레이, MTU와 경로 제어](layers-and-routing.md)
+2. [링크, 오버레이, MTU와 경로 제어](layers-and-routing.md)
+3. [TCP, UDP, 연결과 전송 속도](tcp-and-udp.md)
+4. [TLS, HTTP와 요청 단계별 시간](tls-http.md)
+5. [이름 조회에서 응답 본문까지: DNS, 연결 재사용과 실패 위치](dns-and-connection-lifecycle.md)
+6. [인터페이스, 장비, 흐름과 능동 검사](network-metrics.md)
+7. [Linux 네트워크 스택 카운터 읽기](linux-stack-counters.md)
 8. [네트워크 장비 수집: SNMP, MIB와 인터페이스 수명](snmp-and-device-models.md)
 9. [경로 수렴과 QoS: 연결은 살아 있는데 통신이 느린 이유](routing-convergence-and-qos.md)
 
 관련 문서: [호스트](../host/README.md), [애플리케이션](../application/README.md), [쿠버네티스](../kubernetes/README.md)
+
+이전: [Linux 원천 관측 실습: CPU, 가상 메모리와 실제 I/O](../host/linux-observation-lab.md) · 다음: [주소, 경로, 이름 해석](addressing-routing-dns.md)

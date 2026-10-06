@@ -1,6 +1,8 @@
 # 메모리 회수와 OOM: 부족해지는 과정과 종료의 증거
 
-> 상태: 검토됨 · 적용 범위: Linux 6.12 VM·OOM 코드, 6.13·6.15·6.18의 명시한 차이, cgroup v2 · 3d 원천·저장 증거 확인: 2026-10-06 · WSL 실습은 Claude가 2026-10-05 실행; 강제 회수·OOM 실험 없음
+> 상태: 검토됨 · 적용 범위: Linux 6.12 VM·OOM 코드, 6.13·6.15·6.18의 명시한 차이, cgroup v2 · 원천 확인일: 2026-10-06 · 실습 여부: 저장된 로컬 실행 근거 포함; 구성·한계는 본문
+
+> **심화 안내:** [메모리 기초](memory.md), [PSI](numa-and-pressure.md), [cgroup 메모리](../containers/memory-accounting-and-oom.md)를 먼저 읽습니다. 구현 세부보다 신호의 범위와 종료 원인 표를 우선 읽어도 됩니다.
 
 ## 사용량이 그대로인데 요청이 느려지는 상황
 
@@ -22,13 +24,9 @@
 | `pswpin`, `pswpout` | 누적 swap 페이지 수 | swap backing 저장소 읽기/쓰기 경로의 페이지 계정; zswap 적재·zero 최적화까지 합친 총 회수량이 아님 |
 | `oom_kill` | 누적 OOM kill 계수 | 커널 OOM victim 처리 경로의 계수; 호스트 전체 부족 사건 수로 바로 해석하지 않음 |
 
-회수량은 [vmscan](https://github.com/torvalds/linux/blob/v6.12/mm/vmscan.c), refault는 [workingset의 folio 페이지 수 계정](https://github.com/torvalds/linux/blob/v6.12/mm/workingset.c)을 따른다. `allocstall_*`은 같은 커널에서 cgroup reclaim을 제외한 `do_try_to_free_pages` 경로에서 증가한다. `oom_kill`은 전역·memcg OOM이 공유하는 kill 경로에서 증가하므로 “호스트 OOM 발생 횟수”라는 이름은 범위를 과장한다. 한 OOM 처리의 희생자 수와 사건 수도 구분한다. [OOM 계정 코드](https://github.com/torvalds/linux/blob/v6.12/mm/oom_kill.c)
+**가상 예시:** 초기화·부팅 변경이 없는 10초 동안 direct scan이 10,000페이지, direct steal이 2,500페이지 증가했다면 관측 구간의 회수/scan 비는 `2,500 / 10,000 = 25%`입니다. scan 증가가 0이면 비율을 계산하지 않습니다. 같은 커널·회수 경로·범위에서 추이를 비교하고, MGLRU 여부와 서로 다른 수집 시점을 기록합니다. 이를 페이지 검사의 엄밀한 성공 확률이나 보편적인 장애 임계값으로 쓰지 않습니다.
 
-특히 Linux 6.12의 `shrink_inactive_list`와 MGLRU `scan_folios`·`evict_folios`는 kswapd/direct 전역 계수를 `!cgroup_reclaim(sc)` 조건에서 증가시키지만 anon/file 계수에는 그 조건을 두지 않습니다. 컨테이너의 memory.high/max/reclaim에 따른 회수가 전역 `pgscan_direct`에 그대로 나타난다고 가정하지 않습니다. MGLRU의 scan 계수는 조사한 모든 페이지가 아니라 **회수 대상으로 LRU에서 분리한 isolated 페이지 수**를 넣으므로, 옛 LRU 경로와 비율의 의미도 달라집니다. [6.12 계수 지점](https://github.com/torvalds/linux/blob/v6.12/mm/vmscan.c)
-
-**계산 예시:** 초기화·부팅 변경이 없는 10초 동안 direct scan이 10,000페이지, direct steal이 2,500페이지 증가했다면 관측 구간의 회수/scan 비는 `2,500 / 10,000 = 25%`입니다. scan 증가가 0이면 비율을 계산하지 않습니다. 같은 커널·회수 경로·범위에서 추이를 비교하고, MGLRU 여부와 서로 다른 수집 시점을 기록합니다. 이를 페이지 검사의 엄밀한 성공 확률이나 보편적인 장애 임계값으로 쓰지 않습니다.
-
-**계산 예시:** base page가 4 KiB인 환경에서 10초 동안 `pswpout`이 512 증가하면 페이지 환산량은 2 MiB, 평균 0.2 MiB/s입니다. 페이지 크기를 4 KiB로 고정해 구현하지 않습니다. Linux 6.12에서 zero-filled folio의 최적화는 `swpout_zero`, zswap의 메모리 내 압축 저장은 `zswpout`으로 집계하며, 그 시점에는 backing 저장소 쓰기의 `pswpout`을 증가시키지 않습니다. 따라서 `pswpout`만으로 모든 swap-out 활동을 세면 빠지는 경로가 있습니다. 반면 **zram은 swap backing block device이므로 그쪽 쓰기는 pswpout에 포함**됩니다. 둘을 같은 “압축 swap 제외” 규칙으로 처리하지 않으며, 페이지 환산량을 물리 디스크 쓰기 바이트로 단정하지도 않습니다. [6.12 page_io](https://github.com/torvalds/linux/blob/v6.12/mm/page_io.c), [zswap 계정](https://github.com/torvalds/linux/blob/v6.12/mm/zswap.c), [zram](https://docs.kernel.org/admin-guide/blockdev/zram.html)
+**가상 예시:** base page가 4 KiB인 환경에서 10초 동안 `pswpout`이 512 증가하면 페이지 환산량은 2 MiB, 평균 0.2 MiB/s입니다. 페이지 크기를 4 KiB로 고정해 구현하지 않습니다. Linux 6.12에서 zero-filled folio의 최적화는 `swpout_zero`, zswap의 메모리 내 압축 저장은 `zswpout`으로 집계하며, 그 시점에는 backing 저장소 쓰기의 `pswpout`을 증가시키지 않습니다. 따라서 `pswpout`만으로 모든 swap-out 활동을 세면 빠지는 경로가 있습니다. 반면 **zram은 swap backing block device이므로 그쪽 쓰기는 pswpout에 포함**됩니다. 둘을 같은 “압축 swap 제외” 규칙으로 처리하지 않으며, 페이지 환산량을 물리 디스크 쓰기 바이트로 단정하지도 않습니다. [6.12 page_io](https://github.com/torvalds/linux/blob/v6.12/mm/page_io.c), [zswap 계정](https://github.com/torvalds/linux/blob/v6.12/mm/zswap.c), [zram](https://docs.kernel.org/admin-guide/blockdev/zram.html)
 
 ## cgroup에서 같은 질문을 한다
 
@@ -36,7 +34,7 @@
 
 버전 분기도 필요합니다. upstream **6.13부터 memory.stat에 pswpin/pswpout**, **6.15부터 pgscan_proactive/pgsteal_proactive**가 들어옵니다. 후자의 `memory.reclaim`에 의한 자발적 회수는 direct 분류에서 분리됩니다. 6.12 수집 계약을 그대로 적용하면 새 키를 누락하거나 direct 감소를 회수 감소로 오독할 수 있습니다. 배포판 backport를 고려해 버전과 실제 필드 가용성을 함께 확인합니다. [6.13 memcontrol](https://github.com/torvalds/linux/blob/v6.13/mm/memcontrol.c), [6.15 memcontrol](https://github.com/torvalds/linux/blob/v6.15/mm/memcontrol.c), [6.15 reclaimer_offset](https://github.com/torvalds/linux/blob/v6.15/mm/vmscan.c), [6.18 계정](https://github.com/torvalds/linux/blob/v6.18/mm/memcontrol.c)
 
-`memory.swap.current`는 현재 swap 사용량이지 swap I/O율이 아닙니다. `memory.events`의 `high`는 high 경계로 인한 throttle·direct reclaim, `oom`은 메모리 할당이 OOM 상태에 이른 계수, `oom_kill`은 해당 그룹의 프로세스가 OOM killer에 의해 죽은 계수입니다. `oom`이 증가해도 반드시 kill이 발생하지 않으며, `oom_kill`만으로 한도 초과의 원인을 확정할 수 없습니다. 기본 `memory.events`는 하위 계층 사건도 포함하므로 `memory.events.local`과 mount 옵션을 확인합니다. [events·swap 규약](https://docs.kernel.org/6.12/admin-guide/cgroup-v2.html#memory-interface-files)
+`memory.swap.current`는 현재 swap 사용량이고 swap I/O율은 아닙니다. `memory.events`의 high·oom·oom_kill 및 계층 범위는 [컨테이너 메모리 정본](../containers/memory-accounting-and-oom.md)을 따릅니다. 사건의 증가와 종료 원인은 별도로 확인합니다.
 
 회수율·refault율이 증가하면서 `memory.pressure`와 요청 지연도 증가하면 working set이 유효 용량보다 큰지 조사합니다. 단순히 캐시를 비우는 것을 해결책으로 제시하지 않습니다. 캐시 제거가 재읽기 비용을 더 늘릴 수 있기 때문입니다.
 
@@ -55,15 +53,13 @@ Linux 6.12의 커널 로그는 다음 필드를 원인 조사에 사용합니다
 
 `/proc/PID/oom_score`는 현재 조건에서의 badness 점수이며 미래에 죽을 확률이 아닙니다. `oom_score_adj`의 범위는 −1000…1000이고 −1000은 커널 OOM 선정에서 제외하는 특수값입니다. 이 보호를 일반 SIGKILL이나 userspace 메모리 관리자의 종료까지 막는 것으로 해석하지 않습니다. 기본 수집기는 값을 읽으며 조정값을 바꾸지 않습니다. [oom_score](https://man7.org/linux/man-pages/man5/proc_pid_oom_score.5.html), [oom_score_adj](https://man7.org/linux/man-pages/man5/proc_pid_oom_score_adj.5.html)
 
-Linux 6.12의 `/proc/PID/oom_score`는 `totalram_pages + total_swap_pages`를 분모 기준으로 사용합니다. 실제 memcg OOM은 `mem_cgroup_get_max()`로 정한 해당 범위의 totalpages를 사용하므로, proc 점수 목록을 cgroup OOM의 실제 희생자 순위라고 표시하지 않습니다. [proc 점수 계산](https://github.com/torvalds/linux/blob/v6.12/fs/proc/base.c), [OOM 범위별 분모](https://github.com/torvalds/linux/blob/v6.12/mm/oom_kill.c)
-
 ## 종료 원인별 증거
 
 | 분류 | 필요한 증거 조합 | 혼동하기 쉬운 것 |
 | --- | --- | --- |
-| 전역 또는 할당 범위의 커널 OOM | 커널 OOM 문맥·제약, 당시 가용량·회수·PSI, 희생자 수명 | `oom_kill` 증가만으로 물리 RAM 전체 고갈 확정 |
-| cgroup 한도 관련 OOM | `oom_memcg`, 유효 조상 한도, events 차분, 해당 컨테이너 종료 | 현재 사용량이 한도보다 낮으므로 과거 OOM 부정; 종료 후 이미 해제됐을 수 있음 |
-| Kubernetes node-pressure eviction | Pod `Evicted` 상태·메시지, kubelet 이벤트·신호 | 모든 Evicted를 컨테이너 memory.max 초과로 취급 |
+| 노드 전체 또는 할당 범위의 커널 OOM | 커널 OOM 문맥·제약, 당시 가용량·회수·PSI, 희생자 수명 | `oom_kill` 증가만으로 물리 RAM 전체 고갈 확정 |
+| 컨테이너·Pod·kubepods 등 cgroup 한도(memcg) OOM | `oom_memcg`, 유효 조상 한도, events 차분, 해당 컨테이너 종료 | 현재 사용량이 한도보다 낮으므로 과거 OOM 부정; 종료 후 이미 해제됐을 수 있음 |
+| kubelet 노드 압박 축출(eviction) | Pod `Evicted` 상태·메시지, kubelet 이벤트·신호 | 모든 Evicted를 컨테이너 memory.max 초과로 취급 |
 | 다른 SIGKILL·userspace 종료 | 서비스 관리자·운영 조작 등의 기록 | exit 137만으로 OOMKilled 확정 |
 
 Pod의 `state.terminated`와 `lastState.terminated`를 함께 확인하는 이유와 kubelet의 종료 구분은 [자원 압박과 종료](../kubernetes/pressure-and-termination.md)에 있습니다. [컨테이너 메모리 회계](../containers/memory-accounting-and-oom.md)와 연결해 원천마다 대상·수명을 맞춥니다.
@@ -76,6 +72,16 @@ Pod의 `state.terminated`와 `lastState.terminated`를 함께 확인하는 이�
 
 **저장된 실습 결과:** 2026-10-05의 WSL2 Linux 6.18.33.2에서 `oom_kill`, `pgscan/pgsteal_*`, `allocstall_*`, `workingset_refault_*` 키를 읽었고, `pgscan_proactive`·`pgsteal_proactive`도 존재했습니다. 선택한 계수의 당시 값은 모두 0이었습니다. 이는 원천의 존재·형식 관측이며, 강제 메모리 압박·회수·OOM 동작 검증은 아닙니다. 익명·파일·memfd의 8 MiB 매핑 결과는 [프로세스 장](processes.md)에 연결했습니다. [요약과 원자료 목록](../../labs/results/1.1-r3/linux-memory.json), [vmstat 원문 gzip](../../labs/results/1.1-r3/linux-memory.raw/vmstat.gz)
 
+## 심화: 구현 근거
+
+folio는 커널이 함께 다루는 페이지 묶음이고, isolated는 회수 후보를 LRU 목록에서 분리한 상태입니다. MGLRU와 기존 회수 경로는 scan을 세는 지점이 달라 비율을 비교할 때 구현을 확인해야 합니다. OOM 로그의 gfp_mask는 할당 제약, `order`는 요청한 **2^order개의 연속 페이지**를 뜻합니다. [페이지 할당 API](https://docs.kernel.org/core-api/mm-api.html) 로그를 처음 읽을 때는 앞의 원인 범위·희생자 구분을 먼저 적용합니다.
+
+회수량은 [vmscan](https://github.com/torvalds/linux/blob/v6.12/mm/vmscan.c), refault는 [workingset의 folio 페이지 수 계정](https://github.com/torvalds/linux/blob/v6.12/mm/workingset.c)을 따른다. `allocstall_*`은 같은 커널에서 cgroup reclaim을 제외한 `do_try_to_free_pages` 경로에서 증가한다. `oom_kill`은 전역·memcg OOM이 공유하는 kill 경로에서 증가하므로 “호스트 OOM 발생 횟수”라는 이름은 범위를 과장한다. 한 OOM 처리의 희생자 수와 사건 수도 구분한다. [OOM 계정 코드](https://github.com/torvalds/linux/blob/v6.12/mm/oom_kill.c)
+
+특히 Linux 6.12의 `shrink_inactive_list`와 MGLRU `scan_folios`·`evict_folios`는 kswapd/direct 전역 계수를 `!cgroup_reclaim(sc)` 조건에서 증가시키지만 anon/file 계수에는 그 조건을 두지 않습니다. 컨테이너의 memory.high/max/reclaim에 따른 회수가 전역 `pgscan_direct`에 그대로 나타난다고 가정하지 않습니다. MGLRU의 scan 계수는 조사한 모든 페이지가 아니라 **회수 대상으로 LRU에서 분리한 isolated 페이지 수**를 넣으므로, 옛 LRU 경로와 비율의 의미도 달라집니다. [6.12 계수 지점](https://github.com/torvalds/linux/blob/v6.12/mm/vmscan.c)
+
+Linux 6.12의 `/proc/PID/oom_score`는 `totalram_pages + total_swap_pages`를 분모 기준으로 사용합니다. 실제 memcg OOM은 `mem_cgroup_get_max()`로 정한 해당 범위의 totalpages를 사용하므로, proc 점수 목록을 cgroup OOM의 실제 희생자 순위라고 표시하지 않습니다. [proc 점수 계산](https://github.com/torvalds/linux/blob/v6.12/fs/proc/base.c), [OOM 범위별 분모](https://github.com/torvalds/linux/blob/v6.12/mm/oom_kill.c)
+
 ## 이해 확인
 
 1. `allocstall` 100은 100초 대기인가? **사건 계수이므로 시간을 알 수 없습니다. PSI와 지연을 함께 봅니다.**
@@ -83,3 +89,5 @@ Pod의 `state.terminated`와 `lastState.terminated`를 함께 확인하는 이�
 3. swap 사용량이 일정하면 swap I/O도 없는가? **점유량과 들어오고 나가는 활동은 다릅니다.**
 
 관련: [메모리 기초](memory.md), [프로세스 메모리 원천](processes.md), [NUMA·PSI](numa-and-pressure.md)
+
+이전: [메모리와 가상 주소 공간 및 메모리 압력](memory.md) · 다음: [블록 I/O와 파일시스템 용량](disk-io.md) · [분야 목차](README.md)

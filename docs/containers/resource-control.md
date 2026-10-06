@@ -1,12 +1,10 @@
 # 컨테이너 CPU와 메모리 자원 제어
 
-> 상태: 검토됨 · 범위: Linux cgroup v2, 일반적인 fair 계열 CPU 제어 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: Linux cgroup v2, 일반적인 fair 계열 CPU 제어 · 원천 확인일: 2026-10-06 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
-호스트에 남는 CPU와 메모리가 많아도 컨테이너에 정한 한도에 걸릴 수 있습니다. 건물에 빈 공간이 있어도 특정 방의 사용 제한은 따로 있는 것과 비슷합니다. CPU quota는 실행 시간을 제한하고 메모리 제어는 다른 방식으로 작동하므로, 두 자원의 한도를 동일한 실패 규칙으로 설명하지 않습니다.
-
-호스트에 자원이 남아 있는데 컨테이너가 느리거나 종료될 수 있습니다. 컨테이너가 사용할 수 있는 범위는 호스트 전체 용량뿐 아니라 자신과 상위 그룹에 적용된 제어 정책으로 결정되기 때문입니다.
+호스트에 남는 CPU와 메모리가 많아도 컨테이너에 정한 한도에 걸릴 수 있습니다. 건물에 빈 공간이 있어도 특정 방의 사용 제한은 따로 있는 것과 비슷합니다. CPU quota는 실행 시간을 제한하고 메모리 제어는 다른 방식으로 작동하므로, 두 자원의 한도를 동일한 실패 규칙으로 설명하지 않습니다. 제품에서는 해당 컨테이너와 조상 cgroup의 유효 한도를 함께 확인합니다.
 
 ## 격리와 자원 제어는 서로 다른 기능이다
 
@@ -64,7 +62,7 @@ CPU bandwidth 제어는 일정 구간의 시간 예산을 다 사용한 그룹�
 
 `memory.high` 초과 자체는 OOM killer를 호출하는 조건이 아닙니다. `memory.events`는 계층의 사건을 포함할 수 있고, `memory.events.local`은 로컬 범위를 다룹니다. [Linux cgroup v2 Memory](https://docs.kernel.org/admin-guide/cgroup-v2.html#memory)
 
-`memory.current`를 프로세스 RSS나 런타임 힙 크기와 같은 값으로 취급하지 않습니다. 비교하려는 지표의 부과 범위와 메모리 유형을 먼저 맞춥니다. 런타임이 보여주는 Working Set에도 자체 정의가 있을 수 있으므로 이름만으로 차감식을 추정하지 않습니다.
+`memory.current`를 프로세스 RSS나 런타임 힙 크기와 같은 값으로 취급하지 않습니다. 비교하려는 지표의 부과 범위와 메모리 유형을 먼저 맞춥니다. cAdvisor의 working set 계산은 [컨테이너 메모리 계정](memory-accounting-and-oom.md), Windows의 상주 페이지 Working Set은 [Windows 관측](../host/windows.md#working-set과-privateusage), OS 메모리 유형은 [호스트 메모리](../host/memory.md)를 봅니다. 이름만으로 차감식을 추정하지 않습니다.
 
 ## 호스트에 여유가 있어도 실패하는 이유
 
@@ -96,6 +94,8 @@ CPU bandwidth 제어는 일정 구간의 시간 예산을 다 사용한 그룹�
 
 **제품 적용 제안:** 사용량만 저장하지 않고 적용 한도·가중치·부모 관계·관측 위치와 설정 변경 시각을 함께 기록합니다. 설명되지 않는 비율에는 임의의 분모를 채우지 않습니다.
 
+working set의 계산식과 `memory.events`의 단위는 [컨테이너 메모리 계정](memory-accounting-and-oom.md)을 정본으로 사용합니다.
+
 ## 이해 확인
 
 - 1.5 CPU 한도는 전용 물리 코어를 예약하는가? **시간 대역폭과 독점 코어는 다른 설정이다.**
@@ -103,3 +103,5 @@ CPU bandwidth 제어는 일정 구간의 시간 예산을 다 사용한 그룹�
 - memory.high 초과와 OOM kill은 같은 사건인가? **아니다. 회수·제한과 종료 사건을 구분해야 한다.**
 
 관련: [CPU](../host/cpu.md), [메모리](../host/memory.md), [컨테이너 격리와 수명](isolation-and-lifecycle.md), [쿠버네티스](../kubernetes/README.md)
+
+이전: [컨테이너의 격리와 실행 수명](isolation-and-lifecycle.md) · 다음: [컨테이너 메모리: 사용량, working set과 OOM을 구분하기](memory-accounting-and-oom.md) · [분야 목차](README.md)

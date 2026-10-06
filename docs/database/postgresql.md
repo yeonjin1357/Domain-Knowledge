@@ -1,12 +1,12 @@
 # PostgreSQL 관측: 활동, 누적 통계와 정리 작업
 
-> 상태: 검토됨 · 적용 범위: PostgreSQL 18 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: PostgreSQL 18 · 원천 확인일: 2026-10-03 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
 PostgreSQL에서는 지금 무엇을 기다리는지 보여 주는 활동 정보와 과거부터 누적한 통계가 서로 다릅니다. 한 시점에 연결 100개가 보였다는 사실로 최근 1분 동안 쿼리 100개가 실행되었다고 계산할 수 없습니다. 상태·누적량·통계가 시작된 시각을 함께 이해해야 합니다.
 
-PostgreSQL 수집은 현재 활동과 누적 통계를 구분하는 것에서 시작합니다. 시점의 세션 수와 시작 이후 누적 실행 수를 같은 유형으로 저장하면 안 됩니다.
+제품에서는 현재 활동과 누적 통계의 유형을 분리합니다. 권한·통계 cache·버전 분기는 [운영 관측](postgresql-operations.md)에서 확인합니다.
 
 ## 관측 원천
 
@@ -25,7 +25,7 @@ PostgreSQL 수집은 현재 활동과 누적 통계를 구분하는 것에서 �
 
 이 확장은 SQL 계획·실행 통계를 집계합니다. `calls`는 실행 수, `total_exec_time`은 누적 실행 시간이며 ms 단위입니다. 추적 설정이 필요한 계획·I/O 시간 항목은 수집이 꺼져 있으면 0일 수 있습니다. 문장은 사용자·DB·queryid 등의 집계 기준으로 구분되므로 queryid만 전역 키로 사용하지 않습니다. [PostgreSQL pg_stat_statements](https://www.postgresql.org/docs/18/pgstatstatements.html)
 
-초기화와 항목 교체가 없다는 가정의 합성 표본입니다.
+초기화와 항목 교체가 없다는 가정의 가상 예시 표본입니다.
 
 ```text
 시점 1: calls=1,000, total_exec_time=12,000 ms
@@ -39,9 +39,11 @@ PostgreSQL 수집은 현재 활동과 누적 통계를 구분하는 것에서 �
 
 UPDATE·DELETE 뒤 남는 이전 행 버전은 더 필요하지 않을 때 정리할 수 있습니다. 일반 VACUUM은 공간을 재사용 가능하게 만들지만 대부분의 경우 파일 크기를 그대로 OS에 반환하는 작업은 아닙니다. VACUUM FULL은 재작성으로 압축하며 잠금·작업 특성이 다릅니다. [PostgreSQL Routine Vacuuming](https://www.postgresql.org/docs/18/routine-vacuuming.html)
 
-따라서 “vacuum이 성공했는데 파일 크기가 그대로”라는 사실만으로 실패를 판정하지 않습니다. 회수 가능 공간과 물리 파일 크기는 다른 지표입니다. 관측 시스템에서는 자동 정리 작업의 최근 성공, 처리량, 실패, 오래 열린 트랜잭션과 여유 저장 공간을 함께 보여 주도록 제안합니다. 회수 기준점에는 prepared transaction, replication slot의 `xmin`·`catalog_xmin`, standby의 `hot_standby_feedback`도 영향을 줄 수 있습니다. catalog와 일반 행의 범위를 구분하고 [회수 기준점 조사](transactions-and-locks.md)를 함께 확인합니다.
+일반 VACUUM의 공간 재사용과 파일 축소는 다릅니다. 회수 기준점(xmin horizon)의 원천·freeze 진행점(datfrozenxid)·실측은 [PostgreSQL 운영 관측](postgresql-operations.md#회수-기준점을-붙잡는-원천별로-읽기)을 봅니다.
 
 ## 버전 차이를 다루는 수집기
+
+view·컬럼의 버전별 매핑은 [운영 장의 어댑터 표](postgresql-operations.md#어댑터의-버전-분기-표)에 모았습니다. 이 개요에서는 현재 활동과 누적량의 구분을 먼저 익힙니다.
 
 이 장의 기준은 18이며 이전 버전에서 모든 view와 컬럼이 같다고 가정하지 않습니다. 수집 시작 시 버전을 기록하고 지원 view를 확인하며, 없는 컬럼은 0으로 채우지 않고 지원 여부를 표시합니다. 확장 설치·설정 변경이 필요한 자료와 기본 조회 자료도 구분합니다.
 
@@ -67,4 +69,4 @@ GROUP BY state, wait_event_type, wait_event;
 2. 일반 VACUUM 뒤 파일이 작아져야만 성공인가? **재사용 가능한 공간 확보와 파일 축소는 다릅니다.**
 3. 누적 mean 차분은 구간 mean인가? **시간 합의 차분을 호출 수 차분으로 나눠야 합니다.**
 
-다음: [MySQL·MariaDB](mysql-mariadb.md) · [DB 목차](README.md)
+이전: [쿼리, 인덱스, 실행 계획과 비용](queries-and-indexes.md) · 다음: [MySQL과 MariaDB 관측](mysql-mariadb.md) · [분야 목차](README.md)

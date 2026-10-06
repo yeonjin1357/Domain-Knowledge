@@ -1,6 +1,6 @@
 # 호스트 수집 명세: 원천 필드에서 지표까지
 
-> 상태: 검토됨 · 적용 범위: Linux procfs·cgroup v2와 Windows API · 검토일: 2026-10-04 · 원천 규약 검토, Linux 자기 프로세스·기존 cgroup과 Windows API 일부는 로컬 실험
+> 상태: 검토됨 · 적용 범위: Linux procfs·cgroup v2와 Windows API · 원천 확인일: 2026-10-04 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 수집기는 숫자를 읽는 프로그램이면서 그 숫자의 뜻을 보존하는 프로그램입니다. 예를 들어 원천에 `1024`가 있어도 단위가 kB인지 page인지 byte인지 모르면 정확한 지표를 만들 수 없습니다. 이 장은 모니터링 제품의 첫 어댑터를 구현할 때 사용할 최소 계약을 제안합니다. 표의 정규화 이름은 이 책의 설계 예시이며 특정 exporter의 공식 이름이 아닙니다.
 
@@ -19,7 +19,7 @@
 
 Linux 정의는 [proc stat](https://man7.org/linux/man-pages/man5/proc_stat.5.html), [PID stat](https://man7.org/linux/man-pages/man5/proc_pid_stat.5.html), [meminfo](https://man7.org/linux/man-pages/man5/proc_meminfo.5.html), [디스크 통계](https://docs.kernel.org/admin-guide/iostats.html), [cgroup v2](https://docs.kernel.org/admin-guide/cgroup-v2.html)에 근거합니다. Windows는 [GetSystemTimes](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getsystemtimes)를 사용합니다. 다른 API의 단위를 이 표에서 추측하지 않습니다.
 
-[Linux 실습](linux-observation-lab.md)은 자기 프로세스의 stat·smaps·io와 기존 cgroup 읽기를 확인했습니다. 이 표의 모든 호스트 필드나 제한 동작을 실행 검증한 것은 아닙니다. 최초 CPU 표본과 별도로 [시계 진단 재실행](../../labs/results/1.1-linux-clock-r1.json)을 보존했습니다. 단일 스레드 busy 구간의 프로세스 CPU clock은 RAW와 거의 같은 증가량을 보였지만 MONOTONIC보다 빨랐고, sleep·idle의 시계 차이와 adjtimex 값도 분모의 주파수 조정 설명에 부합했습니다. 수집기는 CPU/MONOTONIC > 1을 100%로 자르기보다 분모 시계·RAW 비교·조정 상태·스레드 수를 품질 정보로 남기도록 제안합니다. 이 재실행으로 RAW·tick이 없는 과거 1.06 표본의 원인이나 시계 조정 주체까지 확정하지 않습니다.
+[Linux 실습](linux-observation-lab.md)은 자기 프로세스의 CPU·메모리·I/O와 기존 cgroup 읽기를 확인했습니다. CPU 비율에는 분모 시계·스레드 수·품질 표시가 필요하며, MONOTONIC/RAW 차이의 관측과 한계는 해당 장을 따릅니다. 이 표의 모든 필드·제한 동작을 실행 검증한 것은 아닙니다.
 
 ## 읽기 한 번이 하나의 원자적 스냅샷은 아니다
 
@@ -71,3 +71,5 @@ Windows CPU의 실제 원천 표본과 산식은 [실습](../cross-domain/reprod
 1. 장치 논리 sector 크기가 4096B면 diskstats sector도 4096B인가? **해당 통계는 512B 단위이므로 별도로 해석합니다.**
 2. 첫 표본으로 초당 CPU 사용량을 만들 수 있는가? **이 차분 정책에서는 이전 표본이 필요합니다.**
 3. permission denied를 값 0으로 저장해도 되는가? **접근 실패와 0 사용량을 구분해야 합니다.**
+
+이전: [CPU와 메모리의 위치: NUMA, 캐시, 스케줄링과 압력](numa-and-pressure.md) · 다음: [Linux 원천 관측 실습: CPU, 가상 메모리와 실제 I/O](linux-observation-lab.md) · [분야 목차](README.md)

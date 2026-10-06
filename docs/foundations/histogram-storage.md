@@ -1,6 +1,8 @@
 # 분포를 저장하는 방법: 지수 버킷, native histogram과 sketch
 
-> 상태: 검토됨 · 범위: OTel ExponentialHistogram Stable 데이터 모델·Development 변환 절, Prometheus 3.13.4·3.15.0, DDSketch·t-digest · 3d 원천·저장 증거 확인: 2026-10-06 · promtool은 Claude가 2026-10-05 실행
+> 상태: 검토됨 · 적용 범위: OTel ExponentialHistogram Stable 데이터 모델·Development 변환 절, Prometheus 3.13.4·3.15.0, DDSketch·t-digest · 원천 확인일: 2026-10-06 · 실습 여부: 저장된 로컬 실행 근거 포함; 구성·한계는 본문
+
+> **심화 안내:** 처음 읽을 때 건너뛰어도 됩니다. 선수: [시계열](time-series.md), [분포와 집계](distributions.md). 수집·저장 계약을 설계할 때 돌아오세요.
 
 ## p99만 저장하면 나중에 질문을 바꿀 수 없다
 
@@ -28,7 +30,9 @@ Classic Histogram은 버킷마다 별도 float 시계열을 둡니다. Native Hi
 
 OTel scale과 Prometheus 표준 schema의 해상도는 대응하지만 **버킷 index는 1만큼 다릅니다**. Prometheus index n의 경계는 OTel index n−1에 대응합니다. OTLP의 dense 배열과 Prometheus의 sparse span 표현도 다릅니다. OTel→Prometheus의 **Exponential Histograms 변환 절은 확인일 현재 Development**이며 scale > 8이면 허용 범위로 downscale을 권고(SHOULD), scale < −4 또는 변환 불가능한 표본은 폐기(MUST)하도록 규정합니다. 반대 방향 변환 절의 Stable 표시나 데이터 모델의 안정 상태와 혼동하지 않습니다. 변환의 count·경계·부호·zero 영역·temporality와 손실 여부를 검증합니다. [OTel→Prometheus 변환 규약](https://opentelemetry.io/docs/specs/otel/compatibility/prometheus_and_openmetrics/#exponential-histograms)
 
-### 기능 상태와 실제 수집 설정
+**수집 계약에는 노출 형식·scrape 설정·변환 손실을 명시해야 합니다.** 도구가 stable이어도 필요한 형식의 수집이 자동으로 켜지는 것은 아닙니다. 다음 표는 이 결론을 구현할 때 확인할 설정입니다.
+
+### 구현자 참고: 기능 상태와 실제 수집 설정
 
 Prometheus **3.8.0**은 native histogram을 stable이지만 선택적으로 켜는 기능으로 발표하며 `scrape_native_histograms`를 도입했습니다. **3.9.0**은 실험 상태 해제와 옛 feature flag의 no-op 처리를 명시합니다. 따라서 안정화의 시작을 3.9 하나로만 표시하지 않습니다. 이번 고정 대상 3.13.4·3.15.0에서 `--enable-feature=native-histograms`는 기능을 켜는 스위치가 아니라 no-op입니다. 서버의 scrape 설정과 원천의 노출 형식을 별도로 확인합니다. [3.8·3.9 변경 기록](https://github.com/prometheus/prometheus/blob/v3.15.0/CHANGELOG.md), [3.13.4 flag 처리](https://github.com/prometheus/prometheus/blob/v3.13.4/cmd/prometheus/main.go), [3.15.0 flag 처리](https://github.com/prometheus/prometheus/blob/v3.15.0/cmd/prometheus/main.go)
 
@@ -44,14 +48,16 @@ NHCB 변환은 **이미 잃은 버킷 내부의 원본 값을 복원하지 않�
 
 `histogram_quantile`은 classic과 custom bucket native에서 버킷 안을 선형 보간합니다. 표준 exponential native의 0이 아닌 버킷에서는 로그 공간에서 균등하다는 가정으로 지수 보간하며, zero bucket은 선형 보간합니다. `histogram_fraction`도 경계 사이를 추정할 때 같은 보간 방식을 씁니다. [Prometheus 3.15 함수 정의](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/querying/functions.md#histogram_quantile)
 
-다음은 **실측이 아닌 계산 예시**입니다. 양수 값 1.25·1.75·2.5·3.5초를 count=4, sum=9초, `(1,2]` 2개·`(2,4]` 2개로 집계합니다. classic 누적 버킷은 `le=1:0`, `le=2:2`, `le=4:4`, `le=+Inf:4`이며, native는 schema 0을 사용한다고 가정합니다.
+다음은 **가상 예시**입니다. 양수 값 1.25·1.75·2.5·3.5초를 count=4, sum=9초, `(1,2]` 2개·`(2,4]` 2개로 집계합니다. classic 누적 버킷은 `le=1:0`, `le=2:2`, `le=4:4`, `le=+Inf:4`이며, native는 schema 0을 사용한다고 가정합니다.
 
 | 질문 | classic 선형 보간 | 표준 native 지수 보간 |
 | --- | --- | --- |
 | p25 | 1 + (2−1)×1/2 = **1.5초** | 1×(2/1)^(1/2) = **√2 ≈ 1.414214초** |
 | `(1,1.5]`의 추정 비율 | (2/4)×(1.5−1)/(2−1) = **0.25** | (2/4)×log₂(1.5) ≈ **0.292481** |
 
-원래 표본의 `(1,1.5]` 비율은 1/4입니다. native의 값이 다른 것은 이 구간에서의 보간 가정 때문입니다. 더 조밀한 버킷은 오차를 줄일 수 있지만 특정 데이터에서 항상 더 정확하다는 보장은 아닙니다. `histogram_count`는 native 표본의 count를 읽으며, classic float 버킷을 넣으면 무시합니다. classic에서는 `_count` 또는 누적 `+Inf`를 사용합니다. 이 예시 산술은 `verify_examples`에 연결합니다. [fraction·count 정의](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/querying/functions.md#histogram_fraction)
+이 책의 [nearest-rank 규칙](distributions.md)으로 원표본 p25는 `ceil(0.25 × 4)=1`번째인 **1.25초**입니다. 위 버킷 추정값이 이 원표본 정답과 다른 이유는 버킷 내부의 위치를 잃었기 때문입니다.
+
+원래 표본의 `(1,1.5]` 비율은 1/4입니다. native의 값이 다른 것은 이 구간에서의 보간 가정 때문입니다. 더 조밀한 버킷은 오차를 줄일 수 있지만 특정 데이터에서 항상 더 정확하다는 보장은 아닙니다. `histogram_count`는 native 표본의 count를 읽으며, classic float 버킷을 넣으면 무시합니다. classic에서는 `_count` 또는 누적 `+Inf`를 사용합니다. 산술 재검사 방법은 [검증 기록](../validation.md)에 있습니다. [fraction·count 정의](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/querying/functions.md#histogram_fraction)
 
 ## Sketch: 무슨 오차를 보장하는가
 
@@ -60,7 +66,7 @@ NHCB 변환은 **이미 잃은 버킷 내부의 원본 값을 복원하지 않�
 | DDSketch | 상대 크기에 맞춘 로그 버킷 | 양수 분위수 값 x에 대해 추정값의 상대 오차를 제한; 순위 오차와 구분 |
 | t-digest | 가까운 표본을 가중 centroid로 합치되 꼬리 쪽을 세밀하게 유지 | 병합 가능하고 꼬리 정확도를 목표로 함; 모든 입력에 동일한 상대 오차 상한을 보장한다고 쓰지 않음 |
 
-DDSketch의 상대 오차 α는 값 기준 `|추정값−x|/x`입니다. **예시:** x=100 ms, α=0.01이면 해당 보장 범위는 99~101 ms입니다. 이것은 p99가 p98~p100 사이로 움직인다는 뜻이 아닙니다. 메모리 한도를 위해 낮거나 높은 버킷을 collapse하는 구현은 합쳐진 영역까지 같은 오차 보장을 적용하지 않습니다. 병합 시에는 같은 mapping·오차 설정과 collapse 정책을 확인합니다. [원 논문](https://arxiv.org/abs/1908.10693), [저자 구현의 보장과 제한](https://github.com/DataDog/sketches-py)
+DDSketch의 상대 오차 α는 값 기준 `|추정값−x|/x`입니다. **가상 예시:** x=100 ms, α=0.01이면 해당 보장 범위는 99~101 ms입니다. 이것은 p99가 p98~p100 사이로 움직인다는 뜻이 아닙니다. 메모리 한도를 위해 낮거나 높은 버킷을 collapse하는 구현은 합쳐진 영역까지 같은 오차 보장을 적용하지 않습니다. 병합 시에는 같은 mapping·오차 설정과 collapse 정책을 확인합니다. [원 논문](https://arxiv.org/abs/1908.10693), [저자 구현의 보장과 제한](https://github.com/DataDog/sketches-py)
 
 t-digest는 압축 정도·입력 분포·병합 과정에 따른 정확도를 실제 데이터로 검증해야 합니다. centroid 크기의 불변식과 분위수 추정의 보편적인 오차 상한은 다른 주장입니다. 원 프로젝트도 GK·KLL 같은 엄격한 보장과의 차이를 설명합니다. 따라서 “병합 가능”을 “병합 순서와 무관하게 완전히 같은 결과”로 번역하지 않습니다. [t-digest 원 프로젝트](https://github.com/tdunning/t-digest), [설계 논문](https://arxiv.org/abs/1902.04023)
 
@@ -71,9 +77,9 @@ t-digest는 압축 정도·입력 분포·병합 과정에 따른 정확도를 �
 3. 합치기 전에 단위, 관측 대상, 시간 구간, counter reset, sampling 조건이 호환되는지 검사합니다. 형식이 호환되어도 중복 관측을 합치면 틀립니다.
 4. 수집·저장·조회·장기 집계의 모든 경로에서 형식 지원과 해상도 축소를 기록합니다. 결과 옆에 count와 보간 방식, 실제 보존 해상도를 보여 줍니다.
 
-**합성 입력의 실행 결과:** Claude가 2026-10-05 실행한 promtool 3.13.4·3.15.0은 위 분포를 표현한 fixture에서 모두 classic p25=1.5, 표준 native p25=1.414213562373095를 반환했습니다. fraction은 각각 0.25와 0.29248125036057815, count는 4였습니다. NHCB는 같은 경계의 classic과 같은 선형 보간 결과를 냈고, classic float 입력에 `histogram_count`를 적용한 결과는 빈 벡터였습니다. fixture의 `classic_count_ignored=0`은 그 **빈 결과 벡터의 길이**이며 원래 관측 수가 0이라는 뜻은 아닙니다. [실행 요약·gzip 목록](../../labs/results/1.1-r3/histograms.json), [입력·판정식](../../labs/review-r3/histograms/fixture.json)
+**합성 입력의 실행 결과:** 2026-10-05 실행한 promtool 3.13.4·3.15.0은 위 분포를 표현한 fixture에서 모두 classic p25=1.5, 표준 native p25=1.414213562373095를 반환했습니다. fraction은 각각 0.25와 0.29248125036057815, count는 4였습니다. NHCB는 같은 경계의 classic과 같은 선형 보간 결과를 냈고, classic float 입력에 `histogram_count`를 적용한 결과는 빈 벡터였습니다. fixture의 `classic_count_ignored=0`은 그 **빈 결과 벡터의 길이**이며 원래 관측 수가 0이라는 뜻은 아닙니다. [실행 요약·gzip 목록](../../labs/results/1.1-r3/histograms.json), [입력·판정식](../../labs/review-r3/histograms/fixture.json)
 
-두 버전의 계산을 뒷받침하는 결과이며 실제 요청 분포, 서버 scrape·remote write, OTel 변환 경로까지 검증한 자료는 아닙니다. 모든 숫자와 입력 hash·원자료는 `verify_review_r3 --published`에서 재검사합니다.
+두 버전의 계산을 뒷받침하는 결과이며 실제 요청 분포, 서버 scrape·remote write, OTel 변환 경로까지 검증한 자료는 아닙니다. 저장 입력·출력 검사의 범위는 [검증 기록](../validation.md)에 있습니다.
 
 ## 이해 확인
 
@@ -83,3 +89,5 @@ t-digest는 압축 정도·입력 분포·병합 과정에 따른 정확도를 �
 4. promtool 테스트 성공이 운영 scrape 지원을 보증하는가? **서버 설정·노출 형식·전송·저장 경로를 별도로 검증해야 합니다.**
 
 관련: [분포의 집계](distributions.md), [관측 데이터의 시작 시각](metric-context-and-start-time.md), [저장과 조회](../product/storage-and-query.md)
+
+이전: [평균과 백분위수 및 분포의 집계](distributions.md) · 다음: [성능을 읽는 순서: 처리량, 대기열, 표본과 실험](performance-and-statistics.md) · [분야 목차](README.md)

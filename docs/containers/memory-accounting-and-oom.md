@@ -1,8 +1,6 @@
 # 컨테이너 메모리: 사용량, working set과 OOM을 구분하기
 
-> 상태: 검토됨 · 적용 범위: Linux cgroup v2, cAdvisor 0.52.1 계산, Kubernetes의 메모리 관측 · 검토일: 2026-10-04 · OOM·eviction은 문서 검토이며 직접 유발하지 않음
-
-버전 상태: 계산 설명의 원래 기준은 cAdvisor 0.52.1입니다. Kubernetes 1.37.1이 참조하는 cAdvisor lib 0.60.5에서도 아래 working set 식이 유지됨을 코드로 대조했습니다. 새 버전 실행 실험은 수행하지 않았습니다. [Kubernetes 의존성](https://github.com/kubernetes/kubernetes/blob/v1.37.1/go.mod), [cAdvisor lib 0.60.5](https://github.com/google/cadvisor/blob/lib/v0.60.5/lib/container/libcontainer/handler.go)
+> 상태: 검토됨 · 적용 범위: Linux cgroup v2, cAdvisor 0.52.1 계산, Kubernetes의 메모리 관측 · 원천 확인일: 2026-10-06 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
@@ -52,6 +50,7 @@ Kubernetes request는 스케줄링 등에서 사용하는 자원 요구량입니
 | `memory.events: max` | max 경계를 넘으려던 사건 |
 | `memory.events: oom` | 정의된 OOM 조건의 사건; 모든 할당 실패와 동일하지 않음 |
 | `memory.events: oom_kill` | 해당 cgroup 프로세스가 OOM killer에 의해 죽은 수 |
+| `memory.events: oom_group_kill` | group OOM 발생 수; 종료 프로세스 수와 구분 |
 | `memory.events.local` | 하위 계층을 합치지 않는 local 사건 |
 
 `memory.events`는 기본적으로 하위 계층을 포함하며 관련 mount 옵션도 확인합니다. 특히 `oom_kill`은 **어떤 종류의 OOM killer에 의한 종료도** 셀 수 있으므로 증가 하나만으로 이 cgroup의 `memory.max`가 유일한 원인이라고 확정하지 않습니다. [사건 필드 정의](https://docs.kernel.org/admin-guide/cgroup-v2.html#memory)
@@ -60,9 +59,7 @@ Kubernetes request는 스케줄링 등에서 사용하는 자원 요구량입니
 
 ## OOM kill과 kubelet eviction
 
-노드 메모리 압박에 대한 kubelet eviction은 Pod를 종료해 자원을 회수하는 관리 동작입니다. 커널 OOM과 작동 주체·조건·관측 경로가 다릅니다. eviction의 threshold·grace period·우선순위·request 대비 사용 등은 해당 Kubernetes 규약을 따릅니다. [Node-pressure eviction](https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/)
-
-조사할 때는 Pod 상태·종료 reason·container 이전 상태, 노드 상태, kernel 기록, cgroup 사건의 시간 순서를 함께 봅니다. 재시작 횟수만으로 어떤 경로인지 확정하지 않습니다. 같은 Pod 이름이 유지돼도 컨테이너 실행 수명은 달라질 수 있습니다. [Pod와 컨테이너 상태](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/)
+종료 조사는 **컨테이너·Pod·kubepods 등 cgroup 한도(memcg) OOM, 노드 전체 커널 OOM, kubelet 축출(eviction)** 세 경로로 나눕니다. `memory.events`만으로 개별 사건의 원인을 확정하지 않습니다. Pod 수명·종료 상태·kernel 로그를 연결하는 [종료 원인 증거 표](../kubernetes/pressure-and-termination.md#oomkilled와-evicted를-증거로-나눈다)를 따릅니다.
 
 ## 흔한 조사 질문을 순서로 바꾸기
 
@@ -81,9 +78,13 @@ Kubernetes request는 스케줄링 등에서 사용하는 자원 요구량입니
 
 [Linux 실습](../host/linux-observation-lab.md)에서 기존 cgroup 필드와 자기 프로세스의 매핑을 읽었습니다. private 익명 매핑은 쓰기 전 Rss 0에서 페이지 접근 후 32MiB가 되었습니다. 그러나 cgroup 한도나 OOM을 유발하지 않았으므로 이 결과로 high/max의 제어 효과를 실행 검증했다고 표시하지 않습니다.
 
+버전 상태: 계산 설명의 원래 기준은 cAdvisor 0.52.1입니다. Kubernetes 1.37.1이 참조하는 cAdvisor lib 0.60.5에서도 위 working set 식이 유지됨을 코드로 대조했습니다. 새 버전 실행 실험은 수행하지 않았습니다. [Kubernetes 의존성](https://github.com/kubernetes/kubernetes/blob/v1.37.1/go.mod), [cAdvisor lib 0.60.5](https://github.com/google/cadvisor/blob/lib/v0.60.5/lib/container/libcontainer/handler.go)
+
 ## 이해 확인
 
 1. WorkingSet 400MiB이면 heap도 400MiB인가? **계산과 포함 범위가 다릅니다.**
 2. high 사건이 늘면 반드시 OOM kill인가? **high 경계는 reclaim·throttling과 관련됩니다.**
 3. oom_kill 하나로 cgroup limit 초과를 확정하는가? **global OOM 등 가능한 경로를 추가 증거로 구분합니다.**
 4. cgroup max가 무제한이면 메모리 장애가 불가능한가? **부모 계층과 노드 전체 자원도 유한합니다.**
+
+이전: [컨테이너 CPU와 메모리 자원 제어](resource-control.md) · 다음: [컨테이너 파일시스템, 쓰기 계층과 볼륨](filesystems.md) · [분야 목차](README.md)

@@ -1,6 +1,6 @@
 # 로그, 지속성, 복제와 복구
 
-> 상태: 검토됨 · 적용 범위: 공통 복구 모델과 PostgreSQL 18 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: 공통 복구 모델과 PostgreSQL 18 사례 · 원천 확인일: 2026-10-06 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
@@ -10,15 +10,28 @@
 
 ## WAL이 필요한 이유
 
-Write-Ahead Logging은 데이터 파일 변경을 영구 저장하기 전에 해당 변경을 설명하는 로그를 먼저 영구 저장하는 원리입니다. PostgreSQL은 이를 통해 커밋 때 변경된 모든 데이터 페이지를 즉시 기록하지 않아도 로그로 복구할 수 있습니다. 여러 트랜잭션의 로그 동기화를 묶는 경우도 있습니다. [PostgreSQL WAL Introduction](https://www.postgresql.org/docs/18/wal-intro.html)
+Write-Ahead Logging은 데이터 파일 변경을 지속성을 확보하기 전에 해당 변경을 설명하는 로그의 지속성을 먼저 확보하는 원리입니다. PostgreSQL은 이를 통해 커밋 때 변경된 모든 데이터 페이지를 즉시 기록하지 않아도 로그로 복구할 수 있습니다. 여러 트랜잭션의 로그 동기화를 묶는 경우도 있습니다. [PostgreSQL WAL Introduction](https://www.postgresql.org/docs/18/wal-intro.html)
 
 따라서 커밋 지연을 조사할 때 데이터 파일의 IOPS만 보면 부족합니다. WAL 생성량, 동기화 지연과 저장 경로를 구분하는 관측을 제안합니다. 캐시에 쓰인 것과 장애 후 보존 가능한 저장에 도달한 것도 구분합니다.
 
 ## 성공 응답의 경계
 
-PostgreSQL의 `synchronous_commit`은 성공 응답 전에 어느 WAL 처리까지 기다릴지를 설정합니다. `off`에서는 서버가 비정상 종료되면 최근 성공 응답된 트랜잭션이 유실될 수 있습니다. 동기 standby가 설정된 경우 `on`은 해당 standby의 영구 저장, `remote_apply`는 적용까지 기다리는 의미를 가집니다. 동기 standby 설정이 없으면 이름만으로 원격 보장을 얻지 않습니다. [PostgreSQL WAL Configuration](https://www.postgresql.org/docs/18/runtime-config-wal.html)
+PostgreSQL의 `synchronous_commit`은 성공 응답 전에 어느 WAL 처리까지 기다릴지를 설정합니다. `off`에서는 서버가 비정상 종료되면 최근 성공 응답된 트랜잭션이 유실될 수 있습니다. 동기 standby가 설정된 경우 `on`은 해당 standby의 WAL 지속성 완료, `remote_apply`는 적용까지 기다리는 의미를 가집니다. 동기 standby 설정이 없으면 이름만으로 원격 보장을 얻지 않습니다. [PostgreSQL WAL Configuration](https://www.postgresql.org/docs/18/runtime-config-wal.html)
 
 이 예는 설정 이름이 실제 보장과 함께 읽혀야 함을 보여 줍니다. 모든 엔진에서 같은 옵션 이름이나 기본값을 사용한다고 일반화하지 않습니다.
+
+## 복제 단계의 이름을 맞추기
+
+| 공통 단계 | PostgreSQL 용어·위치 | 동기 standby가 구성된 경우의 대기 옵션 |
+| --- | --- | --- |
+| 수신 | receive: 복제본에 도착 | 수신만으로 지속성·적용 보장 없음 |
+| OS에 기록 | write / `write_lsn` | `remote_write`: 원격 OS write까지 |
+| 지속성 경계까지 기록 | flush / `flush_lsn` | `on`: 원격 WAL flush까지 |
+| 적용 | replay / `replay_lsn` | `remote_apply`: 원격 replay까지 |
+
+`local`은 로컬 WAL flush, `off`는 그 완료를 기다리지 않는 정책입니다. 표는 PostgreSQL의 설정 대응이며 다른 엔진의 ACK 의미로 그대로 치환하지 않습니다. [synchronous_commit](https://www.postgresql.org/docs/18/runtime-config-wal.html#GUC-SYNCHRONOUS-COMMIT), [복제 위치](https://www.postgresql.org/docs/18/monitoring-stats.html#MONITORING-PG-STAT-REPLICATION-VIEW)
+
+**LSN(Log Sequence Number)**은 WAL의 위치입니다. 수신·write·flush·replay 차이는 동일 로그 계열에서 비교해야 합니다. 장치 cache와 파일 API의 완료 경계는 [쓰기 경로](../storage/write-path-and-durability.md)에서 설명합니다.
 
 ## 복제의 여러 위치
 
@@ -34,9 +47,9 @@ PostgreSQL의 replication slot은 필요한 WAL을 남겨 두는 데 사용됩�
 
 ## lag는 하나의 숫자가 아니다
 
-PostgreSQL의 `pg_stat_replication` lag는 최근 WAL의 기록·동기화·적용과 통지에 걸린 시간을 나타냅니다. 복제본이 따라잡은 뒤 원본이 유휴 상태가 되면 NULL이 될 수 있으며, 현재 잔량을 모두 처리하는 데 필요한 예상 시간은 아닙니다. [PostgreSQL Replication Statistics](https://www.postgresql.org/docs/18/monitoring-stats.html#MONITORING-PG-STAT-REPLICATION-VIEW)
+PostgreSQL의 `pg_stat_replication` lag는 최근 WAL의 기록·동기화·적용과 통지에 걸린 시간을 나타냅니다. 복제본이 따라잡은 뒤 원본이 유휴 상태가 되면 NULL이 될 수 있으며, `pg_read_all_stats` 등의 권한이 없어 상세 lag가 가려진 경우도 구분해야 합니다. [컬럼별 권한·NULL 경계](postgresql-operations.md#읽기-전용-수집-sql과-권한)를 확인하며, 이 값은 현재 잔량을 모두 처리하는 데 필요한 예상 시간은 아닙니다. [PostgreSQL Replication Statistics](https://www.postgresql.org/docs/18/monitoring-stats.html#MONITORING-PG-STAT-REPLICATION-VIEW)
 
-제품은 시간 지연, 로그 위치 차이, receiver 상태, 마지막 진행 시각과 업무 데이터의 신선도를 구분하도록 제안합니다. [MySQL의 Seconds_Behind_Source](mysql-mariadb.md)도 고유한 의미와 한계가 있습니다.
+제품은 시간 지연, 로그 위치 차이, receiver 상태, 마지막 진행 시각과 업무 데이터의 신선도를 구분하도록 제안합니다. [MySQL의 Seconds_Behind_Source](mysql-operations.md#seconds_behind_source의-null은-0이-아니다)도 고유한 의미와 한계가 있습니다.
 
 가상 계산에서 잔량이 8 GiB, 적용률이 40 MiB/s, 원본 신규 생성률이 24 MiB/s로 계속 일정하다고 가정하면 순감소율은 16 MiB/s입니다.
 
@@ -45,6 +58,15 @@ PostgreSQL의 `pg_stat_replication` lag는 최근 WAL의 기록·동기화·적�
 ```
 
 이는 조건부 추정입니다. 생성률이 적용률 이상이면 이 식으로 유한한 완료 시간을 얻지 못합니다. 로그 작업의 난이도가 바뀌면 같은 바이트라도 적용 시간이 달라질 수 있어 실측 예측 정확도를 보장하지 않습니다.
+
+### 복제 지연 NULL을 엔진별로 읽기
+
+| 원천 | NULL이 나올 수 있는 의미 | 추가 확인 |
+| --- | --- | --- |
+| PostgreSQL `write_lag/flush_lag/replay_lag` | 따라잡은 뒤 유휴 상태, 아직 관련 보고 없음 등 | sender 상태·LSN·최근 보고와 기능 범위 |
+| MySQL `Seconds_Behind_Source` | applier 중지 또는 수신·적용 상태상 값을 계산하지 않는 조건 | receiver·applier, 로그 위치, GTID |
+
+NULL을 0으로 채우거나 NULL 자체로 정상·장애를 확정하지 않습니다. 특히 PostgreSQL NULL도 항상 따라잡았다는 증거는 아닙니다. [PostgreSQL lag 정의](https://www.postgresql.org/docs/18/monitoring-stats.html#MONITORING-PG-STAT-REPLICATION-VIEW), [MySQL 정의](https://dev.mysql.com/doc/refman/8.4/en/show-replica-status.html)
 
 ## 복제와 백업의 차이
 
@@ -65,4 +87,4 @@ PostgreSQL의 `pg_stat_replication` lag는 최근 WAL의 기록·동기화·적�
 2. lag 시간은 따라잡기 예상 시간인가? **원천 정의가 그와 다를 수 있습니다.**
 3. 백업 성공은 복원 검증 성공인가? **실제 복원 자료를 따로 확인해야 합니다.**
 
-다음: [비관계형·분산·분석 DB](distributed-and-analytical.md) · [DB 목차](README.md)
+이전: [시계열·그래프·문서·열 지향 DB를 비교하는 기준](specialized-data-models.md) · 다음: [DB 고가용성: 장애 전환, fencing과 복구 완료의 의미](high-availability.md) · [분야 목차](README.md)

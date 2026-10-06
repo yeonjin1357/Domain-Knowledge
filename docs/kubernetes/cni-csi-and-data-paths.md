@@ -1,6 +1,8 @@
 # CNI와 CSI: Pod 연결과 볼륨 준비가 실패하는 위치
 
-> 상태: 검토됨 · 적용 범위: CNI 1.1.0, CSI 1.11.0과 Kubernetes 개념 · 검토일: 2026-10-04 · 클러스터 실행 검증 없음
+> 상태: 검토됨 · 적용 범위: CNI 1.1.0, CSI 1.11.0과 Kubernetes 개념 · 원천 확인일: 2026-10-04 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
+
+선수 용어: **sandbox**는 Pod의 공유 실행 환경을 관리하는 런타임 경계입니다. [자원 설정·cgroup 계층](../kubernetes/resources-and-scheduling.md#설정이-linux-cgroup으로-이어지는-경로)에서 컨테이너와의 차이를 먼저 확인합니다.
 
 CNI와 CSI는 특정 제품 이름이 아니라 플러그인과 실행 환경 사이의 약속입니다. CNI는 컨테이너 네트워크 설정, CSI는 스토리지 작업의 인터페이스를 다룹니다. “CNI를 쓴다”만으로 패킷이 터널을 지나는지, BGP 경로를 쓰는지, eBPF로 Service를 처리하는지는 알 수 없습니다.
 
@@ -56,3 +58,5 @@ CSI는 Identity, Controller, Node 서비스와 capability를 정의합니다. �
 1. CNI 1.1.0이면 모든 plugin의 기능이 같은가? **규약 버전과 구현·지원 기능은 다릅니다.**
 2. 모든 CSI 드라이버가 staging 단계를 수행하는가? **capability에 따라 다릅니다.**
 3. PVC Bound면 mount도 성공했는가? **바인딩과 Node의 실제 준비 단계는 구분합니다.**
+
+이전: [워크로드 종류와 제어 평면의 가용성](workloads-and-control-plane.md) · 다음: [API 변경, CRD와 Operator를 관측하는 방법](operators-and-api-lifecycle.md) · [분야 목차](README.md)

@@ -1,6 +1,6 @@
 # 쿠버네티스 도메인
 
-> 상태: 검토됨 · 적용 범위: Kubernetes 공통 개념 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: Kubernetes 공통 개념 · 원천 확인일: 2026-10-03 · 실습 여부: 각 상세 장에 명시
 
 쿠버네티스 영역에서는 클러스터의 구성, 워크로드 실행 상태, 자원 사용 및 변경 이력을 연결합니다. 원하는 상태가 실제로 실현되고 있는지, 문제가 어느 계층에서 시작됐는지 이해하는 것이 목적입니다.
 
@@ -53,3 +53,5 @@ API에서 얻는 리소스 상태, 런타임에서 얻는 사용량, 애플리�
 10. [API 변경, CRD와 Operator를 관측하는 방법](operators-and-api-lifecycle.md)
 
 관련 문서: [호스트](../host/README.md), [애플리케이션](../application/README.md), [도메인 간 분석](../cross-domain/README.md)
+
+이전: [컨테이너 수집의 플랫폼 차이: cgroup v1·v2와 Windows](../containers/platform-differences.md) · 다음: [Kubernetes 객체와 제어 루프](objects-and-control-loops.md)

@@ -1,6 +1,14 @@
 # TCP, UDP, 연결과 전송 속도
 
-> 상태: 검토됨 · 적용 범위: TCP RFC 9293, UDP, QUIC의 기본 차이 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: TCP RFC 9293, UDP, QUIC의 기본 차이 · 원천 확인일: 2026-10-03 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
+
+## TCP 상태와 서버의 두 대기열
+
+일반적인 TCP 연결 수립에서 클라이언트는 SYN을 보내 `SYN-SENT`, 서버는 응답 뒤 `SYN-RECEIVED`, 확인이 끝나면 `ESTABLISHED`로 진행합니다. 상대의 FIN을 받은 `CLOSE-WAIT`는 로컬 애플리케이션이 닫기를 기다리는 상태이며, `TIME-WAIT`는 종료 뒤 오래된 segment와 재전송을 다루는 상태입니다. 모든 연결이 같은 방향·동시에 종료되는 것은 아닙니다. [TCP 상태·전이](https://www.rfc-editor.org/rfc/rfc9293.html#section-3.3.2)
+
+Linux 서버의 **SYN 대기열**은 아직 수립 중인 요청, **accept 대기열**은 수립되어 애플리케이션의 `accept()`를 기다리는 연결을 다룹니다. syncookie·TFO 같은 경로는 이 단순 흐름의 예외를 가지므로 SYN 도착 수, child 생성 수, accept 완료 수를 같은 카운터로 쓰지 않습니다. [listen의 backlog](https://man7.org/linux/man-pages/man2/listen.2.html), [Linux 스택 카운터](linux-stack-counters.md)
+
+**제품 적용 제안:** 연결 실패에서는 상태별 소켓 수와 양쪽 대기열을 분리해 봅니다. 연결이 ESTABLISHED라는 사실만으로 애플리케이션이 요청을 읽었다고 판단하지 않습니다.
 
 ## 먼저 이해할 것
 
@@ -61,10 +69,12 @@ QUIC는 UDP 위에서 동작하지만 연결, 보안, 신뢰성 있는 스트림
 
 연결 기록에는 전송 프로토콜, 양 끝 주소·포트, 연결 시도/성립/종료 시각, 종료 사유의 원천을 둡니다. RTT는 측정 방법과 표본 수를 붙이고, 전송량은 원본 바이트인지 재전송과 헤더를 포함하는지 정의합니다. HTTP/2와 QUIC에서는 연결 하나에 여러 요청이 있을 수 있으므로 연결 수를 요청 수로 사용하지 않습니다.
 
+함께 읽기: [Linux TCP·UDP 스택 카운터](linux-stack-counters.md), [SNMP 장비 수집](snmp-and-device-models.md).
+
 ## 이해 확인
 
 1. `write()` 두 번이면 상대의 읽기도 두 번인가? **TCP는 바이트 스트림이므로 그렇지 않습니다.**
 2. 연결 수립 성공으로 결제 성공을 판정할 수 있는가? **업무 결과를 추가 확인해야 합니다.**
 3. 윈도 1 MiB, RTT 0.1초의 이상화된 경계는? **10 MiB/s이며 실측 보장값이 아닙니다.**
 
-다음: [TLS와 HTTP](tls-http.md) · [네트워크 목차](README.md)
+이전: [링크, 오버레이, MTU와 경로 제어](layers-and-routing.md) · 다음: [TLS, HTTP와 요청 단계별 시간](tls-http.md) · [분야 목차](README.md)

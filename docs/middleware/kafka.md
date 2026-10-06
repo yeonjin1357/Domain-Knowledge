@@ -1,12 +1,24 @@
 # Kafka: 파티션, offset, lag와 처리 보장
 
-> 상태: 검토됨 · 적용 범위: Apache Kafka 4.3, 일반 consumer group · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (4.3 broker·KRaft·share group)
+> 상태: 검토됨 · 적용 범위: Apache Kafka 4.3, 일반 consumer group · 원천 확인일: 2026-10-06 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
-Kafka에서는 topic을 partition으로 나누고 그 안의 로그 위치로 처리 진행을 설명합니다. 소비자가 읽은 위치와 다시 시작할 때 사용할 commit 위치는 다를 수 있습니다. offset 차이가 언제나 남은 업무 개수와 같지는 않으므로 데이터 보존·압축·transaction과 소비 규칙을 함께 확인합니다.
+Kafka에서는 topic을 partition으로 나누고 그 안의 로그 위치로 처리 진행을 설명합니다. 소비자가 읽은 위치와 다시 시작할 때 사용할 commit 위치는 다를 수 있습니다. offset 차이가 언제나 남은 업무 개수와 같지는 않으므로 데이터 보존·압축·transaction과 소비 규칙을 함께 확인합니다. 제품은 기록·복제·읽기·업무 처리·offset commit을 서로 다른 완료 단계로 다룹니다.
 
-Kafka를 관측할 때는 기록, 복제, 읽기, 업무 처리, offset commit을 구분해야 합니다. 소비자가 읽었다는 사실만으로 후속 DB 반영이 완료됐다고 할 수 없습니다.
+## 용어 먼저
+
+| 용어 | 이 장에서의 뜻 |
+| --- | --- |
+| partition | topic을 나눈 순서 있는 로그 단위; 서로 다른 partition 사이 전역 순서는 없음 |
+| consumer group | partition 소비를 분담하는 소비자 집합 |
+| position / committed position | 다음에 읽을 위치 / 복구 시 쓸 저장 위치 |
+| lag | 선택한 끝 위치와 소비 위치의 offset 차이; 시간 단위 아님 |
+| leader / ISR | partition의 주도 replica / 충분히 동기화된 replica 집합 |
+| HW / LSO | high watermark(성공적으로 복제된 마지막 메시지의 offset + 1) / transaction 가시성을 고려한 last stable offset |
+| KRaft controller | Raft 기반 metadata 관리·제어 역할; broker 데이터 처리와 구분 |
+
+각 값의 정확한 경계는 아래 API·운영 정의를 따릅니다. [Kafka 설계](https://kafka.apache.org/43/design/design/), [Consumer API](https://kafka.apache.org/43/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html)
 
 ## 로그와 파티션
 
@@ -15,6 +27,8 @@ Kafka의 topic은 partition으로 나뉘고 각 partition은 순서가 있는 �
 관측 키에는 클러스터, topic, partition, consumer group과 client 범위를 구분하도록 제안합니다. topic 전체 평균만 보면 한 partition에 작업이 몰리는 현상이 가려질 수 있습니다.
 
 ## 서로 다른 offset
+
+용어표의 ISR에는 **leader 자신도 포함**됩니다. HW·LSO의 경계는 [KafkaConsumer endOffsets API](https://kafka.apache.org/43/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html), ISR 범위는 [min.insync.replicas 정의](https://kafka.apache.org/43/configuration/topic-configs/#min.insync.replicas)를 근거로 읽습니다.
 
 consumer의 현재 position은 다음에 읽을 위치이고 committed position은 복구 시 사용할 저장 위치입니다. `endOffsets()`가 제공하는 경계도 isolation level에 따라 다릅니다. `read_uncommitted`에서는 high watermark, `read_committed`에서는 high watermark와 열린 트랜잭션 위치를 고려한 last stable offset을 사용합니다. [KafkaConsumer API](https://kafka.apache.org/43/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html)
 
@@ -45,7 +59,7 @@ Kafka consumer의 `records-lag-max`는 현재 offset 기준이며 committed offs
 
 ## lag의 증가율과 따라잡기
 
-합성 예에서 처리 대기 작업을 직접 센 값이 60,000건이고 지속 유입이 800건/s, 완료가 1,000건/s로 일정하면 순감소는 200건/s입니다. 같은 조건이 계속되면 300초가 필요합니다. 이 계산은 offset 차이를 무조건 실제 건수로 간주한 것이 아니라 실제 작업 수가 알려진 모델입니다.
+가상 예시에서 처리 대기 작업을 직접 센 값이 60,000건이고 지속 유입이 800건/s, 완료가 1,000건/s로 일정하면 순감소는 200건/s입니다. 같은 조건이 계속되면 300초가 필요합니다. 이 계산은 offset 차이를 무조건 실제 건수로 간주한 것이 아니라 실제 작업 수가 알려진 모델입니다.
 
 완료율이 유입률보다 낮으면 잔량이 늘어납니다. consumer 개수를 늘리는 선택은 partition 수, 할당, 병목과 처리 순서 제약을 확인한 뒤 평가합니다. consumer 개수만 늘면 언제나 처리율이 비례 증가한다는 보장은 없습니다.
 
@@ -72,9 +86,9 @@ lag가 증가하고 broker는 여유롭다면 consumer 처리 시간, DB 호출,
 
 앞 두 이름의 prefix는 `kafka.server:type=ReplicaManager,name=`, 뒤 두 이름은 `kafka.controller:type=KafkaController,name=`입니다. KRaft에서 controller 전용 노드를 구성하면 broker만 scrape해서 controller 지표가 안 보일 수 있습니다. 이 이름들이 모두 KRaft 전용이라는 뜻도 아닙니다. 4.0부터 ZooKeeper 모드는 제거됐지만 이전 계열에서 존재하던 지표와 새로운 KRaft metadata/quorum 지표를 구분합니다. [4.0 업그레이드](https://kafka.apache.org/40/getting-started/upgrade/)
 
-**예시:** replication factor=3, min ISR=2, 현재 ISR=2인 partition은 under-replicated지만 under-min-ISR은 아닙니다. ISR=1로 줄면 두 조건에 모두 해당합니다. 두 gauge를 더해 “장애 partition 총수”를 만들면 중복됩니다. 단발적인 controller 0 관측은 leader 전환·수집 시차·누락과 함께 조사합니다. [UnderMinIsr 도입 정의](https://cwiki.apache.org/confluence/spaces/KAFKA/pages/70257093/KIP-164-%2BAdd%2BUnderMinIsrPartitionCount%2Band%2Bper-partition%2BUnderMinIsr%2Bmetrics)
+**가상 예시:** replication factor=3, min ISR=2, 현재 ISR=2인 partition은 under-replicated지만 under-min-ISR은 아닙니다. ISR=1로 줄면 두 조건에 모두 해당합니다. 두 gauge를 더해 “장애 partition 총수”를 만들면 중복됩니다. 단발적인 controller 0 관측은 leader 전환·수집 시차·누락과 함께 조사합니다. [UnderMinIsr 도입 정의](https://cwiki.apache.org/confluence/spaces/KAFKA/pages/70257093/KIP-164-%2BAdd%2BUnderMinIsrPartitionCount%2Band%2Bper-partition%2BUnderMinIsr%2Bmetrics)
 
-Kafka 4.3.0 KRaft의 `ControllerServer`는 각 controller에 metadata 지표 publisher를 등록합니다. `OfflinePartitionsCount`는 각 controller가 적용한 metadata의 클러스터 전체 offline partition 수이므로 controller별 값을 더하면 중복됩니다. **제품 적용 제안:** 같은 클러스터의 active controller 값을 우선 사용하고, 여러 replica의 최댓값을 보조 신호로 표시할 때도 수집 시각·metadata 적용 지연을 남깁니다. 최댓값이 언제나 최신 상태라는 보장은 없습니다. [publisher 등록](https://github.com/apache/kafka/blob/4.3.0/core/src/main/scala/kafka/server/ControllerServer.scala#L378), [offline 계정](https://github.com/apache/kafka/blob/4.3.0/metadata/src/main/java/org/apache/kafka/controller/metrics/ControllerMetadataMetricsPublisher.java)
+**버전 메모 — 중복 계수 주의:** Kafka 4.3.0 KRaft의 `ControllerServer`는 각 controller에 metadata 지표 publisher를 등록합니다. `OfflinePartitionsCount`는 각 controller가 적용한 metadata의 클러스터 전체 offline partition 수이므로 controller별 값을 더하면 중복됩니다. **제품 적용 제안:** 같은 클러스터의 active controller 값을 우선 사용하고, 여러 replica의 최댓값을 보조 신호로 표시할 때도 수집 시각·metadata 적용 지연을 남깁니다. 최댓값이 언제나 최신 상태라는 보장은 없습니다. [publisher 등록](https://github.com/apache/kafka/blob/4.3.0/core/src/main/scala/kafka/server/ControllerServer.scala#L378), [offline 계정](https://github.com/apache/kafka/blob/4.3.0/metadata/src/main/java/org/apache/kafka/controller/metrics/ControllerMetadataMetricsPublisher.java)
 
 ## share group은 committed offset 한 개로 설명하지 않는다
 
@@ -92,4 +106,4 @@ KIP-932의 share group은 한 partition을 여러 consumer가 협력해 읽고 �
 4. UnderReplicated와 UnderMinIsr를 더하면 장애 partition 총수인가? **두 조건이 겹칠 수 있습니다.**
 5. share group lag를 consumer committed offset 차이로 대체해도 되는가? **개별 획득·확인·terminal 상태를 다루는 별도 모델입니다.**
 
-다음: [메시지 큐](message-queues.md) · [미들웨어 목차](README.md)
+이전: [캐시와 Redis: 적중, 메모리, 만료와 지속성](cache-redis.md) · 다음: [메시지 큐: 발행 확인, 전달, 처리와 재전달](message-queues.md) · [분야 목차](README.md)

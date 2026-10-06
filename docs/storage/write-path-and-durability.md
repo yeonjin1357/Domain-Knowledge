@@ -1,12 +1,22 @@
 # 쓰기가 끝났다는 뜻: 버퍼, fsync, WAL과 복제
 
-> 상태: 검토됨 · 적용 범위: Linux 파일 API와 PostgreSQL 18의 지속성 규약 · 검토일: 2026-10-04 · 전원 장애·장치 고장·복제 장애는 직접 재현하지 않음 · 2라운드 보강 확인: 2026-10-05 (FLUSH/FUA·PG18 fsync 실패)
+> 상태: 검토됨 · 적용 범위: Linux 파일 API와 PostgreSQL 18의 지속성 규약 · 원천 확인일: 2026-10-06 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
 메모장에 입력한 글이 화면에 보이는 것, 저장 버튼이 끝난 것, 다른 컴퓨터에서 복구할 수 있는 것은 서로 다른 상태입니다. 서버에서도 프로그램의 버퍼, 운영체제 페이지 캐시, 저장 장치, 복제본 사이에 완료 경계가 있습니다. 모니터링은 어느 경계까지 끝난 지연을 재는지 밝혀야 합니다.
 
 선수 내용은 [저장 모델과 성능](models-and-performance.md), [복제와 복구](../database/replication-and-recovery.md)입니다.
+
+## flush라는 이름의 세 경계
+
+| 문맥 | 비우거나 완료하는 범위 | 아직 보장하지 않는 것 |
+| --- | --- | --- |
+| 언어·라이브러리 flush | 사용자 공간 버퍼에서 하위 I/O 계층으로 전달 | 장치 지속성 |
+| 장치 cache FLUSH | 휘발성 장치 cache의 선행 쓰기를 지속성 경계로 반영 | 별도 복제본의 적용 |
+| DB 복제본의 WAL flush | 복제본이 받은 WAL을 그 서버의 지속성 경계까지 기록 | 질의에 반영하는 replay |
+
+이름 대신 완료 경계를 표시합니다. [fsync](https://man7.org/linux/man-pages/man2/fsync.2.html), [장치 cache 제어](https://docs.kernel.org/block/writeback_cache_control.html), [PostgreSQL 복제 상태](https://www.postgresql.org/docs/18/monitoring-stats.html#MONITORING-PG-STAT-REPLICATION-VIEW)
 
 ## 한 번의 쓰기가 지나는 계층
 
@@ -17,7 +27,7 @@ flowchart LR
     Device --> Media["장치의 지속성 경계"]
     App --> DB["DB WAL·commit 정책"]
     DB --> Kernel
-    DB --> Replica["복제본의 수신·flush·apply"]
+    DB --> Replica["복제본: 수신 → write(기록) → flush(지속성) → replay(적용)"]
 ```
 
 이 그림은 경계를 나누는 개념도입니다. 모든 저장소가 같은 경로와 캐시를 갖거나 복제를 항상 이 위치에서 수행한다는 뜻은 아닙니다.
@@ -26,7 +36,7 @@ flowchart LR
 
 Linux `write()`는 요청한 크기보다 적은 byte를 쓸 수 있으므로 반환 길이를 확인해야 합니다. 또한 성공 반환만으로 데이터가 디스크에 지속됐다고 보장하지 않습니다. 후속 쓰기·fsync·close에서 이전 쓰기와 관련된 오류가 드러날 수도 있습니다. [write 규약](https://man7.org/linux/man-pages/man2/write.2.html)
 
-따라서 제품의 “쓰기 완료 시간”을 설명할 때 호출 반환 시간인지, flush가 포함됐는지, 업무 트랜잭션 commit까지인지 구분합니다. 빠른 write 반환과 빠른 영속 기록은 다른 측정일 수 있습니다.
+따라서 제품의 “쓰기 완료 시간”을 설명할 때 호출 반환 시간인지, flush가 포함됐는지, 업무 트랜잭션 commit까지인지 구분합니다. 빠른 write 반환과 빠른 지속성 완료는 다른 측정일 수 있습니다.
 
 ## flush, fsync, fdatasync
 
@@ -37,7 +47,7 @@ Linux `write()`는 요청한 크기보다 적은 byte를 쓸 수 있으므로 �
 | 관측한 반환 | 확인할 수 있는 범위 | 추가 확인이 필요한 것 |
 | --- | --- | --- |
 | 언어의 flush | 사용자 공간 버퍼 처리 | 장치 지속성 |
-| write의 byte 반환 | 시스템 호출의 처리량 | 후속 오류·영속 완료 |
+| write의 byte 반환 | 시스템 호출의 처리량 | 후속 오류·지속성 완료 |
 | fsync 성공 | OS·장치 인터페이스가 보고한 동기화 완료 | 실제 장치가 약속을 지키는지와 장애 범위 |
 | DB commit 응답 | DB 설정이 정의한 완료 경계 | 복제본·HA 전환·전체 업무 완료 |
 
@@ -55,17 +65,25 @@ Linux `write()`는 요청한 크기보다 적은 byte를 쓸 수 있으므로 �
 
 ## DB가 데이터 페이지보다 WAL을 먼저 다루는 이유
 
+**복구에 필요한 변경 기록을 먼저 지속시켜 두면 데이터 페이지를 나중에 써도 WAL로 복구할 수 있습니다.** 그래서 commit 지연과 모든 데이터 페이지 기록 지연은 같은 값이 아닙니다. [WAL 원리](https://www.postgresql.org/docs/18/wal-intro.html)
+
 PostgreSQL은 변경 복구에 필요한 WAL을 이용합니다. commit을 확인할 때 모든 변경 데이터 페이지를 제자리 파일에 즉시 기록해야 하는 방식과 구분합니다. 저장 장치·컨트롤러·파일시스템이 동기화 요구를 올바르게 이행하는 것도 지속성의 전제입니다. [PostgreSQL WAL 신뢰성](https://www.postgresql.org/docs/18/wal-reliability.html), [WAL 개요](https://www.postgresql.org/docs/18/wal-intro.html)
 
 모니터링에서는 데이터 파일 쓰기, WAL 쓰기·동기화, checkpoint, backend 대기를 나누어 봅니다. IOPS가 증가한 사실만으로 어느 경계가 commit 지연을 지배하는지 확정하지 않습니다.
 
+**Checkpoint(DB)**는 이후 복구가 시작할 기준을 남기는 작업입니다. PostgreSQL에서는 dirty data page를 디스크에 반영하고 특별한 checkpoint record를 WAL에 기록합니다. 애플리케이션의 각 commit마다 checkpoint가 완료되는 것은 아니며, 스트림 처리 checkpoint와도 원천 계약을 구분합니다. [PostgreSQL 18 checkpoint](https://www.postgresql.org/docs/18/wal-configuration.html)
+
 ## asynchronous commit과 fsync 해제는 다르다
+
+**PostgreSQL 비동기 commit은 DB 비정상 종료·immediate shutdown에서도 최근 성공 응답의 유실 가능성이 있습니다. `fsync=off`의 데이터 손상 위험은 하드웨어 또는 OS 장애에 관한 것이며 PostgreSQL 자체의 실패와 구분합니다.** 두 설정을 같은 지속성 수준으로 비교하지 않습니다.
 
 PostgreSQL의 asynchronous commit에서는 최근에 성공 응답한 트랜잭션이 비정상 종료 후 유실될 수 있습니다. 그러나 WAL 기반 일관성 보장을 유지하는 의미와, `fsync=off`로 저장 동기화 보장을 제거하는 경우의 위험은 다릅니다. 설정 이름을 모두 “디스크를 기다리지 않는 옵션”으로 뭉뚱그리지 않습니다. [Asynchronous commit](https://www.postgresql.org/docs/18/wal-async-commit.html)
 
 모니터링 제품에는 활성 설정과 변경 시점도 필요합니다. commit 지연이 줄었다면 장치가 개선됐을 수도 있지만 완료 보장 수준이 바뀌었을 수도 있습니다. 성능 수치만 비교하기 전에 동일한 보장 아래 측정했는지 확인합니다.
 
 ## 복제본의 완료 단계도 다르다
+
+단계 이름은 [수신·write·flush·replay 대응표](../database/replication-and-recovery.md#복제-단계의-이름을-맞추기)를 따릅니다.
 
 복제본이 WAL을 받았다는 것, 지속성 경계까지 flush했다는 것, 질의에서 읽을 수 있도록 적용했다는 것은 다른 상태입니다. PostgreSQL `synchronous_commit`은 설정에 따라 대기하는 경계가 달라지며 동기 대기 대상 설정과 함께 해석합니다. [WAL 설정](https://www.postgresql.org/docs/18/runtime-config-wal.html#GUC-SYNCHRONOUS-COMMIT)
 
@@ -91,3 +109,5 @@ PostgreSQL의 asynchronous commit에서는 최근에 성공 응답한 트랜잭�
 2. DB commit은 모든 데이터 페이지가 제자리 파일에 기록됐다는 뜻인가? **WAL과 실제 commit 정책을 확인합니다.**
 3. receive lag와 apply lag는 같은가? **복제본의 완료 단계가 다릅니다.**
 4. fsync를 한 번 실행해 성공했다면 장치의 장애 복구까지 검증했는가? **정상 호출 결과이며 장애 복구 실험은 별도입니다.**
+
+이전: [블록, 파일, 객체 저장소와 성능 경계](models-and-performance.md) · 다음: [저장 용량, 복제, 스냅샷과 복구 가능성](capacity-and-protection.md) · [분야 목차](README.md)

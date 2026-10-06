@@ -1,6 +1,6 @@
 # TLS, HTTP와 요청 단계별 시간
 
-> 상태: 검토됨 · 적용 범위: TLS 1.3, HTTP 의미론·HTTP/2·HTTP/3, curl 시간 필드 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (TLS 1.2/1.3·HTTP/1.1·BR 2.3.1)
+> 상태: 검토됨 · 적용 범위: TLS 1.3, HTTP 의미론·HTTP/2·HTTP/3, curl 시간 필드 · 원천 확인일: 2026-10-05 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
@@ -55,7 +55,7 @@ HTTP/3은 QUIC를 사용합니다. 스트림을 구분하는 전송 기반이 �
 
 새 TCP 연결 위에서 수행하는 일반적인 full handshake를 메시지 흐름으로 세면 TLS 1.2는 2 RTT, TLS 1.3은 1 RTT가 기본 비교 모델입니다. TCP 연결·DNS 시간은 별도입니다. TLS 1.2 재개, TLS 1.3 HelloRetryRequest에 따른 추가 왕복, 0-RTT는 이 모델과 구분합니다. 이는 표준 메시지 흐름에서 도출한 비교이지 모든 연결이 정확히 그 시간에 끝난다는 성능 보장이 아닙니다. [TLS 1.2 §7.3](https://www.rfc-editor.org/rfc/rfc5246.html#section-7.3), [TLS 1.3 §2](https://www.rfc-editor.org/rfc/rfc8446.html#section-2)
 
-**합성 예시:** RTT가 30 ms이고 DNS·TCP·계산·인증서 검증 시간 등을 제외하면 위 TLS 교환의 왕복 대기 성분은 각각 약 60 ms와 30 ms입니다. 반면 curl `time_appconnect`는 **시작부터** 보안 연결 완료까지의 초 단위 누적 시간입니다. 직접 연결·새 TCP·리다이렉트 없음 조건에서 TLS 구간을 보려면 `time_appconnect−time_connect`처럼 앞 구간을 분리합니다. 재사용·프록시·HTTP/3에는 동일한 차감식을 자동 적용하지 않습니다. [curl APPCONNECT_TIME](https://curl.se/libcurl/c/CURLINFO_APPCONNECT_TIME.html)
+**가상 예시:** RTT가 30 ms이고 DNS·TCP·계산·인증서 검증 시간 등을 제외하면 위 TLS 교환의 왕복 대기 성분은 각각 약 60 ms와 30 ms입니다. 반면 curl `time_appconnect`는 **시작부터** 보안 연결 완료까지의 초 단위 누적 시간입니다. 직접 연결·새 TCP·리다이렉트 없음 조건에서 TLS 구간을 보려면 `time_appconnect−time_connect`처럼 앞 구간을 분리합니다. 재사용·프록시·HTTP/3에는 동일한 차감식을 자동 적용하지 않습니다. [curl APPCONNECT_TIME](https://curl.se/libcurl/c/CURLINFO_APPCONNECT_TIME.html)
 
 TLS 1.2의 선택적 False Start는 조건을 만족한 client가 server Finished를 받기 전에 애플리케이션 데이터를 보내게 합니다. 따라서 **첫 데이터 송신 가능 시각**과 **handshake 검증 완료 시각**을 구분해야 합니다. 2 RTT 모델을 모든 요청의 송신 대기 시간으로 일반화하지 않습니다. 이 예외의 curl 타이머 반영은 사용하는 TLS backend를 포함한 별도 실행 검증 대상입니다. [RFC 7918 §4](https://www.rfc-editor.org/rfc/rfc7918.html#section-4)
 
@@ -76,9 +76,9 @@ TLS 1.2의 선택적 False Start는 조건을 만족한 client가 server Finishe
 
 ## 누적 타이머를 더하면 안 되는 이유
 
-curl의 `time_namelookup`, `time_connect`, `time_appconnect`, `time_starttransfer`, `time_total`은 각각 시작 이후 해당 단계에 도달한 시간을 나타냅니다. 연결 대상에는 프록시가 포함될 수 있고 재사용·리다이렉트·프로토콜에 따라 해석이 달라집니다. [curl 공식 매뉴얼: write-out](https://curl.se/docs/manpage.html#-w)
+curl의 `time_namelookup`, `time_connect`, `time_appconnect`, `time_starttransfer`(TTFB: 첫 응답 바이트까지의 누적 시간), `time_total`은 각각 시작 이후 해당 단계에 도달한 시간을 나타냅니다. 연결 대상에는 프록시가 포함될 수 있고 재사용·리다이렉트·프로토콜에 따라 해석이 달라집니다. [curl 공식 매뉴얼: write-out](https://curl.se/docs/manpage.html#-w)
 
-아래는 **새 TCP 연결, 직접 HTTPS 접근, 리다이렉트 없음, 순차 단계**라는 가정의 합성 데이터입니다.
+아래는 **새 TCP 연결, 직접 HTTPS 접근, 리다이렉트 없음, 순차 단계, TLS 1.3 full handshake**라는 가정의 가상 예시 데이터입니다.
 
 | 필드 | 시작 이후 시간 |
 | --- | ---: |
@@ -98,6 +98,8 @@ TLS 후 첫 바이트까지    = 240 − 90 = 150 ms
 ```
 
 누적값을 그대로 더한 680 ms는 잘못된 총시간입니다. 또 150 ms 전체를 서버 CPU 시간으로 부르면 안 됩니다. 요청 전송, 양방향 경로, 서버 대기와 실행 등이 포함될 수 있습니다. 위 차감식은 HTTP/3이나 기존 연결 재사용의 모든 경로에 일반화하는 공식이 아닙니다.
+
+이 가상 예시에서 TCP의 30 ms를 RTT로도 가정하면 TLS 구간 50 ms 중 약 30 ms는 TLS 1.3의 왕복 대기 성분, 나머지 20 ms는 계산·검증·스케줄링 등에 배정한 **가상 잔여 시간**입니다. 실제 타이머만으로 그 20 ms의 원인을 분해했다는 뜻은 아닙니다.
 
 ## 프록시가 있으면 연결도 여러 개다
 
@@ -125,4 +127,4 @@ flowchart LR
 5. TLS 1.3이면 time_appconnect가 반드시 1 RTT인가? **누적 타이머이며 DNS·TCP, 재시도와 처리 시간이 포함될 수 있습니다.**
 6. 최대 인증서 기간이 바뀌면 기존 인증서의 만료일도 그날 바뀌는가? **발급일별 규칙과 실제 notAfter를 확인합니다.**
 
-다음: [인터페이스와 흐름 관측](network-metrics.md) · [네트워크 목차](README.md)
+이전: [TCP, UDP, 연결과 전송 속도](tcp-and-udp.md) · 다음: [이름 조회에서 응답 본문까지: DNS, 연결 재사용과 실패 위치](dns-and-connection-lifecycle.md) · [분야 목차](README.md)

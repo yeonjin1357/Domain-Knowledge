@@ -1,6 +1,6 @@
 # 블록 I/O와 파일시스템 용량
 
-> 상태: 검토됨 · 범위: Linux 블록 계층과 statvfs, sysstat iostat · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: Linux 블록 계층과 statvfs, sysstat iostat · 원천 확인일: 2026-10-03 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
@@ -34,7 +34,7 @@ Linux 블록 통계에는 완료된 읽기·쓰기 작업, 병합된 요청, 전
 | I/O 활성 시간 | 누적값 | 장치의 I/O 활동 시간 회계 |
 | 가중 I/O 시간 | 누적값 | 진행 중 작업 수를 반영한 시간 합계 |
 
-Linux 6.12의 diskstats 시간 필드 4·8·10·11·15·17은 32bit unsigned ms입니다. 64bit 커널에서도 `2^32 ms` 단위로 wrap하므로 감소를 곧바로 reset으로 판정하지 않습니다. 약 49.71일은 누적 시간 눈금이며 병렬 작업 합계가 빠르게 증가하면 실제 wrap 간격은 더 짧을 수 있습니다. 같은 수명·최대 증가량·wrap 횟수를 판정할 수 없는 구간은 결측 사유를 보존합니다. [원천 유형](https://docs.kernel.org/admin-guide/iostats.html), [출력 코드](https://github.com/torvalds/linux/blob/v6.12/block/genhd.c#L1239-L1300)
+diskstats의 시간 필드는 64bit 커널에서도 32bit unsigned ms로 wrap할 수 있습니다. 감소만으로 reset을 확정하지 않으며, 필드 번호·누적 시간·복원 가능 조건은 [호스트 수집 계약](collection-contracts.md#차분-변환의-상태-기계)을 따릅니다. [원천 유형](https://docs.kernel.org/admin-guide/iostats.html)
 
 커널과 장치 종류에 따라 추가 discard·flush 필드가 있습니다. 필드 수와 버전을 확인하고 읽기·쓰기만의 계산을 전체 작업의 계산이라고 표시하지 않습니다.
 
@@ -113,6 +113,8 @@ df -h
 df -i
 ```
 
+함께 읽기: [장치 관측과 저장 모델의 연결](../storage/models-and-performance.md), [쓰기의 지속성 경계](../storage/write-path-and-durability.md).
+
 ## 이해 확인
 
 - 초당 100회 I/O가 항상 초당 1,000회보다 적은 바이트를 처리하는가? **작업 크기가 달라 알 수 없다.**
@@ -120,3 +122,5 @@ df -i
 - 평균 지연이 3 ms면 모든 요청이 3 ms 이내인가? **평균은 지연 분포의 상한을 보장하지 않는다.**
 
 관련: [메모리](memory.md), [스토리지](../storage/README.md), [분포와 집계](../foundations/distributions.md)
+
+이전: [메모리 회수와 OOM: 부족해지는 과정과 종료의 증거](reclaim-and-oom.md) · 다음: [프로세스와 스레드 및 파일 디스크립터](processes.md) · [분야 목차](README.md)

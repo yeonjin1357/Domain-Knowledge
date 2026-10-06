@@ -1,6 +1,6 @@
 # GPU와 가속기: 활동, 메모리와 분할
 
-> 상태: 검토됨 · 적용 범위: NVML R550의 활용률 정의, NVIDIA MIG·DCGM, AMD SMI API · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 3d 원천·저장 증거 확인: 2026-10-06
+> 상태: 검토됨 · 적용 범위: NVML R550의 활용률 정의, NVIDIA MIG·DCGM, AMD SMI API · 원천 확인일: 2026-10-06 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 ## 먼저 이해할 것
 
@@ -8,11 +8,13 @@ GPU는 많은 연산을 병렬로 처리하도록 구성된 장치입니다. GPU
 
 GPU 사용률 100%는 이론 최대 연산량의 100%를 달성했다는 뜻으로 일반화할 수 없습니다. 먼저 어떤 엔진과 어느 시간 구간의 활동을 측정했는지 확인합니다.
 
+GPU **kernel**은 GPU에서 실행하는 연산 함수이며 OS kernel과 다릅니다. **NVML**은 NVIDIA 장치 상태를 조회하는 관리 API이고, **DCGM**은 데이터센터 GPU 관리·상태·프로파일링을 위한 도구/API입니다. [NVML](https://docs.nvidia.com/deploy/nvml-api/index.html), [DCGM](https://docs.nvidia.com/datacenter/dcgm/latest/user-guide/feature-overview.html)
+
 ## 활동 시간과 처리 효율
 
 NVML R550의 `nvmlUtilization_t.gpu`는 표본 기간에 하나 이상의 kernel이 실행된 시간 비율입니다. `memory`는 device memory가 읽히거나 쓰인 시간 비율이며 사용 중인 메모리 용량의 비율이 아닙니다. 이 장은 해당 릴리스의 정의를 명시적으로 사용합니다. [NVML R550 utilization structure](https://docs.nvidia.com/deploy/nvml-api/latest/api/structnvmlUtilization__t.html)
 
-합성 예에서 1초 동안 어떤 kernel이 계속 실행됐더라도 연산 유닛을 얼마나 효율적으로 사용했는지는 이 시간 비율만으로 알 수 없습니다. 반대로 VRAM 80 GiB 중 60 GiB를 사용했다면 용량 비율은 75%이며 memory activity 75%와 다른 값입니다.
+가상 예시에서 1초 동안 어떤 kernel이 계속 실행됐더라도 연산 유닛을 얼마나 효율적으로 사용했는지는 이 시간 비율만으로 알 수 없습니다. 반대로 VRAM 80 GiB 중 60 GiB를 사용했다면 용량 비율은 75%이며 memory activity 75%와 다른 값입니다.
 
 | 관측 축 | 단위 예 | 질문 |
 | --- | --- | --- |
@@ -80,3 +82,5 @@ GPU 활동은 낮고 업무 지연은 높다면 CPU 전처리, 데이터 읽기,
 5. clock reason이 켜져 있으면 과열인가? **idle·전력 등 다른 사유도 있으므로 bit별 의미를 봐야 합니다.**
 
 관련: [호스트 목차](README.md) · [애플리케이션](../application/README.md)
+
+이전: [가상화: 호스트, 하이퍼바이저와 게스트](virtualization.md) · 다음: [CPU와 메모리의 위치: NUMA, 캐시, 스케줄링과 압력](numa-and-pressure.md) · [분야 목차](README.md)

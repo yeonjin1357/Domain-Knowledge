@@ -1,6 +1,8 @@
 # 사례: 재시작, 메모리 한도와 볼륨 부족
 
-> 상태: 학습용 분석 사례 · 모든 수치·시간·대상은 가상 · 실제 시스템 조치 없음 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: 본문에 명시한 기술·버전 · 원천 확인일: 2026-10-04 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
+
+메모리 원천은 [컨테이너 계정](../containers/memory-accounting-and-oom.md), [종료 세 경로](../kubernetes/pressure-and-termination.md), [회수와 OOM](../host/reclaim-and-oom.md)을 연결합니다. Linux `MemAvailable` 추정량과 kubelet `memory.available`의 working set 기반 값은 같은 원천이 아닙니다.
 
 ## 먼저 이해할 것
 
@@ -68,8 +70,12 @@
 
 메모리 사례는 종료한 실행의 자료를 보존하고, 용량 사례는 volume → filesystem → DB 로그 경로 → replication 관계를 연결하는 것이 핵심입니다. 같은 이름의 새 컨테이너나 다른 mount의 여유 공간으로 과거 사건을 설명하지 않습니다.
 
+복제 완료 단계 이름은 [수신·기록·적용 대응표](../database/replication-and-recovery.md#복제-단계의-이름을-맞추기)를 따릅니다.
+
 ## 이해 확인
 
 1. 호스트 여유가 충분하면 컨테이너 OOM은 불가능한가? **cgroup 한도에 의해 별도로 발생할 수 있다.**
 2. heap과 컨테이너 사용량의 차이가 곧 누수인가? **계수 범위·시각·구성 항목이 다르므로 단정할 수 없다.**
 3. 남은 공간 20시간 예측은 보장된 장애 시각인가? **순증가가 유지된다는 가정의 결과다.**
+
+이전: [사례: 느린 주문 요청과 DB 연결 대기](slow-requests.md) · 다음: [사례: 캐시 미스, 재시도와 처리 적체](backlogs-and-retries.md) · [분야 목차](README.md)

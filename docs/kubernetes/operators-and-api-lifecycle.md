@@ -1,6 +1,6 @@
 # API 변경, CRD와 Operator를 관측하는 방법
 
-> 상태: 검토됨 · 적용 범위: Kubernetes 공식 API·CRD·admission·Operator 문서 · 검토일: 2026-10-04 · 구현별 필드는 별도 확인
+> 상태: 검토됨 · 적용 범위: Kubernetes 공식 API·CRD·admission·Operator 문서 · 원천 확인일: 2026-10-04 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 Kubernetes의 제어 루프는 “원하는 상태를 저장하고, 현재 상태를 그쪽으로 바꾸는 작업”입니다. Operator는 이 패턴으로 특정 애플리케이션의 운영 지식을 코드에 담습니다. DB Operator가 있다는 사실만으로 백업·복제·장애 전환이 모두 성공했다는 뜻은 아닙니다. 원하는 상태와 실제 작업 결과를 각각 봐야 합니다. [Operator 패턴](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/)
 
@@ -45,3 +45,5 @@ API 상태, controller의 reconcile 성공·실패·재시도, 실제 업무 상
 3. resourceVersion을 정수로 빼서 객체 나이를 계산하는가? **순서 비교를 지원하는 버전에서도 값의 차이가 시간 단위는 아닙니다.**
 
 관련: [객체와 제어 루프](objects-and-control-loops.md) · [수집](collection.md)
+
+이전: [CNI와 CSI: Pod 연결과 볼륨 준비가 실패하는 위치](cni-csi-and-data-paths.md) · 다음: [애플리케이션 도메인](../application/README.md) · [분야 목차](README.md)

@@ -1,12 +1,10 @@
 # Windows의 CPU와 메모리 관측
 
-> 상태: 검토됨 · 범위: Windows Win32 성능 API와 PDH · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (PDH 실명과 Task Manager 빌드 차이)
+> 상태: 검토됨 · 적용 범위: Windows Win32 성능 API와 PDH · 원천 확인일: 2026-10-06 · 실습 여부: CPU API 실행; 메모리·PDH 조회 미실행
 
 ## 먼저 이해할 것
 
-Windows와 Linux는 CPU·메모리를 관측할 수 있지만 원천 이름과 계정이 다릅니다. 같은 CPU 50%라도 API가 어느 CPU 집합을 합쳤는지, idle을 어디에 포함했는지 알아야 합니다. Windows의 working set과 commit도 서로 다른 질문에 답합니다. 이 장은 Linux 필드명을 그대로 치환하지 않고 API 정의에서 계산을 시작합니다.
-
-운영체제마다 CPU 시간과 메모리 사용을 노출하는 방식이 다릅니다. 통합 모니터링 제품은 화면의 공통 개념을 제공하되 원천 API의 의미를 보존해야 합니다. 이 장은 Windows에서 자주 혼동하는 계산을 설명합니다.
+Windows와 Linux는 CPU·메모리를 관측할 수 있지만 원천 이름과 계정이 다릅니다. 같은 CPU 50%라도 API가 어느 CPU 집합을 합쳤는지, idle을 어디에 포함했는지 알아야 합니다. Windows의 working set과 commit도 서로 다른 질문에 답합니다. 이 장은 Linux 필드명을 그대로 치환하지 않고 API 정의에서 계산을 시작합니다. 제품은 공통 화면에서도 Windows 원천의 CPU·메모리 계정을 보존합니다.
 
 ## 시스템 CPU 시간
 
@@ -41,13 +39,17 @@ Windows와 Linux는 CPU·메모리를 관측할 수 있지만 원천 이름과 �
 
 `GetPerformanceInfo`가 반환하는 `PERFORMANCE_INFORMATION`에는 물리 메모리와 Commit 관련 필드가 있습니다. 크기 필드 중 다수는 페이지 수이고 `PageSize`는 바이트 수입니다. [Microsoft PERFORMANCE_INFORMATION](https://learn.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-performance_information)
 
-| 필드 | 의미 |
-| --- | --- |
-| PhysicalTotal | 물리 메모리의 페이지 수 |
-| PhysicalAvailable | 바로 재사용할 수 있는 물리 페이지 수 |
-| CommitTotal | 현재 약속된 메모리의 페이지 수 |
-| CommitLimit | 현재 Commit 한도에 해당하는 페이지 수 |
-| PageSize | 페이지 하나의 바이트 수 |
+| Win32 API 필드 | PDH 카운터·대응 개념 | 단위·해석 |
+| --- | --- | --- |
+| `PhysicalTotal` | OS가 사용할 수 있는 실제 물리 메모리 | API는 페이지 수 |
+| `PhysicalAvailable` | `\Memory\Available MBytes` | API는 페이지, PDH는 MBytes; free·standby 등 바로 재사용 가능한 물리 여유 |
+| `CommitTotal` | `\Memory\Committed Bytes` | API는 페이지, PDH는 byte; 상주량이 아닌 시스템 commit charge |
+| `CommitTotal / CommitLimit` | `\Memory\% Committed Bytes In Use` | 비율에 100을 곱하면 %; 물리 메모리 사용률과 다름 |
+| `PageSize` | 위 API 페이지 수를 byte로 변환하는 크기 | byte/page |
+| `PROCESS_MEMORY_COUNTERS_EX.WorkingSetSize` | 프로세스 working set | byte; 물리 메모리 상주량 |
+| `PROCESS_MEMORY_COUNTERS_EX.PrivateUsage` | 프로세스 private commit | byte; 실제 page file 기록량과 다름 |
+
+PDH 메모리 경로의 근거: [Available MBytes](https://learn.microsoft.com/en-us/troubleshoot/windows-server/performance/troubleshoot-performance-problems-in-windows), [commit 카운터](https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/introduction-to-the-page-file), [PROCESS_MEMORY_COUNTERS_EX](https://learn.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-process_memory_counters_ex). 이 표는 의미·단위 대응이며 서로 다른 시각에 읽은 API와 PDH가 bit 단위로 같다는 보장이 아닙니다. standby와 Private Bytes는 [메모리 비교](memory.md)와 연결합니다.
 
 Commit은 RAM 상주량과 다릅니다. 페이지를 Commit하면 CommitTotal에 반영되지만 실제 물리 메모리 부과는 접근 시점과 관련됩니다. CommitLimit은 페이지 파일 확장 등의 조건에 따라 변할 수 있습니다. [Microsoft PERFORMANCE_INFORMATION 필드 정의](https://learn.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-performance_information)
 
@@ -58,11 +60,13 @@ Commit 비율 = CommitTotal / CommitLimit
 
 Commit 비율과 물리 메모리 비율을 두 개의 지표로 제공합니다. 한쪽을 다른 쪽의 대체값으로 사용하지 않습니다.
 
+`PERFORMANCE_INFORMATION.PhysicalTotal`을 설치된 RAM 용량으로 표시하지 않습니다. 설치량은 `GetPhysicallyInstalledSystemMemory`가 SMBIOS에서 읽는 별도 값이며, BIOS·드라이버 예약 등 때문에 OS가 사용할 수 있는 물리 메모리와 다를 수 있습니다. 페이지 수인 전자는 `PageSize`와 함께 해석합니다. [PhysicalTotal 정의](https://learn.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-performance_information), [설치 RAM API와 예약량](https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getphysicallyinstalledsystemmemory)
+
 ## Working Set과 PrivateUsage
 
 `PROCESS_MEMORY_COUNTERS_EX`의 `WorkingSetSize`는 현재 Working Set의 바이트 수입니다. `PrivateUsage`는 프로세스의 Commit Charge를 나타냅니다. `PagefileUsage`라는 이름도 해당 구조에서는 Commit Charge 의미이므로 실제 페이지 파일에 쓰인 바이트 수라고 읽으면 안 됩니다. [Microsoft PROCESS_MEMORY_COUNTERS_EX](https://learn.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-process_memory_counters_ex)
 
-가상의 프로세스가 Working Set 400 MiB, PrivateUsage 1 GiB를 보고해도 모순이 아닙니다. 서로 다른 양을 측정하기 때문입니다. 정확히 어떤 페이지가 상주·공유·개인 상태인지는 추가 관측이 필요합니다.
+가상 예시의 프로세스가 Working Set 400 MiB, PrivateUsage 1 GiB를 보고해도 모순이 아닙니다. 서로 다른 양을 측정하기 때문입니다. 정확히 어떤 페이지가 상주·공유·개인 상태인지는 추가 관측이 필요합니다.
 
 ## 성능 카운터 수집
 
@@ -86,9 +90,6 @@ PDH는 Windows 성능 카운터를 조회하고 기록을 다루는 API입니다
 | --- | --- | --- |
 | `\Processor Information(_Total)\% Processor Time` | %: 관측 구간의 비 idle 시간 기준 | 주파수 반영 작업량·프로세스별 CPU 합과 다름. [Time/Utility 정의](https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/cpu-usage-exceeds-100) |
 | `\Processor Information(_Total)\% Processor Utility` | %: 기준 성능 대비 작업 능력의 사용, 주파수 변화를 반영 | nominal 성능 기준이므로 turbo에서 100%를 넘을 수 있음. [Microsoft 설명](https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/cpu-usage-exceeds-100) |
-| `\Memory\Available MBytes` | MBytes: 즉시 할당 가능한 물리 메모리 | free 목록만이 아니라 standby 등 재사용 가능한 메모리도 포함. [Windows 성능 진단](https://learn.microsoft.com/en-us/troubleshoot/windows-server/performance/troubleshoot-performance-problems-in-windows), [가용량 정의](https://learn.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-performance_information) |
-| `\Memory\Committed Bytes` | byte: 시스템 commit charge | 실제 RAM 상주량·페이지 파일 쓰기량 아님. [commit와 카운터](https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/introduction-to-the-page-file) |
-| `\Memory\% Committed Bytes In Use` | %: Committed Bytes / Commit Limit | 물리 메모리 사용률 아님; 한도 변경도 영향. [commit 비율 정의](https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/introduction-to-the-page-file) |
 | `\System\Processor Queue Length` | 실행을 기다리는 ready thread 수, 현재 표본 | 실행 중인 thread는 제외; I/O 대기나 전체 thread 수 아님. [Microsoft의 해당 System 카운터 정의](https://learn.microsoft.com/en-us/exchange/exchange-2013-performance-counters-exchange-2013-help) |
 
 Utility와 Time은 같은 100% 척도가 아닙니다. 주파수 반영 비율이 100%를 넘었다고 값을 잘라내거나 불가능한 CPU 시간이라고 판정하지 않습니다. 반대로 GetProcessTimes의 다중 CPU 시간 합이 100%를 넘는 이유와도 구분합니다. [Microsoft Utility 설명](https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/cpu-usage-exceeds-100)
@@ -97,7 +98,7 @@ Utility와 Time은 같은 100% 척도가 아닙니다. 주파수 반영 비율�
 
 PDH의 rate 계열 등 두 표본이 필요한 카운터는 `PdhCollectQueryData`로 첫 기준점을 얻고 간격 뒤 다시 수집한 다음 formatted 값을 계산합니다. 첫 응답의 미완성 상태를 0%로 출력하지 않습니다. 모든 gauge까지 무조건 두 점 차분하는 것도 잘못입니다. 원천 counter type, 반환 `CStatus`, instance 수명과 계산 구간을 확인합니다. [PDH 표본 수집](https://learn.microsoft.com/en-us/windows/win32/perfctrs/collecting-performance-data)
 
-**예시:** Committed Bytes=12 GiB, Commit Limit=16 GiB이면 `75%`입니다. 동시에 Available MBytes가 보고하는 물리 여유는 별도 값이며 이 식으로 역산하지 않습니다. 제품에는 원천 counter path·OS build·표본 간격·원래 단위를 남기고 범용 임계값을 임의로 붙이지 않습니다. 실제 조회에는 제공자별 읽기 권한이 필요하고 많은 instance의 고빈도 수집은 부하를 늘립니다.
+**가상 예시:** Committed Bytes=12 GiB, Commit Limit=16 GiB이면 `75%`입니다. 동시에 Available MBytes가 보고하는 물리 여유는 별도 값이며 이 식으로 역산하지 않습니다. 제품에는 원천 counter path·OS build·표본 간격·원래 단위를 남기고 범용 임계값을 임의로 붙이지 않습니다. 실제 조회에는 제공자별 읽기 권한이 필요하고 많은 instance의 고빈도 수집은 부하를 늘립니다.
 
 ## Linux와 비교할 때
 
@@ -118,3 +119,5 @@ PDH의 rate 계열 등 두 표본이 필요한 카운터는 `PdhCollectQueryData
 - Task Manager와 수집기 CPU가 다르면 수집기가 틀린가? **Time/Utility·build·표본 구간·instance 범위를 먼저 맞춘다.**
 
 관련: [CPU](cpu.md), [메모리](memory.md), [시계열](../foundations/time-series.md)
+
+이전: [프로세스와 스레드 및 파일 디스크립터](processes.md) · 다음: [가상화: 호스트, 하이퍼바이저와 게스트](virtualization.md) · [분야 목차](README.md)

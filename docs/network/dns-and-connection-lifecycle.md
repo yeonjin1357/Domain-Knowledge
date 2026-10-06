@@ -1,6 +1,6 @@
 # 이름 조회에서 응답 본문까지: DNS, 연결 재사용과 실패 위치
 
-> 상태: 검토됨 · 적용 범위: DNS·TCP·HTTP의 명시된 규약, Python 3.12.3 HTTP/1.1 로컬 실습 · 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: DNS·TCP·HTTP의 명시된 규약, Python 3.12.3 HTTP/1.1 로컬 실습 · 원천 확인일: 2026-10-04 · 실습 여부: 저장된 로컬 실행 근거 포함; 구성·한계는 본문
 
 ## 먼저 이해할 것
 
@@ -26,9 +26,7 @@ flowchart LR
 
 ## DNS 오류를 한 종류로 뭉치지 않는다
 
-NXDOMAIN은 이름 부재를 나타냅니다. CNAME·DNAME 체인이 있으면 응답 RCODE는 최종 query cycle 기준이므로 원래 별칭의 부재로 곧바로 귀속하지 않습니다. 최초 이름·체인·최종 이름을 함께 봅니다. [RFC 6604 §3](https://www.rfc-editor.org/rfc/rfc6604.html#section-3) NODATA는 이름은 존재하지만 요청한 유형의 자료가 없는 경우를 설명합니다. DNS는 부정 응답도 규약에 따라 캐시할 수 있으므로 이름을 만든 직후 모든 client가 즉시 새 결과를 본다고 보장하지 않습니다. [RFC 2308](https://www.rfc-editor.org/rfc/rfc2308.html)
-
-SERVFAIL, 질의 timeout, 이름 부재를 같은 오류로 저장하면 재조사 방향이 흐려집니다. 응답 코드, 질의 이름·유형, 실제 resolver, 시간과 캐시 문맥을 함께 확인하도록 제안합니다. answer가 비었다는 사실만으로 항상 NXDOMAIN이라고 판단하지 않습니다.
+NXDOMAIN·NODATA·SERVFAIL·timeout은 서로 다른 관측입니다. CNAME/DNAME 체인의 실패는 최초 별칭에 바로 귀속하지 않습니다. 분류·부정 캐시 규칙은 [주소와 DNS 정본](addressing-routing-dns.md)에 두고 여기서는 연결 수명과 연결해 읽습니다.
 
 DNS TTL은 해당 DNS 자료의 캐시 수명과 관계가 있습니다. 이미 열린 TCP 연결의 종료 시간을 직접 정하는 값은 아닙니다. 이름 조회와 연결 재사용이 분리된 구현에서는 DNS가 바뀌어도 기존 연결이 남을 수 있습니다. 이것은 연결 수명 정책과 함께 조사할 설계상 관계입니다.
 
@@ -71,7 +69,7 @@ HTTP/1.1에서는 메시지 framing에 맞게 본문이 완료됐는지 확인�
 | DNS timeout | resolver 응답·질의 유형·경로·재시도 | 대상 서버의 애플리케이션 장애 |
 | 연결 확보 대기 | pool active/idle/waiter·반환 정책 | TCP 연결 실패 |
 | 연결 거절 | 실제 주소·port·listener·중간 응답 | 항상 방화벽 문제 |
-| TLS 실패 | 검증 오류·SNI·인증서·프로토콜 | 단순 네트워크 단절 |
+| TLS 실패 | 검증 오류·SNI(접속할 서버 이름)·인증서·프로토콜 | 단순 네트워크 단절 |
 | 헤더 200 뒤 본문 실패 | framing·연결 종료·client 예외 | 성공한 업무 응답 |
 | 재시도 후 성공 | attempt별 경로와 deadline | 중간 실패가 없었음 |
 
@@ -93,3 +91,5 @@ python3 scripts/run_http_lab.py
 2. DNS TTL이 끝나면 열린 연결도 반드시 닫히는가? **DNS 자료와 연결 수명의 계약을 구분합니다.**
 3. HTTP 200을 읽으면 본문 전송도 끝났는가? **실습에서 본문이 잘려 예외가 발생했습니다.**
 4. 응답이 timeout이면 서버가 아무 작업도 하지 않았는가? **작업 완료와 응답 전달은 다른 경계입니다.**
+
+이전: [TLS, HTTP와 요청 단계별 시간](tls-http.md) · 다음: [인터페이스, 장비, 흐름과 능동 검사](network-metrics.md) · [분야 목차](README.md)

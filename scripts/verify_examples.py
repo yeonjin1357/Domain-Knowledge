@@ -57,8 +57,8 @@ def main():
     case(p, "sum of child lengths", sum(end - start for start, end in intervals), 400)
     case(p, "child union ms", len(covered), 230)
     case(p, "uncovered parent ms", 300 - len(covered), 70)
-    case(p, "true error percent", F(100, 10000) * 100, 1)
-    case(p, "sampled error percent", round(100 / 199 * 100, 2), 50.25)
+    # Sampling arithmetic lives in application/trace-sampling-and-context.
+    # Do not keep testing a removed, competing example from this overview.
     text = (ROOT / "docs" / (p + ".md")).read_text(encoding="utf-8")
     matches = re.findall(r"(?m)^00-([0-9a-f]{32})-([0-9a-f]{16})-([0-9a-f]{2})$", text)
     case(p, "traceparent v00 literal length and nonzero IDs", len(matches) == 1 and all(int(x, 16) > 0 for x in matches[0][:2]), True)
@@ -206,7 +206,7 @@ def main():
     case(p, "Lambda mean concurrency", 100 * F(2, 10), 20)
     case(p, "event total seconds", 30 + F(2, 10), 30.2)
 
-    p = "product/collection-pipelines"
+    p = "product/capacity-and-loss-budgets"
     case(p, "buffer fill seconds", F(900, 8 - 5), 300)
     case(p, "buffer drain seconds", F(900, 14 - 8), 150)
     p = "product/storage-and-query"
@@ -294,6 +294,20 @@ def main():
     for index, (p, token, actual, expected) in enumerate(r3_examples, 1):
         assert token in (ROOT / "docs" / (p + ".md")).read_text(encoding="utf-8"), (p, token)
         case(p, f"round 3b printed example {index}", actual, expected)
+
+    # Editorial additions: independently derived values, bound to printed text.
+    editorial_examples = [
+        ("foundations/histogram-storage", "**1.25초**", sorted(sample_seconds)[ceil(F(1, 4) * len(sample_seconds)) - 1], F(5, 4)),
+        ("foundations/service-level-objectives", "28 ÷ 4 = 7일", F(28, 4), 7),
+        ("network/layers-and-routing", "1,410", 1450 - 20 - 20, 1410),
+        ("network/snmp-and-device-models", "약 3.44초", round(F(2**32 * 8, 10_000_000_000), 2), 3.44),
+        ("network/snmp-and-device-models", "약 34.4초", round(F(2**32 * 8, 1_000_000_000), 1), 34.4),
+        ("kubernetes/pressure-and-termination", "137 = 128 + 9", 128 + 9, 137),
+        ("glossary", "초당 1 μs", F(1, 1_000_000) * 1_000_000, 1),
+    ]
+    for p, token, actual, expected in editorial_examples:
+        assert token in (ROOT / "docs" / (p + ".md")).read_text(encoding="utf-8"), (p, token)
+        case(p, "round 4b printed " + token, actual, expected)
 
     # Boundary checks: these make the limitations in the text explicit.
     p = "foundations/time-series"

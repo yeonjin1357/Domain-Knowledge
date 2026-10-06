@@ -1,6 +1,6 @@
 # 계측을 넣는 위치: 자동 계측, 수동 span, eBPF와 프로파일
 
-> 상태: 검토됨 · 적용 범위: OpenTelemetry·Linux BPF·런타임 프로파일의 개념 · 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: OpenTelemetry·Linux BPF·런타임 프로파일의 개념 · 원천 확인일: 2026-10-04 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 계측은 시스템의 동작을 기록하도록 측정 지점을 넣는 일입니다. 계측 위치가 다르면 같은 요청도 다르게 보입니다. 현관에서 잰 체류 시간과 계산대에서 잰 업무 시간이 다르듯이, HTTP client span과 server span의 시간은 원래 동일할 필요가 없습니다.
 
@@ -47,8 +47,14 @@ CPU 프로파일은 CPU 실행 비용을 조사하고, allocation 프로파일�
 
 제품은 agent 버전, 계측 라이브러리, 수집 설정, 샘플링 정책, symbol 처리 상태를 함께 저장합니다. 사용자가 “아무 trace도 없다”를 실제 요청 없음과 계측 실패 중 어느 쪽으로 해석해야 하는지 확인할 수 있어야 합니다.
 
+### HTTP 상태와 span 오류는 관측 위치에 따라 다르다
+
+OTel HTTP 규약(1.44.0, 2026-10-06 확인)은 추가 문맥이 없을 때 4xx의 **server span status는 unset으로 남겨야 하고(MUST)**, **client span은 Error로 두기를 권고(SHOULD)**합니다. 5xx는 Error를 권고합니다. 계측기가 요청의 추가 의미를 알면 더 정확한 상태를 정할 수 있으므로 “404는 어디서나 오류”로 묶지 않습니다. 이는 업무 성공 정의와도 별개입니다. [HTTP span status 규약](https://opentelemetry.io/docs/specs/semconv/http/http-spans/#status)
+
 ## 이해 확인
 
 1. span이 100개면 사용자 요청도 100개인가? **한 요청이 여러 span과 재시도를 포함할 수 있습니다.**
 2. CPU flame graph가 전체 지연 원인을 보여 주는가? **CPU를 사용하지 않은 대기가 빠질 수 있습니다.**
 3. 자동 agent 설치면 모든 프레임워크가 계측되는가? **지원 버전과 실제 출력 확인이 필요합니다.**
+
+이전: [브라우저, 실제 사용자 관측과 합성 검사(synthetic monitoring)](user-experience.md) · 다음: [트레이스를 읽는 전제: 문맥 전파, sampling과 모집단](trace-sampling-and-context.md) · [분야 목차](README.md)

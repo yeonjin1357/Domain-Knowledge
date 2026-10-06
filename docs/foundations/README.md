@@ -1,6 +1,12 @@
 # 모니터링 공통 개념
 
-> 상태: 검토됨 · 적용 범위: 도메인 공통, 일부 Prometheus 예시 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: 도메인 공통, 일부 Prometheus 예시 · 원천 확인일: 2026-10-03 · 실습 여부: 각 상세 장에 명시
+
+## 먼저 만나는 도구 이름
+
+Prometheus는 지표를 수집하고 시계열로 저장·질의하는 도구이며, **scrape**는 대상 endpoint에서 지표를 읽어 오는 동작입니다. Prometheus의 **exporter**는 다른 원천의 값을 이 방식으로 노출하는 구성 요소입니다. OpenTelemetry(OTel)는 지표·로그·트레이스의 계측과 전송을 위한 규약·도구 모음이고, **OTLP**는 그 데이터를 주고받는 프로토콜입니다. OTel **Collector**는 receiver로 받아 처리한 뒤 exporter로 내보내는 프로세스이므로, 여기의 exporter는 Prometheus exporter와 방향·역할이 다릅니다. [Prometheus 개요](https://prometheus.io/docs/introduction/overview/), [OTel 개념](https://opentelemetry.io/docs/concepts/), [Collector](https://opentelemetry.io/docs/collector/)
+
+명세의 **Stable**은 정해진 호환성 정책 아래 안정된 부분, **Development**는 바뀔 수 있는 개발 단계입니다. 도구 버전이나 실습 통과 여부와는 별개이며 해당 절의 상태를 확인합니다. [OTel 안정성 정책](https://opentelemetry.io/docs/specs/otel/versioning-and-stability/)
 
 통합 모니터링에서 여러 도메인의 데이터를 함께 읽으려면 무엇을, 어디에서, 언제, 어떤 방식으로 관측했는지 알아야 합니다. 이 문서는 도메인별 설명에서 공통으로 사용할 출발점을 정리합니다.
 
@@ -59,3 +65,5 @@ Prometheus에서 Counter는 재시작 시 초기화될 수 있는 누적 증가�
 11. [분산 시스템: 복제, 합의, 시간과 불확실한 결과](distributed-systems.md)
 
 관련 문서: [지표 명세 템플릿](../../templates/metric.md), [도메인 간 장애 분석](../cross-domain/README.md)
+
+이전: [제1.2판의 범위와 사실 확인 원칙](../scope.md) · 다음: [처음 읽는 시스템 지도: 요청 하나가 지나가는 길](system-map.md)

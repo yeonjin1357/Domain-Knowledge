@@ -1,6 +1,6 @@
 # 스트림 처리: event time, watermark, checkpoint와 역압
 
-> 상태: 검토됨 · 적용 범위: Flink 1.20, Spark Structured Streaming 문서, Pulsar 4.0 사례 · 검토일: 2026-10-04 · 실제 분산 작업 실행 없음
+> 상태: 검토됨 · 적용 범위: Flink 1.20, Spark Structured Streaming 문서, Pulsar 4.0 사례 · 원천 확인일: 2026-10-04 · 실습 여부: 원천·가상 예시 중심; 연결 실습의 범위는 본문
 
 메시지를 저장하는 것과 메시지로 계산한 결과를 완성하는 것은 다릅니다. 메시지 broker가 건강해도 소비 작업의 상태 복구, 시간창 집계, 외부 저장이 막힐 수 있습니다. 스트림 처리는 계속 들어오는 사건을 읽어 상태를 갱신하거나 결과를 내는 처리 모델입니다.
 
@@ -32,12 +32,6 @@ checkpoint는 복구할 처리 상태와 진행 위치 등을 일관된 방식�
 
 예시로 마지막 checkpoint가 3분 전이고 그 이후 외부 API 호출이 100건 성공했다면, 복구 뒤 동일 입력이 재처리될 때 외부 효과를 어떻게 다룰지 별도 설계가 필요합니다. checkpoint의 존재만으로 외부 중복을 배제할 수 없습니다.
 
-## Pulsar와 캐시의 추가 관측 경계
-
-Pulsar는 subscription 유형에 따라 메시지 전달과 공유 방식이 달라집니다. topic의 backlog와 특정 subscription의 미처리 상태를 구분하고, acknowledgment·redelivery·retention의 경계를 보존합니다. broker 하나의 건강 상태만으로 모든 subscription 처리를 설명하지 않습니다. [Pulsar 4.0 messaging](https://pulsar.apache.org/docs/4.0.x/concepts-messaging/)
-
-파이프라인이 Memcached 같은 캐시를 사용하는 경우에는 hits/misses, eviction, 연결, 저장 여유를 함께 확인합니다. item이 없어지는 것은 앱이 명시적으로 삭제한 경우 외에도 만료·메모리 관리 등과 연결될 수 있습니다. 캐시 hit 비율은 실제 요청 구성과 함께 읽습니다. [Memcached protocol의 stats 필드](https://github.com/memcached/memcached/blob/master/doc/protocol.txt)
-
 ## 제품 적용 제안과 이해 확인
 
 파이프라인을 source → operator → sink로 표현하고, event time 지연·처리율·backpressure·state 크기·checkpoint·외부 업무 성공을 별도 관측합니다. 입력 offset의 진전만을 “업무 최신화”로 표시하지 않습니다.
@@ -45,3 +39,5 @@ Pulsar는 subscription 유형에 따라 메시지 전달과 공유 방식이 달
 1. CPU가 낮으면 stream 결과가 늦을 수 없는가? **watermark·입력 유휴·외부 대기를 봐야 합니다.**
 2. checkpoint 성공이면 외부 결제도 정확히 한 번인가? **sink와 업무 멱등성의 보장 경계가 필요합니다.**
 3. broker backlog와 사용자 화면의 최신성은 같은가? **소비 이후 계산·저장·조회 경계도 있습니다.**
+
+이전: [프록시, 로드밸런서와 서비스 메시](proxies-and-mesh.md) · 다음: [클라우드 도메인](../cloud/README.md) · [분야 목차](README.md)

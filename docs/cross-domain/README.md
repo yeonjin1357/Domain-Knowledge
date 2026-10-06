@@ -1,6 +1,6 @@
 # 도메인 간 장애 분석
 
-> 상태: 검토됨 · 적용 범위: 가상의 서비스 구성과 분석 흐름 제안 · 실환경 검증: 수행하지 않음
+> 상태: 검토됨 · 적용 범위: 가상의 서비스 구성과 분석 흐름 제안 · 원천 확인일: 2026-10-04 · 실습 여부: 각 상세 장에 명시
 
 통합 모니터링에서는 서비스의 증상을 실행 환경과 외부 의존성으로 연결해 조사해야 합니다. 이 문서는 도메인 문서를 함께 사용하는 방법과 제품이 제공할 탐색 흐름을 제안합니다.
 
@@ -54,17 +54,6 @@ flowchart LR
 
 관계가 추정된 것인지 직접 확인한 것인지 구분하고, 과거 사건을 현재 배치 관계로 해석하지 않도록 유효 시각을 다루는 방안을 검토합니다.
 
-## 상세 분석 사례
-
-1. [느린 주문 요청](slow-requests.md): 풀 대기, DB 잠금, CPU·네트워크 가설 비교
-2. [재시작과 자원 경계](resource-failures.md): OOM·eviction, heap·cgroup, WAL 볼륨 증가
-3. [적체와 재시도](backlogs-and-retries.md): 캐시 미스, 호출 증폭, 큐 해소 속도
-4. [관측 자료 중단](missing-observations.md): 대상 장애와 공통 수집 경로 장애 구분
-
-사례의 모든 수치는 원리를 설명하는 가상 입력입니다. 원인 확정에 필요한 증거와 현재 자료로 알 수 없는 부분을 구분합니다.
-
-관련 문서: [애플리케이션](../application/README.md), [쿠버네티스](../kubernetes/README.md), [호스트](../host/README.md), [DB](../database/README.md), [네트워크](../network/README.md)
-
 ## 상세 본문
 
 1. [사례: 느린 주문 요청과 DB 연결 대기](slow-requests.md)
@@ -74,3 +63,5 @@ flowchart LR
 5. [재현 실습: 계산, 실제 엔진, 운영 검증의 경계](reproducible-labs.md)
 6. [종합 연습: 주문 지연을 증거로 좁혀 가기](capstone-investigation.md)
 7. [해설이 있는 분석 연습: 보이는 증거로 어디까지 말할 수 있을까](investigation-workbook.md)
+
+이전: [클라우드 한도, 비용과 용량: 사용량만으로 보이지 않는 제약](../cloud/quotas-cost-and-capacity.md) · 다음: [사례: 느린 주문 요청과 DB 연결 대기](slow-requests.md)

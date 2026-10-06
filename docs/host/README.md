@@ -1,6 +1,6 @@
 # 호스트 도메인
 
-> 상태: 검토됨 · 적용 범위: 호스트 공통 개요, Linux 설명 예시 · 출처 확인일: 2026-10-03
+> 상태: 검토됨 · 적용 범위: 호스트 공통 개요, Linux 설명 예시 · 원천 확인일: 2026-10-03 · 실습 여부: 각 상세 장에 명시
 
 호스트 영역에서는 애플리케이션과 DB가 실행되는 운영체제 및 자원의 상태를 다룹니다. 첫 번째 목표는 어떤 자원을 얼마나 쓰는지 파악하고, 두 번째 목표는 자원 때문에 작업이 지연되는지 확인하는 것입니다.
 
@@ -45,7 +45,7 @@ PSI는 CPU·메모리·I/O 자원 경합으로 작업이 멈춘 시간의 영향
 
 1. [CPU 실행 시간과 스케줄링 대기](cpu.md)
 2. [메모리와 가상 주소 공간 및 메모리 압력](memory.md)
-3. [메모리 회수와 OOM: 부족해지는 과정과 종료의 증거](reclaim-and-oom.md)
+3. [메모리 회수와 OOM: 부족해지는 과정과 종료의 증거](reclaim-and-oom.md) — 심화: 메모리·PSI·cgroup을 읽은 뒤
 4. [블록 I/O와 파일시스템 용량](disk-io.md)
 5. [프로세스와 스레드 및 파일 디스크립터](processes.md)
 6. [Windows의 CPU와 메모리 관측](windows.md)
@@ -56,3 +56,5 @@ PSI는 CPU·메모리·I/O 자원 경합으로 작업이 멈춘 시간의 영향
 11. [Linux 원천 관측 실습: CPU, 가상 메모리와 실제 I/O](linux-observation-lab.md)
 
 관련 문서: [공통 개념](../foundations/README.md), [컨테이너](../containers/README.md), [쿠버네티스](../kubernetes/README.md), [네트워크](../network/README.md)
+
+이전: [분산 시스템: 복제, 합의, 시간과 불확실한 결과](../foundations/distributed-systems.md) · 다음: [CPU 실행 시간과 스케줄링 대기](cpu.md)
