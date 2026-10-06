@@ -1,6 +1,6 @@
 # MySQL과 MariaDB 관측
 
-> 상태: 검토됨 · 적용 범위: MySQL 8.4 InnoDB·Performance Schema, MariaDB 진단 명령의 차이 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: MySQL 8.4 InnoDB·Performance Schema, MariaDB 진단 명령의 차이 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 3b 원천 검토: 2026-10-05 (새 실습 결과 미반영)
 
 버전 상태: MySQL 사례는 8.4 LTS 문서에 고정했습니다. 9.7 LTS와 이후 YY.M 번호 체계가 존재하며, 새 계열의 모든 동작을 검증한 설명은 아닙니다. 9.7.3은 Docker image 전용 보안 패치입니다. [버전별 기준과 지원 상태](../coverage.md#교차-검토-시점의-버전-상태)
 
@@ -41,6 +41,8 @@ ps를 ns로 오해하면 1,000배의 오류가 생깁니다. 제품의 공통 �
 `Seconds_Behind_Source`는 receiver와 applier의 진행을 해석하는 특정 지표입니다. receiver가 원본보다 늦게 받고 있어도 applier가 받은 자료를 따라잡았으면 0이 표시될 수 있습니다. 따라서 0 하나로 원본과 모든 데이터가 동일하다고 판단하지 않습니다. [MySQL SHOW REPLICA STATUS](https://dev.mysql.com/doc/refman/8.4/en/show-replica-status.html)
 
 복제 채널, receiver·applier 상태, 오류, 로그 위치와 필요한 데이터의 적용 여부를 함께 비교합니다. 시간 지표를 바이트 잔량이나 실제 업무 데이터의 신선도와 혼동하지 않습니다.
+
+잠금 그래프, 커밋 시 flush, GTID의 수신·적용 timestamp와 NULL 조건은 [MySQL 운영 관측](mysql-operations.md)에서 8.4·9.7 공식 문서를 대조해 설명합니다. 해당 비교 범위를 이 장의 모든 MariaDB 설명에 적용하지 않습니다.
 
 ## MariaDB의 진단 명령
 

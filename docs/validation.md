@@ -1,6 +1,85 @@
 # 제1.1판 검증 기록
 
-판 기준일은 **2026-10-04**로 유지합니다. 2b 원고 보강과 2d 결과 반영·검사는 **2026-10-05**, 기존 실행·화면 기록은 각 기록의 날짜를 따릅니다. 공식 원천의 의미 검토, 자동 문서 검사, 실제 실행, 화면 확인의 범위를 나누어 기록합니다. 사용자 제품이나 운영 환경 전체의 지원 인증을 뜻하지 않습니다.
+판 기준일은 **2026-10-04**로 유지합니다. 3f 결과 반영·검사는 **2026-10-06**, 기존 실행·화면 기록은 각 기록의 날짜를 따릅니다. 공식 원천의 의미 검토, 자동 문서 검사, 실제 실행, 화면 확인의 범위를 나누어 기록합니다. 사용자 제품이나 운영 환경 전체의 지원 인증을 뜻하지 않습니다.
+
+## 3f MySQL r2 출판과 3라운드 검증
+
+Claude가 2026-10-06 KST(원문 UTC 10월 5일)에 실행한 [8.4.11 r2](../labs/results/1.1-r3/mysql-8.4.11-r2.json)·[9.7.2 r2](../labs/results/1.1-r3/mysql-9.7.2-r2.json)를 각각 **supported 5, gzip 132개** 그대로 출판했습니다. 입력 hash·압축 전후 hash·SQL/XML·NULL·정리 완료를 검사했습니다. r1의 반증 4개는 판정 설계 결함의 이력으로 보존했으며 최종 r2 숫자로 덮지 않았습니다.
+
+두 버전 모두 next-key sys 행의 0→1 전이와 blocker 해제 뒤 삽입을 확인했습니다. GTID 직후 SBS 12/14와 coordinator 위치 일치 뒤 0을 함께 검사하고, 재개 직후에는 SBS=0이어도 위치가 다른 표본이 있었음을 보존했습니다. 최종 복제 값은 baseline 0·IO 중지 NULL·SQL 중지 NULL·재개 0입니다. [본문의 조건·전후 값](database/mysql-operations.md)
+
+3라운드 출판 누계는 **7묶음·27개 판정(supported 23·refuted 4), gzip 525개**입니다. 이 중 최종 채택 실행은 메모리·분포·시계와 MySQL r2의 17개 supported 조건이며, 27에는 이전 r1 반복 실행을 포함합니다. 범용 제품 지원 인증으로 해석하지 않습니다.
+
+| 검사 | 3f 범위·결과 |
+| --- | --- |
+| `check_docs` | PASS: 상세 100장·구조·목차·로컬 링크·검토 hash |
+| `verify_examples` | PASS: 60개 원문의 산술·해석 185개 |
+| `verify_contracts` | PASS: 어댑터 경계 22개·원문 연결 계산 28개·과거 실습 hash |
+| `verify_revision` | PASS: 기존 근거와 3라운드 27개 판정·525개 gzip·입력·전후 SQL·본문 관측 |
+| `build_book --check`, `build_html --check` | PASS: 원문 122개의 BOOK.md·BOOK.html과 생성 일치 |
+| `verify_review_r3 --result …`·`--published` | PASS: r2 두 입력 및 출판 일곱 묶음, r1 verdict 유지·r2 가시성/위치 전이 |
+
+3f의 Codex 검사는 저장 근거·코드와 생성 결과를 대조한 것입니다. WSL DB 실행은 Claude가 수행했습니다. 실행기·manifest·자산을 다시 고치지 않았으므로 이번 결과를 반영하기 위한 추가 DB 재실행은 필요하지 않습니다. [provenance](../review/evidence-provenance.json), [3f 기록](../review/claude-codex-r3.md)
+
+Claude가 전달한 3e BOOK.html 화면 PASS는 수신 당시 HTML hash와 일치함을 확인하고 [receipt](../review/html-check-r3e-incoming.json)를 보존했습니다. 새 3f 생성본의 화면 검사 상태는 [검토 기록](../review/claude-codex-r3.md)에 별도로 남깁니다.
+
+## 3e 당시 MySQL 결과 출판과 관측 조건 재검사
+
+Claude가 2026-10-05 실행한 [MySQL 8.4.11](../labs/results/1.1-r3/mysql-8.4.11-r1.json)·[9.7.2](../labs/results/1.1-r3/mysql-9.7.2-r1.json)의 r1 JSON을 byte 그대로 복사하고 gzip 원자료 **200개 전체**를 보존했습니다. 각 supported 3·refuted 2를 유지합니다. 3e 당시 3라운드 누계는 요약 JSON **5개**, gzip **261개**, 판정 **17개(supported 13·refuted 4)**입니다. 이전 blocked 시도는 실행 이력으로 남기며 DB 관측 근거와 구분합니다.
+
+원자료 재검사에서 next-key의 직접 잠금 관계와 rollback 뒤 INSERT 완료를 확인했지만 sys 행은 비어 있었습니다. 복제는 목표 GTID 실행을 기다렸지만 coordinator 위치가 뒤처져 SBS=0/NULL이라는 즉시 관측 조건을 만족하지 않았습니다. 9.7.2 재개 표본은 실제 SBS=1입니다. [분석 JSON](../review/mysql-r3e-analysis.json)·[본문 해석](database/mysql-operations.md)에 원천 SQL 참조와 코드 근거를 연결했습니다.
+
+| 검사 | 3e 범위 |
+| --- | --- |
+| `check_docs` | 상세 100장의 구조·목차·로컬 링크·검토 hash |
+| `verify_examples` | 기존 60개 원문의 산술·해석 185개 |
+| `verify_contracts` | 어댑터 경계 22개·원문 연결 계산 28개·과거 실습 hash |
+| `verify_revision` | 기존 근거와 3라운드 17개 판정·261개 gzip·실행 당시 입력 사본·본문의 핵심 관측 |
+| `build_book --check`, `build_html --check` | 원문 122개로 재생성한 BOOK.md·BOOK.html과 일치 |
+| `verify_review_r3 --published` | 다섯 묶음의 gzip·SQL 원문/요약·NULL 보존·판정·분석 수치·입력 hash; Linux 실행 없음 |
+| `verify_review_r3` | 실제 r1에서 도출한 회귀 조건: sys 세션 일치·100 ms cache 경계·GTID와 coordinator 위치 분리·SBS로 대기하지 않음; 기존 parser·경로·정리 실패 검사 포함 |
+
+6개 기본 검사와 두 추가 검사에서 PASS를 확인했습니다. **이는 저장 근거와 수정한 관측 코드의 오프라인 검사입니다.** 당시에는 sys view 재조회·coordinator 위치 대기를 보완한 r2 실행 전이었으며, 이후 실행·검증은 위 3f 절에 반영했습니다. 원래 runner는 [보존 사본](../labs/archive/review_r3_2026_10_05/mysql_r1/run_mysql_r3_lab.py)에 두고 [provenance](../review/evidence-provenance.json)로 연결했으므로 현재 입력 hash를 옛 결과에 소급 적용하지 않습니다.
+
+Claude가 보낸 3d BOOK.html 화면 PASS는 [당시 receipt](../review/html-check-r3d-incoming.json)와 수신 당시 HTML hash를 대조했습니다. **당시 3e 생성본의 화면 검사는 후속 작업**이었으며, Claude가 전달한 PASS receipt를 3f에서 확인했습니다. 과거 화면 PASS를 새 생성본에 적용하지 않습니다. [새 실행·화면 검사 명령](../review/claude-codex-r3.md)
+
+## 3d 당시 결과 출판과 재검사
+
+2026-10-05 Claude 실행의 Linux 메모리·histogram·시계 상태를 [세 요약 JSON](cross-domain/reproducible-labs.md#3라운드-메모리분포시계의-작은-실험)과 gzip 원자료 61개로 출판했습니다. supported는 각각 4·2·1개입니다. 요약 파일은 전달 파일과 byte 단위로 같고, gzip 전후 hash·입력 hash·정리 완료·단위 환산·비용 중앙값·실제 promtool 출력을 검사합니다. 현재 manifest와 달라진 실행 입력은 당시 사본을 보존해 [provenance](../review/evidence-provenance.json)에 연결했습니다.
+
+| 검사 | 3d 범위 |
+| --- | --- |
+| `check_docs` | 상세 100장의 구조·목차·로컬 링크·검토 hash |
+| `verify_examples` | 기존 60개 원문의 산술·해석 185개 |
+| `verify_contracts` | 기존 어댑터 경계 22개·원문 연결 계산 28개·과거 실습 hash |
+| `verify_revision` | 과거 출판 근거에 3라운드 7개 판정·61개 gzip·입력 사본·본문 관측 계산 추가 |
+| `build_book --check`, `build_html --check` | 원문 122개로 다시 생성한 BOOK.md·BOOK.html과 일치 |
+| `verify_review_r3 --published` | 위 세 출판 묶음의 독립 검사; 실습·다운로드 없음 |
+| `verify_review_r3 --assets` | 준비 입력·NULL/proc/PSI parser·원자료 무결성·경로/정리 실패·deb 경로/링크·ELF 경계, 공식 자산 receipt·파일 hash |
+
+위 6개 기본 검사와 추가 검사에서 PASS를 확인했습니다. 이번 작업은 Windows Python에서의 저장 근거·준비 코드 검사이며 WSL 메모리·시계·promtool을 재실행하지 않았습니다. 조회 비용은 실제 30개 표본에서 다시 계산했으나 다른 프로세스·커널의 고정 비용으로 쓰지 않습니다. 강제 OOM·전역 압박·cgroup 생성 성공을 주장하지 않습니다.
+
+MySQL 8.4.10·9.7.2의 이전 preflight blocked 기록은 성공 근거로 출판하지 않았습니다. **8.4.11의 공식 서명 검증·압축 해제·파일 hash**, libaio/libnuma의 고정 패키지·파일 대조와 AMD64 ABI 소스 검토까지 수행했습니다. 3d 당시에는 private alias 생성·Linux loader·두 MySQL 인스턴스 실행이 후속 작업이었습니다. **그때는 실제 잠금·복제 숫자를 적지 않았으며, 이후 실행 결과를 위 3e 절에 반영했습니다.** 3a의 준비 hash는 당시 기록으로 보존하고, 변경한 3d 준비 입력과 혼동하지 않습니다. [상세 판정·실행 명령](../review/claude-codex-r3.md)
+
+이번 BOOK.html의 브라우저 화면 검사는 Claude가 수행합니다. 이전 `html-check`는 새 생성본의 시각적 검사를 대신하지 않습니다. 이번 사실 검토의 개별 공식 원천은 확인했으며 전체 외부 URL 상태 파일을 전수 재조회한 것은 아닙니다.
+
+## 3b 당시 원고 보강의 검사 범위
+
+2026-10-05에 새 3장과 기존 장의 Tier 3 설명을 보강했습니다. 상세 본문은 **100장**, 통합본의 원문은 **122개**입니다. 판 번호와 기준일은 유지했습니다. 주제별 공식 자료·고정 소스 확인, 채택하지 않은 단서와 이유는 [3라운드 기록](../review/claude-codex-r3.md), 검토한 원문 hash는 [장별 기록](../review/chapter-review.json)에 있습니다.
+
+| 검사 | 3b 범위 |
+| --- | --- |
+| `check_docs` | 상세 100장, UTF-8·구조·로컬 링크·목차·검토 hash |
+| `verify_examples` | 60개 원문의 산술·해석 185개; 새 15개는 본문 결과 문자열과 계산을 함께 대조 |
+| `verify_contracts` | 기존 어댑터 경계 22개·원문 연결 계산 28개·보존 실습 hash |
+| `verify_revision` | 기존 출판 근거와 1라운드 시계·2라운드 결과의 입력 hash·핵심 값 대조 |
+| `build_book --check`, `build_html --check` | 원문 122개로 재생성한 BOOK.md·BOOK.html과 생성 일치 |
+
+위 6개 명령을 Windows Python에서 `python -X utf8 -B scripts/<명령>.py` 형태로 실행해 모두 PASS를 확인했습니다. 문서 검사는 Markdown 124개·상세 100장·로컬 링크 2,241개를 검사했고, 외부 URL 546개는 목록화했습니다. 이 숫자가 모든 외부 URL의 재검증을 뜻하지는 않습니다.
+
+**실행과 원고의 경계:** 3b 당시에는 Linux·MySQL·promtool·시계 실습을 실행하거나 새 결과를 출판하지 않았습니다. SQL Server·Oracle·runtime·GPU·로그 수집 명령도 실행하지 않았습니다. 당시 3a 준비 파일 16개의 저장 hash는 모두 일치했고 실행기·manifest·`.tools/`·`.lab-runs/`는 변경하지 않았습니다. 이후 3d에서 위와 같이 결과와 재준비를 반영했습니다.
+
+새 HTML의 브라우저 화면 검사는 수행하지 않았습니다. 이전 `html-check` 기록은 이전 생성본에 해당하며 이번 생성본의 시각적 검증을 대신하지 않습니다. 외부 링크는 해당 사실을 검토할 때 열람했으며, 전체 URL 상태 목록의 전수 재검증은 하지 않았습니다.
 
 ## 2d 결과 출판과 재검사
 
@@ -104,7 +183,9 @@ Kubernetes 실험은 API server·etcd만 띄웠습니다. 실제 업무 Pod·kub
 
 ## 실행하지 않은 범위
 
-물리 Linux 장비 전체와 모든 procfs 필드, cgroup 제한·OOM·eviction, Kubernetes 최신 patch·1.35/1.36 서버·업무 workload·CNI·CSI, MySQL·SQL Server·Oracle 서버 질의, JVM·.NET 등 runtime agent 전수, 실제 DNS·TLS·HTTP/2, 상용 SNMP 장비, cloud 계정·비용 API, 분산 장애 전환·전원 장애·복구는 실행하지 않았습니다. 본문에서는 연결한 공식 원천의 적용 범위로 설명하며 해당 환경을 검증했다고 표시하지 않습니다.
+물리 Linux 장비 전체와 모든 procfs 필드, cgroup 제한·OOM·eviction, Kubernetes 최신 patch·1.35/1.36 서버·업무 workload·CNI·CSI, SQL Server·Oracle 서버 질의, JVM·.NET 등 runtime agent 전수, 실제 DNS·TLS·HTTP/2, 상용 SNMP 장비, cloud 계정·비용 API, 분산 장애 전환·전원 장애·복구는 실행하지 않았습니다. 본문에서는 연결한 공식 원천의 적용 범위로 설명하며 해당 환경을 검증했다고 표시하지 않습니다.
+
+MySQL은 위 8.4.11·9.7.2 r1·r2의 소유 임시 인스턴스에서 실행했습니다. 운영 계정의 최소 권한과 crash 복구·전원 장애 지속성은 실행 검증하지 않았습니다.
 
 ## 문서 검사 재현
 

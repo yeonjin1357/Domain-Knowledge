@@ -1,0 +1,55 @@
+{
+  "checked_on": "2026-10-06",
+  "stage": "3d preparation only; no Linux loader/database execution",
+  "mysql_8_4_11": {
+    "archive_sha256": "383f54e124d5f325d67f0c6912a8f96814eedc761a17ea30112e52fa4cc6b143",
+    "signature_verification": {
+      "method": "GPG detached signature with pinned official fingerprint",
+      "status": "[GNUPG:] NEWSIG\n[GNUPG:] KEY_CONSIDERED BCA43417C3B485DD128EC6D4B7B3B788A8D3785C 0\n[GNUPG:] SIG_ID Nb8/S/EEGd1FDW4CrBhAKz7qVPA 2026-07-01 1782929927\n[GNUPG:] KEY_CONSIDERED BCA43417C3B485DD128EC6D4B7B3B788A8D3785C 0\n[GNUPG:] GOODSIG B7B3B788A8D3785C MySQL Release Engineering <mysql-build@oss.oracle.com>\n[GNUPG:] VALIDSIG BCA43417C3B485DD128EC6D4B7B3B788A8D3785C 2026-07-01 1782929927 0 4 0 1 8 00 BCA43417C3B485DD128EC6D4B7B3B788A8D3785C\n",
+      "stderr": "gpgv: Signature made Thu Jul  2 03:18:47 2026    \ngpgv:                using RSA key BCA43417C3B485DD128EC6D4B7B3B788A8D3785C\ngpgv: Good signature from \"MySQL Release Engineering <mysql-build@oss.oracle.com>\"\n",
+      "fingerprint": "BCA43417C3B485DD128EC6D4B7B3B788A8D3785C",
+      "returncode": 0
+    },
+    "extracted_file_count": 382
+  },
+  "runtime_package_checks": [
+    {
+      "package": "libaio1t64",
+      "archive_sha256": "433212b33e26d424605c01cec1de33b63f2cc12870987b4cb7b3625baba66a19",
+      "member_sha256": "9dbba7441fe096f6654bfd31bfdbba52f41a209bd4a560468293c226ff63c998",
+      "member_bytes": 14336,
+      "reused_file_byte_equal": false
+    },
+    {
+      "package": "libnuma1",
+      "archive_sha256": "f333b8edf6f0b705c19f2a67008194df66f7aab0fa2350dc98510569a033ff29",
+      "member_sha256": "02d7582c5d391e460e56aa67a414360e3183b968206645b9123f9dc7bff5d009",
+      "member_bytes": 52248,
+      "reused_file_byte_equal": true
+    }
+  ],
+  "runtime_verification_limit": "libaio HTTPS Packages SHA256, no signed InRelease chain; ABI compatibility inferred from pinned upstream packaging source patches for AMD64 LP64 only",
+  "blocked_history": {
+    "mysql-8.4.10.json": "69c1ebd9c616f71134fdbc0902d655b9a419cd235b35d6977f41397472d5eada",
+    "mysql-9.7.2.json": "8482fff623bad2169b528c41620f6e48115a4c6207a355ed92137c322ad498d8"
+  },
+  "checks": [
+    "GPG pinned fingerprint, successful detached signature verification",
+    "archive and ELF package-member SHA256, PG libnuma byte comparison",
+    "owned destination cleanup on validation failure",
+    "pre-existing invalid destination preserved"
+  ],
+  "pending": [
+    "private aliases and Linux loader preflight",
+    "MySQL 8.4.11 and 9.7.2 lock/deadlock/replication scenarios",
+    "new BOOK.html browser rendering"
+  ],
+  "prepared_inputs_sha256": {
+    "labs/review-r3/assets.json": "4d9fa81b3ee67027641525a6be1c8a7f7dc28cce70fbf95dc2728500a38308e3",
+    "labs/review-r3/mysql-runtime.json": "04be19a0146ce5f54f8151bc0fb38bca9089b388af3fc1bf2e6d4963bd1639f8",
+    "scripts/prepare_mysql_r3_runtime.py": "26141cd07a7526db6d4045d027974be305ca570cf06d597e2b514bae5f90f3b4",
+    "scripts/run_mysql_r3_lab.py": "0bff81f2c5c9ac8de30b6b867f4706df8d81a70a56479adc47c10cfe47f8d171",
+    "scripts/get_review_r3_assets.py": "c6fe965f36e984951be4905841107d6f54050a722c41d646e1f9d8fbd8c101d1",
+    "scripts/verify_review_r3.py": "19fd7b9ad0f38b9ab3741afbddfdd458e20e72ada05e9badf287886d5ce41508"
+  }
+}

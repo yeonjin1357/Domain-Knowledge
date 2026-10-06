@@ -1,0 +1,152 @@
+{
+  "prepared_on": "2026-10-05",
+  "recorded_at_utc": "2026-10-05T14:22:10.020808+00:00",
+  "phase": "3a preparation only",
+  "branch": "review/claude-codex-r3",
+  "head": "9dfbede",
+  "execution": {
+    "wsl_invocations": 0,
+    "linux_binary_executions": 0,
+    "lab_sql_executions": 0,
+    "system_installs": 0,
+    "service_registrations": 0,
+    "commit_push_branch_switch": false,
+    "actual_actions": "Windows download, GPG dearmor/gpgv, authenticated tar extraction, Python preparation/fault-injection checks"
+  },
+  "unchanged": {
+    "count": 130,
+    "scope": "All tracked docs/, labs/results/, book.json, BOOK.md, BOOK.html compared byte-for-byte with HEAD"
+  },
+  "prepared_files_sha256": {
+    ".gitattributes": "c93abba984869e4857e43916b5c8b08b88aae08ed7a3bb611ffa1ca36af80f22",
+    "labs/archive/review_r2_assets_2026_10_05.json": "6859cca01bfcca358cb514f0bb16bc772cbc3c0fb1c30ef793e21dadd1e92555",
+    "labs/review-r3/assets.json": "91fc56d5debea87e2a94a2e66a9055552646014404f7d530b8a3e091613eb659",
+    "labs/review-r3/evidence-policy.md": "c44000c54d0bc57ba06174b7394457686c628a401c4d900263cd4f5bd6e9fdf3",
+    "labs/review-r3/histograms/fixture.json": "da360c4bf6e33df2e85077a453be40df7a5934f61417d379d8df62486600c4c0",
+    "labs/review-r3/histograms/rules.yml": "33ad630ebfb5ed10886d6b12150cfd0269b07ad8c472aa019bde00f77e1b6ad9",
+    "labs/review-r3/histograms/tests.yml": "98acf1c33f5c4c51750c21892d3ebe75adee6bac3daf80213b7ac8e56017736e",
+    "review/claude-codex-r3a.md": "94cf0a5c4e3014acb2101cfd31bb83ba6568320e7b74851c12d699f7c6035aa1",
+    "review/evidence-provenance.json": "d4a0772f5e8abfa9f116d43578d3a97d72cf97e322a4089662d55b442e345cb3",
+    "scripts/get_review_r3_assets.py": "c6fe965f36e984951be4905841107d6f54050a722c41d646e1f9d8fbd8c101d1",
+    "scripts/lab_r3_common.py": "65a73ca00113bdac3152e01b68eb6f43ec1d93bd596800cb150afb73b78eccd6",
+    "scripts/run_clock_r3_lab.py": "7a99691c10107e375f7157b2ab2a84ed34919b69eb1ce8ca1cb4d39055ddc411",
+    "scripts/run_histogram_r3_lab.py": "a4eccf09168e47e3faf8bb56b3d1a554da998158994c430a35ab5d43abf68a12",
+    "scripts/run_linux_memory_r3_lab.py": "274276931eb05240f5d4ca9a7bcf514a321a887e642da7dfa420f4f300bac8b6",
+    "scripts/run_mysql_r3_lab.py": "b048659dc38e3ca4f233755bb82a31ee82737054a2211493f3b7fadf83ecf8cf",
+    "scripts/verify_review_r3.py": "7fc18d177d516c7f54a960d21cf91612a8f97a16daeb9ab2414902a3ec2ed43e"
+  },
+  "official_verifications": [
+    {
+      "id": "mysql-8.4.10",
+      "signature_verification": {
+        "method": "GPG detached signature with pinned official fingerprint",
+        "status": "[GNUPG:] NEWSIG\n[GNUPG:] KEY_CONSIDERED BCA43417C3B485DD128EC6D4B7B3B788A8D3785C 0\n[GNUPG:] SIG_ID B6Y7I6yZcZiVPYRYc0zKvls8Gx8 2026-06-09 1780995691\n[GNUPG:] KEY_CONSIDERED BCA43417C3B485DD128EC6D4B7B3B788A8D3785C 0\n[GNUPG:] GOODSIG B7B3B788A8D3785C MySQL Release Engineering <mysql-build@oss.oracle.com>\n[GNUPG:] VALIDSIG BCA43417C3B485DD128EC6D4B7B3B788A8D3785C 2026-06-09 1780995691 0 4 0 1 8 00 BCA43417C3B485DD128EC6D4B7B3B788A8D3785C\n",
+        "stderr": "gpgv: Signature made Tue Jun  9 18:01:31 2026    \ngpgv:                using RSA key BCA43417C3B485DD128EC6D4B7B3B788A8D3785C\ngpgv: Good signature from \"MySQL Release Engineering <mysql-build@oss.oracle.com>\"\n",
+        "fingerprint": "BCA43417C3B485DD128EC6D4B7B3B788A8D3785C",
+        "returncode": 0
+      },
+      "archive_sha256": "88ac9cc85bed076c4c8c6e816c3369a6febfbb5db13e6e174f1d8971161e0b77",
+      "receipt_sha256": "685f95af54aa3b675ad457043a47225bbd41c4ae89d5551407421f6e391c5a97"
+    },
+    {
+      "id": "mysql-9.7.2",
+      "signature_verification": {
+        "method": "GPG detached signature with pinned official fingerprint",
+        "status": "[GNUPG:] NEWSIG\n[GNUPG:] KEY_CONSIDERED BCA43417C3B485DD128EC6D4B7B3B788A8D3785C 0\n[GNUPG:] SIG_ID l9A7EKY4fE4Mft7ro2l23wBngE8 2026-07-13 1783964628\n[GNUPG:] KEY_CONSIDERED BCA43417C3B485DD128EC6D4B7B3B788A8D3785C 0\n[GNUPG:] GOODSIG B7B3B788A8D3785C MySQL Release Engineering <mysql-build@oss.oracle.com>\n[GNUPG:] VALIDSIG BCA43417C3B485DD128EC6D4B7B3B788A8D3785C 2026-07-13 1783964628 0 4 0 1 8 00 BCA43417C3B485DD128EC6D4B7B3B788A8D3785C\n",
+        "stderr": "gpgv: Signature made Tue Jul 14 02:43:48 2026    \ngpgv:                using RSA key BCA43417C3B485DD128EC6D4B7B3B788A8D3785C\ngpgv: Good signature from \"MySQL Release Engineering <mysql-build@oss.oracle.com>\"\n",
+        "fingerprint": "BCA43417C3B485DD128EC6D4B7B3B788A8D3785C",
+        "returncode": 0
+      },
+      "archive_sha256": "6fe0baf13792e56afa3d93d6a174b4d5700901db1c8d09665225423dc094d0bb",
+      "receipt_sha256": "a0e5d788195150e004770b9270b19b7bbf4b4e980123a08d2e7fffa913d77a8a"
+    },
+    {
+      "id": "prometheus-3.13.4",
+      "checksum_file_sha256": "f7a6d2afc0bfcb424395148f08b19b6140288475313f106b7f508c23ba332127",
+      "checksum_entry": "87f21a66f96c597a189cef8d640e8921b621fc17a9feff707c332c4f3b3ddd56  prometheus-3.13.4.linux-amd64.tar.gz",
+      "github_asset_digest": "sha256:87f21a66f96c597a189cef8d640e8921b621fc17a9feff707c332c4f3b3ddd56"
+    },
+    {
+      "id": "prometheus-3.15.0",
+      "checksum_file_sha256": "023cab1e6b275ee1b8f5f64215a01d74bbb1b19c45183b7296ced4aa4532707b",
+      "checksum_entry": "2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0  prometheus-3.15.0.linux-amd64.tar.gz",
+      "github_asset_digest": "sha256:2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0"
+    }
+  ],
+  "initial_pipeline_failure": {
+    "command": "verify_revision",
+    "cause": "Current LF-normalized r2 assets manifest does not have the CRLF hash recorded by four historical results",
+    "resolution": "Added byte-identical CRLF archive verified against recorded SHA256 and round-2a assets snapshot; added existing provenance archive mappings and -text attribute; no historical result or expected hash changed"
+  },
+  "runtime_validation_pending": [
+    "Linux RSS/PSI/cgroup and query costs",
+    "MySQL runtime dependencies, startup, lock and GTID observations (8.4.10, 9.7.2)",
+    "promtool classic/native query observations (3.13.4, 3.15.0)",
+    "Read-only local synchronization metadata"
+  ],
+  "exclusions": [
+    "No deliberately induced global memory pressure/OOM/swap",
+    "No cgroup controller enable/limit write/process migration",
+    "No MySQL crash/power-loss/durability experiment",
+    "No Prometheus server native-histogram ingestion test",
+    "No external clock calibration or attribution of adjtimex setter"
+  ],
+  "validation": [
+    {
+      "command": "python -X utf8 -B scripts/check_docs.py",
+      "chunk_id": "d5c299",
+      "wall_time_seconds": 0.4035034,
+      "exit_code": 0,
+      "original_token_count": 66,
+      "output": "PASS: 121 Markdown files; 97 detailed chapters; 2043 local links; 459 distinct external URLs\r\nChecked: UTF-8, headings, fences, local paths/anchors, manifest coverage, chapter indexing\r\nExternal URLs are inventoried, not automatically revalidated by this script\r\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/verify_examples.py",
+      "chunk_id": "b9523b",
+      "wall_time_seconds": 0.050892,
+      "exit_code": 0,
+      "original_token_count": 34,
+      "output": "PASS: 170 arithmetic/interpretation checks across 57 source documents\r\nNo production diagnostic command or database query was executed\r\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/verify_contracts.py",
+      "chunk_id": "f36b54",
+      "wall_time_seconds": 0.050009,
+      "exit_code": 0,
+      "original_token_count": 24,
+      "output": "PASS: 22 adapter edge cases; 28 source-bound calculations; recorded lab hashes and statuses\r\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/verify_revision.py",
+      "chunk_id": "6a76c9",
+      "wall_time_seconds": 0.3171455,
+      "exit_code": 0,
+      "original_token_count": 382,
+      "output": "PASS: published Linux clock evidence SHA256, runner hash, 4 intervals, 61 idle samples and chapter values\r\nIdle MONO/RAW: 0.9363740129706928 sample mean tick/10000: 0.9363754098360656 freq ppm range: -49.82659912109375 40.45188903808594\r\nPASS: saved evidence integrity labs\\results\\1.1-r2-kubernetes.json {'refuted': 2, 'supported': 14}\r\nSupported/refuted/inconclusive/blocked describe observations; integrity PASS is not universal product certification.\r\nPASS: saved evidence integrity labs\\results\\1.1-r2-prometheus.json {'supported': 2}\r\nSupported/refuted/inconclusive/blocked describe observations; integrity PASS is not universal product certification.\r\nPASS: saved evidence integrity labs\\results\\1.1-r2-otel.json {'supported': 14}\r\nSupported/refuted/inconclusive/blocked describe observations; integrity PASS is not universal product certification.\r\nPASS: saved evidence integrity labs\\results\\1.1-r2-postgresql.json {'supported': 4}\r\nSupported/refuted/inconclusive/blocked describe observations; integrity PASS is not universal product certification.\r\nPASS: 36 published round-2 scenarios (34 supported, 2 refuted); archive provenance and reported observations\r\nPASS: 31 recorded scenarios in 5 suites; all evidence input hashes; SQL excerpt; 12 calculations and timestamp-value pairing\r\nHistorical inputs include the byte-identical archived Linux runner. Its CPU passed flag did not validate wall-clock calibration.\r\nSaved execution evidence was checked; servers and source facts were not re-executed by this command\r\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/build_book.py --check",
+      "chunk_id": "3ff16f",
+      "wall_time_seconds": 0.3653792,
+      "exit_code": 0,
+      "original_token_count": 11,
+      "output": "PASS: BOOK.md matches 119 source documents\r\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/build_html.py --check",
+      "chunk_id": "488892",
+      "wall_time_seconds": 0.7403034,
+      "exit_code": 0,
+      "original_token_count": 16,
+      "output": "PASS: BOOK.html matches source documents and pinned renderer\r\n"
+    },
+    {
+      "command": "python -X utf8 -B scripts/verify_review_r3.py --assets",
+      "chunk_id": "8ac7a7",
+      "wall_time_seconds": 2.0092737,
+      "exit_code": 0,
+      "original_token_count": 289,
+      "output": "RECORDED: C:\\project\\Domain-Knowledge\\.lab-runs\\r3\\preparation\\verify-s735w2sc\\bundle.json; status=recorded\r\nPASS: bundle.json: 1 complete gzip artifacts; {'supported': 1}; inputs match\r\nRECORDED: C:\\project\\Domain-Knowledge\\.lab-runs\\r3\\preparation\\verify-s735w2sc\\budget.json; status=recorded\r\nRECORDED: C:\\project\\Domain-Knowledge\\.lab-runs\\r3\\preparation\\verify-s735w2sc\\failure.json; status=error\r\nRECORDED: C:\\project\\Domain-Knowledge\\.lab-runs\\r3\\preparation\\verify-s735w2sc\\log-failure.json; status=error\r\nRECORDED: C:\\project\\Domain-Knowledge\\.lab-runs\\r3\\preparation\\verify-s735w2sc\\stop-failure.json; status=error\r\nRECORDED: C:\\project\\Domain-Knowledge\\.lab-runs\\r3\\preparation\\verify-s735w2sc\\native-failure.json; status=error\r\nPASS: preparation, independent histogram arithmetic, NULL/proc/PSI parsers, gzip integrity, boundaries and failure cleanup\r\nPASS: authenticated extraction receipt and file hashes: mysql-8.4.10\r\nPASS: authenticated extraction receipt and file hashes: mysql-9.7.2\r\nPASS: authenticated extraction receipt and file hashes: prometheus-3.13.4\r\nPASS: authenticated extraction receipt and file hashes: prometheus-3.15.0\r\n"
+    }
+  ]
+}

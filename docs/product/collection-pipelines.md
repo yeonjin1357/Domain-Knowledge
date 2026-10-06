@@ -1,6 +1,6 @@
 # 수집, 변환, 전송과 유실의 경계
 
-> 상태: 검토됨 · 범위: 공통 수집 구조, OpenTelemetry Collector·OTLP · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 범위: 공통 수집 구조, OpenTelemetry Collector·OTLP, Fluent Bit 5.1.3 및 명시한 이전 버전 차이 · 3d 공식 문서·소스 검토: 2026-10-06 · Fluent Bit 장애 실습은 수행하지 않음
 
 ## 먼저 이해할 것
 
@@ -74,6 +74,41 @@ Collector의 persistent sending queue는 디스크에 보관해 프로세스 재
 
 큐가 찼을 때 가능한 정책에는 입력 거절, 오래된 항목 폐기, 우선순위별 제한, 전송량 제한이 있습니다. 어떤 정책이든 버린 양과 이유를 남겨야 조회 결과의 모집단을 설명할 수 있습니다. 재시도 역시 [업무 요청의 재시도](../application/timeouts-and-retries.md)처럼 부하를 증폭할 수 있습니다.
 
+## 로그가 없는 것과 로그를 잃은 것을 구분한다
+
+검색 결과가 비었다면 애플리케이션이 기록하지 않았을 수도 있고, 파일을 읽지 못했거나 필터·버퍼·전송·색인 단계에서 사라졌을 수도 있습니다. 수집기가 읽기 전 파일이 삭제됐다면 수집기의 drop counter에도 잡히지 않을 수 있습니다. 따라서 “drop=0”만으로 종단 간 무손실을 보증하지 않습니다.
+
+다음은 **Fluent Bit 5.1.3 코드와 공식 monitoring 문서를 2026-10-06 확인한** 원천입니다. GitHub 릴리스 게시 시각은 2026-10-01 UTC이며 프로젝트 공지의 날짜는 9월 30일입니다. plugin instance별로 읽으며 누적 수명과 단위를 보존합니다. chunk는 여러 record를 모아 전송하는 묶음이므로 chunk 수와 로그 줄 수를 더하거나 같은 분모로 나누지 않습니다. [공식 릴리스](https://github.com/fluent/fluent-bit/releases/tag/v5.1.3), [프로젝트 공지](https://fluentbit.io/announcements/v5.1.3/), [monitoring](https://docs.fluentbit.io/manual/administration/monitoring)
+
+**아래 fluentbit_* 이름은 `/api/v2/metrics/prometheus` 기준**입니다. v2의 일반 `/api/v2/metrics`는 cmetrics text, `/api/v2/metrics/prometheus`는 Prometheus text 0.0.4 형식입니다. v1 JSON·v1 Prometheus endpoint에 모든 같은 이름이 있다고 가정하지 않습니다. 특히 filter drop 등 cmetrics 원천의 가용성을 endpoint별로 확인하며, 표의 `/api/v1/storage`만 별도의 JSON 상태 응답입니다. [endpoint·v2 지표 구분](https://docs.fluentbit.io/manual/administration/monitoring)
+
+| 지표 | 단위·형태 | 판단할 수 있는 것 |
+| --- | --- | --- |
+| `fluentbit_input_records_total` | 누적 record | input이 성공적으로 받아들인 수; 원천에서 발생한 전체 수는 아님 |
+| `fluentbit_filter_drop_records_total` | 누적 record | filter에서 제거한 수; 의도한 정책일 수도 있음 |
+| `fluentbit_output_proc_records_total` | 누적 record | output이 성공적으로 보낸 수; 최종 검색 완료와 구분 |
+| `fluentbit_output_retries_total` | chunk 재시도 요청 횟수 | 같은 chunk의 여러 재시도 포함 가능; 유실 건수 아님 |
+| `fluentbit_output_retries_failed_total` | 재시도 한도 소진 chunk 수 | 해당 chunk 재시도 만료·폐기 |
+| `fluentbit_output_dropped_records_total` | 누적 record | 복구 불가 오류 또는 재시도 만료로 output에서 버린 수 |
+| `fluentbit_output_errors_total` | 실패 chunk 수 | 로그 메시지 줄 수나 실패 record 수와 같지 않음 |
+| `fluentbit_input_memrb_dropped_chunks`, `fluentbit_input_memrb_dropped_bytes` | 누적 chunk / byte | memrb가 가득 차서 버린 양; record 수로 바꾸지 않음 |
+| `fluentbit_input_files_rotated_total` | 누적 file | Tail이 관측한 회전; 그 자체가 손실 수는 아님 |
+| `fluentbit_input_long_line_skipped_total` | 누적 occurrence | Tail의 긴 줄 생략; 버퍼 크기·skip 설정과 함께 해석 |
+| `fluentbit_processor_items_drop_total` | 누적 item | processor에서 제거한 항목; signal·processor 단계와 의도한 정책을 구분 |
+| `fluentbit_input_ingestion_paused` | gauge 0/1 | input 수집이 pause된 상태; pause 횟수가 아님 |
+| `fluentbit_input_storage_overlimit` | gauge 0/1 | input storage 한도 초과 상태; 유실 개수를 나타내지 않음 |
+| `/api/v1/storage`의 chunk·byte 통계 | 상태값 | buffered 자료와 메모리/파일시스템 상태; 누적 전송량과 구분 |
+
+버전 경계도 지표별로 다릅니다. memrb drop과 pause·overlimit gauge는 **v4.1.0 코드에도 존재**하며, files_rotated_total도 같은 버전의 Tail에서 확인됩니다. processor items_drop_total은 비교한 v4.2.0에는 없고 v5.0.0에는 있습니다. long_line_skipped_total은 여기서는 v5.1.3 제공을 확인한 범위로 쓰며 최초 도입 버전은 확정하지 않습니다. [v4.1.0 input 지표](https://github.com/fluent/fluent-bit/blob/v4.1.0/src/flb_input.c), [v4.1.0 memrb 폐기 계정](https://github.com/fluent/fluent-bit/blob/v4.1.0/src/flb_input_chunk.c), [v4.1.0 Tail](https://github.com/fluent/fluent-bit/blob/v4.1.0/plugins/in_tail/tail_config.c), [v5.0.0 processor](https://github.com/fluent/fluent-bit/blob/v5.0.0/src/flb_processor.c), [v5.1.3 Tail](https://github.com/fluent/fluent-bit/blob/v5.1.3/plugins/in_tail/tail_config.c)
+
+Fluent Bit의 `Retry_Limit`은 chunk에 적용됩니다. filesystem buffering을 써도 무한 보존은 아닙니다. output의 `storage.total_limit_size`가 차면 해당 논리 목적지 큐의 가장 오래된 chunk를 버려 공간을 만듭니다. memrb도 한도 초과 때 가장 오래된 chunk를 버리는 별도 경로이며 해당 input drop 계수를 봅니다. input pause 동안 파일이 회전·삭제되는 조건도 따로 조사합니다. [buffering과 한도](https://docs.fluentbit.io/manual/administration/buffering-and-storage), [5.1.3 폐기 경로](https://github.com/fluent/fluent-bit/blob/v5.1.3/src/flb_input_chunk.c), [pause 계정](https://github.com/fluent/fluent-bit/blob/v5.1.3/src/flb_input.c), [overlimit 계정](https://github.com/fluent/fluent-bit/blob/v5.1.3/src/flb_storage.c)
+
+여러 output으로 fan-out하면 성공·폐기 수가 목적지마다 생깁니다. 이를 합쳐 “원본 로그 손실 수”로 만들지 않습니다. 필터가 record를 추가하거나 multiline을 합치는 경우에도 입력−출력의 단순 차이는 손실이 아닐 수 있습니다. Collector의 `send_failed_*`는 [그 버전의 전달 계약](telemetry-delivery-contracts.md)에 따라 해석하며 Fluent Bit의 retry counter로 이름만 치환하지 않습니다.
+
+제품 적용 제안: 원천 마지막 읽기 시각·파일 수명/offset·input 성공·의도한 filter 제거·buffer·output 실패·저장 수신·검색 가능을 단계별로 표시합니다. pipeline 설정 변경과 restart를 경계로 남기고, 분기·변환이 없는 같은 record 집합에서만 수지 계산을 합니다. 합성 sentinel 로그로 도착 여부를 확인하는 검사는 별도 트래픽이며 자연 발생 로그 전체를 증명하지 않습니다.
+
+HTTP metric endpoint 조회는 읽기 전용이지만, 먼저 HTTP server·storage metrics가 구성되어야 하고 접근 제어가 필요합니다. 이를 켜는 것은 설정 변경입니다. 이 장에서는 endpoint를 켜거나 로그 전송 장애를 실행하지 않았습니다. 수집 빈도·응답량·endpoint 노출 범위도 설계에 포함합니다.
+
 ## 수집 연동을 완료했다고 판단할 근거
 
 다음은 어댑터를 실제 구현할 때 수행할 검증 항목입니다. 이 문서 작성 중 실제 연동을 실행했다는 뜻은 아닙니다.
@@ -89,5 +124,7 @@ Collector의 persistent sending queue는 디스크에 보관해 프로세스 재
 1. HTTP 200을 받았으면 모든 OTLP 항목이 저장되었는가? **부분 성공 본문과 수신 서버의 계약을 확인해야 한다.**
 2. 영속 큐가 있으면 무한 장애 시간을 견디는가? **용량·디스크·재시도 조건에 한계가 있다.**
 3. 변환 작업자가 재시작하면 누적값의 차이를 바로 계산할 수 있는가? **이전 값과 수명 정보를 복원하지 못하면 불확실한 첫 구간을 따로 처리해야 한다.**
+4. retries_failed 1은 로그 1건 유실인가? **Fluent Bit의 해당 단위는 chunk이므로 포함 record 수가 필요합니다.**
+5. drop counter가 0이면 원천 로그가 모두 검색 가능한가? **수집 전 손실·가시성 지연 등 관측 밖의 경계가 남습니다.**
 
 관련: [식별과 관계](entities-and-topology.md), [저장과 조회](storage-and-query.md), [제품 자체 관측](self-observation-and-access.md)

@@ -1,6 +1,8 @@
 # CPU와 메모리의 위치: NUMA, 캐시, 스케줄링과 압력
 
-> 상태: 검토됨 · 적용 범위: Linux NUMA·CPU affinity·PSI 인터페이스 · 검토일: 2026-10-04 · 명령은 이 환경에서 실행하지 않음
+> 상태: 검토됨 · 적용 범위: Linux NUMA·CPU affinity·PSI 인터페이스 · 검토일: 2026-10-04 · 운영 명령 예시는 미실행; 아래 WSL 저장 관측과 구분 · 3d 원천·저장 증거 확인: 2026-10-06
+
+> 3라운드 보강: Linux 6.12·6.18 코드와 6.0/6.1 도입 경계 확인, 2026-10-05
 
 서버 전체에 메모리가 남아 있어도 어떤 CPU가 가까이 접근할 수 있는 메모리는 부족할 수 있습니다. NUMA는 CPU와 메모리의 위치에 따라 접근 특성이 달라지는 구조입니다. 가까운 창고와 먼 창고를 떠올리면 쉽지만, 실제 비용은 장비 구조·배치·접근 패턴에 따라 달라지므로 “원격 메모리는 항상 몇 배 느리다”는 고정 배수를 사용하지 않습니다.
 
@@ -38,6 +40,22 @@ PSI의 `some`은 적어도 일부 작업이 해당 자원을 기다린 구간을
 
 ## 읽기 전용 조사와 제품 적용 제안
 
+### PSI가 없는 것과 압력이 0인 것은 다르다
+
+같은 이미지의 애플리케이션을 옮겼는데 `memory.pressure`가 사라졌다면 부하 감소보다 먼저 커널·mount·권한을 봅니다. `CONFIG_PSI`가 기능을 제공하고 `CONFIG_PSI_DEFAULT_DISABLED=y`이면 부팅 인자 `psi=1`로 활성화할 수 있습니다. 이 설명은 활성화 조건이며 수집기가 부팅 설정을 변경하라는 지시가 아닙니다. cgroup v2의 `cpu.pressure`, `memory.pressure`, `io.pressure`는 그 계층의 작업 범위이며 시스템 `/proc/pressure/*`와 같은 모집단이 아닙니다. cgroup의 `cgroup.pressure`는 **그 cgroup 자신의** PSI 집계만 켜고 끕니다. 이 설정은 비계층적이므로 하위 cgroup의 활성 상태를 바꾸지 않습니다. 존재·활성·접근 가능 여부를 따로 기록합니다. [Linux 6.12 Kconfig](https://github.com/torvalds/linux/blob/v6.12/init/Kconfig), [cgroup v2 pressure](https://docs.kernel.org/6.12/admin-guide/cgroup-v2.html)
+
+IRQ/SOFTIRQ pressure는 upstream **6.1에 들어왔으며** 6.0 소스에는 해당 원천이 없습니다. `CONFIG_IRQ_TIME_ACCOUNTING` 조건에서 `/proc/pressure/irq`와 `irq.pressure`가 제공되고, 읽히는 행은 `full`만입니다. 작업에 쓸 수 없었던 interrupt 처리 시간을 다루며 CPU `some`이나 단순 `/proc/stat`의 irq 비율과 동일 정의로 매핑하지 않습니다. 런타임 IRQ time accounting 상태도 계정에 영향을 주므로 파일 존재만으로 유효한 값이 계속 갱신된다고 단정하지 않습니다. [6.0 PSI](https://github.com/torvalds/linux/blob/v6.0/kernel/sched/psi.c), [6.1 PSI_IRQ와 irq 인터페이스](https://github.com/torvalds/linux/blob/v6.1/kernel/sched/psi.c), [6.12 psi_account_irqtime](https://github.com/torvalds/linux/blob/v6.12/kernel/sched/psi.c)
+
+**시스템 전체 CPU `full`은 정의되지 않습니다.** Linux는 5.13에 노출된 이 행을 호환성을 위해 0으로 표시합니다. 그 0은 “CPU 경쟁이 전혀 없다”는 증거가 아닙니다. cgroup CPU full은 해당 그룹의 실행 가능한 작업이 실행 기회를 얻지 못하는 범위에서 의미가 있으므로 시스템 값과 구별합니다. IRQ `full`도 이름만 같을 뿐 이 시스템 CPU full의 무효 규칙을 적용하는 항목은 아닙니다. [PSI 설명](https://docs.kernel.org/accounting/psi.html), [6.12 psi_show](https://github.com/torvalds/linux/blob/v6.12/kernel/sched/psi.c)
+
+### trigger는 조회와 별도의 모니터 등록이다
+
+PSI trigger는 파일을 열고 `some 또는 full`, `threshold_us`, `window_us`를 써 넣은 뒤 같은 fd를 poll/epoll로 감시하는 방식입니다. **예시** `some 200000 2000000`은 2초 window 안의 누적 some stall 200 ms를 감시하며 용량 10% 경보가 아닙니다. fd당 한 trigger이고 닫으면 제거됩니다. 이 등록은 시스템 한도를 바꾸지는 않지만 커널 모니터 자원과 wakeup 비용을 사용하므로 읽기 전용 수집과 구분합니다. [PSI monitor 규약](https://docs.kernel.org/accounting/psi.html)
+
+Linux **6.12·6.18 소스**의 판정은 `0 < window_us <= 10,000,000`, `0 < threshold_us <= window_us`입니다. fd를 열 때의 자격에 `CAP_SYS_RESOURCE`가 없는 경우 window는 2초의 배수여야 합니다. 따라서 무권한 경로에서 가능한 window는 2·4·6·8·10초입니다. cgroup 파일의 쓰기 접근 권한도 별도로 필요합니다. 옛 문서의 “최소 500 ms”를 이 버전 코드의 검증 규칙으로 쓰지 않으며, “cgroup trigger는 항상 CAP_SYS_RESOURCE 필요”라고도 쓰지 않습니다. 두 인터페이스가 같은 생성 함수를 사용합니다. [6.12 psi_trigger_create](https://github.com/torvalds/linux/blob/v6.12/kernel/sched/psi.c), [6.18의 같은 검사](https://github.com/torvalds/linux/blob/v6.18/kernel/sched/psi.c), [cgroup pressure_write](https://github.com/torvalds/linux/blob/v6.12/kernel/cgroup/cgroup.c)
+
+제품에는 기본 주기의 읽기와 필요한 대상의 제한된 trigger를 분리하고, 등록 실패·권한 부족·기능 비활성·실제 0을 다른 상태로 보존할 것을 제안합니다. 2026-10-05 WSL2 Linux 6.18.33.2 실습에서는 시스템 cpu·memory·io PSI를 읽었고 irq 파일은 없었습니다. `/sys/fs/cgroup/init.scope`의 memory·cpu·io pressure는 읽혔지만 자식 cgroup 생성은 PermissionError로 불가능했습니다. irq 부재와 위임 부재를 0으로 바꾸지 않았습니다. 예시 trigger를 설치하거나 부팅 설정·한도·프로세스 배치를 변경하지 않았습니다. [실행 요약·원자료](../../labs/results/1.1-r3/linux-memory.json)
+
 ```bash
 lscpu
 cat /sys/devices/system/node/online
@@ -54,3 +72,5 @@ cat /proc/self/status
 1. 캐시 miss가 늘면 디스크가 느려진 것인가? **해당 캐시 계층과 다음 접근 대상을 확인해야 합니다.**
 2. 메모리 여유 합계가 많으면 배치 문제를 배제할 수 있는가? **NUMA 정책과 허용 노드 제한을 봐야 합니다.**
 3. PSI 20%와 메모리 사용률 20%는 같은가? **시간 비중과 용량 비중으로 서로 다릅니다.**
+4. 시스템 CPU full이 0이면 CPU 대기가 없는가? **그 범위에서 정의되지 않아 0인 행이므로 CPU some과 대상 cgroup을 봅니다.**
+5. PSI trigger 등록은 파일 내용 조회만 하는가? **커널 모니터를 만들므로 권한·자원·fd 수명 관리가 필요합니다.**

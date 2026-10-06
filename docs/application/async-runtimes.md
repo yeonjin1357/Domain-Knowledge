@@ -1,6 +1,6 @@
 # Go, Node.js, Python의 동시성과 관측
 
-> 상태: 검토됨 · 적용 범위: Go 런타임 API, Node.js 이벤트 루프, CPython 3.14 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: Go 런타임 API, Node.js 26.10.0·24.19.0 이벤트 루프, CPython 3.14 · 3d 원천 검토: 2026-10-06 · 런타임 계측 실습은 수행하지 않음
 
 ## 먼저 이해할 것
 
@@ -32,6 +32,14 @@ Node.js에서는 이벤트 루프의 callback 처리와 libuv worker pool의 작
 
 이벤트 루프 지연 25 ms를 그대로 요청의 p99 25 ms로 부르지 않습니다. 표본 대상과 분포가 다릅니다.
 
+### ELU는 프로세스 CPU 비율이 아니다
+
+**Node.js v26.10.0·v24.19.0 문서 확인: 2026-10-06.** `performance.eventLoopUtilization()`은 이벤트 루프의 누적 active·idle 시간을 고해상도 ms로 제공하고 그 비율을 계산합니다. 이전 호출 결과를 인자로 주면 구간 값을 얻을 수 있습니다. 직접 만든 객체를 전달하거나 utilization 비율끼리 뺄셈하지 않습니다. active는 event provider(예: epoll_wait) 밖의 시간이라 동기 블로킹에도 높아질 수 있습니다. OS CPU 사용률과 나란히 보아야 “계산 중”과 “루프 진행이 막힘”을 구분할 수 있습니다. [고정 버전 perf_hooks 원천](https://github.com/nodejs/node/blob/v26.10.0/doc/api/perf_hooks.md)
+
+같은 문서에서 `monitorEventLoopDelay`의 `samplePerIteration`은 **26.5.0에 추가되고 24.19.0 LTS에도 backport**됐습니다. v25.9.0 문서에는 이 옵션이 없으므로 단순한 major 버전 대소 비교로 지원 여부를 판정하지 않습니다. 기본 false에서는 `resolution`(기본 10 ms) timer로 표본을 얻습니다. true에서는 루프 iteration마다 prepare/check hook으로 표본을 얻으며 resolution은 무시합니다. true 모드는 유휴 상태에서 루프를 살려 두거나 추가 iteration을 강제하지 않습니다. 두 모드의 결과는 상당히 달라 직접 비교하지 말라는 API 설명을 따릅니다. 같은 지표 이름이라도 모드 변경 전후를 연속 분포로 합치지 않습니다. [v26.10.0 API](https://github.com/nodejs/node/blob/v26.10.0/doc/api/perf_hooks.md#perf_hooksmonitoreventloopdelayoptions), [24.19.0 추가 기록](https://github.com/nodejs/node/blob/v24.19.0/doc/api/perf_hooks.md#perf_hooksmonitoreventloopdelayoptions), [25.9.0 원천](https://github.com/nodejs/node/blob/v25.9.0/doc/api/perf_hooks.md)
+
+제품 적용 제안: runtime·worker 수명, 측정 모드, resolution, histogram reset 시각을 보존합니다. histogram의 enable/disable·reset은 계측 상태 변경이며 반복 관측 비용이 있습니다. 애플리케이션 또는 허용된 계측 코드에 추가해야 하며 외부에서 PID만 알면 읽을 수 있는 파일은 아닙니다. 이 절에서는 Node 프로세스에 계측을 설치하거나 실행하지 않았습니다.
+
 ## Python: GIL과 asyncio는 다른 축이다
 
 CPython에는 GIL이 있는 일반 실행과 free-threaded 빌드가 있습니다. 3.13부터 도입된 free-threading 지원에서는 빌드가 이를 지원하는지와 현재 GIL이 실제로 꺼져 있는지가 별도 문제이며, 확장 모듈에 의해 GIL이 다시 활성화될 수도 있습니다. 따라서 “Python은 언제나 한 코어만 쓴다”는 일반화는 피해야 합니다. [CPython 3.14 free threading](https://docs.python.org/3.14/howto/free-threading-python.html)
@@ -60,5 +68,7 @@ asyncio의 이벤트 루프는 자신이 실행되는 스레드에서 task와 ca
 1. goroutine 10,000개는 요청 10,000개인가? **일대일 관계가 보장되지 않습니다.**
 2. 이벤트 루프 지연과 요청 지연은 같은 분포인가? **표본 대상이 다릅니다.**
 3. CPython 버전만으로 GIL 상태를 확정할 수 있는가? **빌드와 실제 실행 상태를 확인해야 합니다.**
+4. ELU가 높은데 CPU가 낮을 수 있는가? **동기 블로킹으로 루프가 진행하지 못하면 가능합니다.**
+5. Node의 timer 모드와 iteration 모드 지연 p99를 바로 비교해도 되는가? **표본 방식이 달라 모드·설정을 함께 구분해야 합니다.**
 
 다음: [브라우저와 사용자 경험](user-experience.md) · [애플리케이션 목차](README.md)

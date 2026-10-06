@@ -1,0 +1,61 @@
+{
+  "observations_example": [
+    1.25,
+    1.75,
+    2.5,
+    3.5
+  ],
+  "units": "observations and seconds",
+  "expressions": {
+    "classic_q25": {
+      "expr": "histogram_quantile(0.25, classic_bucket)",
+      "expected": 1.5
+    },
+    "classic_fraction": {
+      "expr": "histogram_fraction(1, 1.5, classic_bucket)",
+      "expected": 0.25
+    },
+    "classic_count": {
+      "expr": "classic_count",
+      "expected": 4
+    },
+    "native_q25": {
+      "expr": "histogram_quantile(0.25, native)",
+      "expected": 1.4142135623730951
+    },
+    "native_fraction": {
+      "expr": "histogram_fraction(1, 1.5, native)",
+      "expected": 0.2924812503605781
+    },
+    "native_count": {
+      "expr": "histogram_count(native)",
+      "expected": 4
+    },
+    "custom_q25": {
+      "expr": "histogram_quantile(0.25, custom)",
+      "expected": 1.5
+    },
+    "custom_fraction": {
+      "expr": "histogram_fraction(1, 1.5, custom)",
+      "expected": 0.25
+    },
+    "custom_count": {
+      "expr": "histogram_count(custom)",
+      "expected": 4
+    },
+    "classic_count_ignored": {
+      "expr": "count(histogram_count(classic_count)) or vector(0)",
+      "expected": 0
+    }
+  },
+  "scope": "Synthetic distribution, no measured requests; no rate/reset/extrapolation or scrape ingestion test",
+  "interpolation_sources": [
+    "https://prometheus.io/docs/prometheus/latest/querying/functions/#histogram_quantile",
+    "https://prometheus.io/docs/prometheus/latest/querying/functions/#histogram_fraction"
+  ],
+  "feature_sources": [
+    "https://github.com/prometheus/prometheus/blob/v3.13.4/CHANGELOG.md",
+    "https://github.com/prometheus/prometheus/blob/v3.15.0/CHANGELOG.md"
+  ],
+  "feature_status": "Native histogram stable since 3.9.0 per pinned CHANGELOG; test rules uses no feature flag. Server scrape_native_histograms configuration is separate and is not tested here."
+}

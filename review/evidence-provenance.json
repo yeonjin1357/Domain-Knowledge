@@ -35,6 +35,69 @@
       "archived_path": "labs/archive/lab_r2_common_2026_10_05.py",
       "sha256": "260f654988729f0119f17e50a6c9b8fe2cf89f7edf697170ffe45338e8af8518",
       "reason": "Round 2d: preserve successfully executed helper before correcting native-directory registration and cleanup failure reporting. Recorded observations are unchanged."
+    },
+    {
+      "evidence": "labs/results/1.1-r2-kubernetes.json",
+      "original_path": "labs/review-r2/assets.json",
+      "archived_path": "labs/archive/review_r2_assets_2026_10_05.json",
+      "sha256": "6859cca01bfcca358cb514f0bb16bc772cbc3c0fb1c30ef793e21dadd1e92555",
+      "reason": "Round 3a preparation found checkout LF normalization of the CRLF manifest recorded by round 2. This archive is byte-identical to its recorded SHA256 and semantically identical to the current manifest and the preserved round-2a assets snapshot; published result bytes/hashes remain unchanged."
+    },
+    {
+      "evidence": "labs/results/1.1-r2-prometheus.json",
+      "original_path": "labs/review-r2/assets.json",
+      "archived_path": "labs/archive/review_r2_assets_2026_10_05.json",
+      "sha256": "6859cca01bfcca358cb514f0bb16bc772cbc3c0fb1c30ef793e21dadd1e92555",
+      "reason": "Round 3a preparation found checkout LF normalization of the CRLF manifest recorded by round 2. This archive is byte-identical to its recorded SHA256 and semantically identical to the current manifest and the preserved round-2a assets snapshot; published result bytes/hashes remain unchanged."
+    },
+    {
+      "evidence": "labs/results/1.1-r2-otel.json",
+      "original_path": "labs/review-r2/assets.json",
+      "archived_path": "labs/archive/review_r2_assets_2026_10_05.json",
+      "sha256": "6859cca01bfcca358cb514f0bb16bc772cbc3c0fb1c30ef793e21dadd1e92555",
+      "reason": "Round 3a preparation found checkout LF normalization of the CRLF manifest recorded by round 2. This archive is byte-identical to its recorded SHA256 and semantically identical to the current manifest and the preserved round-2a assets snapshot; published result bytes/hashes remain unchanged."
+    },
+    {
+      "evidence": "labs/results/1.1-r2-postgresql.json",
+      "original_path": "labs/review-r2/assets.json",
+      "archived_path": "labs/archive/review_r2_assets_2026_10_05.json",
+      "sha256": "6859cca01bfcca358cb514f0bb16bc772cbc3c0fb1c30ef793e21dadd1e92555",
+      "reason": "Round 3a preparation found checkout LF normalization of the CRLF manifest recorded by round 2. This archive is byte-identical to its recorded SHA256 and semantically identical to the current manifest and the preserved round-2a assets snapshot; published result bytes/hashes remain unchanged."
+    },
+    {
+      "evidence": "labs/results/1.1-r3/linux-memory.json",
+      "original_path": "labs/review-r3/assets.json",
+      "archived_path": "labs/archive/review_r3_2026_10_05/assets.json",
+      "sha256": "91fc56d5debea87e2a94a2e66a9055552646014404f7d530b8a3e091613eb659",
+      "reason": "Round 3d: preserve the manifest used by Claude before adding MySQL 8.4.11. Published observations and input hashes are unchanged."
+    },
+    {
+      "evidence": "labs/results/1.1-r3/histograms.json",
+      "original_path": "labs/review-r3/assets.json",
+      "archived_path": "labs/archive/review_r3_2026_10_05/assets.json",
+      "sha256": "91fc56d5debea87e2a94a2e66a9055552646014404f7d530b8a3e091613eb659",
+      "reason": "Round 3d: preserve the manifest used by Claude before adding MySQL 8.4.11. Published observations and input hashes are unchanged."
+    },
+    {
+      "evidence": "labs/results/1.1-r3/clock-state.json",
+      "original_path": "labs/review-r3/assets.json",
+      "archived_path": "labs/archive/review_r3_2026_10_05/assets.json",
+      "sha256": "91fc56d5debea87e2a94a2e66a9055552646014404f7d530b8a3e091613eb659",
+      "reason": "Round 3d: preserve the manifest used by Claude before adding MySQL 8.4.11. Published observations and input hashes are unchanged."
+    },
+    {
+      "evidence": "labs/results/1.1-r3/mysql-8.4.11-r1.json",
+      "original_path": "scripts/run_mysql_r3_lab.py",
+      "archived_path": "labs/archive/review_r3_2026_10_05/mysql_r1/run_mysql_r3_lab.py",
+      "sha256": "0bff81f2c5c9ac8de30b6b867f4706df8d81a70a56479adc47c10cfe47f8d171",
+      "reason": "Round 3e: preserve r1 assumptions before correcting sys/INNODB_TRX visibility polling and separating GTID completion from coordinator checkpoint convergence. No saved verdict rewritten."
+    },
+    {
+      "evidence": "labs/results/1.1-r3/mysql-9.7.2-r1.json",
+      "original_path": "scripts/run_mysql_r3_lab.py",
+      "archived_path": "labs/archive/review_r3_2026_10_05/mysql_r1/run_mysql_r3_lab.py",
+      "sha256": "0bff81f2c5c9ac8de30b6b867f4706df8d81a70a56479adc47c10cfe47f8d171",
+      "reason": "Round 3e: preserve r1 assumptions before correcting sys/INNODB_TRX visibility polling and separating GTID completion from coordinator checkpoint convergence. No saved verdict rewritten."
     }
   ],
   "published": [
@@ -112,6 +175,113 @@
         "supported": 4
       },
       "validator": "scripts/verify_review_r2.py --published; also called by scripts/verify_revision.py"
+    },
+    {
+      "id": "linux-memory-r3",
+      "evidence": "labs/results/1.1-r3/linux-memory.json",
+      "sha256": "7d895a7a30d10181f4a6426d83d78ba3ca4f8306beced0a0e72f814c5ddb3f83",
+      "runner": "scripts/run_linux_memory_r3_lab.py",
+      "runner_sha256": "274276931eb05240f5d4ca9a7bcf514a321a887e642da7dfa420f4f300bac8b6",
+      "run_at_utc": "2026-10-05T14:25:19.149680+00:00",
+      "execution_attribution": "Claude executed on WSL Ubuntu 24.04; Codex checked saved inputs, gzip bytes and derived observations in round 3d.",
+      "publication_method": "Byte-identical JSON and every referenced gzip copied from .lab-runs/r3; no values or verdicts rewritten.",
+      "scope": "Local synthetic observations; no production or external time calibration",
+      "verdict_counts": {
+        "supported": 4
+      },
+      "validator": "scripts/verify_review_r3.py --published; called by scripts/verify_revision.py"
+    },
+    {
+      "id": "histograms-r3",
+      "evidence": "labs/results/1.1-r3/histograms.json",
+      "sha256": "e299135d7b4c93f935ec69db09765062d6598f37c756b4272ba4ea79d64de34d",
+      "runner": "scripts/run_histogram_r3_lab.py",
+      "runner_sha256": "a4eccf09168e47e3faf8bb56b3d1a554da998158994c430a35ab5d43abf68a12",
+      "run_at_utc": "2026-10-05T14:25:20.512263+00:00",
+      "execution_attribution": "Claude executed on WSL Ubuntu 24.04; Codex checked saved inputs, gzip bytes and derived observations in round 3d.",
+      "publication_method": "Byte-identical JSON and every referenced gzip copied from .lab-runs/r3; no values or verdicts rewritten.",
+      "scope": "Local synthetic observations; no production or external time calibration",
+      "verdict_counts": {
+        "supported": 2
+      },
+      "validator": "scripts/verify_review_r3.py --published; called by scripts/verify_revision.py"
+    },
+    {
+      "id": "clock-state-r3",
+      "evidence": "labs/results/1.1-r3/clock-state.json",
+      "sha256": "8eca5bf3afb1343a57edfe1e233a706850efa96a5887abcbaeed75615dc114da",
+      "runner": "scripts/run_clock_r3_lab.py",
+      "runner_sha256": "7a99691c10107e375f7157b2ab2a84ed34919b69eb1ce8ca1cb4d39055ddc411",
+      "run_at_utc": "2026-10-05T14:25:37.621248+00:00",
+      "execution_attribution": "Claude executed on WSL Ubuntu 24.04; Codex checked saved inputs, gzip bytes and derived observations in round 3d.",
+      "publication_method": "Byte-identical JSON and every referenced gzip copied from .lab-runs/r3; no values or verdicts rewritten.",
+      "scope": "Local synthetic observations; no production or external time calibration",
+      "verdict_counts": {
+        "supported": 1
+      },
+      "validator": "scripts/verify_review_r3.py --published; called by scripts/verify_revision.py"
+    },
+    {
+      "id": "mysql-8.4.11-r1-r3",
+      "evidence": "labs/results/1.1-r3/mysql-8.4.11-r1.json",
+      "sha256": "1f2736fad023e23084b61dd2d55407c15e9ae28e7c1f6bd9adc782272b670ed6",
+      "runner": "scripts/run_mysql_r3_lab.py",
+      "runner_sha256": "0bff81f2c5c9ac8de30b6b867f4706df8d81a70a56479adc47c10cfe47f8d171",
+      "run_at_utc": "2026-10-05T15:44:37.372022+00:00",
+      "execution_attribution": "Claude executed on WSL Ubuntu 24.04; Codex checked complete raw SQL/XML, archived inputs, source code and verdict causes in round 3e.",
+      "publication_method": "Byte-identical JSON and all 100 referenced gzip sidecars; supported/refuted values are unchanged.",
+      "scope": "Local owned MySQL instances with two applier workers. Composite r1 criteria assumed immediate sys view and checkpoint visibility; refutations retained as evidence of those assumptions.",
+      "verdict_counts": {
+        "refuted": 2,
+        "supported": 3
+      },
+      "validator": "scripts/verify_review_r3.py --published; called by scripts/verify_revision.py"
+    },
+    {
+      "id": "mysql-9.7.2-r1-r3",
+      "evidence": "labs/results/1.1-r3/mysql-9.7.2-r1.json",
+      "sha256": "e97f442ce3701ac4ef8119de32c7219eeea9dfed70e004f7b0875506ed6c354c",
+      "runner": "scripts/run_mysql_r3_lab.py",
+      "runner_sha256": "0bff81f2c5c9ac8de30b6b867f4706df8d81a70a56479adc47c10cfe47f8d171",
+      "run_at_utc": "2026-10-05T15:45:19.403828+00:00",
+      "execution_attribution": "Claude executed on WSL Ubuntu 24.04; Codex checked complete raw SQL/XML, archived inputs, source code and verdict causes in round 3e.",
+      "publication_method": "Byte-identical JSON and all 100 referenced gzip sidecars; supported/refuted values are unchanged.",
+      "scope": "Local owned MySQL instances with two applier workers. Composite r1 criteria assumed immediate sys view and checkpoint visibility; refutations retained as evidence of those assumptions.",
+      "verdict_counts": {
+        "refuted": 2,
+        "supported": 3
+      },
+      "validator": "scripts/verify_review_r3.py --published; called by scripts/verify_revision.py"
+    },
+    {
+      "id": "mysql-8.4.11-r2-r3",
+      "evidence": "labs/results/1.1-r3/mysql-8.4.11-r2.json",
+      "sha256": "981b612dd4adcd5fd6e3a3c02a6c98104298c90e026d02f379f95d4421a86034",
+      "runner": "scripts/run_mysql_r3_lab.py",
+      "runner_sha256": "fde7265ffe3a262a65a3722c0b026cc5e996de432613cf65826bab534c98de3b",
+      "run_at_utc": "2026-10-05T16:14:23.655302+00:00",
+      "execution_attribution": "Claude executed on WSL Ubuntu 24.04, 2026-10-06 KST (2026-10-05 UTC); Codex checked complete SQL/XML, gzip hashes, inputs, visibility transitions and verdicts in round 3f.",
+      "publication_method": "Byte-identical JSON and all 132 referenced gzip sidecars; no values or verdicts rewritten.",
+      "scope": "Owned local instances; five supported conditions with bounded sys visibility and independent file/position gates. Immediate samples retained. Historical r1 composite-condition refutations are preserved separately.",
+      "verdict_counts": {
+        "supported": 5
+      },
+      "validator": "scripts/verify_review_r3.py --published; called by scripts/verify_revision.py"
+    },
+    {
+      "id": "mysql-9.7.2-r2-r3",
+      "evidence": "labs/results/1.1-r3/mysql-9.7.2-r2.json",
+      "sha256": "647cc93e33b75a3afef6bf250a34ce2bc6537a3c2273570438e28a2a753a10e5",
+      "runner": "scripts/run_mysql_r3_lab.py",
+      "runner_sha256": "fde7265ffe3a262a65a3722c0b026cc5e996de432613cf65826bab534c98de3b",
+      "run_at_utc": "2026-10-05T16:15:08.510543+00:00",
+      "execution_attribution": "Claude executed on WSL Ubuntu 24.04, 2026-10-06 KST (2026-10-05 UTC); Codex checked complete SQL/XML, gzip hashes, inputs, visibility transitions and verdicts in round 3f.",
+      "publication_method": "Byte-identical JSON and all 132 referenced gzip sidecars; no values or verdicts rewritten.",
+      "scope": "Owned local instances; five supported conditions with bounded sys visibility and independent file/position gates. Immediate samples retained. Historical r1 composite-condition refutations are preserved separately.",
+      "verdict_counts": {
+        "supported": 5
+      },
+      "validator": "scripts/verify_review_r3.py --published; called by scripts/verify_revision.py"
     }
   ]
 }

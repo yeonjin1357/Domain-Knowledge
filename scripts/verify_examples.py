@@ -6,7 +6,7 @@ or live PromQL/SQL. Source paragraphs still require editorial review.
 """
 
 from fractions import Fraction as F
-from math import ceil, floor, isclose
+from math import ceil, floor, isclose, log2, sqrt
 import re
 
 from doc_utils import ROOT
@@ -271,6 +271,29 @@ def main():
     # Same used bytes, different limit: changed percentage is not freed memory.
     p = "kubernetes/pressure-and-termination"
     case(p, "doubling limit halves ratio without changing numerator", F(400, 1024) / F(400, 512), F(1, 2))
+
+    # Round 3b manuscript arithmetic only. Do not import or modify active lab inputs.
+    sample_seconds = [F(5, 4), F(7, 4), F(5, 2), F(7, 2)]
+    r3_examples = [
+        ("host/reclaim-and-oom", "2,500 / 10,000 = 25%", F(2500, 10000) * 100, 25),
+        ("host/reclaim-and-oom", "2 MiB", F(512 * 4 * KiB, MiB), 2),
+        ("host/reclaim-and-oom", "0.2 MiB/s", F(512 * 4 * KiB, MiB * 10), .2),
+        ("host/numa-and-pressure", "2초 window 안의 누적 some stall 200 ms", F(200000, 1000), 200),
+        ("foundations/histogram-storage", "scale=0 → base=2", 2 ** (2 ** 0), 2),
+        ("foundations/histogram-storage", "base=√2 ≈ 1.414214", round(2 ** (2 ** -1), 6), 1.414214),
+        ("foundations/histogram-storage", "count=4", len(sample_seconds), 4),
+        ("foundations/histogram-storage", "sum=9초", sum(sample_seconds), 9),
+        ("foundations/histogram-storage", "**1.5초**", 1 + F(2 - 1, 2), 1.5),
+        ("foundations/histogram-storage", "**√2 ≈ 1.414214초**", round(sqrt(2), 6), 1.414214),
+        ("foundations/histogram-storage", "**0.25**", F(2, 4) * F(3 - 2, 2) / (2 - 1), .25),
+        ("foundations/histogram-storage", "**0.292481**", round(F(2, 4) * log2(1.5), 6), .292481),
+        ("foundations/histogram-storage", "비율은 1/4", F(sum(1 < x <= F(3, 2) for x in sample_seconds), len(sample_seconds)), .25),
+        ("foundations/histogram-storage", "99~101 ms", 100 * (1 - F(1, 100)), 99),
+        ("foundations/histogram-storage", "99~101 ms", 100 * (1 + F(1, 100)), 101),
+    ]
+    for index, (p, token, actual, expected) in enumerate(r3_examples, 1):
+        assert token in (ROOT / "docs" / (p + ".md")).read_text(encoding="utf-8"), (p, token)
+        case(p, f"round 3b printed example {index}", actual, expected)
 
     # Boundary checks: these make the limitations in the text explicit.
     p = "foundations/time-series"

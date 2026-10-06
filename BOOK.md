@@ -2,7 +2,7 @@
 
 # 통합 모니터링 도메인 지식서
 
-> 제1.1판 · 기준일: 2026-10-04 · 상세 본문 97장
+> 제1.1판 · 기준일: 2026-10-04 · 상세 본문 100장
 
 통합 모니터링 제품을 설계·구현하는 개발자를 위한 지식서입니다. 공식 자료로 확인한 설명, 가상 계산, 설계 제안을 구분합니다.
 
@@ -19,6 +19,7 @@
   - [시계열과 지표의 데이터 모델](#chapter-docs-foundations-time-series)
   - [지표에 남겨야 할 문맥: exemplar와 카운터 시작 시각](#chapter-docs-foundations-metric-context-and-start-time)
   - [평균과 백분위수 및 분포의 집계](#chapter-docs-foundations-distributions)
+  - [분포를 저장하는 방법: 지수 버킷, native histogram과 sketch](#chapter-docs-foundations-histogram-storage)
   - [성능을 읽는 순서: 처리량, 대기열, 표본과 실험](#chapter-docs-foundations-performance-and-statistics)
   - [서비스 수준 지표와 오류 예산](#chapter-docs-foundations-service-level-objectives)
   - [시간과 관측 데이터의 품질](#chapter-docs-foundations-time-and-data-quality)
@@ -29,6 +30,7 @@
   - [호스트 도메인](#chapter-docs-host-readme)
   - [CPU 실행 시간과 스케줄링 대기](#chapter-docs-host-cpu)
   - [메모리와 가상 주소 공간 및 메모리 압력](#chapter-docs-host-memory)
+  - [메모리 회수와 OOM: 부족해지는 과정과 종료의 증거](#chapter-docs-host-reclaim-and-oom)
   - [블록 I/O와 파일시스템 용량](#chapter-docs-host-disk-io)
   - [프로세스와 스레드 및 파일 디스크립터](#chapter-docs-host-processes)
   - [Windows의 CPU와 메모리 관측](#chapter-docs-host-windows)
@@ -91,6 +93,7 @@
   - [PostgreSQL 관측: 활동, 누적 통계와 정리 작업](#chapter-docs-database-postgresql)
   - [PostgreSQL 운영 관측: 오래된 ID, 회수 기준점, 통계 호환성](#chapter-docs-database-postgresql-operations)
   - [MySQL과 MariaDB 관측](#chapter-docs-database-mysql-mariadb)
+  - [MySQL: 잠금 대기, 커밋과 복제의 서로 다른 완료 지점](#chapter-docs-database-mysql-operations)
   - [SQL Server와 Oracle: 대기와 실행 통계](#chapter-docs-database-sqlserver-oracle)
   - [로그, 지속성, 복제와 복구](#chapter-docs-database-replication-and-recovery)
   - [DB 고가용성: 장애 전환, fencing과 복구 완료의 의미](#chapter-docs-database-high-availability)
@@ -214,6 +217,22 @@
 | 화면과 알림이 늦거나 다르게 보임 | [cloud 시간 축](#chapter-docs-cloud-provider-metrics) → [알림 지연](#chapter-docs-product-alerts-and-incidents) | 측정·게시·평가·발송의 각 시간 |
 
 Kafka broker·share group은 [Kafka](#chapter-docs-middleware-kafka), Windows의 PDH와 CPU 표시는 [Windows](#chapter-docs-host-windows), 저장 완료는 [쓰기 경로](#chapter-docs-storage-write-path-and-durability), 프로토콜의 세부 경계는 [TLS·HTTP](#chapter-docs-network-tls-http)와 [SNMP](#chapter-docs-network-snmp-and-device-models)를 찾아봅니다.
+
+<a id="chapter-docs-reading-guide--원천을-구분하는-세-번째-읽기"></a>
+
+### 원천을 구분하는 세 번째 읽기
+
+2026-10-05의 3b에서는 다음 내용을 보강했습니다. 아래의 “관측”은 원천 정의를 읽는 학습이며 새 실습 결과의 출판은 3d에서 합니다. [3라운드 원천 검토 기록](review/claude-codex-r3.md)에 채택 범위와 확인하지 못한 내용이 있습니다.
+
+| 질문 | 읽을 순서 | 이해 확인 |
+| --- | --- | --- |
+| 메모리는 비슷한데 왜 느려지고 죽는가 | [회수와 OOM](#chapter-docs-host-reclaim-and-oom) → [PSI](#chapter-docs-host-numa-and-pressure) → [프로세스](#chapter-docs-host-processes) | 사용량·회수 페이지·대기 시간·종료 사건을 구분하는가? |
+| 없는 키를 넣는데 왜 기다리는가 | [MySQL 운영](#chapter-docs-database-mysql-operations) | gap lock과 deadlock, timeout의 롤백 범위를 설명하는가? |
+| 커밋과 복제 완료는 같은가 | [MySQL 운영](#chapter-docs-database-mysql-operations) → [SQL Server·Oracle](#chapter-docs-database-sqlserver-oracle) | 수신·적용·redo·저장 설정, NULL·0의 차이를 보존하는가? |
+| histogram 형식을 바꿔도 p99는 같은가 | [분포](#chapter-docs-foundations-distributions) → [분포 저장 형식](#chapter-docs-foundations-histogram-storage) | 경계·scale·보간·상대 오차를 구분하는가? |
+| 로그 시각을 신뢰할 수 있는가 | [시계 동기화](#chapter-docs-foundations-time-and-data-quality) | offset·frequency·불확실성·smear와 MONOTONIC/RAW를 구분하는가? |
+| 런타임·GPU 내부에서 무엇이 막히는가 | [JMX·JFR·EventPipe](#chapter-docs-application-managed-runtimes) → [Node ELU](#chapter-docs-application-async-runtimes) → [GPU](#chapter-docs-host-gpu) | pool·이벤트·루프·SM·메모리의 관측 범위를 구분하는가? |
+| 로그가 없다는 것은 오류가 없다는 뜻인가 | [로그 전달](#chapter-docs-product-collection-pipelines) → [HAProxy](#chapter-docs-middleware-proxies-and-mesh) | record·chunk·세션·요청·응답 코드의 단위를 보존하는가? |
 
 <a id="chapter-docs-reading-guide--개념을-배운-뒤-실제-결과와-연결하기"></a>
 
@@ -387,12 +406,13 @@ Prometheus에서 Counter는 재시작 시 초기화될 수 있는 누적 증가�
 2. [시계열과 지표의 데이터 모델](#chapter-docs-foundations-time-series)
 3. [지표에 남겨야 할 문맥: exemplar와 카운터 시작 시각](#chapter-docs-foundations-metric-context-and-start-time)
 4. [평균과 백분위수 및 분포의 집계](#chapter-docs-foundations-distributions)
-5. [성능을 읽는 순서: 처리량, 대기열, 표본과 실험](#chapter-docs-foundations-performance-and-statistics)
-6. [서비스 수준 지표와 오류 예산](#chapter-docs-foundations-service-level-objectives)
-7. [시간과 관측 데이터의 품질](#chapter-docs-foundations-time-and-data-quality)
-8. [숫자가 다를 때: 측정 경계, 시간 구간과 오차](#chapter-docs-foundations-measurement-and-comparability)
-9. [트레이스와 로그 및 프로파일의 연결](#chapter-docs-foundations-traces-logs-profiles)
-10. [분산 시스템: 복제, 합의, 시간과 불확실한 결과](#chapter-docs-foundations-distributed-systems)
+5. [분포를 저장하는 방법: 지수 버킷, native histogram과 sketch](#chapter-docs-foundations-histogram-storage)
+6. [성능을 읽는 순서: 처리량, 대기열, 표본과 실험](#chapter-docs-foundations-performance-and-statistics)
+7. [서비스 수준 지표와 오류 예산](#chapter-docs-foundations-service-level-objectives)
+8. [시간과 관측 데이터의 품질](#chapter-docs-foundations-time-and-data-quality)
+9. [숫자가 다를 때: 측정 경계, 시간 구간과 오차](#chapter-docs-foundations-measurement-and-comparability)
+10. [트레이스와 로그 및 프로파일의 연결](#chapter-docs-foundations-traces-logs-profiles)
+11. [분산 시스템: 복제, 합의, 시간과 불확실한 결과](#chapter-docs-foundations-distributed-systems)
 
 관련 문서: [지표 명세 템플릿](#chapter-templates-metric), [도메인 간 장애 분석](#chapter-docs-cross-domain-readme)
 
@@ -737,7 +757,7 @@ exemplar는 해당 tenant의 trace 조회로 연결하며 “표본 연결”, �
 
 ## 평균과 백분위수 및 분포의 집계
 
-> 상태: 검토됨 · 범위: 기초 통계, Prometheus 히스토그램 예시 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 범위: 기초 통계, Prometheus 히스토그램 예시 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04 · 3b 원천 검토: 2026-10-05 (새 실습 결과 미반영)
 
 <a id="chapter-docs-foundations-distributions--먼저-이해할-것"></a>
 
@@ -799,6 +819,8 @@ Prometheus의 Summary가 노출한 분위수는 인스턴스 간에 단순 합�
 
 Prometheus의 Classic Histogram은 `le`로 표현하는 누적 버킷과 `_count`, `_sum`을 사용합니다. Native Histogram은 복합 표본으로 분포를 표현합니다. 형식별 구간 호환성과 수집·조회 지원을 확인해야 합니다. [Prometheus Histogram 유형](https://prometheus.io/docs/concepts/metric_types/#histogram)
 
+구체적인 분포 저장 형식과 오차의 차이는 [지수 버킷·native histogram·sketch](#chapter-docs-foundations-histogram-storage)에서 이어집니다. 같은 count라도 선형·지수 보간이 다른 결과를 내는 계산 예시와 형식 선택 기준을 설명합니다.
+
 <a id="chapter-docs-foundations-distributions--실제-조회식의-구조"></a>
 
 ### 실제 조회식의 구조
@@ -856,6 +878,116 @@ B 오류율 = 9 / 900 = 1%
 3. 히스토그램에서 100 ms와 300 ms 버킷만 있으면 200 ms 이하 건수를 정확히 아는가? **아니다. 구간 안의 원본 분포가 필요하다.**
 
 관련: [시계열](#chapter-docs-foundations-time-series), [서비스 수준 목표](#chapter-docs-foundations-service-level-objectives)
+
+[통합 목차로](#book-top)
+
+---
+
+<a id="chapter-docs-foundations-histogram-storage"></a>
+
+<a id="chapter-docs-foundations-histogram-storage--분포를-저장하는-방법-지수-버킷-native-histogram과-sketch"></a>
+
+## 분포를 저장하는 방법: 지수 버킷, native histogram과 sketch
+
+> 상태: 검토됨 · 범위: OTel ExponentialHistogram Stable 데이터 모델·Development 변환 절, Prometheus 3.13.4·3.15.0, DDSketch·t-digest · 3d 원천·저장 증거 확인: 2026-10-06 · promtool은 Claude가 2026-10-05 실행
+
+<a id="chapter-docs-foundations-histogram-storage--p99만-저장하면-나중에-질문을-바꿀-수-없다"></a>
+
+### p99만 저장하면 나중에 질문을 바꿀 수 없다
+
+오늘은 서비스별 p99가 필요하지만 내일은 전체 서비스의 300 ms 이하 비율이 필요할 수 있습니다. p99 숫자만 남기면 이 질문에 답할 분포가 사라집니다. 모든 요청을 저장하기에는 비용이 커서, 버킷이나 작은 요약 자료구조인 **sketch**에 관측값들을 모읍니다. 저장 크기를 줄이는 대신 어떤 오차를 허용하고 무엇을 합칠 수 있는지 정해야 합니다. 기본 평균·백분위수 계산은 [분포의 집계](#chapter-docs-foundations-distributions)를 먼저 읽습니다.
+
+<a id="chapter-docs-foundations-histogram-storage--otel-exponentialhistogram-값이-커질수록-버킷도-넓어진다"></a>
+
+### OTel ExponentialHistogram: 값이 커질수록 버킷도 넓어진다
+
+명시적 경계 Histogram이 `0.1, 0.2, 0.5초` 같은 경계를 나열한다면 ExponentialHistogram은 `scale`로 경계 배율을 정합니다. **값의 단위는 metric의 단위**이고 scale 자체에는 초·바이트 단위가 없습니다. 양수 버킷 index i의 범위는 `(base^i, base^(i+1)]`입니다. 음수는 절댓값을 같은 방식으로 분류해 별도의 배열에 담습니다. [OTel 데이터 모델](https://opentelemetry.io/docs/specs/otel/metrics/data-model/#exponentialhistogram)
+
+```text
+base = 2^(2^(-scale))
+예시: scale=0 → base=2 → (1,2], (2,4], (4,8] …
+예시: scale=1 → base=√2 ≈ 1.414214 → 1에서 2 사이에 버킷 2개
+```
+
+`zero_count`는 절댓값이 `zero_threshold` 이하인 관측을 셉니다. zero bucket을 “실제로 0인 요청 수”로만 해석하지 않습니다. positive/negative의 `offset`과 연속 `bucket_counts` 배열은 누적 `le` 값이 아닌 **각 버킷의 개수**입니다. 전체 개수·합계·시간 구간·temporality도 따로 보존합니다. [OTLP ExponentialHistogramDataPoint](https://github.com/open-telemetry/opentelemetry-proto/blob/v1.11.1/opentelemetry/proto/metrics/v1/metrics.proto)
+
+scale을 1단계 낮추면 인접 버킷을 합쳐 더 거친 분포를 만들 수 있습니다. 이때 원래 개수가 다른 경계로 잘못 배분되는 오차 없이 재배치됩니다(perfect subsetting). 하지만 작은 버킷들의 차이는 사라지므로 **분위수의 정밀도가 그대로 유지된다는 뜻은 아닙니다**. 다른 zero threshold끼리 합칠 때에도 더 넓은 zero 영역에 맞추며 필요하면 채워진 버킷의 경계까지 넓혀야 합니다. [scale 축소](https://opentelemetry.io/docs/specs/otel/metrics/data-model/#exponential-scale), [zero 병합](https://opentelemetry.io/docs/specs/otel/metrics/data-model/#zero-count-and-zero-threshold)
+
+<a id="chapter-docs-foundations-histogram-storage--prometheus-native-histogram-전송저장-단위도-달라진다"></a>
+
+### Prometheus native histogram: 전송·저장 단위도 달라진다
+
+Classic Histogram은 버킷마다 별도 float 시계열을 둡니다. Native Histogram은 한 표본에 count·sum·버킷을 담습니다. 표준 exponential schema의 유효 범위는 −4~8이며, 값이 클수록 촘촘합니다. custom bucket schema −53(NHCB)은 명시한 경계를 담습니다. “native”가 항상 exponential이라는 뜻은 아닙니다. [Native histogram 명세](https://prometheus.io/docs/specs/native_histograms/#schema)
+
+수신기는 schema 9~52를 −4~8의 유효 schema로 낮춰 받을 수 있습니다(MAY). Prometheus는 3.7.0부터 높은 schema의 수신 해상도를 줄이는 처리를 지원합니다. 이 허용을 “9~52가 그대로 저장되는 표준 schema”라고 설명하지 않습니다. [수신 schema 규약](https://prometheus.io/docs/specs/native_histograms/#schema), [3.7 변경 기록](https://github.com/prometheus/prometheus/blob/v3.15.0/CHANGELOG.md)
+
+OTel scale과 Prometheus 표준 schema의 해상도는 대응하지만 **버킷 index는 1만큼 다릅니다**. Prometheus index n의 경계는 OTel index n−1에 대응합니다. OTLP의 dense 배열과 Prometheus의 sparse span 표현도 다릅니다. OTel→Prometheus의 **Exponential Histograms 변환 절은 확인일 현재 Development**이며 scale > 8이면 허용 범위로 downscale을 권고(SHOULD), scale < −4 또는 변환 불가능한 표본은 폐기(MUST)하도록 규정합니다. 반대 방향 변환 절의 Stable 표시나 데이터 모델의 안정 상태와 혼동하지 않습니다. 변환의 count·경계·부호·zero 영역·temporality와 손실 여부를 검증합니다. [OTel→Prometheus 변환 규약](https://opentelemetry.io/docs/specs/otel/compatibility/prometheus_and_openmetrics/#exponential-histograms)
+
+<a id="chapter-docs-foundations-histogram-storage--기능-상태와-실제-수집-설정"></a>
+
+#### 기능 상태와 실제 수집 설정
+
+Prometheus **3.8.0**은 native histogram을 stable이지만 선택적으로 켜는 기능으로 발표하며 `scrape_native_histograms`를 도입했습니다. **3.9.0**은 실험 상태 해제와 옛 feature flag의 no-op 처리를 명시합니다. 따라서 안정화의 시작을 3.9 하나로만 표시하지 않습니다. 이번 고정 대상 3.13.4·3.15.0에서 `--enable-feature=native-histograms`는 기능을 켜는 스위치가 아니라 no-op입니다. 서버의 scrape 설정과 원천의 노출 형식을 별도로 확인합니다. [3.8·3.9 변경 기록](https://github.com/prometheus/prometheus/blob/v3.15.0/CHANGELOG.md), [3.13.4 flag 처리](https://github.com/prometheus/prometheus/blob/v3.13.4/cmd/prometheus/main.go), [3.15.0 flag 처리](https://github.com/prometheus/prometheus/blob/v3.15.0/cmd/prometheus/main.go)
+
+| 두 고정 버전의 설정 | 기본값 | 의미 |
+| --- | --- | --- |
+| `scrape_native_histograms` | false | 원천이 노출한 native 부분 수집; 프로토콜 협상도 확인 |
+| `convert_classic_histograms_to_nhcb` | false | classic 경계를 유지하는 custom bucket native 형식으로 변환 |
+| `always_scrape_classic_histograms` | false | native 수집·변환과 함께 원천 classic 부분도 추가로 수집 |
+
+NHCB 변환은 **이미 잃은 버킷 내부의 원본 값을 복원하지 않습니다**. 같은 관측을 classic과 native로 함께 저장했으면 요청 수를 둘 다 더하지 않습니다. 위 설정은 서버 scrape 동작이며, promtool 단위 테스트가 통과했다는 사실만으로 exporter·scrape·remote write 경로까지 확인했다고 말할 수 없습니다. [3.13.4 구성](https://github.com/prometheus/prometheus/blob/v3.13.4/docs/configuration/configuration.md), [3.15.0 구성](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/configuration/configuration.md)
+
+<a id="chapter-docs-foundations-histogram-storage--같은-버킷-개수라도-보간-가정이-다르다"></a>
+
+### 같은 버킷 개수라도 보간 가정이 다르다
+
+`histogram_quantile`은 classic과 custom bucket native에서 버킷 안을 선형 보간합니다. 표준 exponential native의 0이 아닌 버킷에서는 로그 공간에서 균등하다는 가정으로 지수 보간하며, zero bucket은 선형 보간합니다. `histogram_fraction`도 경계 사이를 추정할 때 같은 보간 방식을 씁니다. [Prometheus 3.15 함수 정의](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/querying/functions.md#histogram_quantile)
+
+다음은 **실측이 아닌 계산 예시**입니다. 양수 값 1.25·1.75·2.5·3.5초를 count=4, sum=9초, `(1,2]` 2개·`(2,4]` 2개로 집계합니다. classic 누적 버킷은 `le=1:0`, `le=2:2`, `le=4:4`, `le=+Inf:4`이며, native는 schema 0을 사용한다고 가정합니다.
+
+| 질문 | classic 선형 보간 | 표준 native 지수 보간 |
+| --- | --- | --- |
+| p25 | 1 + (2−1)×1/2 = **1.5초** | 1×(2/1)^(1/2) = **√2 ≈ 1.414214초** |
+| `(1,1.5]`의 추정 비율 | (2/4)×(1.5−1)/(2−1) = **0.25** | (2/4)×log₂(1.5) ≈ **0.292481** |
+
+원래 표본의 `(1,1.5]` 비율은 1/4입니다. native의 값이 다른 것은 이 구간에서의 보간 가정 때문입니다. 더 조밀한 버킷은 오차를 줄일 수 있지만 특정 데이터에서 항상 더 정확하다는 보장은 아닙니다. `histogram_count`는 native 표본의 count를 읽으며, classic float 버킷을 넣으면 무시합니다. classic에서는 `_count` 또는 누적 `+Inf`를 사용합니다. 이 예시 산술은 `verify_examples`에 연결합니다. [fraction·count 정의](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/querying/functions.md#histogram_fraction)
+
+<a id="chapter-docs-foundations-histogram-storage--sketch-무슨-오차를-보장하는가"></a>
+
+### Sketch: 무슨 오차를 보장하는가
+
+| 방식 | 압축하는 방법 | 보장과 한계 |
+| --- | --- | --- |
+| DDSketch | 상대 크기에 맞춘 로그 버킷 | 양수 분위수 값 x에 대해 추정값의 상대 오차를 제한; 순위 오차와 구분 |
+| t-digest | 가까운 표본을 가중 centroid로 합치되 꼬리 쪽을 세밀하게 유지 | 병합 가능하고 꼬리 정확도를 목표로 함; 모든 입력에 동일한 상대 오차 상한을 보장한다고 쓰지 않음 |
+
+DDSketch의 상대 오차 α는 값 기준 `|추정값−x|/x`입니다. **예시:** x=100 ms, α=0.01이면 해당 보장 범위는 99~101 ms입니다. 이것은 p99가 p98~p100 사이로 움직인다는 뜻이 아닙니다. 메모리 한도를 위해 낮거나 높은 버킷을 collapse하는 구현은 합쳐진 영역까지 같은 오차 보장을 적용하지 않습니다. 병합 시에는 같은 mapping·오차 설정과 collapse 정책을 확인합니다. [원 논문](https://arxiv.org/abs/1908.10693), [저자 구현의 보장과 제한](https://github.com/DataDog/sketches-py)
+
+t-digest는 압축 정도·입력 분포·병합 과정에 따른 정확도를 실제 데이터로 검증해야 합니다. centroid 크기의 불변식과 분위수 추정의 보편적인 오차 상한은 다른 주장입니다. 원 프로젝트도 GK·KLL 같은 엄격한 보장과의 차이를 설명합니다. 따라서 “병합 가능”을 “병합 순서와 무관하게 완전히 같은 결과”로 번역하지 않습니다. [t-digest 원 프로젝트](https://github.com/tdunning/t-digest), [설계 논문](https://arxiv.org/abs/1902.04023)
+
+<a id="chapter-docs-foundations-histogram-storage--제품-적용-제안"></a>
+
+### 제품 적용 제안
+
+1. SLO처럼 정확히 판정해야 할 경계가 있으면 해당 경계를 직접 세는 explicit bucket 또는 별도 good/total counter를 검토합니다. 분포에서 임의 경계 비율을 추정한 값에는 추정임을 표시합니다.
+2. 지연 범위가 매우 넓으면 exponential 형식의 해상도·최대 버킷 수·zero threshold를 함께 정합니다. 압축 비율은 데이터 분포와 label 수에 따라 측정합니다.
+3. 합치기 전에 단위, 관측 대상, 시간 구간, counter reset, sampling 조건이 호환되는지 검사합니다. 형식이 호환되어도 중복 관측을 합치면 틀립니다.
+4. 수집·저장·조회·장기 집계의 모든 경로에서 형식 지원과 해상도 축소를 기록합니다. 결과 옆에 count와 보간 방식, 실제 보존 해상도를 보여 줍니다.
+
+**합성 입력의 실행 결과:** Claude가 2026-10-05 실행한 promtool 3.13.4·3.15.0은 위 분포를 표현한 fixture에서 모두 classic p25=1.5, 표준 native p25=1.414213562373095를 반환했습니다. fraction은 각각 0.25와 0.29248125036057815, count는 4였습니다. NHCB는 같은 경계의 classic과 같은 선형 보간 결과를 냈고, classic float 입력에 `histogram_count`를 적용한 결과는 빈 벡터였습니다. fixture의 `classic_count_ignored=0`은 그 **빈 결과 벡터의 길이**이며 원래 관측 수가 0이라는 뜻은 아닙니다. [실행 요약·gzip 목록](labs/results/1.1-r3/histograms.json), [입력·판정식](labs/review-r3/histograms/fixture.json)
+
+두 버전의 계산을 뒷받침하는 결과이며 실제 요청 분포, 서버 scrape·remote write, OTel 변환 경로까지 검증한 자료는 아닙니다. 모든 숫자와 입력 hash·원자료는 `verify_review_r3 --published`에서 재검사합니다.
+
+<a id="chapter-docs-foundations-histogram-storage--이해-확인"></a>
+
+### 이해 확인
+
+1. scale을 낮춰 정확히 버킷을 합쳤으면 p99도 그대로인가? **개수 재배치는 정확해도 세부 경계가 사라져 분위수 추정이 달라질 수 있습니다.**
+2. classic을 NHCB로 바꾸면 버킷 안의 원래 값들을 복원하는가? **아닙니다. 표현을 바꾸어도 잃은 정보는 돌아오지 않습니다.**
+3. DDSketch의 1% 오차와 분위수 순위 1% 오차는 같은가? **값의 상대 오차와 순위 오차는 다릅니다.**
+4. promtool 테스트 성공이 운영 scrape 지원을 보증하는가? **서버 설정·노출 형식·전송·저장 경로를 별도로 검증해야 합니다.**
+
+관련: [분포의 집계](#chapter-docs-foundations-distributions), [관측 데이터의 시작 시각](#chapter-docs-foundations-metric-context-and-start-time), [저장과 조회](#chapter-docs-product-storage-and-query)
 
 [통합 목차로](#book-top)
 
@@ -1062,7 +1194,7 @@ Burn rate = 관측 구간의 나쁜 요청 비율 / (1 - S)
 
 ## 시간과 관측 데이터의 품질
 
-> 상태: 검토됨 · 범위: 수집 시각, 지연, 누락, 중복, 시계 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 범위: 수집 시각, 지연, 누락, 중복, 시계 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04 · 3d 원천·저장 증거 확인: 2026-10-06
 
 <a id="chapter-docs-foundations-time-and-data-quality--먼저-이해할-것"></a>
 
@@ -1102,6 +1234,38 @@ Linux의 `CLOCK_REALTIME`은 시스템의 실제 시각을 나타내며 설정 �
 같은 프로세스에서 작업 시간을 재는 코드에는 경과 시간 측정에 적합한 시계를 사용하고, 사건을 다른 시스템과 연결할 때는 원천 시각과 시간 동기화 상태를 고려합니다. 이것은 OS 시계의 성질에 근거한 구현 제안입니다.
 
 가상 예시로 원천 시계가 수집기보다 5초 빠르면, 실제 전송에 1초가 걸려도 `수집 시각 - 원천 시각 = -4초`로 보일 수 있습니다. 음수 차이는 곧바로 전송 로직의 오류를 뜻하지 않습니다. 시계 차이와 필드 정의부터 확인합니다.
+
+<a id="chapter-docs-foundations-time-and-data-quality--동기화-상태를-측정한다-offset과-frequency는-다른-값이다"></a>
+
+### 동기화 상태를 측정한다: offset과 frequency는 다른 값이다
+
+서버 A의 로그가 서버 B보다 먼저 찍혔다는 이유만으로 A의 사건이 먼저였다고 할 수는 없습니다. 시계의 현재 차이인 **offset**과 시계가 빠르거나 느리게 흐르는 정도인 **frequency**를 구분해야 합니다. 이 절은 chrony 4.9·systemd 문서와 LinuxPTP v4.4 코드를 2026-10-06 확인했습니다. chrony 4.9는 2026-08-27 릴리스이며 아래 tracking 필드의 정의는 4.8과 같습니다. chrony·PTP 진단은 실행하지 않았고, timesyncd의 읽기 전용 상태 조회는 아래 저장 실습으로 구분합니다. [chrony 릴리스](https://chrony-project.org/news.html)
+
+| 원천 | 값·단위 | 해석 |
+| --- | --- | --- |
+| `chronyc tracking`: System time | 초, fast/slow 방향 | chronyd가 유지하는 NTP 시계와 시스템 시계 사이에 남은 차이 |
+| Last offset / RMS offset | 초 | 마지막 갱신의 추정 offset / 장기 offset 통계; System time과 같은 기준으로 혼합하지 않음 |
+| Frequency | ppm | 보정하지 않았다면 시스템 시계가 얼마나 빨리·느리게 갈지의 추정 |
+| Skew | ppm | 주파수 추정의 오차 범위; 현재 시각의 오차를 초로 나타낸 값이 아님 |
+| Root delay / dispersion, Leap status | 초 / 상태 | 기준 시계까지 경로·불확실성과 동기화 상태를 함께 확인 |
+
+`tracking`의 모든 offset이 곧 현재 시스템 시계 오차는 아닙니다. 참조 시계의 정확성·네트워크 비대칭·측정 경과 시간도 있어, “동기화됨”을 외부 정확도의 교정 증명으로 쓰지 않습니다. [chrony 4.9 tracking](https://chrony-project.org/doc/4.9/chronyc.html#tracking)
+
+`timedatectl timesync-status`와 `show-timesync`는 systemd-timesyncd의 상태를 읽습니다. chronyd나 외부 VM 시계 관리자의 상태를 모두 설명하는 공통 API가 아닙니다. 서비스 부재·D-Bus 접근 실패는 offset 0으로 저장하지 않습니다. [systemd timedatectl](https://www.freedesktop.org/software/systemd/man/latest/timedatectl.html)
+
+PTP 환경은 하드웨어 시계(PHC)와 시스템 시계의 경로를 구분합니다. LinuxPTP v4.4의 `ptp4l` slave 경로는 local 수신 시각 t2−master 전송 시각 t1에서 경로 delay를 뺀 값을 master_offset으로 계산해 offsetFromMaster와 로그에 사용합니다. 하드웨어 timestamp 모드에서는 해당 PHC 경로의 값이며, `phc2sys`는 시계 사이를 동기화합니다. 한쪽 offset이 작다고 다른 쪽도 정확하다고 볼 수 없습니다. phc2sys 요약의 offset·읽기 delay는 ns, frequency는 ppb입니다. UTC/PTP 시간 척도와 source→sink 방향도 남깁니다. [ptp4l 설정](https://www.linuxptp.org/documentation/ptp4l/), [v4.4 offset 계산](https://github.com/richardcochran/linuxptp/blob/v4.4/tsproc.c), [clock_synchronize·로그](https://github.com/richardcochran/linuxptp/blob/v4.4/clock.c), [phc2sys](https://www.linuxptp.org/documentation/phc2sys/)
+
+<a id="chapter-docs-foundations-time-and-data-quality--stepslewleap-smear"></a>
+
+#### Step·slew·leap smear
+
+step은 시계 값을 불연속적으로 바꾸고 slew는 시계 속도를 조정하여 차이를 줄입니다. `CLOCK_REALTIME`은 두 영향을 받을 수 있으며 REALTIME 두 시각의 차이를 무조건 경과 시간으로 쓰지 않습니다. leap smear는 윤초를 일정 구간에 분산해 시간 척도를 부드럽게 조정하는 정책입니다. 서로 다른 smear 정책이나 smear·비smear source를 섞으면 의도된 시각 차이를 장애로 오인할 수 있습니다. smear를 모든 NTP 동기화의 기본 동작으로 가정하지 않습니다. [clock_gettime](https://man7.org/linux/man-pages/man2/clock_gettime.2.html), [chrony 4.9 leap 정책](https://chrony-project.org/doc/4.9/chrony.conf.html#leapsecmode)
+
+읽기 전용 수집 예시는 `chronyc tracking`, `chronyc sources -v`, `timedatectl show-timesync --all`입니다. 해당 daemon·조회 socket 접근이 필요하며 상태 조회 자체는 시계를 조정하지 않습니다. 빈번한 호출 비용은 수집 주기로 제한합니다. PTP는 이미 동작 중인 서비스의 로그·관리 인터페이스 읽기를 설계하며, 모니터링 목적으로 ptp4l/phc2sys를 새로 실행하면 시계 제어가 발생할 수 있으므로 이 절의 읽기 예시에 포함하지 않습니다.
+
+**제품 적용 제안:** offset·frequency·불확실성·최근 갱신 시각·참조원·시간 척도·가용성을 데이터 품질에 연결합니다. 서로 다른 호스트의 시각 차이가 불확실성 범위 안이면 사건 순서를 확정하지 않습니다. 1라운드 MONOTONIC/RAW 관측은 경과 시계의 속도 차이를 보여 주며 NTP offset 하나와 같은 값이 아닙니다. tick을 설정한 주체는 그 근거 없이는 지정하지 않습니다.
+
+**저장된 실습 결과(2026-10-05 WSL2 Linux 6.18.33.2):** 2초 sleep 구간의 MONOTONIC은 2.000092274초, RAW는 2.076169165초로 비율은 약 0.963357이었습니다. 전후 adjtimex는 tick 9,634 µs, freq −42.834381 ppm으로 같았습니다. 이어진 timedatectl show는 NTPSynchronized=yes, timesync-status는 offset +873.315 ms를 보고했습니다. 서로 다른 시점·원천의 값이며, 동기화 상태 yes가 현재 offset 0이나 외부 정확도 인증을 의미하지 않습니다. 이 결과도 tick 설정 주체를 식별하지는 않습니다. [시계 요약과 원자료 hash](labs/results/1.1-r3/clock-state.json), [timesync-status 원문 gzip](labs/results/1.1-r3/clock-state.raw/command-003.gz)
 
 <a id="chapter-docs-foundations-time-and-data-quality--0과-데이터-없음은-다르다"></a>
 
@@ -1159,6 +1323,9 @@ Prometheus의 즉시 조회에는 Lookback과 Staleness 규칙이 있습니다. 
 <a id="chapter-docs-foundations-time-and-data-quality--이해-확인"></a>
 
 ### 이해 확인
+
+- chrony Skew가 1 ppm이면 현재 시각이 1 ms 어긋났는가? **주파수 추정의 불확실성과 현재 시각 차이는 다른 값입니다.**
+- ptp4l의 offset만 작으면 시스템 CLOCK_REALTIME도 정확한가? **PHC·시스템 시계의 연결과 기준원·시간 척도를 함께 확인해야 합니다.**
 
 1. 전송 지연을 계산했더니 음수이면 데이터가 시간을 거슬러 이동했는가? **서로 다른 시계의 오차와 timestamp의 의미를 먼저 확인해야 한다.**
 2. 60초 동안 600건이면 매초 10건씩 처리했는가? **구간 평균은 10건/초지만 내부의 발생 분포는 알 수 없다.**
@@ -1559,14 +1726,15 @@ PSI는 CPU·메모리·I/O 자원 경합으로 작업이 멈춘 시간의 영향
 
 1. [CPU 실행 시간과 스케줄링 대기](#chapter-docs-host-cpu)
 2. [메모리와 가상 주소 공간 및 메모리 압력](#chapter-docs-host-memory)
-3. [블록 I/O와 파일시스템 용량](#chapter-docs-host-disk-io)
-4. [프로세스와 스레드 및 파일 디스크립터](#chapter-docs-host-processes)
-5. [Windows의 CPU와 메모리 관측](#chapter-docs-host-windows)
-6. [가상화: 호스트, 하이퍼바이저와 게스트](#chapter-docs-host-virtualization)
-7. [GPU와 가속기: 활동, 메모리와 분할](#chapter-docs-host-gpu)
-8. [CPU와 메모리의 위치: NUMA, 캐시, 스케줄링과 압력](#chapter-docs-host-numa-and-pressure)
-9. [호스트 수집 명세: 원천 필드에서 지표까지](#chapter-docs-host-collection-contracts)
-10. [Linux 원천 관측 실습: CPU, 가상 메모리와 실제 I/O](#chapter-docs-host-linux-observation-lab)
+3. [메모리 회수와 OOM: 부족해지는 과정과 종료의 증거](#chapter-docs-host-reclaim-and-oom)
+4. [블록 I/O와 파일시스템 용량](#chapter-docs-host-disk-io)
+5. [프로세스와 스레드 및 파일 디스크립터](#chapter-docs-host-processes)
+6. [Windows의 CPU와 메모리 관측](#chapter-docs-host-windows)
+7. [가상화: 호스트, 하이퍼바이저와 게스트](#chapter-docs-host-virtualization)
+8. [GPU와 가속기: 활동, 메모리와 분할](#chapter-docs-host-gpu)
+9. [CPU와 메모리의 위치: NUMA, 캐시, 스케줄링과 압력](#chapter-docs-host-numa-and-pressure)
+10. [호스트 수집 명세: 원천 필드에서 지표까지](#chapter-docs-host-collection-contracts)
+11. [Linux 원천 관측 실습: CPU, 가상 메모리와 실제 I/O](#chapter-docs-host-linux-observation-lab)
 
 관련 문서: [공통 개념](#chapter-docs-foundations-readme), [컨테이너](#chapter-docs-containers-readme), [쿠버네티스](#chapter-docs-kubernetes-readme), [네트워크](#chapter-docs-network-readme)
 
@@ -1736,7 +1904,7 @@ cat /proc/pressure/cpu
 
 ## 메모리와 가상 주소 공간 및 메모리 압력
 
-> 상태: 검토됨 · 범위: Linux 호스트·프로세스, Windows 비교의 기초 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 범위: Linux 호스트·프로세스, Windows 비교의 기초 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04 · 3b 원천 검토: 2026-10-05 (새 실습 결과 미반영)
 
 <a id="chapter-docs-host-memory--먼저-이해할-것"></a>
 
@@ -1802,6 +1970,8 @@ RSS를 합하면 330 MiB이지만 이 예시의 고유 물리 페이지는 `50 +
 
 ### 페이지 폴트와 스왑 활동
 
+회수·refault·OOM을 자세히 구분하려면 [메모리 회수와 OOM](#chapter-docs-host-reclaim-and-oom), 빠른 프로세스 메모리 원천과 상세 조사 비용은 [프로세스 장](#chapter-docs-host-processes)을 이어 읽습니다.
+
 페이지 폴트는 필요한 페이지에 접근하는 과정에서 추가 처리가 필요한 사건입니다. Linux `getrusage`는 I/O 없이 처리된 minor fault와 I/O가 필요한 major fault를 구분합니다. major fault를 모두 스왑 읽기로 단정할 수는 없습니다. 파일 매핑 접근 등도 조사해야 합니다. [Linux getrusage](https://man7.org/linux/man-pages/man2/getrusage.2.html)
 
 스왑 사용량이 남아 있는 상태와 지금 스왑 읽기·쓰기가 활발한 상태는 다른 질문입니다. `/proc/vmstat`에는 `pswpin`, `pswpout` 등 VM 활동 계수기가 있습니다. 사용량과 해당 활동의 증가 추세를 나누어 관측합니다. [Linux proc_vmstat](https://man7.org/linux/man-pages/man5/proc_vmstat.5.html)
@@ -1862,6 +2032,114 @@ cat /proc/pressure/memory
 - 스왑 사용량이 높으면 현재도 스왑 I/O가 많은가? **현재 활동의 증가량을 별도로 봐야 한다.**
 
 관련: [CPU](#chapter-docs-host-cpu), [블록 I/O](#chapter-docs-host-disk-io), [컨테이너 자원 제어](#chapter-docs-containers-resource-control), [Windows](#chapter-docs-host-windows)
+
+[통합 목차로](#book-top)
+
+---
+
+<a id="chapter-docs-host-reclaim-and-oom"></a>
+
+<a id="chapter-docs-host-reclaim-and-oom--메모리-회수와-oom-부족해지는-과정과-종료의-증거"></a>
+
+## 메모리 회수와 OOM: 부족해지는 과정과 종료의 증거
+
+> 상태: 검토됨 · 적용 범위: Linux 6.12 VM·OOM 코드, 6.13·6.15·6.18의 명시한 차이, cgroup v2 · 3d 원천·저장 증거 확인: 2026-10-06 · WSL 실습은 Claude가 2026-10-05 실행; 강제 회수·OOM 실험 없음
+
+<a id="chapter-docs-host-reclaim-and-oom--사용량이-그대로인데-요청이-느려지는-상황"></a>
+
+### 사용량이 그대로인데 요청이 느려지는 상황
+
+서버가 빈 공간을 만들려고 오래된 페이지를 정리하면 애플리케이션은 실행 대신 그 작업을 기다릴 수 있습니다. 필요해서 다시 읽는 페이지를 계속 밀어내면 사용량 그래프는 비슷해도 응답 시간이 나빠집니다. **얼마나 차 있는가**, **얼마나 회수하는가**, **얼마나 기다리는가**, **무엇이 종료됐는가**는 서로 다른 질문입니다.
+
+깨끗한 파일 캐시는 원본 파일에서 다시 읽을 수 있지만, 수정된 페이지는 writeback이 필요하고 익명 메모리는 보존할 swap 등의 조건을 봐야 합니다. 백그라운드 `kswapd` 회수와 할당 경로가 직접 수행하는 direct reclaim을 구분합니다. direct reclaim 증가는 할당자가 회수 작업에 참여한다는 단서이며 시간 자체를 측정한 값은 아닙니다. [Linux 6.12 회수 경로](https://github.com/torvalds/linux/blob/v6.12/mm/vmscan.c)
+
+<a id="chapter-docs-host-reclaim-and-oom--procvmstat의-누적값과-단위"></a>
+
+### /proc/vmstat의 누적값과 단위
+
+다음은 Linux 6.12 이름을 기준으로 한 표입니다. 커널 설정·버전·배포판에 따라 키가 달라지므로 순서나 전체 필드 수를 고정하지 않습니다. 이 파일은 시스템 VM 통계이며 컨테이너 안에서 읽었다고 그 컨테이너만의 통계가 되지 않습니다. [vmstat 출력](https://github.com/torvalds/linux/blob/v6.12/mm/vmstat.c), [proc_vmstat](https://man7.org/linux/man-pages/man5/proc_vmstat.5.html)
+
+| 원천 | 단위·형태 | 의미와 주의 |
+| --- | --- | --- |
+| `pgscan_kswapd`, `pgscan_direct` | 누적 페이지 수 | 전역 회수 경로의 scan 계정; cgroup 대상 회수는 제외. MGLRU의 계수 지점은 아래 참고 |
+| `pgsteal_kswapd`, `pgsteal_direct` | 누적 페이지 수 | 전역 회수 경로의 회수량; cgroup 대상 회수는 제외 |
+| `pgscan_anon/file`, `pgsteal_anon/file` | 누적 페이지 수 | 익명/파일 유형별 계정으로 cgroup 대상 회수도 포함; 위 두 행과 같은 모집단의 분할이 아님 |
+| `allocstall_*` | 누적 사건 수, zone별 | 할당에 따른 회수 진입의 단서; 대기 중인 프로세스 수나 µs가 아님 |
+| `workingset_refault_anon/file` | 누적 페이지 수 | 이전에 밀려났던 페이지를 다시 가져오는 refault; 모든 page fault와 같지 않음 |
+| `pswpin`, `pswpout` | 누적 swap 페이지 수 | swap backing 저장소 읽기/쓰기 경로의 페이지 계정; zswap 적재·zero 최적화까지 합친 총 회수량이 아님 |
+| `oom_kill` | 누적 OOM kill 계수 | 커널 OOM victim 처리 경로의 계수; 호스트 전체 부족 사건 수로 바로 해석하지 않음 |
+
+회수량은 [vmscan](https://github.com/torvalds/linux/blob/v6.12/mm/vmscan.c), refault는 [workingset의 folio 페이지 수 계정](https://github.com/torvalds/linux/blob/v6.12/mm/workingset.c)을 따른다. `allocstall_*`은 같은 커널에서 cgroup reclaim을 제외한 `do_try_to_free_pages` 경로에서 증가한다. `oom_kill`은 전역·memcg OOM이 공유하는 kill 경로에서 증가하므로 “호스트 OOM 발생 횟수”라는 이름은 범위를 과장한다. 한 OOM 처리의 희생자 수와 사건 수도 구분한다. [OOM 계정 코드](https://github.com/torvalds/linux/blob/v6.12/mm/oom_kill.c)
+
+특히 Linux 6.12의 `shrink_inactive_list`와 MGLRU `scan_folios`·`evict_folios`는 kswapd/direct 전역 계수를 `!cgroup_reclaim(sc)` 조건에서 증가시키지만 anon/file 계수에는 그 조건을 두지 않습니다. 컨테이너의 memory.high/max/reclaim에 따른 회수가 전역 `pgscan_direct`에 그대로 나타난다고 가정하지 않습니다. MGLRU의 scan 계수는 조사한 모든 페이지가 아니라 **회수 대상으로 LRU에서 분리한 isolated 페이지 수**를 넣으므로, 옛 LRU 경로와 비율의 의미도 달라집니다. [6.12 계수 지점](https://github.com/torvalds/linux/blob/v6.12/mm/vmscan.c)
+
+**계산 예시:** 초기화·부팅 변경이 없는 10초 동안 direct scan이 10,000페이지, direct steal이 2,500페이지 증가했다면 관측 구간의 회수/scan 비는 `2,500 / 10,000 = 25%`입니다. scan 증가가 0이면 비율을 계산하지 않습니다. 같은 커널·회수 경로·범위에서 추이를 비교하고, MGLRU 여부와 서로 다른 수집 시점을 기록합니다. 이를 페이지 검사의 엄밀한 성공 확률이나 보편적인 장애 임계값으로 쓰지 않습니다.
+
+**계산 예시:** base page가 4 KiB인 환경에서 10초 동안 `pswpout`이 512 증가하면 페이지 환산량은 2 MiB, 평균 0.2 MiB/s입니다. 페이지 크기를 4 KiB로 고정해 구현하지 않습니다. Linux 6.12에서 zero-filled folio의 최적화는 `swpout_zero`, zswap의 메모리 내 압축 저장은 `zswpout`으로 집계하며, 그 시점에는 backing 저장소 쓰기의 `pswpout`을 증가시키지 않습니다. 따라서 `pswpout`만으로 모든 swap-out 활동을 세면 빠지는 경로가 있습니다. 반면 **zram은 swap backing block device이므로 그쪽 쓰기는 pswpout에 포함**됩니다. 둘을 같은 “압축 swap 제외” 규칙으로 처리하지 않으며, 페이지 환산량을 물리 디스크 쓰기 바이트로 단정하지도 않습니다. [6.12 page_io](https://github.com/torvalds/linux/blob/v6.12/mm/page_io.c), [zswap 계정](https://github.com/torvalds/linux/blob/v6.12/mm/zswap.c), [zram](https://docs.kernel.org/admin-guide/blockdev/zram.html)
+
+<a id="chapter-docs-host-reclaim-and-oom--cgroup에서-같은-질문을-한다"></a>
+
+### cgroup에서 같은 질문을 한다
+
+`memory.stat`의 `pgscan`, `pgsteal`, `pgscan_kswapd/direct`, `pgsteal_kswapd/direct`, `workingset_refault_anon/file`은 해당 cgroup 범위의 회수·refault를 조사하는 원천입니다. `anon`, `file`, `shmem` 같은 바이트 단위 상태값과 페이지·사건 누적값을 같은 단위로 합치지 않습니다. 모든 vmstat 이름에 동일한 cgroup 필드가 있다고 가정하지 않으며 `allocstall_*`을 이름만 바꾸어 만들어 내지 않습니다. [cgroup v2 memory.stat](https://docs.kernel.org/6.12/admin-guide/cgroup-v2.html#memory-interface-files)
+
+버전 분기도 필요합니다. upstream **6.13부터 memory.stat에 pswpin/pswpout**, **6.15부터 pgscan_proactive/pgsteal_proactive**가 들어옵니다. 후자의 `memory.reclaim`에 의한 자발적 회수는 direct 분류에서 분리됩니다. 6.12 수집 계약을 그대로 적용하면 새 키를 누락하거나 direct 감소를 회수 감소로 오독할 수 있습니다. 배포판 backport를 고려해 버전과 실제 필드 가용성을 함께 확인합니다. [6.13 memcontrol](https://github.com/torvalds/linux/blob/v6.13/mm/memcontrol.c), [6.15 memcontrol](https://github.com/torvalds/linux/blob/v6.15/mm/memcontrol.c), [6.15 reclaimer_offset](https://github.com/torvalds/linux/blob/v6.15/mm/vmscan.c), [6.18 계정](https://github.com/torvalds/linux/blob/v6.18/mm/memcontrol.c)
+
+`memory.swap.current`는 현재 swap 사용량이지 swap I/O율이 아닙니다. `memory.events`의 `high`는 high 경계로 인한 throttle·direct reclaim, `oom`은 메모리 할당이 OOM 상태에 이른 계수, `oom_kill`은 해당 그룹의 프로세스가 OOM killer에 의해 죽은 계수입니다. `oom`이 증가해도 반드시 kill이 발생하지 않으며, `oom_kill`만으로 한도 초과의 원인을 확정할 수 없습니다. 기본 `memory.events`는 하위 계층 사건도 포함하므로 `memory.events.local`과 mount 옵션을 확인합니다. [events·swap 규약](https://docs.kernel.org/6.12/admin-guide/cgroup-v2.html#memory-interface-files)
+
+회수율·refault율이 증가하면서 `memory.pressure`와 요청 지연도 증가하면 working set이 유효 용량보다 큰지 조사합니다. 단순히 캐시를 비우는 것을 해결책으로 제시하지 않습니다. 캐시 제거가 재읽기 비용을 더 늘릴 수 있기 때문입니다.
+
+<a id="chapter-docs-host-reclaim-and-oom--oom-로그에서-원인-범위와-희생자를-분리한다"></a>
+
+### OOM 로그에서 원인 범위와 희생자를 분리한다
+
+Linux 6.12의 커널 로그는 다음 필드를 원인 조사에 사용합니다. 로그 문구를 장기 고정 API로 취급하지 않고 커널별 parser와 원문을 보존합니다. [oom_kill.c](https://github.com/torvalds/linux/blob/v6.12/mm/oom_kill.c), [memcontrol.c의 OOM 문맥](https://github.com/torvalds/linux/blob/v6.12/mm/memcontrol.c)
+
+| 필드·문구 | 질문 |
+| --- | --- |
+| `invoked oom-killer`, `gfp_mask`, `order` | 어떤 할당 시도가 OOM 처리를 유발했는가? 이 작업이 최종 희생자라는 뜻은 아님 |
+| `constraint`, `nodemask`, `mems_allowed` | 전체 메모리뿐 아니라 cpuset·mempolicy 제한이 관련됐는가? |
+| `global_oom`, `oom_memcg`, `task_memcg` | OOM 판단 범위와 희생자의 cgroup은 무엇인가? |
+| `Killed process`, PID·UID·comm | 어떤 실행이 종료됐는가? PID 재사용과 namespace도 확인 |
+| `total-vm`, `anon-rss`, `file-rss`, `shmem-rss`, `pgtables` | 주소 공간·상주 분류·페이지 테이블 사용량; total-vm을 RAM 점유로 읽지 않음 |
+| `oom_score_adj` | `invoked oom-killer` 줄은 **유발한 작업**, `Killed process` 줄은 **희생자**의 조정값; 서로 다른 대상 필드로 저장 |
+
+`/proc/PID/oom_score`는 현재 조건에서의 badness 점수이며 미래에 죽을 확률이 아닙니다. `oom_score_adj`의 범위는 −1000…1000이고 −1000은 커널 OOM 선정에서 제외하는 특수값입니다. 이 보호를 일반 SIGKILL이나 userspace 메모리 관리자의 종료까지 막는 것으로 해석하지 않습니다. 기본 수집기는 값을 읽으며 조정값을 바꾸지 않습니다. [oom_score](https://man7.org/linux/man-pages/man5/proc_pid_oom_score.5.html), [oom_score_adj](https://man7.org/linux/man-pages/man5/proc_pid_oom_score_adj.5.html)
+
+Linux 6.12의 `/proc/PID/oom_score`는 `totalram_pages + total_swap_pages`를 분모 기준으로 사용합니다. 실제 memcg OOM은 `mem_cgroup_get_max()`로 정한 해당 범위의 totalpages를 사용하므로, proc 점수 목록을 cgroup OOM의 실제 희생자 순위라고 표시하지 않습니다. [proc 점수 계산](https://github.com/torvalds/linux/blob/v6.12/fs/proc/base.c), [OOM 범위별 분모](https://github.com/torvalds/linux/blob/v6.12/mm/oom_kill.c)
+
+<a id="chapter-docs-host-reclaim-and-oom--종료-원인별-증거"></a>
+
+### 종료 원인별 증거
+
+| 분류 | 필요한 증거 조합 | 혼동하기 쉬운 것 |
+| --- | --- | --- |
+| 전역 또는 할당 범위의 커널 OOM | 커널 OOM 문맥·제약, 당시 가용량·회수·PSI, 희생자 수명 | `oom_kill` 증가만으로 물리 RAM 전체 고갈 확정 |
+| cgroup 한도 관련 OOM | `oom_memcg`, 유효 조상 한도, events 차분, 해당 컨테이너 종료 | 현재 사용량이 한도보다 낮으므로 과거 OOM 부정; 종료 후 이미 해제됐을 수 있음 |
+| Kubernetes node-pressure eviction | Pod `Evicted` 상태·메시지, kubelet 이벤트·신호 | 모든 Evicted를 컨테이너 memory.max 초과로 취급 |
+| 다른 SIGKILL·userspace 종료 | 서비스 관리자·운영 조작 등의 기록 | exit 137만으로 OOMKilled 확정 |
+
+Pod의 `state.terminated`와 `lastState.terminated`를 함께 확인하는 이유와 kubelet의 종료 구분은 [자원 압박과 종료](#chapter-docs-kubernetes-pressure-and-termination)에 있습니다. [컨테이너 메모리 회계](#chapter-docs-containers-memory-accounting-and-oom)와 연결해 원천마다 대상·수명을 맞춥니다.
+
+<a id="chapter-docs-host-reclaim-and-oom--수집과-제품-적용-제안"></a>
+
+### 수집과 제품 적용 제안
+
+읽기 전용 예시는 `cat /proc/vmstat`, `cat /proc/pressure/memory`, `getconf PAGESIZE`입니다. 대상 PID의 score/status 읽기는 procfs 접근 정책을 따릅니다. 커널 로그 조회인 `dmesg`는 `dmesg_restrict`·권한·컨테이너 격리로 제한될 수 있고, 전체 로그 반복 수집은 비용과 민감 정보 범위를 검토합니다. 위 쉘 명령과 dmesg 예시는 별도로 실행하지 않았으며, 아래 실습에서는 procfs 파일만 읽었습니다. 권한 부족·로그 유실을 “OOM 없음”으로 변환하지 않습니다. [dmesg 권한](https://man7.org/linux/man-pages/man1/dmesg.1.html)
+
+제품에는 호스트 boot ID와 cgroup 수명을 붙여 누적값을 차분하고, 회수 활동·PSI·종료 타임라인을 나란히 표시할 것을 제안합니다. 키가 없는 커널에는 미지원 상태를 남깁니다. 그룹과 조상 통계를 중복 합산하지 않고, 종료 직전 한도와 종료 후 사용량을 다른 시점으로 보존합니다.
+
+**저장된 실습 결과:** 2026-10-05의 WSL2 Linux 6.18.33.2에서 `oom_kill`, `pgscan/pgsteal_*`, `allocstall_*`, `workingset_refault_*` 키를 읽었고, `pgscan_proactive`·`pgsteal_proactive`도 존재했습니다. 선택한 계수의 당시 값은 모두 0이었습니다. 이는 원천의 존재·형식 관측이며, 강제 메모리 압박·회수·OOM 동작 검증은 아닙니다. 익명·파일·memfd의 8 MiB 매핑 결과는 [프로세스 장](#chapter-docs-host-processes)에 연결했습니다. [요약과 원자료 목록](labs/results/1.1-r3/linux-memory.json), [vmstat 원문 gzip](labs/results/1.1-r3/linux-memory.raw/vmstat.gz)
+
+<a id="chapter-docs-host-reclaim-and-oom--이해-확인"></a>
+
+### 이해 확인
+
+1. `allocstall` 100은 100초 대기인가? **사건 계수이므로 시간을 알 수 없습니다. PSI와 지연을 함께 봅니다.**
+2. 컨테이너 `oom_kill` 증가만으로 memory.max 초과를 확정하는가? **커널 OOM 문맥과 한도·events·종료 정보를 대조해야 합니다.**
+3. swap 사용량이 일정하면 swap I/O도 없는가? **점유량과 들어오고 나가는 활동은 다릅니다.**
+
+관련: [메모리 기초](#chapter-docs-host-memory), [프로세스 메모리 원천](#chapter-docs-host-processes), [NUMA·PSI](#chapter-docs-host-numa-and-pressure)
 
 [통합 목차로](#book-top)
 
@@ -2022,7 +2300,9 @@ df -i
 
 ## 프로세스와 스레드 및 파일 디스크립터
 
-> 상태: 검토됨 · 범위: Linux procfs와 프로세스 인터페이스 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 범위: Linux procfs와 프로세스 인터페이스 · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04 · 3d 원천·저장 증거 확인: 2026-10-06
+
+> 3라운드 보강: Linux 6.12 상태·메모리 원천 확인, 2026-10-05
 
 <a id="chapter-docs-host-processes--먼저-이해할-것"></a>
 
@@ -2053,10 +2333,51 @@ Linux `status`에는 스레드 그룹·스레드 ID, 부모 ID, 상태와 스레
 | R | 실행 중이거나 실행 가능한 상태 |
 | S | 인터럽트 가능한 대기 |
 | D | 인터럽트 불가능한 대기 상태로 표시되는 범주 |
+| I | 유휴 kernel thread로 표시되는 TASK_IDLE; 일반 D와 구분 |
 | T·t | 중지 또는 추적에 따른 중지 |
 | Z | 종료했지만 상태 회수가 남은 좀비 |
 
 대기 상태만으로 특정 디스크나 잠금이 원인이라고 단정하지 않습니다. 스레드 스택, 대기 지점, I/O와 런타임 정보를 더 확인합니다.
+
+Linux 6.12의 `TASK_IDLE`은 `TASK_UNINTERRUPTIBLE`과 `TASK_NOLOAD`를 결합하고 `I`로 노출합니다. 이 상태의 대기는 load average의 uninterruptible 기여에서 제외됩니다. 따라서 I를 D에 합쳐 load를 역산하지 않습니다. load average는 시간 평균이며 순간 상태 목록과도 같지 않습니다. [상태 정의](https://github.com/torvalds/linux/blob/v6.12/include/linux/sched.h), [sched_contributes_to_load](https://github.com/torvalds/linux/blob/v6.12/kernel/sched/core.c), [load 평균 계정](https://github.com/torvalds/linux/blob/v6.12/kernel/sched/loadavg.c)
+
+<a id="chapter-docs-host-processes--먼저-저비용-메모리-원천을-읽고-상세-매핑으로-좁힌다"></a>
+
+### 먼저 저비용 메모리 원천을 읽고 상세 매핑으로 좁힌다
+
+수천 개 프로세스의 메모리를 매번 자세히 조사하면 수집기 자체가 부담을 만들 수 있습니다. 먼저 status/statm으로 변화한 대상을 찾고 필요할 때 smaps_rollup·smaps으로 내려가는 방식을 고려합니다. 이것은 비용을 제한하는 제품 제안이며 모든 프로세스에서 일정한 배수만큼 빠르다는 뜻은 아닙니다.
+
+| 원천 | 단위·계산 | 관측 범위와 한계 |
+| --- | --- | --- |
+| `status: VmRSS` | 원천 kB, bytes로는 ×1024 | `RssAnon + RssFile + RssShmem`; 빠른 계정이므로 정밀 snapshot으로 취급하지 않음 |
+| `RssAnon` | kB | 상주 익명 페이지 |
+| `RssFile` | kB | 상주 파일 매핑 페이지 |
+| `RssShmem` | kB | 상주 shared memory·tmpfs·shared anonymous 계열 |
+| `VmSwap` | kB | private anonymous swap 사용량; shmem swap은 포함하지 않음 |
+| `statm: resident` | 페이지 수 × 실제 page size | VmRSS에 대응하는 근사 resident 계정 |
+| `statm: shared` | 페이지 수 × 실제 page size | RssFile+RssShmem에 대응; 현재 둘 이상이 실제 공유한 페이지 수라는 뜻은 아님 |
+| `smaps` | 매핑별 kB | page table을 조사해 RSS·PSS 등 상세 분류 제공 |
+| `smaps_rollup` | 합산 kB | 매핑별 텍스트 대신 프로세스 전체 합산; 여전히 페이지 조사 비용이 있음 |
+
+status/statm의 RSS 계정은 비동기 처리 등의 이유로 부정확할 수 있습니다. smaps는 더 정밀한 조사 수단이지만 읽는 동안 대상이 계속 변하므로 서로 다른 파일을 연속해서 읽은 값을 하나의 원자적 snapshot처럼 등식 검증하지 않습니다. [커널 proc 메모리 설명](https://docs.kernel.org/6.12/filesystems/proc.html), [statm의 정확도 제한](https://man7.org/linux/man-pages/man5/proc_pid_statm.5.html), [status 필드](https://man7.org/linux/man-pages/man5/proc_pid_status.5.html)
+
+PSS는 공유 페이지의 비용을 공유자에게 나눠 귀속합니다. RSS와 PSS가 어떤 질문에 답하는지는 [메모리 장의 공유 페이지 예시](#chapter-docs-host-memory)를 봅니다. smaps_rollup은 smaps의 내용을 먼저 모두 출력해 사용자 공간에서 합산하는 비용을 줄이지만, 모든 메모리 변화의 무비용 계수기는 아닙니다. 페이지·매핑 수, 권한, 커널 구현과 읽기 빈도에 따라 비용을 평가합니다. [smaps·rollup 정의](https://docs.kernel.org/6.12/filesystems/proc.html#smaps)
+
+수집 시에는 PID·starttime을 전후 확인해 PID 재사용을 구분합니다. 대상 procfs를 읽을 권한과 ptrace 접근 검사·hidepid 같은 제한을 확인하고, 프로세스 종료·권한 부족·미지원은 0으로 채우지 않습니다. 명령 예시 `cat /proc/self/status`는 **cat 자신의 정보**를 읽습니다. 제품 대상 PID의 상태를 읽는 것과 구분하며, 상세 매핑 조회는 읽기 전용이어도 비용이 있습니다. 이 cat 명령은 별도로 실행하지 않았습니다. 아래 실습의 procfs 읽기와 구분합니다. [procfs 접근](https://man7.org/linux/man-pages/man5/proc.5.html), [smaps](https://man7.org/linux/man-pages/man5/proc_pid_smaps.5.html)
+
+**저장된 실습 결과(Claude 실행 2026-10-05, WSL2 Linux 6.18.33.2):** 각각 8 MiB를 매핑하고 페이지를 만진 뒤, 익명·파일·memfd는 해당 `Pss_Anon`·`Pss_File`·`Pss_Shmem`이 각각 8,388,608 bytes 증가했습니다. 서로 다른 자식 프로세스의 전후 차이이며 일반적인 메모리 누수 판정 기준이 아닙니다. [요약과 모든 gzip 원자료의 hash](labs/results/1.1-r3/linux-memory.json)
+
+같은 실행의 익명 매핑 단계에서 statm resident는 7,320페이지였고, 페이지 크기 4 KiB를 곱한 29,280 KiB가 status의 `VmRSS`와 같았습니다. memfd 단계의 shared는 `4,709 × 4 = 18,836 KiB`로 `RssFile 10,644 + RssShmem 8,192 KiB`와 같았습니다. **이 표본에서의 일치**이며 status/statm의 근사성이나 순차 조회의 한계를 없애지는 않습니다. [resident 원자료](labs/results/1.1-r3/linux-memory.raw/anonymous-allocated-statm.gz), [memfd status](labs/results/1.1-r3/linux-memory.raw/memfd-allocated-status.gz)
+
+각 원천을 30회 읽은 경과 시간의 중앙값은 다음과 같습니다. `CLOCK_MONOTONIC_RAW`로 측정한 로컬 호출 비용이며 커널·매핑 수·캐시·스케줄링이 달라지면 결과도 달라집니다. 원천 간 고정 비용 배율로 사용하지 않습니다. 파싱된 값과 원자료, 표본의 중앙값 계산은 `verify_review_r3 --published`가 검사합니다.
+
+| 매핑 단계 | status | smaps_rollup | smaps |
+| --- | --- | --- | --- |
+| 익명 | 14.9515 µs | 90.647 µs | 172.609 µs |
+| 파일 | 19.06 µs | 105.816 µs | 195.4055 µs |
+| memfd | 17.5295 µs | 105.3905 µs | 200.052 µs |
+
+메모리 분류의 이동을 누수라고 단정하기 전에 [회수와 OOM](#chapter-docs-host-reclaim-and-oom)을 연결해 봅니다.
 
 좀비는 계속 애플리케이션 코드를 실행하는 상태가 아닙니다. 부모가 종료 상태를 회수하지 않으면 필요한 프로세스 정보가 남을 수 있으므로, 좀비 증가에서는 부모의 회수 동작을 조사합니다. [Linux wait](https://man7.org/linux/man-pages/man2/wait.2.html)
 
@@ -2091,7 +2412,7 @@ Linux `status`에는 스레드 그룹·스레드 ID, 부모 ID, 상태와 스레
 | 카운터가 감소 | 수명 변경·초기화·원천 회계 조건 확인 |
 | 스레드 수와 목록 불일치 | 수집 시각 차이와 조회 중 변화 확인 |
 
-프로세스별 고비용 정보는 필요한 대상과 빈도로 제한합니다. 원천 파일을 읽는 권한과 부하를 수집 명세에 적고, 실패를 0으로 바꾸지 않습니다. 이 장에서는 프로세스 조회 명령을 실행하지 않았습니다.
+프로세스별 고비용 정보는 필요한 대상과 빈도로 제한합니다. 원천 파일을 읽는 권한과 부하를 수집 명세에 적고, 실패를 0으로 바꾸지 않습니다. 별도 운영 프로세스의 조회 명령은 실행하지 않았으며, 위 실습은 소유한 자식 프로세스의 관측입니다.
 
 <a id="chapter-docs-host-processes--이해-확인"></a>
 
@@ -2100,6 +2421,9 @@ Linux `status`에는 스레드 그룹·스레드 ID, 부모 ID, 상태와 스레
 - `FDSize=1024`면 현재 1,024개 FD가 열려 있는가? **할당 슬롯 크기이므로 그렇지 않다.**
 - 프로세스 이름이 같으면 재시작 전후의 누적값을 이어 붙여도 되는가? **실행 수명을 확인해야 한다.**
 - 부모와 자식의 I/O를 모두 더하면 항상 전체인가? **원천의 자식 포함 조건을 확인해야 한다.**
+- VmSwap에 프로세스가 참조하는 shmem의 swap도 모두 포함되는가? **private anonymous 기준이며 shmem swap을 포함하지 않습니다.**
+- smaps_rollup은 페이지를 조사하지 않는 저비용 합계인가? **출력은 줄지만 상세 페이지 조사 비용이 남으므로 status와 같은 비용으로 가정하지 않습니다.**
+- 상태 I인 kernel thread도 load average에 더하는가? **TASK_IDLE은 TASK_NOLOAD를 포함하므로 해당 대기 상태는 제외합니다.**
 
 관련: [CPU](#chapter-docs-host-cpu), [메모리](#chapter-docs-host-memory), [블록 I/O](#chapter-docs-host-disk-io), [컨테이너 격리](#chapter-docs-containers-isolation-and-lifecycle)
 
@@ -2345,7 +2669,7 @@ VM 가상 디스크 → 이미지/볼륨 → 백엔드 저장소
 
 ## GPU와 가속기: 활동, 메모리와 분할
 
-> 상태: 검토됨 · 적용 범위: NVML R550의 활용률 정의, NVIDIA MIG·DCGM, AMD SMI API · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: NVML R550의 활용률 정의, NVIDIA MIG·DCGM, AMD SMI API · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 3d 원천·저장 증거 확인: 2026-10-06
 
 <a id="chapter-docs-host-gpu--먼저-이해할-것"></a>
 
@@ -2359,7 +2683,7 @@ GPU 사용률 100%는 이론 최대 연산량의 100%를 달성했다는 뜻으�
 
 ### 활동 시간과 처리 효율
 
-NVML R550의 `nvmlUtilization_t.gpu`는 표본 기간에 하나 이상의 kernel이 실행된 시간 비율입니다. `memory`는 device memory가 읽히거나 쓰인 시간 비율이며 사용 중인 메모리 용량의 비율이 아닙니다. 이 장은 해당 릴리스의 정의를 명시적으로 사용합니다. [NVML R550 utilization structure](https://docs.nvidia.com/deploy/archive/R550/nvml-api/structnvmlUtilization__t.html)
+NVML R550의 `nvmlUtilization_t.gpu`는 표본 기간에 하나 이상의 kernel이 실행된 시간 비율입니다. `memory`는 device memory가 읽히거나 쓰인 시간 비율이며 사용 중인 메모리 용량의 비율이 아닙니다. 이 장은 해당 릴리스의 정의를 명시적으로 사용합니다. [NVML R550 utilization structure](https://docs.nvidia.com/deploy/nvml-api/latest/api/structnvmlUtilization__t.html)
 
 합성 예에서 1초 동안 어떤 kernel이 계속 실행됐더라도 연산 유닛을 얼마나 효율적으로 사용했는지는 이 시간 비율만으로 알 수 없습니다. 반대로 VRAM 80 GiB 중 60 GiB를 사용했다면 용량 비율은 75%이며 memory activity 75%와 다른 값입니다.
 
@@ -2389,6 +2713,37 @@ DCGM의 profiling은 하드웨어 카운터로 더 자세한 활동을 관측합
 
 AMD SMI의 `amdsmi_get_gpu_activity`도 graphics·memory·multimedia 엔진 활동을 구분하며 지원되지 않는 경우를 반환할 수 있습니다. 연결한 공식 Python API 문서는 이 함수가 **virtual machine guest에서 지원되지 않는다**고 명시합니다. 해당 조건의 미지원을 0% 활동으로 변환하지 않습니다. NVIDIA 지표와 단순 이름 치환을 하지 않습니다. [AMD SMI Python API](https://rocm.docs.amd.com/projects/amdsmi/en/latest/reference/amdsmi-py-api.html#amdsmi-get-gpu-activity)
 
+<a id="chapter-docs-host-gpu--dcgm-프로파일링-활동-시간과-warp-점유는-다르다"></a>
+
+### DCGM 프로파일링: 활동 시간과 warp 점유는 다르다
+
+**보강 확인: 2026-10-05.** 다음 필드 이름·ID는 DCGM v4.0.0 header에 고정했습니다. SM은 GPU의 연산 실행 단위, warp는 함께 실행하도록 묶인 스레드 집합입니다. 아래 ratio는 측정 구간 평균이며 순간값이나 요청별 trace가 아닙니다. [고정 header](https://github.com/NVIDIA/DCGM/blob/v4.0.0/dcgmlib/dcgm_fields.h), [DCGM profiling 정의](https://docs.nvidia.com/datacenter/dcgm/latest/learn/modules/profiling.html)
+
+| 필드·ID | 무엇을 나누어 계산하는가 | 혼동하지 않을 것 |
+| --- | --- | --- |
+| `DCGM_FI_PROF_SM_ACTIVE`·1002 | SM에 적어도 하나의 warp가 active인 시간 비율을 SM 전체에 평균 | active에는 메모리 요청을 기다리는 warp도 포함; 실제 연산 발행률과 다름 |
+| `DCGM_FI_PROF_SM_OCCUPANCY`·1003 | resident warp 수 / 하드웨어가 지원하는 최대 동시 warp 수의 시간 평균 | 점유가 높다고 반드시 처리율이 높은 것은 아님 |
+| `DCGM_FI_PROF_PIPE_TENSOR_ACTIVE`·1004 | tensor pipe 활동 cycle의 비율 | tensor 연산 활동이며 모든 종류의 연산 성능이 아님 |
+| `DCGM_FI_PROF_DRAM_ACTIVE`·1005 | 장치 메모리 interface가 송수신 중인 cycle의 비율 | VRAM 할당 용량도 실제 byte/s도 아님 |
+
+확인일의 공식 latest 문서는 같은 ID를 SM_UTIL_RATIO·SM_OCCUPANCY_RATIO·TENSOR_UTIL_RATIO·DRAM_UTIL_RATIO 이름으로도 설명합니다. 공식 header에는 기존 이름의 alias가 있으나, 이름 변경의 최초 릴리스를 이 장에서 확정하지 않습니다. adapter는 설치된 DCGM header·버전·field metadata로 이름과 단위를 확인해야 합니다. [공식 header의 alias](https://github.com/NVIDIA/DCGM/blob/master/dcgmlib/dcgm_fields.h)
+
+NVML GPU utilization은 측정 구간에 kernel이 하나라도 실행된 시간의 비율입니다. 이를 모든 SM이 얼마나 채워졌는지를 보여 주는 위 지표와 동일시하지 않습니다. 활동률·occupancy가 높아도 메모리 대기·명령 조합·동기화로 업무 처리율이 낮을 수 있습니다. [NVML utilization 정의](https://docs.nvidia.com/deploy/nvml-api/group__nvmlDeviceQueries.html)
+
+프로파일링은 지원 GPU·권한·동시에 수집 가능한 counter group을 확인해야 합니다. Nsight 등과 counter 자원이 충돌할 수 있고, pause 동안의 blank는 활동 0이 아닙니다. 조회·watch도 측정 비용이 있으며 profiler pause/resume은 다른 수집기에 영향을 주는 상태 변경입니다. 이 장에서는 GPU 조회·프로파일링·부하 생성 명령을 실행하지 않았습니다.
+
+<a id="chapter-docs-host-gpu--xid-ecc-row-remapping과-클럭-제한"></a>
+
+### Xid, ECC, row remapping과 클럭 제한
+
+Xid는 NVIDIA driver가 kernel/event log에 남기는 오류 보고 코드입니다. 하드웨어·driver·애플리케이션 문제의 단서이지, 모든 Xid가 GPU 물리 고장이라는 판정은 아닙니다. 로그 시각·GPU UUID/PCI 주소·driver·프로세스 수명과 코드별 조사를 연결합니다. 동일 코드의 반복과 서로 다른 오류 수를 구분하며 누락된 로그를 정상으로 보지 않습니다. [Xid 소개](https://docs.nvidia.com/deploy/xid-errors/latest/introduction.html), [로그 식별](https://docs.nvidia.com/deploy/xid-errors/latest/working-with-xid-errors.html)
+
+ECC는 correctable/uncorrectable, DRAM/SRAM 등의 위치, volatile/aggregate 범위를 함께 봅니다. volatile은 driver load 이후 수명이며 단순 호스트 부팅 이후로 고정하면 안 됩니다. aggregate도 초기화 기능·지원 조건을 확인합니다. row remapping은 문제가 있는 메모리 행을 예비 행으로 대체하는 기능으로, 오류 수와 교체된 행 수는 다른 값입니다. 지원 장치에서 pending·실패 여부·예비 행 가용성을 함께 읽고 reset 필요 상태를 표시합니다. 모니터링이 자동으로 GPU reset을 실행하는 의미는 아닙니다. [nvidia-smi ECC·Row Remapper](https://docs.nvidia.com/deploy/nvidia-smi/index.html)
+
+Clock event reason(구 throttle reason)은 GPU idle, software power cap, thermal slowdown, external power brake, sync boost 등 클럭이 제한되는 조건을 구분합니다. idle도 이유가 될 수 있으므로 모든 활성 bit를 과열로 표시하지 않습니다. 현재 bitmask와 이유별 누적 지속 시간은 다른 형태이며 여러 이유의 시간이 겹칠 수 있습니다. 또한 nvidia-smi 문서의 reason counter는 µs, 최신 NVML Field Value Enums의 해당 시간 필드는 ns로 정의되므로 원천 API별 단위를 확인합니다. [nvidia-smi Clock Event Reasons](https://docs.nvidia.com/deploy/nvidia-smi/index.html), [NVML field 단위](https://docs.nvidia.com/deploy/nvml-api/latest/api/group__nvmlFieldValueEnums.html)
+
+제품 적용 제안: 용량·activity·occupancy·처리율·오류·clock reason을 다른 화면 축으로 두고, 지원 상태·실제 field ID·단위·계정 수명·GPU/MIG 범위를 보존합니다. ECC나 Xid 한 숫자만으로 원인·교체 결정을 자동 확정하지 않습니다.
+
 <a id="chapter-docs-host-gpu--가상-분석"></a>
 
 ### 가상 분석
@@ -2408,6 +2763,8 @@ GPU 활동은 낮고 업무 지연은 높다면 CPU 전처리, 데이터 읽기,
 1. GPU 활동 100%는 최대 FLOPS 달성인가? **그 지표만으로는 알 수 없습니다.**
 2. memory activity는 VRAM 용량 사용률인가? **NVML의 해당 필드에서는 다른 의미입니다.**
 3. 미지원 지표를 0으로 채워도 되는가? **관측 불가를 유휴 상태로 잘못 표현합니다.**
+4. SM_ACTIVE와 SM_OCCUPANCY는 같은 값인가? **warp가 하나라도 active인 시간과 최대 대비 resident warp 비율은 다릅니다.**
+5. clock reason이 켜져 있으면 과열인가? **idle·전력 등 다른 사유도 있으므로 bit별 의미를 봐야 합니다.**
 
 관련: [호스트 목차](#chapter-docs-host-readme) · [애플리케이션](#chapter-docs-application-readme)
 
@@ -2421,7 +2778,9 @@ GPU 활동은 낮고 업무 지연은 높다면 CPU 전처리, 데이터 읽기,
 
 ## CPU와 메모리의 위치: NUMA, 캐시, 스케줄링과 압력
 
-> 상태: 검토됨 · 적용 범위: Linux NUMA·CPU affinity·PSI 인터페이스 · 검토일: 2026-10-04 · 명령은 이 환경에서 실행하지 않음
+> 상태: 검토됨 · 적용 범위: Linux NUMA·CPU affinity·PSI 인터페이스 · 검토일: 2026-10-04 · 운영 명령 예시는 미실행; 아래 WSL 저장 관측과 구분 · 3d 원천·저장 증거 확인: 2026-10-06
+
+> 3라운드 보강: Linux 6.12·6.18 코드와 6.0/6.1 도입 경계 확인, 2026-10-05
 
 서버 전체에 메모리가 남아 있어도 어떤 CPU가 가까이 접근할 수 있는 메모리는 부족할 수 있습니다. NUMA는 CPU와 메모리의 위치에 따라 접근 특성이 달라지는 구조입니다. 가까운 창고와 먼 창고를 떠올리면 쉽지만, 실제 비용은 장비 구조·배치·접근 패턴에 따라 달라지므로 “원격 메모리는 항상 몇 배 느리다”는 고정 배수를 사용하지 않습니다.
 
@@ -2471,6 +2830,26 @@ PSI의 `some`은 적어도 일부 작업이 해당 자원을 기다린 구간을
 
 ### 읽기 전용 조사와 제품 적용 제안
 
+<a id="chapter-docs-host-numa-and-pressure--psi가-없는-것과-압력이-0인-것은-다르다"></a>
+
+#### PSI가 없는 것과 압력이 0인 것은 다르다
+
+같은 이미지의 애플리케이션을 옮겼는데 `memory.pressure`가 사라졌다면 부하 감소보다 먼저 커널·mount·권한을 봅니다. `CONFIG_PSI`가 기능을 제공하고 `CONFIG_PSI_DEFAULT_DISABLED=y`이면 부팅 인자 `psi=1`로 활성화할 수 있습니다. 이 설명은 활성화 조건이며 수집기가 부팅 설정을 변경하라는 지시가 아닙니다. cgroup v2의 `cpu.pressure`, `memory.pressure`, `io.pressure`는 그 계층의 작업 범위이며 시스템 `/proc/pressure/*`와 같은 모집단이 아닙니다. cgroup의 `cgroup.pressure`는 **그 cgroup 자신의** PSI 집계만 켜고 끕니다. 이 설정은 비계층적이므로 하위 cgroup의 활성 상태를 바꾸지 않습니다. 존재·활성·접근 가능 여부를 따로 기록합니다. [Linux 6.12 Kconfig](https://github.com/torvalds/linux/blob/v6.12/init/Kconfig), [cgroup v2 pressure](https://docs.kernel.org/6.12/admin-guide/cgroup-v2.html)
+
+IRQ/SOFTIRQ pressure는 upstream **6.1에 들어왔으며** 6.0 소스에는 해당 원천이 없습니다. `CONFIG_IRQ_TIME_ACCOUNTING` 조건에서 `/proc/pressure/irq`와 `irq.pressure`가 제공되고, 읽히는 행은 `full`만입니다. 작업에 쓸 수 없었던 interrupt 처리 시간을 다루며 CPU `some`이나 단순 `/proc/stat`의 irq 비율과 동일 정의로 매핑하지 않습니다. 런타임 IRQ time accounting 상태도 계정에 영향을 주므로 파일 존재만으로 유효한 값이 계속 갱신된다고 단정하지 않습니다. [6.0 PSI](https://github.com/torvalds/linux/blob/v6.0/kernel/sched/psi.c), [6.1 PSI_IRQ와 irq 인터페이스](https://github.com/torvalds/linux/blob/v6.1/kernel/sched/psi.c), [6.12 psi_account_irqtime](https://github.com/torvalds/linux/blob/v6.12/kernel/sched/psi.c)
+
+**시스템 전체 CPU `full`은 정의되지 않습니다.** Linux는 5.13에 노출된 이 행을 호환성을 위해 0으로 표시합니다. 그 0은 “CPU 경쟁이 전혀 없다”는 증거가 아닙니다. cgroup CPU full은 해당 그룹의 실행 가능한 작업이 실행 기회를 얻지 못하는 범위에서 의미가 있으므로 시스템 값과 구별합니다. IRQ `full`도 이름만 같을 뿐 이 시스템 CPU full의 무효 규칙을 적용하는 항목은 아닙니다. [PSI 설명](https://docs.kernel.org/accounting/psi.html), [6.12 psi_show](https://github.com/torvalds/linux/blob/v6.12/kernel/sched/psi.c)
+
+<a id="chapter-docs-host-numa-and-pressure--trigger는-조회와-별도의-모니터-등록이다"></a>
+
+#### trigger는 조회와 별도의 모니터 등록이다
+
+PSI trigger는 파일을 열고 `some 또는 full`, `threshold_us`, `window_us`를 써 넣은 뒤 같은 fd를 poll/epoll로 감시하는 방식입니다. **예시** `some 200000 2000000`은 2초 window 안의 누적 some stall 200 ms를 감시하며 용량 10% 경보가 아닙니다. fd당 한 trigger이고 닫으면 제거됩니다. 이 등록은 시스템 한도를 바꾸지는 않지만 커널 모니터 자원과 wakeup 비용을 사용하므로 읽기 전용 수집과 구분합니다. [PSI monitor 규약](https://docs.kernel.org/accounting/psi.html)
+
+Linux **6.12·6.18 소스**의 판정은 `0 < window_us <= 10,000,000`, `0 < threshold_us <= window_us`입니다. fd를 열 때의 자격에 `CAP_SYS_RESOURCE`가 없는 경우 window는 2초의 배수여야 합니다. 따라서 무권한 경로에서 가능한 window는 2·4·6·8·10초입니다. cgroup 파일의 쓰기 접근 권한도 별도로 필요합니다. 옛 문서의 “최소 500 ms”를 이 버전 코드의 검증 규칙으로 쓰지 않으며, “cgroup trigger는 항상 CAP_SYS_RESOURCE 필요”라고도 쓰지 않습니다. 두 인터페이스가 같은 생성 함수를 사용합니다. [6.12 psi_trigger_create](https://github.com/torvalds/linux/blob/v6.12/kernel/sched/psi.c), [6.18의 같은 검사](https://github.com/torvalds/linux/blob/v6.18/kernel/sched/psi.c), [cgroup pressure_write](https://github.com/torvalds/linux/blob/v6.12/kernel/cgroup/cgroup.c)
+
+제품에는 기본 주기의 읽기와 필요한 대상의 제한된 trigger를 분리하고, 등록 실패·권한 부족·기능 비활성·실제 0을 다른 상태로 보존할 것을 제안합니다. 2026-10-05 WSL2 Linux 6.18.33.2 실습에서는 시스템 cpu·memory·io PSI를 읽었고 irq 파일은 없었습니다. `/sys/fs/cgroup/init.scope`의 memory·cpu·io pressure는 읽혔지만 자식 cgroup 생성은 PermissionError로 불가능했습니다. irq 부재와 위임 부재를 0으로 바꾸지 않았습니다. 예시 trigger를 설치하거나 부팅 설정·한도·프로세스 배치를 변경하지 않았습니다. [실행 요약·원자료](labs/results/1.1-r3/linux-memory.json)
+
 ```bash
 lscpu
 cat /sys/devices/system/node/online
@@ -2489,6 +2868,8 @@ cat /proc/self/status
 1. 캐시 miss가 늘면 디스크가 느려진 것인가? **해당 캐시 계층과 다음 접근 대상을 확인해야 합니다.**
 2. 메모리 여유 합계가 많으면 배치 문제를 배제할 수 있는가? **NUMA 정책과 허용 노드 제한을 봐야 합니다.**
 3. PSI 20%와 메모리 사용률 20%는 같은가? **시간 비중과 용량 비중으로 서로 다릅니다.**
+4. 시스템 CPU full이 0이면 CPU 대기가 없는가? **그 범위에서 정의되지 않아 0인 행이므로 CPU some과 대상 cgroup을 봅니다.**
+5. PSI trigger 등록은 파일 내용 조회만 하는가? **커널 모니터를 만들므로 권한·자원·fd 수명 관리가 필요합니다.**
 
 [통합 목차로](#book-top)
 
@@ -5180,7 +5561,7 @@ HPA의 기본 비례 계산은 다음과 같습니다. 실제 결정에는 누�
 
 ## Kubernetes 자원 압박과 종료 원인
 
-> 상태: 검토됨 · 적용 범위: Kubernetes 1.34–1.37, Linux cgroup v2와 명시한 v1 차이 · 원천 확인일: 2026-10-05 · workload 실행 미검증
+> 상태: 검토됨 · 적용 범위: Kubernetes 1.34–1.37, Linux cgroup v2와 명시한 v1 차이 · 원천 확인일: 2026-10-05 · workload 실행 미검증 · 3b 원천 검토: 2026-10-05 (새 실습 결과 미반영)
 
 <a id="chapter-docs-kubernetes-pressure-and-termination--먼저-이해할-상황"></a>
 
@@ -5209,6 +5590,8 @@ HPA의 기본 비례 계산은 다음과 같습니다. 실제 결정에는 누�
 Linux의 kubelet eviction 신호 `memory.available`은 `node capacity − node memory working set`으로 산출합니다. `/proc/meminfo`의 `MemAvailable`을 그대로 읽은 값이 아닙니다. kubelet의 working set 계산에서는 `inactive_file`을 회수 가능하다고 보고 제외하는 점도 유의합니다. [eviction 신호](https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals)
 
 **1.37의 예외:** `HugepageAwareEviction`은 Beta·기본 활성입니다. hugepage를 구성한 노드에서는 eviction manager가 쓰는 `memory.available`에서 노드의 hugepage 총용량을 추가로 뺍니다. memory cgroup working set이 hugetlb 할당을 계정하지 않아 여유가 부풀려지는 것을 보정합니다. 사용 중인 hugepage만 빼는 식이 아니므로 제품은 보정 여부를 함께 보존합니다. [hugepage 보정](https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#memory-signals), [gate 이력](https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/)
+
+**3라운드 코드 확인(2026-10-05): 이 보정은 Summary API에도 반영됩니다.** v1.37.0 `summaryProviderImpl.Get`과 `GetCPUAndMemoryStats`는 gate가 켜져 있으면 `adjustForHugePages`를 호출한 MemoryStats를 `summary.node.memory`에 넣습니다. `availableBytes`에서 Node의 hugepage Capacity 합계를 빼고 0을 하한으로 사용합니다. workingSetBytes 자체를 바꾸는 함수는 아니며, 값·Node가 없거나 hugepage 총용량이 0이면 보정하지 않습니다. 그러므로 gate가 적용된 Summary의 availableBytes에 제품이 hugepage 용량을 다시 빼면 이중 차감입니다. [v1.37.0 summary.go](https://github.com/kubernetes/kubernetes/blob/v1.37.0/pkg/kubelet/server/stats/summary.go)
 
 | 신호 | 단위·범위 | 추가로 확인할 것 |
 | --- | --- | --- |
@@ -6262,7 +6645,7 @@ HTTP의 멱등 메서드는 같은 요청을 여러 번 수행했을 때 의도�
 
 ## JVM과 .NET: 메모리, GC, 실행 자원
 
-> 상태: 검토됨 · 적용 범위: JDK 25 API·HotSpot/G1 사례, .NET 공식 진단 원리 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (안정 semantic conventions 연결)
+> 상태: 검토됨 · 적용 범위: JDK 25 API·HotSpot/G1 사례, .NET 공식 진단 원리·.NET 10+ collect-linux preview · 3d 원천 검토: 2026-10-06 · 런타임 진단 실습은 수행하지 않음
 
 <a id="chapter-docs-application-managed-runtimes--먼저-이해할-것"></a>
 
@@ -6325,6 +6708,38 @@ JVM의 특정 pool 이름을 .NET 세대에 일대일 매핑하는 대신, 공�
 
 가상 사례에서 스레드 수가 40→100, 대기 작업이 0→500, CPU가 20%라면 스레드가 어디에서 기다리는지 확인합니다. DB 풀 대기, 동기적 I/O, 잠금이 후보입니다. 스레드 수 증가 자체를 처리 능력 증가로 해석하지 않습니다.
 
+<a id="chapter-docs-application-managed-runtimes--jvm-합계에서-poolevent로-내려간다"></a>
+
+### JVM: 합계에서 pool·event로 내려간다
+
+**보강 범위: JDK 25 관리 API·JFR, 확인일 2026-10-05.** heap은 안정적인데 RSS가 증가한다면 heap 합계만 반복해서 읽어서는 원인을 찾기 어렵습니다. JMX 관리 인터페이스에서 pool별 상태를 보고, 변화 구간의 JFR 이벤트로 할당·GC·대기의 위치를 좁힙니다.
+
+| 원천 | 단위·관측 범위 | 함정 |
+| --- | --- | --- |
+| `java.lang:type=MemoryPool,name=...` | `Usage`·`PeakUsage`·`CollectionUsage`의 바이트 값 | pool을 이름으로 열거; CollectionUsage는 최근 회수 후 값이며 현재 RSS가 아님 |
+| `java.lang:type=GarbageCollector,name=...` | CollectionCount, CollectionTime(ms) | 미정의 시 −1; 대략적인 누적 collection 시간이지 모든 stop-the-world 구간의 정확한 합이 아님 |
+| `java.nio:type=BufferPool,name=...` | direct·mapped 등의 Count, TotalCapacity, MemoryUsed(bytes) | capacity와 실제 메모리 추정은 정렬·할당자 때문에 다를 수 있음; 미지원 추정 −1 |
+
+pool의 지원 threshold·유효성·max 미정의 상태는 API 결과로 확인합니다. HotSpot의 Metaspace 같은 non-heap pool, direct/mapped buffer와 OS의 RSS는 회계 범위가 다릅니다. mapped buffer의 capacity 전체를 현재 RAM 상주량으로 더하지 않습니다. [MemoryPoolMXBean](https://docs.oracle.com/en/java/javase/25/docs/api/java.management/java/lang/management/MemoryPoolMXBean.html), [GarbageCollectorMXBean](https://docs.oracle.com/en/java/javase/25/docs/api/java.management/java/lang/management/GarbageCollectorMXBean.html), [BufferPoolMXBean](https://docs.oracle.com/en/java/javase/25/docs/api/java.management/java/lang/management/BufferPoolMXBean.html), [HotSpot 클래스 메타데이터](https://docs.oracle.com/en/java/javase/25/gctuning/other-considerations.html)
+
+JFR은 `jdk.GarbageCollection`, `jdk.GCPhasePause`, `jdk.ExecutionSample`, 파일·소켓·monitor 대기 등의 이벤트를 통해 시간과 원인을 연결합니다. 켜진 이벤트, threshold, 주기, stack trace 설정을 기록해야 합니다. 임계 시간보다 짧은 작업이 기록되지 않았다면 “그 작업이 전혀 없었다”가 아닙니다. 기록 템플릿·실제 JDK가 제공하는 이벤트를 먼저 확인합니다. [JDK 25 JFR 분석](https://docs.oracle.com/en/java/javase/25/troubleshoot/troubleshoot-performance-issues-using-jfr.html), [JFR EventSettings](https://docs.oracle.com/en/java/javase/25/docs/api/jdk.jfr/jdk/jfr/EventSettings.html)
+
+`default.jfc`와 `profile.jfc`는 서로 다른 비용·상세도 선택입니다. 어떤 workload에서도 고정된 낮은 오버헤드라는 보증으로 쓰지 않습니다. 특히 heap statistics를 켜는 진단은 추가 GC와 정지 시간을 유발할 수 있습니다. 제품은 기본 지표와 제한된 기간의 상세 recording을 분리하고 recording 설정·용량·종료 조건을 보존하도록 제안합니다. [jcmd JFR 설정](https://docs.oracle.com/en/java/javase/25/docs/specs/man/jcmd.html), [JFR 비용 설명](https://docs.oracle.com/en/java/javase/25/troubleshoot/troubleshoot-performance-issues-using-jfr.html)
+
+JMX attribute 읽기는 읽기 전용이지만 MBean operation에는 GC·설정 변경이 포함될 수 있습니다. JFR 시작·종료는 계측 상태를 바꾸고 파일·CPU 비용을 발생시킵니다. 이 장에서는 둘 다 실행하지 않았습니다. local attach 또는 인증·접근 제어가 설정된 관리 경로를 전제로 하며 공개 무인증 JMX endpoint를 수집 전제로 삼지 않습니다. [JMX 원격 관측과 보안](https://docs.oracle.com/en/java/javase/25/management/monitoring-and-management-using-jmx-technology.html)
+
+<a id="chapter-docs-application-managed-runtimes--net-지표-수집과-eventpipe-세션을-구분한다"></a>
+
+### .NET: 지표 수집과 EventPipe 세션을 구분한다
+
+EventPipe는 .NET runtime·EventSource 이벤트를 프로세스 밖 진단 도구로 보내거나 `.nettrace`로 기록하는 경로입니다. **일반 `dotnet-trace collect` 기준**으로는 커널·native 이벤트와 native frame을 함께 수집하는 OS 전체 profiler로 설명하지 않습니다. `dotnet-counters`는 EventCounter와 Meter API의 값을 관측하고, 상세 trace는 `dotnet-trace` 같은 도구를 사용합니다. [EventPipe](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/eventpipe), [dotnet-counters](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-counters)
+
+확인일 2026-10-06의 공식 문서는 별도 **preview `dotnet-trace collect-linux`** 경로를 제공합니다. .NET 10+, Linux kernel 6.4+의 `CONFIG_USER_EVENTS=y`, tracefs, root 권한 등이 필요하며 perf_events·user_events를 통해 관리 이벤트와 native/커널 이벤트·스택을 함께 기록합니다. Linux x64/Arm64 및 glibc 조건, 새 nettrace 형식을 읽을 분석 도구의 지원도 확인합니다. 기본 설정은 시스템의 여러 프로세스를 수집하므로 대상 제한을 별도로 설계합니다. 일반 collect의 권한·범위로 이 모드를 실행할 수 있다고 가정하지 않으며, 이 장에서는 실행하지 않았습니다. [두 수집 방식과 collect-linux 전제](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-trace#dotnet-trace-collect-linux)
+
+도구 버전·runtime 버전·provider/meter·interval·단위를 수집 계약에 남깁니다. `dotnet-counters --counters System.Runtime`도 대상이 .NET 8 이하이면 System.Runtime Meter가 없으므로 구형 EventCounter 표시로 fallback합니다. 같은 명령으로 얻었다는 이유로 이름·단위·집계 의미가 같은 것으로 매핑하지 않습니다. 구형 EventCounter와 새로운 Meter 또는 [OTel 안정 이름](#chapter-docs-application-semantic-conventions)은 각각 정의를 확인합니다. 이벤트가 꺼졌거나 구독에 실패한 상태도 0으로 저장하지 않습니다. [대상 runtime별 fallback](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-counters)
+
+설명용 명령 `dotnet-counters monitor --process-id 1234 --counters System.Runtime`는 **여기서 실행하지 않았습니다**. 대상 프로세스의 진단 endpoint 접근 권한이 필요하며 Linux/macOS에서는 도구와 대상의 TMPDIR도 맞아야 합니다. 진단 세션과 주기적 계측에 비용이 발생하고, 세션 종료 시 수집을 해제해야 합니다. 이 명령은 단순 기존 파일 읽기와 달리 대상의 진단 세션을 활성화합니다. [도구의 연결 조건](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-counters), [진단 포트의 보안](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/diagnostic-port)
+
 <a id="chapter-docs-application-managed-runtimes--수집-설계"></a>
 
 ### 수집 설계
@@ -6340,6 +6755,8 @@ JVM의 특정 pool 이름을 .NET 세대에 일대일 매핑하는 대신, 공�
 1. JVM committed가 OS RSS와 같은가? **관측 범위와 의미가 다릅니다.**
 2. 정지 시간 목표 100 ms는 모든 정지의 보장 상한인가? **G1에서는 목표이며 절대 보장이 아닙니다.**
 3. CPU가 낮으면 ThreadPool 대기가 없는가? **블로킹으로 대기가 늘 수 있습니다.**
+4. BufferPool TotalCapacity를 RSS에 더하면 native 메모리 총량인가? **예약·할당·상주의 범위가 다르고 중복될 수 있습니다.**
+5. JFR에 짧은 소켓 대기 이벤트가 없으면 대기 자체가 없었는가? **이벤트 활성화와 threshold·표본 조건부터 확인해야 합니다.**
 
 다음: [Go·Node.js·Python](#chapter-docs-application-async-runtimes) · [애플리케이션 목차](#chapter-docs-application-readme)
 
@@ -6453,7 +6870,7 @@ JVM memory 원천은 `MemoryPoolMXBean.getUsage()`이고, GC duration은 GC 알�
 
 ## Go, Node.js, Python의 동시성과 관측
 
-> 상태: 검토됨 · 적용 범위: Go 런타임 API, Node.js 이벤트 루프, CPython 3.14 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: Go 런타임 API, Node.js 26.10.0·24.19.0 이벤트 루프, CPython 3.14 · 3d 원천 검토: 2026-10-06 · 런타임 계측 실습은 수행하지 않음
 
 <a id="chapter-docs-application-async-runtimes--먼저-이해할-것"></a>
 
@@ -6491,6 +6908,16 @@ Node.js에서는 이벤트 루프의 callback 처리와 libuv worker pool의 작
 
 이벤트 루프 지연 25 ms를 그대로 요청의 p99 25 ms로 부르지 않습니다. 표본 대상과 분포가 다릅니다.
 
+<a id="chapter-docs-application-async-runtimes--elu는-프로세스-cpu-비율이-아니다"></a>
+
+#### ELU는 프로세스 CPU 비율이 아니다
+
+**Node.js v26.10.0·v24.19.0 문서 확인: 2026-10-06.** `performance.eventLoopUtilization()`은 이벤트 루프의 누적 active·idle 시간을 고해상도 ms로 제공하고 그 비율을 계산합니다. 이전 호출 결과를 인자로 주면 구간 값을 얻을 수 있습니다. 직접 만든 객체를 전달하거나 utilization 비율끼리 뺄셈하지 않습니다. active는 event provider(예: epoll_wait) 밖의 시간이라 동기 블로킹에도 높아질 수 있습니다. OS CPU 사용률과 나란히 보아야 “계산 중”과 “루프 진행이 막힘”을 구분할 수 있습니다. [고정 버전 perf_hooks 원천](https://github.com/nodejs/node/blob/v26.10.0/doc/api/perf_hooks.md)
+
+같은 문서에서 `monitorEventLoopDelay`의 `samplePerIteration`은 **26.5.0에 추가되고 24.19.0 LTS에도 backport**됐습니다. v25.9.0 문서에는 이 옵션이 없으므로 단순한 major 버전 대소 비교로 지원 여부를 판정하지 않습니다. 기본 false에서는 `resolution`(기본 10 ms) timer로 표본을 얻습니다. true에서는 루프 iteration마다 prepare/check hook으로 표본을 얻으며 resolution은 무시합니다. true 모드는 유휴 상태에서 루프를 살려 두거나 추가 iteration을 강제하지 않습니다. 두 모드의 결과는 상당히 달라 직접 비교하지 말라는 API 설명을 따릅니다. 같은 지표 이름이라도 모드 변경 전후를 연속 분포로 합치지 않습니다. [v26.10.0 API](https://github.com/nodejs/node/blob/v26.10.0/doc/api/perf_hooks.md#perf_hooksmonitoreventloopdelayoptions), [24.19.0 추가 기록](https://github.com/nodejs/node/blob/v24.19.0/doc/api/perf_hooks.md#perf_hooksmonitoreventloopdelayoptions), [25.9.0 원천](https://github.com/nodejs/node/blob/v25.9.0/doc/api/perf_hooks.md)
+
+제품 적용 제안: runtime·worker 수명, 측정 모드, resolution, histogram reset 시각을 보존합니다. histogram의 enable/disable·reset은 계측 상태 변경이며 반복 관측 비용이 있습니다. 애플리케이션 또는 허용된 계측 코드에 추가해야 하며 외부에서 PID만 알면 읽을 수 있는 파일은 아닙니다. 이 절에서는 Node 프로세스에 계측을 설치하거나 실행하지 않았습니다.
+
 <a id="chapter-docs-application-async-runtimes--python-gil과-asyncio는-다른-축이다"></a>
 
 ### Python: GIL과 asyncio는 다른 축이다
@@ -6527,6 +6954,8 @@ asyncio의 이벤트 루프는 자신이 실행되는 스레드에서 task와 ca
 1. goroutine 10,000개는 요청 10,000개인가? **일대일 관계가 보장되지 않습니다.**
 2. 이벤트 루프 지연과 요청 지연은 같은 분포인가? **표본 대상이 다릅니다.**
 3. CPython 버전만으로 GIL 상태를 확정할 수 있는가? **빌드와 실제 실행 상태를 확인해야 합니다.**
+4. ELU가 높은데 CPU가 낮을 수 있는가? **동기 블로킹으로 루프가 진행하지 못하면 가능합니다.**
+5. Node의 timer 모드와 iteration 모드 지연 p99를 바로 비교해도 되는가? **표본 방식이 달라 모드·설정을 함께 구분해야 합니다.**
 
 다음: [브라우저와 사용자 경험](#chapter-docs-application-user-experience) · [애플리케이션 목차](#chapter-docs-application-readme)
 
@@ -6907,13 +7336,14 @@ PostgreSQL 18의 `pg_stat_activity`는 서버 프로세스의 현재 활동을 �
 3. [PostgreSQL 관측: 활동, 누적 통계와 정리 작업](#chapter-docs-database-postgresql)
 4. [PostgreSQL 운영 관측: 오래된 ID, 회수 기준점, 통계 호환성](#chapter-docs-database-postgresql-operations)
 5. [MySQL과 MariaDB 관측](#chapter-docs-database-mysql-mariadb)
-6. [SQL Server와 Oracle: 대기와 실행 통계](#chapter-docs-database-sqlserver-oracle)
-7. [로그, 지속성, 복제와 복구](#chapter-docs-database-replication-and-recovery)
-8. [DB 고가용성: 장애 전환, fencing과 복구 완료의 의미](#chapter-docs-database-high-availability)
-9. [문서형, 분산형, 분석형 DB의 관측](#chapter-docs-database-distributed-and-analytical)
-10. [시계열·그래프·문서·열 지향 DB를 비교하는 기준](#chapter-docs-database-specialized-data-models)
-11. [DB 수집 명세: 읽기 전용 쿼리, 단위, 권한과 통계 수명](#chapter-docs-database-collection-contracts)
-12. [PostgreSQL 실제 실습: 같은 값, 잠금 대기와 실패한 트랜잭션](#chapter-docs-database-postgresql-concurrency-lab)
+6. [MySQL: 잠금 대기, 커밋과 복제의 서로 다른 완료 지점](#chapter-docs-database-mysql-operations)
+7. [SQL Server와 Oracle: 대기와 실행 통계](#chapter-docs-database-sqlserver-oracle)
+8. [로그, 지속성, 복제와 복구](#chapter-docs-database-replication-and-recovery)
+9. [DB 고가용성: 장애 전환, fencing과 복구 완료의 의미](#chapter-docs-database-high-availability)
+10. [문서형, 분산형, 분석형 DB의 관측](#chapter-docs-database-distributed-and-analytical)
+11. [시계열·그래프·문서·열 지향 DB를 비교하는 기준](#chapter-docs-database-specialized-data-models)
+12. [DB 수집 명세: 읽기 전용 쿼리, 단위, 권한과 통계 수명](#chapter-docs-database-collection-contracts)
+13. [PostgreSQL 실제 실습: 같은 값, 잠금 대기와 실패한 트랜잭션](#chapter-docs-database-postgresql-concurrency-lab)
 
 관련 문서: [애플리케이션](#chapter-docs-application-readme), [호스트](#chapter-docs-host-readme), [스토리지](#chapter-docs-storage-readme)
 
@@ -7362,7 +7792,7 @@ I/O 시간은 `track_io_timing`·`track_wal_io_timing` 설정을 함께 수집�
 
 ## MySQL과 MariaDB 관측
 
-> 상태: 검토됨 · 적용 범위: MySQL 8.4 InnoDB·Performance Schema, MariaDB 진단 명령의 차이 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: MySQL 8.4 InnoDB·Performance Schema, MariaDB 진단 명령의 차이 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 3b 원천 검토: 2026-10-05 (새 실습 결과 미반영)
 
 버전 상태: MySQL 사례는 8.4 LTS 문서에 고정했습니다. 9.7 LTS와 이후 YY.M 번호 체계가 존재하며, 새 계열의 모든 동작을 검증한 설명은 아닙니다. 9.7.3은 Docker image 전용 보안 패치입니다. [버전별 기준과 지원 상태](#chapter-docs-coverage--교차-검토-시점의-버전-상태)
 
@@ -7414,6 +7844,8 @@ ps를 ns로 오해하면 1,000배의 오류가 생깁니다. 제품의 공통 �
 
 복제 채널, receiver·applier 상태, 오류, 로그 위치와 필요한 데이터의 적용 여부를 함께 비교합니다. 시간 지표를 바이트 잔량이나 실제 업무 데이터의 신선도와 혼동하지 않습니다.
 
+잠금 그래프, 커밋 시 flush, GTID의 수신·적용 timestamp와 NULL 조건은 [MySQL 운영 관측](#chapter-docs-database-mysql-operations)에서 8.4·9.7 공식 문서를 대조해 설명합니다. 해당 비교 범위를 이 장의 모든 MariaDB 설명에 적용하지 않습니다.
+
 <a id="chapter-docs-database-mysql-mariadb--mariadb의-진단-명령"></a>
 
 ### MariaDB의 진단 명령
@@ -7450,13 +7882,187 @@ MariaDB의 `EXPLAIN`은 계획 정보를 제공하고 `ANALYZE`는 문장을 실
 
 ---
 
+<a id="chapter-docs-database-mysql-operations"></a>
+
+<a id="chapter-docs-database-mysql-operations--mysql-잠금-대기-커밋과-복제의-서로-다른-완료-지점"></a>
+
+## MySQL: 잠금 대기, 커밋과 복제의 서로 다른 완료 지점
+
+> 상태: 검토됨 · 범위: MySQL 8.4·9.7 InnoDB 공식 문서 · 3f 원자료 검토: 2026-10-06 · MySQL 8.4.11·9.7.2 r1·r2 출판 · r2 실행: 2026-10-06 KST
+
+<a id="chapter-docs-database-mysql-operations--행-하나를-넣는데-왜-기다릴까"></a>
+
+### 행 하나를 넣는데 왜 기다릴까
+
+주문 번호가 아직 존재하지 않는데 INSERT가 기다리는 상황을 생각해 봅시다. 다른 트랜잭션이 그 번호가 들어갈 **인덱스 구간**을 잠갔을 수 있습니다. 반대로 커밋 응답이 왔어도 복제본에 적용되었다는 뜻은 아닙니다. 잠금 획득, 로컬 지속성, 복제 수신, 복제 적용은 각각 다른 완료 지점입니다.
+
+<a id="chapter-docs-database-mysql-operations--레코드와-그-사이의-빈-구간을-잠근다"></a>
+
+### 레코드와 그 사이의 빈 구간을 잠근다
+
+InnoDB의 기본 REPEATABLE READ에서 범위를 검색하는 locking read·UPDATE·DELETE는 일반적으로 next-key lock을 사용합니다. 이는 인덱스 레코드 잠금과 그 **앞 gap**의 잠금을 합친 것입니다. gap lock은 그 구간으로의 삽입을 막습니다. 서로 다른 트랜잭션의 gap lock 자체는 함께 존재할 수 있어, 이름의 S/X만으로 일반 레코드 잠금의 충돌 규칙을 적용하면 안 됩니다. 일반적인 일관 읽기 SELECT와 `SELECT ... FOR UPDATE`도 구분합니다. [8.4 InnoDB locking](https://dev.mysql.com/doc/refman/8.4/en/innodb-locking.html), [9.7 InnoDB locking](https://dev.mysql.com/doc/refman/9.7/en/innodb-locking.html)
+
+완전한 unique index 조건으로 **존재하는 한 레코드**를 찾는 경우에는 gap 없이 레코드만 잠글 수 있습니다. “PK 조건이면 언제나 gap 없음”으로 넓히지 않습니다. 없는 값, 복합 unique key 일부 조건, 실제 사용한 인덱스에 따라 잠금 범위가 달라집니다. **예시:** 인덱스 값이 10과 20이고 `(10, 20]` next-key 구간을 잠갔다면 15 삽입이 기다릴 수 있습니다. 아래 실습에서도 k가 10·20인 보조 인덱스와 15 삽입을 사용했으며, 실제 query·잠금 행은 별도 근거로 보존했습니다. [잠금 범위를 결정하는 검색](https://dev.mysql.com/doc/refman/8.4/en/innodb-locks-set.html)
+
+| 원천 | 무엇을 보여 주는가 | 해석할 때 보존할 것 |
+| --- | --- | --- |
+| `performance_schema.data_locks` | 엔진이 보유하거나 요청한 잠금 | schema·table·index, RECORD/TABLE, mode, GRANTED/WAITING |
+| `performance_schema.data_lock_waits` | 요청 잠금과 이를 막는 잠금 사이의 관계 | requested/blocking 엔진·트랜잭션·잠금 ID |
+| `sys.innodb_lock_waits` | 대기 시간·세션 등과 결합한 진단 view | 관측 시각, waiter와 blocker, 오래 열린 트랜잭션 |
+
+잠금 ID는 내부 구조를 파싱할 안정적인 업무 키가 아닙니다. 조회 도중 대기가 끝날 수 있으므로 세 view의 행을 원자적인 전체 그래프로 간주하지 않습니다. 잠금 수는 요청 수나 잠긴 업무 행 수와도 같지 않습니다. [data_locks](https://dev.mysql.com/doc/refman/8.4/en/performance-schema-data-locks-table.html), [data_lock_waits](https://dev.mysql.com/doc/refman/8.4/en/performance-schema-data-lock-waits-table.html), [sys.innodb_lock_waits](https://dev.mysql.com/doc/refman/8.4/en/sys-innodb-lock-waits.html)
+
+8.4.11·9.7.2의 같은 REPEATABLE READ 실습에서 다음 **원래 LOCK_MODE 문자열**을 확인했습니다. `X` 하나만 보고 모든 잠금을 next-key라고 분류하지 않습니다. 아래 해석은 `r3.t`의 실제 레코드·사용 인덱스·쿼리와 함께 확인한 것입니다. [8.4.11 r2 결과](labs/results/1.1-r3/mysql-8.4.11-r2.json), [9.7.2 r2 결과](labs/results/1.1-r3/mysql-9.7.2-r2.json), [원천 잠금 정의](https://dev.mysql.com/doc/refman/8.4/en/innodb-locking.html)
+
+| LOCK_TYPE·위치 | 실제 LOCK_MODE·상태 | 이 실습의 의미 |
+| --- | --- | --- |
+| RECORD, 보조 인덱스 k | `X` · GRANTED | 범위 locking read의 next-key 잠금, k=10·20 레코드에서 관측 |
+| RECORD, 보조 인덱스 k | `X,GAP` · GRANTED | k=15가 없는 구간의 gap 잠금 |
+| RECORD, PRIMARY | `X,REC_NOT_GAP` · GRANTED | 앞 gap을 포함하지 않는 레코드 잠금 |
+| RECORD, 보조 인덱스 k | `X,GAP,INSERT_INTENTION` · WAITING | k=15를 넣으려는 삽입 의도 잠금의 대기 |
+| TABLE | `IX` · GRANTED | 행의 배타 잠금을 위한 테이블 수준 intention 잠금 |
+
+제품 적용 제안: 직접 잠금 관계와 sys view의 표시를 별도 상태로 보존합니다. 실제 다음 next-key 표본에는 `data_lock_waits`의 관계가 있었지만 `sys.innodb_lock_waits`는 비어 있었습니다. sys view는 `INNODB_TRX`와 inner join하며, 두 고정 버전의 InnoDB 코드는 마지막 정보 cache 읽기 뒤 **100 ms 초과**가 지나야 갱신을 허용합니다. 연속된 서로 다른 트랜잭션의 표본을 즉시 모두 연결할 수 있다는 보장은 없습니다. 세 표의 비일관성은 공식 문서에도 명시되어 있습니다. [일관성 제한](https://dev.mysql.com/doc/refman/8.4/en/innodb-information-schema-internal-data.html), [8.4.11 sys view](https://github.com/mysql/mysql-server/blob/mysql-8.4.11/scripts/sys_schema/views/p_s/innodb_lock_waits.sql), [8.4.11 cache 코드](https://github.com/mysql/mysql-server/blob/mysql-8.4.11/storage/innobase/trx/trx0i_s.cc), [9.7.2 cache 코드](https://github.com/mysql/mysql-server/blob/mysql-9.7.2/storage/innobase/trx/trx0i_s.cc)
+
+<a id="chapter-docs-database-mysql-operations--교착과-오래-기다리는-것은-다르다"></a>
+
+#### 교착과 오래 기다리는 것은 다르다
+
+교착은 서로가 놓아야 진행할 수 있는 순환 대기입니다. `innodb_deadlock_detect`의 기본값은 ON입니다. InnoDB가 교착을 발견하면 희생 트랜잭션을 롤백합니다. 반면 `innodb_lock_wait_timeout` 기본 50초는 InnoDB 행 잠금 대기 한도이며, 기본적으로 timeout이 난 **문장**을 롤백합니다. `innodb_rollback_on_timeout`을 켜면 전체 트랜잭션 롤백이 됩니다. 따라서 ERROR 1213과 1205를 동일한 재시도 지점으로 취급하면 안 됩니다. timeout은 모든 쿼리의 실행 제한 시간도 아닙니다. [교착 처리](https://dev.mysql.com/doc/refman/8.4/en/innodb-deadlocks-handling.html), [8.4 InnoDB 변수](https://dev.mysql.com/doc/refman/8.4/en/innodb-parameters.html), [9.7 InnoDB 변수](https://dev.mysql.com/doc/refman/9.7/en/innodb-parameters.html)
+
+ERROR 1213만으로 실제 순환을 확인했다고 표시하지 않습니다. 공식 문서는 wait-for 목록의 200개 트랜잭션 한도 초과나 1,000,000개를 초과하는 잠금 탐색도 교착으로 간주해 롤백한다고 설명합니다. 원문 `LATEST DETECTED DEADLOCK`의 탐색 한도 메시지를 구분합니다. 반대로 InnoDB가 인식하지 못하는 다른 엔진의 잠금이나 MySQL 계층의 테이블 잠금이 포함된 교착은 감지되지 않아 lock timeout으로 끝날 수 있습니다. **LOCK TABLES가 항상 감지 불가인 것은 아닙니다.** `innodb_table_locks=1`과 `autocommit=0` 등의 인식 조건을 확인합니다. [교착 탐색 범위·한도](https://dev.mysql.com/doc/refman/8.4/en/innodb-deadlock-detection.html)
+
+제품 적용 제안: 잠금 대기의 길이, 엔진이 보고한 교착/탐색 한도 사건, 실제 확인한 순환 관계를 구분하고 blocker의 트랜잭션 시작 시각과 마지막 문장을 연결합니다. 잠금 해제를 위한 세션 종료·설정 변경은 읽기 전용 모니터링에 포함하지 않습니다.
+
+<a id="chapter-docs-database-mysql-operations--커밋-응답과-저장-장치의-지속성"></a>
+
+### 커밋 응답과 저장 장치의 지속성
+
+redo log는 InnoDB 복구에 쓰이고 binary log는 복제·시점 복구 등에 쓰입니다. 한쪽의 flush 설정만으로 두 경로 모두의 지속성을 설명할 수 없습니다.
+
+| 설정 | 8.4·9.7에서 확인한 의미 |
+| --- | --- |
+| `innodb_flush_log_at_trx_commit=1` — 기본 | 각 커밋에서 redo를 쓰고 디스크 flush를 요청 |
+| `=2` | 커밋마다 redo를 쓰되 flush는 주기적으로 수행 |
+| `=0` | redo 쓰기와 flush를 주기적으로 수행 |
+| `sync_binlog=1` — 기본 | 커밋 전에 binary log 동기화; group commit의 묶음을 고려 |
+| `sync_binlog=0` | MySQL의 binary log 동기화를 끄고 OS 쓰기 반영에 의존 |
+| `sync_binlog=N`, N > 1 | N개 binary log **commit group**이 모인 뒤 동기화 |
+
+redo의 주기는 기본 1초이며 `innodb_flush_log_at_timeout` 설정과 스케줄링의 영향을 받습니다. 이를 정확히 매초 수행하거나 최대 1초 손실을 항상 보장하는 타이머로 쓰지 않습니다. OS·장치가 flush를 올바르게 이행하는지도 필요합니다. 두 설정이 1이라는 관측은 설정 증거이며, 전원 장애 복구를 실험한 증거가 아닙니다. [redo flush 설명](https://dev.mysql.com/doc/refman/9.7/en/innodb-parameters.html#sysvar_innodb_flush_log_at_trx_commit), [8.4 sync_binlog](https://dev.mysql.com/doc/refman/8.4/en/replication-options-binary-log.html#sysvar_sync_binlog), [9.7 sync_binlog](https://dev.mysql.com/doc/refman/9.7/en/replication-options-binary-log.html#sysvar_sync_binlog), [저장 쓰기 경로](#chapter-docs-storage-write-path-and-durability)
+
+`sync_binlog=1`도 동시 트랜잭션을 묶는 group commit을 없애는 설정은 아닙니다. MySQL 8.4.11의 `ordered_commit`은 SYNC_STAGE에서 모은 큐에 대해 `sync_binlog_file(false)`를 호출하고, 이 함수는 sync 주기가 1이면 그 단계에서 동기화합니다. 따라서 “각 트랜잭션마다 서로 독립적인 fsync 1회”로 바꾸어 읽지 않습니다. 이는 코드 확인이며 이번 실습에서 syscall 횟수나 전원 장애 지속성을 측정한 결과는 아닙니다. [8.4.11 binlog.cc의 SYNC_STAGE·sync_binlog_file](https://github.com/mysql/mysql-server/blob/mysql-8.4.11/sql/binlog.cc)
+
+<a id="chapter-docs-database-mysql-operations--복제의-수신과-적용을-따로-본다"></a>
+
+### 복제의 수신과 적용을 따로 본다
+
+GTID는 트랜잭션을 식별하고 자동 위치 결정에 사용하는 식별자입니다. 하나의 증가 숫자만으로 모든 source·channel의 순서를 비교하는 시계가 아닙니다. source에서 만들어진 집합, receiver가 받은 집합, 실행된 집합을 구분합니다. 수신 집합에 GTID가 나타난 것만으로 해당 트랜잭션 전체가 수신·커밋되었다고 확정하지 않습니다. [GTID 개념](https://dev.mysql.com/doc/refman/8.4/en/replication-gtids-concepts.html), [SHOW REPLICA STATUS의 GTID 필드](https://dev.mysql.com/doc/refman/9.7/en/show-replica-status.html)
+
+| 단계 | 원천과 주요 필드 | 시간의 의미 |
+| --- | --- | --- |
+| 수신 | `replication_connection_status`: `SERVICE_STATE`, `LAST_ERROR_*`, `RECEIVED_TRANSACTION_SET` | 채널 연결·수신 진행과 오류 |
+| 최근 수신 완료 | 같은 표의 `LAST_QUEUED_TRANSACTION_*` | ORIGINAL/IMMEDIATE_COMMIT_TIMESTAMP, START/END_QUEUE_TIMESTAMP |
+| 적용 중·적용 완료 | `replication_applier_status_by_worker`: `APPLYING_TRANSACTION_*`, `LAST_APPLIED_TRANSACTION_*` | ORIGINAL/IMMEDIATE_COMMIT_TIMESTAMP, START_APPLY_TIMESTAMP; 완료 쪽 END_APPLY_TIMESTAMP |
+
+ORIGINAL은 최초 원본에서 커밋한 시각, IMMEDIATE는 바로 위 source에서 커밋한 시각입니다. queue·apply 시각은 replica에서 해당 단계를 처리한 시각입니다. 필드는 microsecond 정밀도의 timestamp이며 Performance Schema의 ps 누적 타이머와 다릅니다. 동일 트랜잭션의 apply 종료−시작은 그 worker의 처리 구간을 나타내지만, 서로 다른 서버의 commit−apply 시각 차이는 시계 오프셋도 포함합니다. 빈 식별자·영 시각·NULL의 의미를 보존하고 유효한 두 시각이 없는 경우 지연을 계산하지 않습니다. [connection status](https://dev.mysql.com/doc/refman/8.4/en/performance-schema-replication-connection-status-table.html), [worker status](https://dev.mysql.com/doc/refman/8.4/en/performance-schema-replication-applier-status-by-worker-table.html)
+
+<a id="chapter-docs-database-mysql-operations--seconds_behind_source의-null은-0이-아니다"></a>
+
+#### Seconds_Behind_Source의 NULL은 0이 아니다
+
+8.4와 9.7 문서는 applier가 멈췄거나, relay log를 모두 소비한 applier에 더 들어올 자료가 없고 receiver도 멈췄으면 `Seconds_Behind_Source`가 NULL이라고 설명합니다. receiver가 실행 중이고 relay log를 모두 소비했으면 0입니다. **병렬 복제에서 목표 GTID의 실행 완료를 이 위치 판정과 동일시하지 않습니다. receiver가 멈췄다는 조건 하나로도 NULL을 보장하지 않습니다.** [8.4 정의](https://dev.mysql.com/doc/refman/8.4/en/show-replica-status.html), [9.7 정의](https://dev.mysql.com/doc/refman/9.7/en/show-replica-status.html)
+
+0이어도 receiver가 느려 원본의 새 자료를 아직 못 받았을 수 있습니다. 병렬 replica에서는 이 값이 최신 worker 하나의 완료 위치를 대표하지 않으며, 시계 차이의 변화도 계산에 영향을 줍니다. 제품에는 원천 값·수신 상태·적용 상태·오류를 함께 보이고, 사용자가 필요한 GTID나 업무 데이터가 적용되었는지는 별도 질문으로 제시합니다.
+
+8.4.11·9.7.2의 `SHOW REPLICA STATUS` 코드는 SQL thread가 실행 중이면 source의 읽은 파일·위치와 coordinator의 group 파일·위치를 비교합니다. 같을 때 receiver가 연결되어 있으면 0, 멈췄으면 NULL입니다. 위치가 다르면 원칙적으로 `max(0, time(nullptr) − last_master_timestamp − clock_diff_with_master)`를 쓰며, 마지막 timestamp가 0인 경우에는 0을 냅니다. 병렬 worker의 commit과 coordinator checkpoint의 갱신은 별개이므로 **목표 GTID가 적용된 표본에서도 SBS가 0이 아닐 수 있습니다.** [8.4.11 SBS·checkpoint 코드](https://github.com/mysql/mysql-server/blob/mysql-8.4.11/sql/rpl_replica.cc), [9.7.2 같은 경로](https://github.com/mysql/mysql-server/blob/mysql-9.7.2/sql/rpl_replica.cc)
+
+제품 적용 제안: 자신이 확인하려는 source의 GTID 집합을 먼저 고정하고, replica의 실행 집합 또는 `WAIT_FOR_EXECUTED_GTID_SET`의 반환 0으로 그 집합의 실행 완료를 확인합니다. 이 대기는 운영 수집의 기본 동작으로 넣지 않고 필요할 때 제한 시간과 권한을 정한 진단으로 둡니다. 실습처럼 다른 writer·필터가 없는 소유 인스턴스의 증거 범위를 보존합니다. worker의 마지막 GTID·apply 종료 시각은 해당 작업의 완료를 연결하는 자료이지 모든 worker·모든 트랜잭션의 최신 상태를 대표하는 단일 시계가 아닙니다. `SHOW`와 Performance Schema 조회도 순차 표본입니다. [GTID 대기의 반환값](https://dev.mysql.com/doc/refman/8.4/en/gtid-functions.html), [worker timestamp](https://dev.mysql.com/doc/refman/8.4/en/performance-schema-replication-applier-status-by-worker-table.html)
+
+<a id="chapter-docs-database-mysql-operations--읽기-전용-수집과-버전-분기"></a>
+
+### 읽기 전용 수집과 버전 분기
+
+다음 SQL은 **읽기 전용 수집 예시**입니다. 실습은 이 중 잠금·설정·복제 상태에 해당하는 SQL을 임시 인스턴스에서 실행했으며, 운영 계정의 최소 권한으로 이 예시 전체를 실행 검증한 것은 아닙니다. 필요한 Performance Schema 표에 SELECT 권한이 있어야 합니다. `SHOW REPLICA STATUS`에는 `REPLICATION CLIENT` 또는 문서에 명시된 관리 권한이 필요합니다. `sys.innodb_lock_waits`는 기반 view의 권한도 확인합니다. [Performance Schema 표의 권한](https://dev.mysql.com/doc/refman/8.4/en/performance-schema-table-characteristics.html), [SHOW 권한](https://dev.mysql.com/doc/refman/8.4/en/show-replica-status.html)
+
+data_locks는 이미 엔진에 존재하는 정보를 노출하므로 공식 문서는 그 정보를 **생성하는 추가 메모리·CPU 비용이 없다**고 설명합니다. 전체 행의 조회·전송·제품 측 저장까지 비용이 0이라는 뜻으로 확대하지 않습니다. 조회 비용은 실제 잠금 수·주기에서 측정할 제품 설계 항목으로 두고, SQL·키의 노출 범위도 제한합니다. 조회는 설정·복제 상태를 바꾸지 않습니다. 또한 INNODB_TRX·data_locks·data_lock_waits 사이의 일관성이 보장되지 않으므로 일시적으로 연결할 상대 행이 없어도 parser 오류로 단정하지 않습니다. [data_locks의 비용 범위](https://dev.mysql.com/doc/refman/8.4/en/performance-schema-data-locks-table.html), [표 사이의 일관성 제한](https://dev.mysql.com/doc/refman/8.4/en/innodb-information-schema-internal-data.html)
+
+```sql
+SELECT @@version, @@global.innodb_flush_log_at_trx_commit,
+       @@global.sync_binlog, @@global.innodb_deadlock_detect,
+       @@global.innodb_lock_wait_timeout;
+SELECT ENGINE, ENGINE_TRANSACTION_ID, OBJECT_SCHEMA, OBJECT_NAME,
+       INDEX_NAME, LOCK_TYPE, LOCK_MODE, LOCK_STATUS
+FROM performance_schema.data_locks;
+SELECT * FROM performance_schema.data_lock_waits;
+SHOW REPLICA STATUS;
+```
+
+기본 잠금·flush 설정과 위 NULL 조건은 두 계열 문서에서 일치했습니다. 이것을 모든 호환성의 보증으로 넓히지 않습니다. 실제 차이의 예로 `mysql_native_password`는 8.4에서 기본 비활성화되고 9.0부터 제거되었습니다. 9.7 연결 실패를 8.4의 옛 plugin 활성화 방법으로 고칠 수는 없습니다. [인증 plugin 수명](https://dev.mysql.com/doc/refman/8.4/en/native-pluggable-authentication.html)
+
+제품 적용 제안: 엔진·버전·channel·worker·서버 시계 상태와 기능 가용성을 수집 계약에 남깁니다. 잠금 ID와 GTID·SQL 원문을 무제한 지표 label로 만들지 않고 제한된 진단 자료에 보존합니다.
+
+<a id="chapter-docs-database-mysql-operations--실습-같은-완료-조건에서-다시-관측한-r2"></a>
+
+### 실습: 같은 완료 조건에서 다시 관측한 r2
+
+Claude가 2026-10-06 KST(원문 UTC 10월 5일)에 WSL Ubuntu 24.04·커널 6.18.33.2에서 **8.4.11·9.7.2 r2**를 실행했습니다. 두 버전 모두 `supported 5`이며 버전마다 JSON과 gzip 132개를 출판했습니다. 이는 아래 고정 구성·입력의 판정입니다. [8.4.11 r2](labs/results/1.1-r3/mysql-8.4.11-r2.json), [9.7.2 r2](labs/results/1.1-r3/mysql-9.7.2-r2.json), [출판·입력 연결](review/evidence-provenance.json)
+
+두 버전은 2026-07-28 일반 릴리스 쌍이며 8.4.12·9.7.3은 Docker 전용 패치입니다. 고정 libaio/libnuma를 전용 디렉터리에서 읽고, 소유한 임시 인스턴스 두 개씩만 사용했습니다. 실행 후 프로세스와 native 데이터 디렉터리 정리를 확인했습니다. 최초 라이브러리 부재 시도는 별도 이력이며 시스템 설치·기존 DB 변경은 하지 않았습니다. [8.4.11 릴리스](https://dev.mysql.com/doc/relnotes/mysql/8.4/en/news-8-4-11.html), [9.7.2 릴리스](https://dev.mysql.com/doc/relnotes/mysql/9.7/en/news-9-7-2.html), [8.4.12 범위](https://dev.mysql.com/doc/relnotes/mysql/8.4/en/news-8-4-12.html), [9.7.3 범위](https://dev.mysql.com/doc/relnotes/mysql/9.7/en/news-9-7-3.html), [준비·검토 기록](review/claude-codex-r3.md)
+
+| r2 시나리오 | 두 버전의 판정 | 확인한 범위 |
+| --- | --- | --- |
+| defaults | supported | redo flush=1, sync_binlog=1; 전원 장애 지속성 시험은 아님 |
+| gap_lock | supported | gap 잠금·INSERT 대기·직접 대기 관계·sys 행, blocker rollback 뒤 삽입 행 확인 |
+| next_key_lock | supported | next-key·INSERT_INTENTION의 engine lock ID 관계, 같은 세션 쌍의 sys 행, rollback 뒤 삽입 행 확인 |
+| deadlock | supported | 구성한 순환에서 ERROR 1213 한 건과 엔진 교착 보고 |
+| replication | supported | GTID와 coordinator 위치를 따로 확인한 뒤 수신·적용 중지에 따른 SBS의 NULL/0 구분 |
+
+복제 실행기는 **replica_parallel_workers=2를 명시**했습니다. 아래 최종 표본은 두 버전이 같습니다. `Read/Exec`는 같은 `binlog.000001`의 읽은 위치와 coordinator 실행 위치이며, GTID는 같은 source UUID 뒤 구간만 표시했습니다. SQL 중지 이외의 행은 파일·위치와 thread 상태를 대기 조건으로 삼았으며 **SBS 값은 대기 조건으로 사용하지 않았습니다.**
+
+| 단계 | IO / SQL | Read/Exec | SBS | source / replica 실행 GTID |
+| --- | --- | --- | --- | --- |
+| baseline | Yes / Yes | 1073 / 1073 | 0 | 1–4 / 1–4 |
+| io_stopped | No / Yes | 1073 / 1073 | NULL | 1–5 / 1–4 |
+| sql_stopped | Yes / No | 1611 / 1342 | NULL | 1–6 / 1–5 |
+| resumed | Yes / Yes | 1611 / 1611 | 0 | 1–6 / 1–6 |
+
+**두 버전의 r2에서 coordinator 파일·위치가 일치한 뒤 baseline·resumed의 SBS는 0이었고, IO 중지·SQL 중지 표본은 NULL이었습니다.** IO 중지 때 적용한 것은 이미 받은 1–4이며, source의 새 GTID 5까지 적용했다는 뜻은 아닙니다. GTID 집합·스레드 상태·파일 위치와 NULL을 함께 보존해야 이 차이를 알 수 있습니다. [r2의 GTID·SQL 원자료](labs/results/1.1-r3/mysql-8.4.11-r2.json), [SHOW의 위치·SBS 정의](https://dev.mysql.com/doc/refman/8.4/en/show-replica-status.html)
+
+<a id="chapter-docs-database-mysql-operations--r1에서-배운-것-실제-작업과-표시의-완료-시점"></a>
+
+#### r1에서 배운 것: 실제 작업과 표시의 완료 시점
+
+r1은 **판정 설계 결함으로 반증된 실행**으로 보존했습니다. 두 버전의 `supported 3, refuted 2`를 고치지 않았습니다. next-key 자체와 INSERT 대기·해제는 있었지만 sys view가 즉시 보여야 한다는 조건이 실패했고, 목표 GTID 실행 완료를 coordinator 위치 갱신과 동일시한 조건도 실패했습니다. r1 재개 SBS는 8.4.11에서 0, 9.7.2에서 1이었습니다. [8.4.11 r1](labs/results/1.1-r3/mysql-8.4.11-r1.json), [9.7.2 r1](labs/results/1.1-r3/mysql-9.7.2-r1.json), [보존 실행기·원인 분석](review/claude-codex-r3.md)
+
+r2는 전후 표본을 함께 남겼습니다. 두 버전 모두 next-key의 첫 sys 조회는 0행이었고, 잠금을 유지한 채 200 ms 대기를 포함한 재조회 한 번 뒤 1행이 나타났습니다. **sys view가 비어 있다는 사실만으로 직접 관측한 잠금 대기를 부정할 수 없습니다.** 이는 위 INNODB_TRX cache·join 설명과 부합하며, 모든 환경의 표시 지연이 200 ms라는 보증은 아닙니다. [sys view의 고정 소스](https://github.com/mysql/mysql-server/blob/mysql-8.4.11/scripts/sys_schema/views/p_s/innodb_lock_waits.sql), [cache 갱신 조건](https://github.com/mysql/mysql-server/blob/mysql-8.4.11/storage/innobase/trx/trx0i_s.cc)
+
+GTID 적용 직후 baseline은 r2에서도 Read/Exec가 1073/158이었고 SBS는 **8.4.11은 12, 9.7.2는 14**였습니다. 파일·위치 일치 뒤에야 위 표의 0을 관측했습니다. 반대로 재개 직후에는 두 버전 모두 SBS=0인데 위치가 1611/1342인 표본도 있었습니다. **GTID 실행 완료, coordinator 위치 갱신, SBS=0을 서로 같은 완료 조건으로 취급하지 않습니다.** 이 관측을 WSL 시계 조정의 인과나 내부 clock_diff 값의 측정으로 확대하지 않습니다. [8.4.11 r2 전후 표본](labs/results/1.1-r3/mysql-8.4.11-r2.json), [9.7.2 r2 전후 표본](labs/results/1.1-r3/mysql-9.7.2-r2.json), [SBS·checkpoint 코드](https://github.com/mysql/mysql-server/blob/mysql-8.4.11/sql/rpl_replica.cc)
+
+<a id="chapter-docs-database-mysql-operations--이해-확인"></a>
+
+### 이해 확인
+
+1. 존재하지 않는 키를 INSERT하는데도 기다릴 수 있는가? **인덱스 gap 잠금이 삽입 위치를 막을 수 있습니다.**
+2. lock timeout과 deadlock의 롤백 범위가 항상 같은가? **아닙니다. 기본 timeout은 해당 문장, 감지된 InnoDB deadlock은 희생 트랜잭션을 롤백합니다.**
+3. sync_binlog=10이면 정확히 트랜잭션 10개마다 동기화하는가? **commit group 수이므로 개별 트랜잭션 수와 같지 않습니다.**
+4. Seconds_Behind_Source NULL을 0으로 바꾸어도 되는가? **알 수 없거나 중지된 상태를 정상으로 바꾸므로 안 됩니다.**
+5. sys.innodb_lock_waits가 비어 있으면 잠금 대기도 없는가? **아닙니다. 직접 잠금 관계와 INNODB_TRX cache의 표시 시점이 다를 수 있습니다.**
+6. 목표 GTID가 모두 실행되면 SBS가 반드시 0인가? **병렬 replica의 coordinator 위치가 아직 갱신되지 않은 표본에서는 0이 아닐 수 있습니다.**
+
+관련: [MySQL·MariaDB 기초](#chapter-docs-database-mysql-mariadb), [복제와 복구](#chapter-docs-database-replication-and-recovery), [수집 품질과 시계](#chapter-docs-foundations-time-and-data-quality)
+
+[통합 목차로](#book-top)
+
+---
+
 <a id="chapter-docs-database-sqlserver-oracle"></a>
 
 <a id="chapter-docs-database-sqlserver-oracle--sql-server와-oracle-대기와-실행-통계"></a>
 
 ## SQL Server와 Oracle: 대기와 실행 통계
 
-> 상태: 검토됨 · 적용 범위: SQL Server DMV·Query Store의 공통 의미, Oracle Database 19c · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: SQL Server DMV·Query Store의 공통 의미, Oracle Database 19c · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 3d 원천 검토: 2026-10-06
 
 <a id="chapter-docs-database-sqlserver-oracle--먼저-이해할-것"></a>
 
@@ -7494,6 +8100,34 @@ Query Store는 쿼리·계획·런타임 통계의 이력을 보존해 계획 �
 
 가상으로 어제 느렸던 계획이 오늘 캐시에서 사라졌다면 현재 DMV에 없다는 사실이 어제 실행되지 않았다는 증거는 아닙니다. 제품은 수집 당시의 계획·집계를 저장했는지, 엔진의 이력 수집이 켜져 있었는지를 구분합니다.
 
+<a id="chapter-docs-database-sqlserver-oracle--sql-server-읽기-충돌을-줄여도-이전-행-버전은-남는다"></a>
+
+### SQL Server: 읽기 충돌을 줄여도 이전 행 버전은 남는다
+
+**보강 확인: 2026-10-05, SQL Server 2019·2022 및 명시한 이후 차이.** 조회가 UPDATE를 덜 막게 만드는 row versioning은 이전 행을 보존하는 비용을 다른 곳에 둡니다. RCSI(`READ_COMMITTED_SNAPSHOT`)는 READ COMMITTED의 문장 단위 일관 읽기, SNAPSHOT은 트랜잭션 단위 일관 읽기를 제공합니다. 오래 유지되는 읽기·트랜잭션은 필요한 이전 버전의 정리를 늦출 수 있습니다. “읽기 잠금 감소”와 “저장 공간 부담 없음”은 다른 주장입니다. [잠금과 row versioning](https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-transaction-locking-and-row-versioning-guide?view=sql-server-ver16)
+
+기본적인 version store는 tempdb에 있지만 **ADR(Accelerated Database Recovery)을 켠 사용자 DB는 그 DB의 persistent version store(PVS)를 사용**합니다. SQL Server 2025에서 tempdb 자체에 ADR을 켜는 경우의 PVS도 별도 구분해야 합니다. 따라서 tempdb만 확인하여 모든 row version 사용량이 작다고 결론 내리지 않습니다. [ADR와 PVS](https://learn.microsoft.com/en-us/sql/relational-databases/accelerated-database-recovery-concepts?view=sql-server-ver17)
+
+`sys.dm_tran_version_store_space_usage`는 DB별로 tempdb에 사용한 version store 공간을 집계합니다. `reserved_space_kb`는 KB, `reserved_page_count`는 페이지 수입니다. 개별 version record를 전수 스캔하는 `sys.dm_tran_version_store`보다 정기 관측에 적합한 집계 원천입니다. PVS는 `sys.dm_tran_persistent_version_store_stats` 등으로 따로 조사하고 in-row/off-row 범위도 확인합니다. [tempdb 집계 DMV](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-objects/sys-dm-tran-version-store-space-usage?view=sql-server-ver17), [PVS 통계](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-tran-persistent-version-store-stats?view=sql-server-ver17)
+
+<a id="chapter-docs-database-sqlserver-oracle--sql-server-ag-아직-보내지-않은-로그와-아직-redo하지-않은-로그"></a>
+
+### SQL Server AG: 아직 보내지 않은 로그와 아직 redo하지 않은 로그
+
+`sys.dm_hadr_database_replica_states`는 DB·replica별 복제 상태입니다. `log_send_queue_size`는 primary에서 secondary로 아직 보내지 않은 로그 양, `redo_queue_size`는 secondary 로그에 도착했지만 아직 redo하지 않은 양이며 둘 다 **KB**입니다. 이름에 record가 들어간 설명을 보고 행 수로 저장하지 않습니다. `log_send_rate`·`redo_rate`의 단위는 KB/s입니다. [AG DMV의 필드·권한](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-objects/sys-dm-hadr-database-replica-states-transact-sql?view=sql-server-ver17)
+
+큐 크기는 시점의 잔량이며 지연 초가 아닙니다. redo_rate는 **DB 엔진 시작 이후 누적 redo 양을 실제 redo가 수행된 누적 시간으로 나눈 평균**입니다. 최근 몇 초의 속도도, 엔진 시작 후 벽시계 전체 시간으로 나눈 속도도 아닙니다. workload나 자원 배치가 바뀌면 과거 평균으로 queue/rate를 계산한 추정이 현재와 어긋날 수 있습니다. `queue/rate`는 유입·실행 조건이 유지된다는 가정하의 추정이며 복구 시간 보증이 아닙니다. primary가 알고 있는 secondary 상태는 마지막 보고에 의존할 수 있어 로컬 관측과 freshness를 함께 남깁니다. 제품은 전송 대기와 redo 대기를 서로 다른 병목 후보로 표시하도록 제안합니다. [send queue 해석](https://learn.microsoft.com/en-us/troubleshoot/sql/database-engine/availability-groups/troubleshooting-log-send-queuing-in-alwayson-availability-group)
+
+다음은 **실행하지 않은 읽기 전용 SQL**입니다. 위 tempdb 집계와 AG DMV는 SQL Server 2019 이하에서 `VIEW SERVER STATE`, 2022 이상에서는 더 좁은 `VIEW SERVER PERFORMANCE STATE`로 조회할 수 있습니다. 기존 `VIEW SERVER STATE`도 이 권한을 포함하므로 새 권한만으로 교체해야 조회되는 것은 아닙니다. 최소 권한 구성을 선택하고 DENY 등의 유효 권한도 확인합니다. [서버 권한 포함 관계](https://learn.microsoft.com/en-us/sql/t-sql/statements/grant-server-permissions-transact-sql?view=sql-server-ver17) 이를 모든 DMV·Azure 배포 형태의 공통 권한으로 넓히지 않습니다. 낮은 빈도의 집계 조회이며, row version 전체 스캔·설정 변경·복제 재시작은 수행하지 않습니다.
+
+```sql
+SELECT database_id, reserved_page_count, reserved_space_kb
+FROM sys.dm_tran_version_store_space_usage;
+SELECT database_id, replica_id, is_local, synchronization_state_desc,
+       log_send_queue_size, log_send_rate, redo_queue_size, redo_rate
+FROM sys.dm_hadr_database_replica_states;
+```
+
 <a id="chapter-docs-database-sqlserver-oracle--oracle-세션의-식별"></a>
 
 ### Oracle 세션의 식별
@@ -7509,6 +8143,20 @@ Oracle `V$SESSION`에는 현재 세션의 SID와 SERIAL# 등이 있습니다. SE
 `V$SQLSTATS`의 CPU_TIME과 ELAPSED_TIME은 microseconds 단위입니다. ELAPSED_TIME은 파싱·실행·fetch를 포함하며 병렬 실행에서는 query coordinator와 병렬 작업자들의 누적 시간이 포함됩니다. 따라서 사용자 한 요청의 벽시계 시간과 같다고 볼 수 없습니다. [Oracle 19c V$SQLSTATS](https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/V-SQLSTATS.html)
 
 가상으로 coordinator 1초, 병렬 작업자 두 개가 각각 1초를 보고했다면 이 정의의 누적 시간은 3초 규모일 수 있습니다. 이를 근거로 사용자가 반드시 3초 기다렸다고 표시하지 않습니다. 클라이언트 관측 시간은 별도 자료가 필요합니다.
+
+<a id="chapter-docs-database-sqlserver-oracle--oracle-ashawr의-기능-활성화와-사용-권리를-구분한다"></a>
+
+### Oracle: ASH·AWR의 기능 활성화와 사용 권리를 구분한다
+
+**Oracle Database 19c 라이선스 문서 확인: 2026-10-05.** ASH는 활성 세션 표본의 이력, AWR은 성능 통계의 이력을 제공하지만, SQL로 조회 가능하다는 것만으로 사용 권리가 있는 것은 아닙니다. `V$ACTIVE_SESSION_HISTORY`와 그 기반 `X$ASH`, AWR 보고서·관련 API는 Diagnostics Pack 범위입니다. 일반적으로 `DBA_HIST_*`도 해당하며, 공식 문서는 `DBA_HIST_SNAPSHOT`, `DBA_HIST_DATABASE_INSTANCE`, `DBA_HIST_SNAP_ERROR`, `DBA_HIST_SEG_STAT`, `DBA_HIST_SEG_STAT_OBJ`, `DBA_HIST_UNDOSTAT`를 예외로 명시합니다. 예외 view 하나를 허용했다고 이를 다른 유료 view와 조인하는 사용까지 허용된 것으로 취급하지 않습니다. [19c Licensing Information — Diagnostics Pack](https://docs.oracle.com/en/database/oracle/oracle-database/19/dblic/Licensing-Information.html)
+
+`CONTROL_MANAGEMENT_PACK_ACCESS`는 NONE·DIAGNOSTIC·DIAGNOSTIC+TUNING으로 기능 활성 범위를 제어합니다. Enterprise Edition의 기본값은 DIAGNOSTIC+TUNING이지만 이 설정이 계약상 이용 권리의 증거는 아닙니다. 제품은 에디션·서비스에 포함된 권리와 고객의 허용 범위를 명시적으로 등록한 뒤 해당 adapter를 활성화하도록 제안합니다. 비활성 상태에서 “되는지 시험”하려고 ASH/AWR를 조회하지 않습니다. [19c 설정 정의](https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/CONTROL_MANAGEMENT_PACK_ACCESS.html)
+
+Diagnostics Pack을 이용하지 않는 관측 경로로는 허용된 `V$SESSION` 현재 상태를 일정 간격으로 자체 저장하는 방법과 Statspack을 검토할 수 있습니다. 자체 표본은 간격 사이의 짧은 활동을 놓치므로 ASH와 동등한 이력이 아닙니다. Statspack도 스냅샷 통계이며 설치·스냅샷 생성은 DB 객체·저장 공간을 변경하는 관리 작업입니다. 모니터링 계정이 자동 설치하지 않고 DBA가 구성한 허용 원천을 읽는 형태로 구분합니다. [V$SESSION 정의](https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/V-SESSION.html), [19c RAC의 Statspack 보고 기능·호환성 설명](https://docs.oracle.com/en/database/oracle/oracle-database/19/racad/monitoring-performance.html)
+
+19c 문서는 Statspack을 하위 호환성을 위한 보고 기능으로 남겨 두고 있습니다. 실제 설치·조회 원천은 해당 배포의 문서와 DBA 구성을 확인합니다. 특히 `spawrio.sql`·`spawrrac.sql`은 19c Licensing Information에서 Diagnostics Pack에 포함하므로 **파일명이 sp로 시작한다는 이유로 무료 Statspack 범위라고 분류하지 않습니다**. [19c 라이선스의 보고서 목록](https://docs.oracle.com/en/database/oracle/oracle-database/19/dblic/Licensing-Information.html)
+
+이 절에서는 Oracle에 연결하거나 조회·설정 변경을 실행하지 않았습니다. 제품 설계는 허용 view·열별 조회 권한과 계약상 사용 범위를 함께 확인하고, 자체 표본의 빈도·SQL 민감 정보·보존량을 제한합니다. 기능 미허용·권한 부족·표본 부재를 각각 다른 상태로 남깁니다.
 
 <a id="chapter-docs-database-sqlserver-oracle--엔진-간-공통-화면의-경계"></a>
 
@@ -7533,6 +8181,9 @@ Oracle `V$SESSION`에는 현재 세션의 SID와 SERIAL# 등이 있습니다. SE
 1. 전체 wait에 signal wait를 더해야 하는가? **이미 포함되므로 중복됩니다.**
 2. 캐시에서 사라진 쿼리는 과거에도 없었는가? **캐시 수명과 실행 이력은 다릅니다.**
 3. Oracle 병렬 elapsed time은 사용자 벽시계 시간인가? **여러 실행 주체의 누적 시간을 포함할 수 있습니다.**
+4. tempdb version store가 작으면 모든 이전 행 버전도 작은가? **ADR의 사용자 DB PVS 등 저장 위치를 확인해야 합니다.**
+5. AG redo queue 0은 전송 대기도 0이라는 뜻인가? **전송과 redo는 서로 다른 단계입니다.**
+6. ASH SELECT가 성공하면 Diagnostics Pack 사용 권리가 확인되는가? **조회 권한·기능 활성화와 계약상 사용 권리는 다릅니다.**
 
 다음: [복제와 복구](#chapter-docs-database-replication-and-recovery) · [DB 목차](#chapter-docs-database-readme)
 
@@ -8527,7 +9178,7 @@ Elasticsearch 응답의 `took`은 coordinating node가 요청을 받은 뒤 응�
 
 ## 프록시, 로드밸런서와 서비스 메시
 
-> 상태: 검토됨 · 적용 범위: NGINX·Envoy·Istio의 관측 경계 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 적용 범위: NGINX·Envoy·Istio·HAProxy 3.2의 관측 경계 · 3d 원천 검토: 2026-10-06 · HAProxy stats 실습은 수행하지 않음
 
 <a id="chapter-docs-middleware-proxies-and-mesh--먼저-이해할-것"></a>
 
@@ -8561,6 +9212,25 @@ Envoy는 upstream 연결 풀 대기, timeout, retry와 retry 제한 초과 등�
 
 합성 예에서 들어온 요청 100개 중 20개가 한 번씩 재시도되면 upstream 시도는 120개입니다. 100+120을 사용자 요청 220개로 보고하면 중복입니다. 재시도 실패와 최종 사용자 실패의 비율도 다릅니다.
 
+<a id="chapter-docs-middleware-proxies-and-mesh--haproxy-stats-대기세션응답-코드를-나눈다"></a>
+
+### HAProxy stats: 대기·세션·응답 코드를 나눈다
+
+**HAProxy 3.2 Management Guide 확인: 2026-10-05.** 앱 로그에는 오류가 없는데 프록시의 실패가 늘었다면 요청 파싱·서버 연결·응답 처리 중 어느 단계인지 나눠 봅니다. stats는 listener·frontend·backend·server 행마다 유효한 필드가 다릅니다. CSV 위치를 고정하지 않고 헤더·행 유형과 proxy/server 식별을 함께 읽습니다. [3.2 stats 정의](https://docs.haproxy.org/3.2/management.html#9.1)
+
+| 필드 | 단위·유형 | 의미 |
+| --- | --- | --- |
+| `qcur` | 현재 요청 수, gauge | 대기 중 요청; backend 행은 server가 아직 배정되지 않은 큐 |
+| `scur`, `slim` | 현재 세션 수 / 설정 한도 | 세션과 요청의 일대일 대응을 가정하지 않음; 행 범위 확인 |
+| `ereq` | 누적 오류 | listener/frontend의 요청 처리 오류; 클라이언트 조기 종료·timeout·잘못된 요청 등 |
+| `econ` | 누적 요청 오류 | backend/server로 연결하려다 오류를 만난 요청 |
+| `eresp` | 누적 응답 오류 | 응답 처리 오류; server abort 등도 포함 |
+| `hrsp_5xx` | 누적 HTTP 응답 수 | 5xx 코드 분류; eresp와 같은 사건 집합이 아님 |
+
+정상적으로 전달받은 upstream 500은 HTTP 5xx이지만 프록시의 전송·응답 처리 오류와 같은 뜻은 아닙니다. backend econ에는 server들의 오류와 특정 server에 귀속되지 않은 오류도 포함되므로 backend와 그 server들을 다시 합치면 중복될 수 있습니다. qcur 역시 backend 미배정 큐와 server 큐의 위치를 구분합니다. [공식 필드 설명](https://www.haproxy.org/download/3.2/doc/management.txt)
+
+Runtime API의 `show stat`은 설정된 stats socket 접근 권한으로 수행하는 읽기 명령입니다. 큰 구성의 전체 표를 고빈도로 읽는 비용과 관리 socket 권한 범위를 제한합니다. stats 초기화·서버 상태 변경 명령은 별개이며 여기서는 어떤 HAProxy 명령도 실행하지 않았습니다. 제품에는 관측 행 유형·누적 수명·요청/세션 단위를 보존하고, 5xx만으로 앱과 프록시 중 원인 주체를 정하지 않도록 제안합니다.
+
 <a id="chapter-docs-middleware-proxies-and-mesh--서비스-메시의-추가-관측"></a>
 
 ### 서비스 메시의 추가 관측
@@ -8584,6 +9254,7 @@ Istio는 서비스·프록시·제어 평면의 지표와 로그·트레이스�
 1. Active connections가 업무 동시 요청 수인가? **유휴 연결 등이 포함될 수 있습니다.**
 2. keepalive 값이 전체 upstream 연결 상한인가? **NGINX의 해당 설정은 그런 의미가 아닙니다.**
 3. 프록시와 앱이 각각 요청 1건을 세면 사용자 요청 2건인가? **같은 요청의 다른 관측일 수 있습니다.**
+4. HAProxy eresp와 hrsp_5xx를 같은 오류 수로 합쳐도 되는가? **처리 오류와 HTTP 코드라는 다른 분류이므로 중복·범위 차이를 확인해야 합니다.**
 
 관련: [재시도](#chapter-docs-application-timeouts-and-retries) · [미들웨어 목차](#chapter-docs-middleware-readme)
 
@@ -9060,7 +9731,7 @@ Azure의 null과 0, 시간 집계의 의미를 확인하고 Google Cloud의 alig
 
 ## 관리형 서비스와 서버리스 관측
 
-> 상태: 검토됨 · 적용 범위: 관리형 관측 모델, AWS Lambda·Google Cloud Run 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (Lambda INIT·Errors 시각)
+> 상태: 검토됨 · 적용 범위: 관리형 관측 모델, AWS Lambda·Google Cloud Run 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (Lambda INIT·Errors 시각) · 3b 원천 검토: 2026-10-05 (새 실습 결과 미반영)
 
 <a id="chapter-docs-cloud-managed-and-serverless--먼저-이해할-것"></a>
 
@@ -9099,7 +9770,7 @@ Lambda Invocations는 함수 코드가 호출된 횟수이며 throttled 요청 �
 
 Lambda 초기화의 관측 출처를 먼저 구분합니다. cold start의 `Init Duration`은 REPORT 로그에서 확인할 수 있으며, Telemetry API의 `platform.initReport`는 초기화 보고 이벤트와 `metrics.durationMs`를 제공합니다. invoke 실패 뒤 suppressed init은 CloudWatch Logs에 추가 INIT 단계로 명시되지 않으면서 **REPORT의 Duration에 INIT+INVOKE 시간이 포함**될 수 있습니다. Telemetry API의 `phase=invoke` 초기화 이벤트로 구분할 수 있으므로 “Init Duration 필드가 없으면 초기화가 없었다”고 결론 내리지 않습니다. [실행 환경 수명과 suppressed init](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html), [Telemetry API 이벤트 스키마](https://docs.aws.amazon.com/lambda/latest/dg/telemetry-schema-reference.html)
 
-기본 on-demand Init의 10초 제한을 넘으면 첫 호출 시 함수 timeout 범위에서 Init을 다시 시도하는 경로도 있습니다. 이는 invoke 실패 뒤 suppressed init과 구분합니다. REPORT 로그에서 확인한 시간 포함 관계를 CloudWatch `Duration` 지표에도 그대로 적용하지 않습니다. 공식 지표 설명은 cold start 제외를 명시하지만 suppressed init과의 세부 대응은 이 장에서 실측하지 않았습니다. [Init 실패·재시도](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html), [Duration 지표 정의](https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics-types.html)
+기본 on-demand Init의 10초 제한을 넘으면 첫 호출 시 함수 timeout 범위에서 Init을 다시 시도하는 경로도 있습니다. 이는 invoke 실패 뒤 suppressed init과 구분합니다. REPORT 로그에서 확인한 시간 포함 관계를 CloudWatch `Duration` 지표에도 그대로 적용하지 않습니다. **2026-10-05 재확인에서도**, 실행 환경 문서는 REPORT의 포함 관계를 명시하고 지표 문서는 cold start 제외를 설명하지만, suppressed init이 `AWS/Lambda`의 `Duration` 지표에도 포함되는지를 직접 연결하는 공식 문장은 확인하지 못했습니다. 이 세부 대응은 미확인 상태이며 실측하지 않았습니다. [Init 실패·재시도](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html), [Duration 지표 정의](https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics-types.html)
 
 2025-08-01부터 managed runtime·ZIP·on-demand 함수의 INIT 단계도 과금 대상이 되었습니다. 다른 실행·배포 방식에서는 이미 적용되던 과금과 구분해야 합니다. **과금 규칙의 변경은 CloudWatch `Duration` 지표에 cold start가 포함된다는 뜻이 아닙니다.** 원천 지표, 로그의 Duration·Init Duration·Billed Duration을 각각의 정의로 읽습니다. [AWS INIT 과금 변경 공지](https://aws.amazon.com/blogs/compute/aws-lambda-standardizes-billing-for-init-phase/)
 
@@ -9821,11 +10492,51 @@ CPU·오류율·요청률을 0으로 채우면 업무가 조용하거나 정상�
 
 ## 재현 실습: 계산, 실제 엔진, 운영 검증의 경계
 
-> 상태: 검토됨 · 적용 범위: Windows·WSL 로컬 실습과 아래 고정 버전·입력 · 기존 실행일: 2026-10-04 · WSL 2라운드 추가 실행: 2026-10-05
+> 상태: 검토됨 · 적용 범위: Windows·WSL 로컬 실습과 아래 고정 버전·입력 · 기존 실행일: 2026-10-04 · WSL 2·3라운드 실행: 각 기록의 UTC · MySQL r2: 2026-10-06 KST · 3f 근거 검토: 2026-10-06
 
 버전 상태: promtool 3.5.0은 기존 기록의 고정 실행 파일입니다. Prometheus 3.5 LTS는 2026-07-31 지원이 끝났고, 검토 시점 LTS 3.13.4와 최신 안정 3.15.0의 별도 실행을 이번에 추가했습니다. [릴리스·지원 표](#chapter-docs-coverage--교차-검토-시점의-버전-상태)를 참고하며 과거 재현 버전을 현재 권장 설치 버전으로 읽지 않습니다.
 
 공식 설명을 읽는 것과 실제 프로그램에서 같은 동작을 보는 것은 서로 보완합니다. 이 장은 작성 환경에서 직접 실행한 실습입니다. 운영 서버나 사용자의 DB를 사용하지 않았고, 로컬 임시 DB와 loopback HTTP, 읽기 전용 Win32 API, 합성 PromQL 입력을 사용했습니다.
+
+<a id="chapter-docs-cross-domain-reproducible-labs--3라운드-메모리분포시계의-작은-실험"></a>
+
+### 3라운드: 메모리·분포·시계의 작은 실험
+
+Claude가 WSL Ubuntu 24.04·커널 6.18.33.2·Python 3.12.3에서 2026-10-05 실행한 세 묶음을 출판했습니다. Codex는 10월 6일 저장 결과·원자료·입력 hash와 원천 정의를 대조했습니다. 이 샌드박스에서 Linux 실습을 다시 실행한 것은 아닙니다.
+
+| 출판 결과 | 판정 | 본문에서 사용하는 관측과 한계 |
+| --- | --- | --- |
+| [Linux 메모리](labs/results/1.1-r3/linux-memory.json) | supported 4 | anonymous·file·memfd 각 8 MiB가 해당 PSS 분류에 반영됨. status·statm 단위 환산, 세 원천의 30회 조회 비용, PSI·vmstat 가용성을 확인. 강제 압박·OOM 실험은 수행하지 않음 |
+| [Histogram](labs/results/1.1-r3/histograms.json) | supported 2 | promtool 3.13.4·3.15.0에서 같은 합성 분포의 classic·표준 exponential native·custom bucket native를 평가. p25는 classic 1.5, exponential native 약 1.414214; count는 모두 4 |
+| [시계 상태](labs/results/1.1-r3/clock-state.json) | supported 1 | MONO/RAW 약 0.963357, tick 9634, freq 약 −42.834 ppm. systemd의 동기화 표시와 offset을 별도로 읽음. tick 설정 주체·RAW의 외부 정확도는 미확정 |
+
+`supported` 7개는 각 실행기의 좁은 성공 조건을 충족했다는 뜻입니다. 모든 커널에서 RSS가 즉시 정확하다거나, 보간값이 실제 분위수와 같거나, 시계가 외부 표준 시간에 맞는다는 보증이 아닙니다. [프로세스 원자료 해석](#chapter-docs-host-processes), [회수·OOM의 범위](#chapter-docs-host-reclaim-and-oom), [PSI 가용성](#chapter-docs-host-numa-and-pressure), [분포 보간](#chapter-docs-foundations-histogram-storage), [시계 해석](#chapter-docs-foundations-time-and-data-quality)
+
+<a id="chapter-docs-cross-domain-reproducible-labs--근거-크기와-재검사"></a>
+
+#### 근거 크기와 재검사
+
+각 summary JSON과 같은 이름의 `.raw/` 디렉터리에 **원자료 전체**를 gzip으로 보존했습니다. 메모리·분포·시계 세 JSON 합계 116,430 B, gzip 61개 합계 40,668 B입니다. 아래 MySQL r1·r2 네 묶음을 더하면 **JSON 7개 합계 1,174,117 B, gzip 525개 합계 221,450 B**입니다. JSON당 1 MiB 제한은 각 파일에 적용되며 합계와 구분합니다. 필요한 행을 요약하되 버리지 않은 원자료로 돌아갈 수 있고, JSON에는 gzip 전후 SHA256·크기·상대 경로가 있습니다. 판정에 필요한 입력 hash는 [provenance](review/evidence-provenance.json)로 연결합니다. 변경 전 manifest는 [실행 당시 사본](labs/archive/review_r3_2026_10_05/assets.json)과 대조합니다. 용량 제한을 넘으면 조용히 자르지 않고 실패하는 [정책](labs/review-r3/evidence-policy.md)을 적용했으며, 기존 2라운드 증거는 소급 변경하지 않았습니다.
+
+다음 명령은 저장소 루트에서 출판 파일을 읽기만 합니다. 도구 다운로드·Linux 프로세스·DB 설정 변경이 없고, hash·gzip 복원·계산에 필요한 CPU와 메모리만 사용합니다. 3f에서 실제 실행해 일곱 출판 묶음 모두 통과했습니다.
+
+```powershell
+python -X utf8 -B scripts/verify_review_r3.py --published
+```
+
+<a id="chapter-docs-cross-domain-reproducible-labs--mysql-r1의-관측-조건을-보완한-r2"></a>
+
+#### MySQL: r1의 관측 조건을 보완한 r2
+
+Claude가 2026-10-06 KST(원문 UTC 10월 5일)에 실행한 **8.4.11·9.7.2 r2**는 각각 supported 5·gzip 132개입니다. Codex는 입력 hash·SQL/XML·정리 완료와 판정 조건을 다시 검사해 두 JSON을 byte 그대로 출판했습니다. 원래 r1의 각 supported 3·refuted 2와 gzip 100개도 **판정 설계 결함으로 반증된 실행**으로 보존합니다. [8.4.11 r2](labs/results/1.1-r3/mysql-8.4.11-r2.json), [9.7.2 r2](labs/results/1.1-r3/mysql-9.7.2-r2.json), [8.4.11 r1](labs/results/1.1-r3/mysql-8.4.11-r1.json), [9.7.2 r1](labs/results/1.1-r3/mysql-9.7.2-r1.json)
+
+- defaults·gap_lock·next_key_lock·deadlock·replication 모두 보완한 성공 조건을 충족했습니다. flush 설정 관측은 전원 장애 지속성 시험이 아닙니다.
+- next-key의 직접 잠금 관계는 첫 표본에도 있었고, sys view는 0행에서 재조회 한 번 뒤 같은 세션 쌍의 1행으로 바뀌었습니다. 잠금 유지 중 관측했으며 rollback 뒤 삽입 행까지 확인했습니다.
+- 복제의 GTID 직후 표본과 coordinator 위치 일치 뒤 표본을 모두 보존했습니다. 최종 SBS는 baseline 0·IO 중지 NULL·SQL 중지 NULL·재개 0입니다. 실제 대기 조건은 파일·위치·스레드 상태였으며 SBS 기대값으로 성공을 유도하지 않았습니다.
+
+[MySQL 본문](#chapter-docs-database-mysql-operations)에 r1→r2의 원인과 전후 표본을 설명했습니다. r1의 [당시 실행기](labs/archive/review_r3_2026_10_05/mysql_r1/run_mysql_r3_lab.py)·[원인 분석](review/mysql-r3e-analysis.json)은 변경하지 않았고, r2도 고정 입력 hash로 연결했습니다. 3라운드 최종 채택 실행은 메모리·분포·시계와 MySQL r2의 **17개 supported 조건**입니다. r1 반복 실행 이력까지 합하면 **7묶음·27개 판정(supported 23·refuted 4), gzip 525개**입니다. 이를 서로 독립적인 27개 기능의 지원 인증으로 읽지 않습니다.
+
+고정 공식 자산과 전용 libaio/libnuma로 실행했으며 시스템 설치·전역 환경·기존 DB는 변경하지 않았습니다. 일반 사용자가 소유한 loopback 인스턴스·native 0700 데이터 디렉터리만 쓰고 종료·정리 완료를 기록했습니다. 최초 라이브러리 부재 preflight는 별도 이력입니다. 실습은 fixture·잠금·교착·복제 상태를 바꾸므로 운영 DB의 읽기 전용 수집과 구분합니다. **이번 r2 결과 반영을 위한 추가 DB 재실행은 필요하지 않습니다.** [실행·검증 기록](review/claude-codex-r3.md)
 
 <a id="chapter-docs-cross-domain-reproducible-labs--제11판에서-추가한-실습"></a>
 
@@ -10415,7 +11126,7 @@ flowchart LR
 
 ## 수집, 변환, 전송과 유실의 경계
 
-> 상태: 검토됨 · 범위: 공통 수집 구조, OpenTelemetry Collector·OTLP · 공식 자료 확인: 2026-10-03 · 편집 검토일: 2026-10-04
+> 상태: 검토됨 · 범위: 공통 수집 구조, OpenTelemetry Collector·OTLP, Fluent Bit 5.1.3 및 명시한 이전 버전 차이 · 3d 공식 문서·소스 검토: 2026-10-06 · Fluent Bit 장애 실습은 수행하지 않음
 
 <a id="chapter-docs-product-collection-pipelines--먼저-이해할-것"></a>
 
@@ -10499,6 +11210,43 @@ Collector의 persistent sending queue는 디스크에 보관해 프로세스 재
 
 큐가 찼을 때 가능한 정책에는 입력 거절, 오래된 항목 폐기, 우선순위별 제한, 전송량 제한이 있습니다. 어떤 정책이든 버린 양과 이유를 남겨야 조회 결과의 모집단을 설명할 수 있습니다. 재시도 역시 [업무 요청의 재시도](#chapter-docs-application-timeouts-and-retries)처럼 부하를 증폭할 수 있습니다.
 
+<a id="chapter-docs-product-collection-pipelines--로그가-없는-것과-로그를-잃은-것을-구분한다"></a>
+
+### 로그가 없는 것과 로그를 잃은 것을 구분한다
+
+검색 결과가 비었다면 애플리케이션이 기록하지 않았을 수도 있고, 파일을 읽지 못했거나 필터·버퍼·전송·색인 단계에서 사라졌을 수도 있습니다. 수집기가 읽기 전 파일이 삭제됐다면 수집기의 drop counter에도 잡히지 않을 수 있습니다. 따라서 “drop=0”만으로 종단 간 무손실을 보증하지 않습니다.
+
+다음은 **Fluent Bit 5.1.3 코드와 공식 monitoring 문서를 2026-10-06 확인한** 원천입니다. GitHub 릴리스 게시 시각은 2026-10-01 UTC이며 프로젝트 공지의 날짜는 9월 30일입니다. plugin instance별로 읽으며 누적 수명과 단위를 보존합니다. chunk는 여러 record를 모아 전송하는 묶음이므로 chunk 수와 로그 줄 수를 더하거나 같은 분모로 나누지 않습니다. [공식 릴리스](https://github.com/fluent/fluent-bit/releases/tag/v5.1.3), [프로젝트 공지](https://fluentbit.io/announcements/v5.1.3/), [monitoring](https://docs.fluentbit.io/manual/administration/monitoring)
+
+**아래 fluentbit_* 이름은 `/api/v2/metrics/prometheus` 기준**입니다. v2의 일반 `/api/v2/metrics`는 cmetrics text, `/api/v2/metrics/prometheus`는 Prometheus text 0.0.4 형식입니다. v1 JSON·v1 Prometheus endpoint에 모든 같은 이름이 있다고 가정하지 않습니다. 특히 filter drop 등 cmetrics 원천의 가용성을 endpoint별로 확인하며, 표의 `/api/v1/storage`만 별도의 JSON 상태 응답입니다. [endpoint·v2 지표 구분](https://docs.fluentbit.io/manual/administration/monitoring)
+
+| 지표 | 단위·형태 | 판단할 수 있는 것 |
+| --- | --- | --- |
+| `fluentbit_input_records_total` | 누적 record | input이 성공적으로 받아들인 수; 원천에서 발생한 전체 수는 아님 |
+| `fluentbit_filter_drop_records_total` | 누적 record | filter에서 제거한 수; 의도한 정책일 수도 있음 |
+| `fluentbit_output_proc_records_total` | 누적 record | output이 성공적으로 보낸 수; 최종 검색 완료와 구분 |
+| `fluentbit_output_retries_total` | chunk 재시도 요청 횟수 | 같은 chunk의 여러 재시도 포함 가능; 유실 건수 아님 |
+| `fluentbit_output_retries_failed_total` | 재시도 한도 소진 chunk 수 | 해당 chunk 재시도 만료·폐기 |
+| `fluentbit_output_dropped_records_total` | 누적 record | 복구 불가 오류 또는 재시도 만료로 output에서 버린 수 |
+| `fluentbit_output_errors_total` | 실패 chunk 수 | 로그 메시지 줄 수나 실패 record 수와 같지 않음 |
+| `fluentbit_input_memrb_dropped_chunks`, `fluentbit_input_memrb_dropped_bytes` | 누적 chunk / byte | memrb가 가득 차서 버린 양; record 수로 바꾸지 않음 |
+| `fluentbit_input_files_rotated_total` | 누적 file | Tail이 관측한 회전; 그 자체가 손실 수는 아님 |
+| `fluentbit_input_long_line_skipped_total` | 누적 occurrence | Tail의 긴 줄 생략; 버퍼 크기·skip 설정과 함께 해석 |
+| `fluentbit_processor_items_drop_total` | 누적 item | processor에서 제거한 항목; signal·processor 단계와 의도한 정책을 구분 |
+| `fluentbit_input_ingestion_paused` | gauge 0/1 | input 수집이 pause된 상태; pause 횟수가 아님 |
+| `fluentbit_input_storage_overlimit` | gauge 0/1 | input storage 한도 초과 상태; 유실 개수를 나타내지 않음 |
+| `/api/v1/storage`의 chunk·byte 통계 | 상태값 | buffered 자료와 메모리/파일시스템 상태; 누적 전송량과 구분 |
+
+버전 경계도 지표별로 다릅니다. memrb drop과 pause·overlimit gauge는 **v4.1.0 코드에도 존재**하며, files_rotated_total도 같은 버전의 Tail에서 확인됩니다. processor items_drop_total은 비교한 v4.2.0에는 없고 v5.0.0에는 있습니다. long_line_skipped_total은 여기서는 v5.1.3 제공을 확인한 범위로 쓰며 최초 도입 버전은 확정하지 않습니다. [v4.1.0 input 지표](https://github.com/fluent/fluent-bit/blob/v4.1.0/src/flb_input.c), [v4.1.0 memrb 폐기 계정](https://github.com/fluent/fluent-bit/blob/v4.1.0/src/flb_input_chunk.c), [v4.1.0 Tail](https://github.com/fluent/fluent-bit/blob/v4.1.0/plugins/in_tail/tail_config.c), [v5.0.0 processor](https://github.com/fluent/fluent-bit/blob/v5.0.0/src/flb_processor.c), [v5.1.3 Tail](https://github.com/fluent/fluent-bit/blob/v5.1.3/plugins/in_tail/tail_config.c)
+
+Fluent Bit의 `Retry_Limit`은 chunk에 적용됩니다. filesystem buffering을 써도 무한 보존은 아닙니다. output의 `storage.total_limit_size`가 차면 해당 논리 목적지 큐의 가장 오래된 chunk를 버려 공간을 만듭니다. memrb도 한도 초과 때 가장 오래된 chunk를 버리는 별도 경로이며 해당 input drop 계수를 봅니다. input pause 동안 파일이 회전·삭제되는 조건도 따로 조사합니다. [buffering과 한도](https://docs.fluentbit.io/manual/administration/buffering-and-storage), [5.1.3 폐기 경로](https://github.com/fluent/fluent-bit/blob/v5.1.3/src/flb_input_chunk.c), [pause 계정](https://github.com/fluent/fluent-bit/blob/v5.1.3/src/flb_input.c), [overlimit 계정](https://github.com/fluent/fluent-bit/blob/v5.1.3/src/flb_storage.c)
+
+여러 output으로 fan-out하면 성공·폐기 수가 목적지마다 생깁니다. 이를 합쳐 “원본 로그 손실 수”로 만들지 않습니다. 필터가 record를 추가하거나 multiline을 합치는 경우에도 입력−출력의 단순 차이는 손실이 아닐 수 있습니다. Collector의 `send_failed_*`는 [그 버전의 전달 계약](#chapter-docs-product-telemetry-delivery-contracts)에 따라 해석하며 Fluent Bit의 retry counter로 이름만 치환하지 않습니다.
+
+제품 적용 제안: 원천 마지막 읽기 시각·파일 수명/offset·input 성공·의도한 filter 제거·buffer·output 실패·저장 수신·검색 가능을 단계별로 표시합니다. pipeline 설정 변경과 restart를 경계로 남기고, 분기·변환이 없는 같은 record 집합에서만 수지 계산을 합니다. 합성 sentinel 로그로 도착 여부를 확인하는 검사는 별도 트래픽이며 자연 발생 로그 전체를 증명하지 않습니다.
+
+HTTP metric endpoint 조회는 읽기 전용이지만, 먼저 HTTP server·storage metrics가 구성되어야 하고 접근 제어가 필요합니다. 이를 켜는 것은 설정 변경입니다. 이 장에서는 endpoint를 켜거나 로그 전송 장애를 실행하지 않았습니다. 수집 빈도·응답량·endpoint 노출 범위도 설계에 포함합니다.
+
 <a id="chapter-docs-product-collection-pipelines--수집-연동을-완료했다고-판단할-근거"></a>
 
 ### 수집 연동을 완료했다고 판단할 근거
@@ -10518,6 +11266,8 @@ Collector의 persistent sending queue는 디스크에 보관해 프로세스 재
 1. HTTP 200을 받았으면 모든 OTLP 항목이 저장되었는가? **부분 성공 본문과 수신 서버의 계약을 확인해야 한다.**
 2. 영속 큐가 있으면 무한 장애 시간을 견디는가? **용량·디스크·재시도 조건에 한계가 있다.**
 3. 변환 작업자가 재시작하면 누적값의 차이를 바로 계산할 수 있는가? **이전 값과 수명 정보를 복원하지 못하면 불확실한 첫 구간을 따로 처리해야 한다.**
+4. retries_failed 1은 로그 1건 유실인가? **Fluent Bit의 해당 단위는 chunk이므로 포함 record 수가 필요합니다.**
+5. drop counter가 0이면 원천 로그가 모두 검색 가능한가? **수집 전 손실·가시성 지연 등 관측 밖의 경계가 남습니다.**
 
 관련: [식별과 관계](#chapter-docs-product-entities-and-topology), [저장과 조회](#chapter-docs-product-storage-and-query), [제품 자체 관측](#chapter-docs-product-self-observation-and-access)
 
@@ -11536,6 +12286,32 @@ OTLP의 성공·partial success·retry 규약을 제품 내부 영속성 보장�
 | PMTUD / DPLPMTUD | 경로 MTU 탐색 / datagram packetization layer의 MTU 탐색 | [MTU](#chapter-docs-network-layers-and-routing) |
 | Time grain / Ingestion delay | 집계 구간 크기 / 측정 후 조회 가능해지기까지의 지연 | [Cloud 시간 축](#chapter-docs-cloud-provider-metrics) |
 
+<a id="chapter-docs-glossary--회수분포-저장엔진-내부를-읽는-용어"></a>
+
+### 회수·분포 저장·엔진 내부를 읽는 용어
+
+| 용어 | 의미·구분 | 상세 |
+| --- | --- | --- |
+| Reclaim / Refault | 페이지 회수 / 밀려났던 페이지의 재참조; 회수량·재읽기와 지연 시간을 구분 | [회수·OOM](#chapter-docs-host-reclaim-and-oom) |
+| Direct reclaim / kswapd | 할당 경로의 직접 회수 / 백그라운드 회수 | [회수·OOM](#chapter-docs-host-reclaim-and-oom) |
+| Memcg OOM | memory cgroup의 제약 범위에서 발생한 OOM; kubelet eviction과 별개 | [회수·OOM](#chapter-docs-host-reclaim-and-oom) |
+| PSI trigger | window 안의 stall 조건을 fd로 감시하는 커널 모니터 등록 | [PSI](#chapter-docs-host-numa-and-pressure) |
+| RssAnon / RssFile / RssShmem | 익명·파일·공유 메모리의 상주량 분류; 정밀도·포함 범위 확인 | [프로세스](#chapter-docs-host-processes) |
+| Next-key / Gap lock | 인덱스 레코드와 앞 구간의 잠금 / 삽입할 빈 구간을 보호하는 잠금 | [MySQL 운영](#chapter-docs-database-mysql-operations) |
+| GTID | 복제 트랜잭션 식별자; wall clock 또는 모든 source의 단일 순번이 아님 | [MySQL 운영](#chapter-docs-database-mysql-operations) |
+| ExponentialHistogram scale | 지수 경계의 해상도 매개변수; 낮추면 버킷이 더 거칠어짐 | [분포 저장](#chapter-docs-foundations-histogram-storage) |
+| NHCB | custom bucket 경계를 담는 native histogram; exponential 형식과 구분 | [분포 저장](#chapter-docs-foundations-histogram-storage) |
+| Sketch / Centroid | 작은 통계 요약 자료구조 / t-digest가 표본들을 묶은 가중 대표점 | [분포 저장](#chapter-docs-foundations-histogram-storage) |
+| Offset / Frequency / Skew | 시각 차이 / 진행 속도 차이 / chrony 주파수 추정의 불확실성 | [시계](#chapter-docs-foundations-time-and-data-quality) |
+| PHC / Leap smear | PTP 하드웨어 시계 / 윤초를 일정 구간에 분산하는 정책 | [시계](#chapter-docs-foundations-time-and-data-quality) |
+| RCSI / PVS | row versioning 기반 READ COMMITTED / ADR의 persistent version store | [SQL Server](#chapter-docs-database-sqlserver-oracle) |
+| ASH / AWR | Oracle 활성 세션 표본 이력 / 성능 통계 이력; 사용 권리 확인 필요 | [Oracle](#chapter-docs-database-sqlserver-oracle) |
+| JFR / EventPipe | JVM 이벤트 기록 / .NET 진단 이벤트 전달 경로 | [런타임](#chapter-docs-application-managed-runtimes) |
+| ELU | 이벤트 루프 active/idle 기준의 사용 비율; OS CPU 사용률과 다름 | [Node](#chapter-docs-application-async-runtimes) |
+| Chunk / Record | 로그 전송·재시도의 묶음 / 개별 기록; 줄 수와도 구분 | [로그 전달](#chapter-docs-product-collection-pipelines) |
+| SM / Warp / Occupancy | GPU 실행 단위 / 실행 스레드 묶음 / 최대 대비 resident warp 점유 | [GPU](#chapter-docs-host-gpu) |
+| Xid / Row remapping | NVIDIA driver 오류 보고 / 불량 메모리 행을 예비 행으로 대체 | [GPU](#chapter-docs-host-gpu) |
+
 용어의 짧은 정의는 학습을 돕는 요약입니다. 실제 판정과 계산은 연결된 원천·버전·조건을 따릅니다.
 
 [통합 목차로](#book-top)
@@ -11609,6 +12385,33 @@ OTLP의 성공·partial success·retry 규약을 제품 내부 영속성 보장�
 | 클라우드 기간 Sum | API가 집계한 구간 양 | 기간으로 나누기; 다음 Sum과 차분하지 않음 | [공급자 지표](#chapter-docs-cloud-provider-metrics) |
 | Lambda 오류율 | Errors/Invocations | throttle로 호출되지 않은 요청의 별도 집계 | [서버리스](#chapter-docs-cloud-managed-and-serverless) |
 
+<a id="chapter-docs-metric-catalog--회수원천별-진행분포의-추가-참조"></a>
+
+### 회수·원천별 진행·분포의 추가 참조
+
+아래 필드는 3b의 원천 검토 범위입니다. 구체적인 버전·권한·미지원 조건은 연결된 장을 따르며 새 실행 결과를 뜻하지 않습니다.
+
+| 원천·개념 | 단위·형태 | 해석 경계 | 상세 |
+| --- | --- | --- | --- |
+| vmstat `pgscan_*`, `pgsteal_*` | 누적 페이지 | 회수 경로별 비교; anon/file 분류와 중복 합산 금지 | [회수](#chapter-docs-host-reclaim-and-oom) |
+| `allocstall_*`, `oom_kill` | 누적 사건 계수 | 대기 초·전역 OOM 사건 수로 변환 금지 | [OOM](#chapter-docs-host-reclaim-and-oom) |
+| `workingset_refault_*`, `pswpin/out` | 누적 페이지 | refault·swap 활동, 현재 점유량과 다름 | [회수](#chapter-docs-host-reclaim-and-oom) |
+| PSI total / avg10·60·300 | µs 누적 / % | 시스템·cgroup 범위, 시스템 CPU full의 무효 0 | [PSI](#chapter-docs-host-numa-and-pressure) |
+| VmRSS·RssAnon/File/Shmem·VmSwap | kB(×1024) | 비동기 RSS 추정, VmSwap은 shmem swap 제외 | [프로세스](#chapter-docs-host-processes) |
+| statm resident / shared | 페이지 | shared는 실제 공유자 수가 아닌 file+shmem 분류 | [프로세스](#chapter-docs-host-processes) |
+| `Seconds_Behind_Source` | 초 또는 NULL | receiver/applier 상태와 NULL 조건; 0도 freshness 보장 아님 | [MySQL](#chapter-docs-database-mysql-operations) |
+| worker·receiver commit/queue/apply timestamp | µs 정밀도 시각 | 서버별 시계와 원본/직전 source·단계 구분 | [MySQL](#chapter-docs-database-mysql-operations) |
+| AG send/redo queue | KB gauge | 아직 미전송 / 수신했지만 미redo; 지연 초와 다름 | [SQL Server](#chapter-docs-database-sqlserver-oracle) |
+| version store reserved_space_kb | KB gauge | tempdb 집계이며 ADR PVS 전체를 대체하지 않음 | [SQL Server](#chapter-docs-database-sqlserver-oracle) |
+| histogram scale/schema·zero threshold | 해상도·원천 단위 경계 | 표본 population·temporality와 함께 보존 | [분포 저장](#chapter-docs-foundations-histogram-storage) |
+| chrony System time / Frequency / Skew | s / ppm / ppm | 시각 차이·속도·추정 오차의 다른 축 | [시계](#chapter-docs-foundations-time-and-data-quality) |
+| BufferPool MemoryUsed / TotalCapacity | byte 추정 | capacity·상주량·실제 할당량 구분, −1 처리 | [JVM](#chapter-docs-application-managed-runtimes) |
+| ELU active·idle / loop delay | ms / ns | CPU 사용률 아님, Node 표본 모드 보존 | [Node](#chapter-docs-application-async-runtimes) |
+| Fluent Bit retries_failed / dropped_records | chunk / record 누적 | retry 횟수·버린 record 수·fan-out 구분 | [로그](#chapter-docs-product-collection-pipelines) |
+| HAProxy qcur·scur / ereq·econ·eresp·hrsp_5xx | 현재 수 / 누적 수 | 요청·세션·처리 오류·HTTP 응답 분류 | [프록시](#chapter-docs-middleware-proxies-and-mesh) |
+| DCGM SM_ACTIVE·SM_OCCUPANCY·tensor·DRAM | ratio | 각 하드웨어 활동 분모; NVML utilization과 구분 | [GPU](#chapter-docs-host-gpu) |
+| Clock event reason / duration | bitmask / API별 시간 | 활성 조건과 누적 시간 구분, nvidia-smi µs·NVML 필드 ns 확인 | [GPU](#chapter-docs-host-gpu) |
+
 <a id="chapter-docs-metric-catalog--제품-자체와-집계-계약"></a>
 
 ### 제품 자체와 집계 계약
@@ -11681,18 +12484,18 @@ OTLP의 성공·partial success·retry 규약을 제품 내부 영속성 보장�
 
 ## 제1.1판의 분야별 범위
 
-판 기준일은 2026-10-04로 유지하며, 2026-10-05 보강 원고는 **12개 분야, 상세 본문 97장**입니다. 표는 읽을 수 있는 본문의 범위이며 사용자 제품의 지원 여부를 뜻하지 않습니다.
+판 기준일은 2026-10-04로 유지하며, 2026-10-06 3f 반영 원고는 **12개 분야, 상세 본문 100장**입니다. 표는 읽을 수 있는 본문의 범위이며 사용자 제품의 지원 여부를 뜻하지 않습니다.
 
 | 분야 | 상세 장 | 이번 판에서 다루는 내용 |
 | --- | ---: | --- |
-| [공통 관측](#chapter-docs-foundations-readme) | 10 | 시스템 지도, 시계열·단위·분포·SLO·시간·trace·sampling, 성능 실험, 분산 시스템 |
-| [호스트](#chapter-docs-host-readme) | 10 | Linux CPU·메모리·블록 I/O·프로세스, Windows API, VM·GPU, NUMA·압력·원천 필드 |
+| [공통 관측](#chapter-docs-foundations-readme) | 11 | 시스템 지도, 시계열·단위·분포·SLO·시간·trace·sampling, 성능 실험, 분산 시스템 |
+| [호스트](#chapter-docs-host-readme) | 11 | Linux CPU·메모리·블록 I/O·프로세스, Windows API, VM·GPU, NUMA·압력·원천 필드 |
 | [네트워크](#chapter-docs-network-readme) | 9 | IP·DNS·TCP·UDP·QUIC·TLS·HTTP, 링크·MTU·BGP, SNMP·OSPF·EVPN·QoS |
 | [스토리지](#chapter-docs-storage-readme) | 4 | 블록·파일·객체, 처리량·IOPS·지속성, 복제·snapshot·복구, RAID·LVM·SAN·NAS |
 | [컨테이너](#chapter-docs-containers-readme) | 5 | namespace·OCI 수명·image·COW·volume, cgroup v1/v2, Windows 격리 차이 |
 | [Kubernetes](#chapter-docs-kubernetes-readme) | 10 | API·Pod·request/limit·HPA·수집·Service·PV/PVC·workload·etcd, CNI·CSI·CRD·Operator |
 | [앱](#chapter-docs-application-readme) | 9 | 요청·queue·pool·deadline·retry, JVM·.NET·Go·Node.js·Python, RUM·계측·프로파일 |
-| [DB](#chapter-docs-database-readme) | 12 | transaction·MVCC·lock·index·plan·WAL·HA, 주요 엔진·분산·분석·시계열·그래프, 수집 SQL |
+| [DB](#chapter-docs-database-readme) | 13 | transaction·MVCC·lock·index·plan·WAL·HA, 주요 엔진·분산·분석·시계열·그래프, 수집 SQL |
 | [미들웨어](#chapter-docs-middleware-readme) | 6 | Redis·Memcached·Kafka·RabbitMQ·Pulsar·검색·프록시·mesh, Flink·Spark 처리 경계 |
 | [클라우드](#chapter-docs-cloud-readme) | 6 | AWS·Azure·Google Cloud 식별·API·기간 집계, 관리형·서버리스·VPC, quota·비용 |
 | [도메인 간 분석](#chapter-docs-cross-domain-readme) | 7 | 지연·자원·적체·관측 중단 사례, 실제 로컬 실습, 종합 연습과 해설 |
@@ -11720,23 +12523,44 @@ OTLP의 성공·partial success·retry 규약을 제품 내부 영속성 보장�
 
 Kubernetes 후속 API 실습은 공식 envtest가 제공되는 **1.34.1·1.37.0**을 선택했습니다. 각 minor의 최신 patch 실행이 아닙니다(2026-10-05 검토 시 최신 **1.34.12·1.37.1**). watch cache true/false의 minor 규약 비교이며 결과는 [인벤토리 본문](#chapter-docs-kubernetes-inventory-consistency)에 반영했습니다. 특정 feature gate의 인과나 최신 patch의 회귀 검증으로 확장하지 않습니다. [전용 자산 pin](labs/review-r2/kubernetes-assets.json), [공식 patch 일정](https://kubernetes.io/releases/patch-releases/)
 
+<a id="chapter-docs-coverage--3라운드-원고-검토와-실습-범위"></a>
+
+### 3라운드: 원고 검토와 실습 범위
+
+새 3장으로 상세 본문이 100장이 됐습니다. 기존 장의 확장까지 포함해 필수 H1·H2·H3·D1·S1과 추가 C1·D2·D3·R1·L1·G1을 다룹니다. 원천 문서·고정 소스 대조와 합성 계산에 더해 3d에서는 메모리·histogram·시계의 7개 판정과 gzip 원자료 61개를 출판했습니다. 3e에서는 MySQL 8.4.11·9.7.2의 10개 판정(supported 6·refuted 4)과 gzip 200개를 추가해 **총 17개 판정·261개 gzip**을 출판했습니다. 3f에서 관측 조건을 보완한 r2 두 묶음의 supported 10·gzip 264개를 추가했습니다. 최종 채택 실행은 17개 supported 조건이고, r1 이력까지 포함한 누계는 **27개 판정(supported 23·refuted 4), gzip 525개**입니다. 실제 잠금·GTID 적용·coordinator 위치와 표시 갱신의 경계를 연결했습니다. [주제별 검토](review/claude-codex-r3.md)
+
+| 주제 | 원고 | 보존한 해석 경계 |
+| --- | --- | --- |
+| H1 회수·OOM | [새 장](#chapter-docs-host-reclaim-and-oom) | 페이지·사건·시간, 전역/memcg OOM·eviction 증거 |
+| H2·H3 PSI·프로세스 | [PSI](#chapter-docs-host-numa-and-pressure), [프로세스](#chapter-docs-host-processes) | 기능 가용성·trigger, RSS 정밀도·상세 조회 비용·I 상태 |
+| D1 MySQL | [새 장](#chapter-docs-database-mysql-operations) | 8.4·9.7 잠금·지속성 설정·복제 timestamp·NULL/0 |
+| S1 분포 저장 | [새 장](#chapter-docs-foundations-histogram-storage) | OTel scale·Prometheus schema·보간·DDSketch·t-digest |
+| C1 시계 | [시간 품질](#chapter-docs-foundations-time-and-data-quality) | offset·frequency·smear·PHC/시스템 시계 |
+| D2·D3 상용 DB | [SQL Server·Oracle](#chapter-docs-database-sqlserver-oracle) | ADR·version store·AG KB, 권한과 Diagnostics Pack 허용 범위 |
+| R1 런타임 | [JVM/.NET](#chapter-docs-application-managed-runtimes), [Node](#chapter-docs-application-async-runtimes) | JMX pool·JFR 비용·EventPipe와 collect-linux preview·ELU·Node 26.5+/24.19+ 표본 모드 |
+| L1 전송 | [로그](#chapter-docs-product-collection-pipelines), [HAProxy](#chapter-docs-middleware-proxies-and-mesh) | record/chunk, retry/drop·frontend/backend/server의 범위 |
+| G1 GPU | [GPU](#chapter-docs-host-gpu) | activity·occupancy·tensor·DRAM·Xid·ECC·clock reason |
+
+2라운드의 미확인 항목 중 Kubernetes 1.37 hugepage 보정은 Summary API의 node.memory.availableBytes에도 반영되는 것을 코드로 확인했습니다. Lambda suppressed init의 CloudWatch Duration 포함 여부는 명시적 공식 근거를 찾지 못해 미확인을 유지합니다. 런타임·GPU·상용 DB를 실제 환경에서 실행 검증한 것으로 표시하지 않습니다.
+
 <a id="chapter-docs-coverage--대표-적용-범위"></a>
 
 ### 대표 적용 범위
 
 | 원천 | 이 책에서의 적용 |
 | --- | --- |
-| PostgreSQL 18, MySQL 8.4, Oracle 19c | 해당 버전의 동작·통계·단위 설명 |
+| PostgreSQL 18, MySQL 8.4·9.7, Oracle 19c | 해당 버전의 동작·통계·단위 설명; MySQL 초기 두 preflight는 blocked, 8.4.11·9.7.2의 잠금·교착·설정·복제 r1·r2 실행, r2는 각 supported 5. r1 반증도 보존 |
 | SQL Server, MariaDB, MongoDB, Cassandra, DynamoDB, ClickHouse | 장에 표시한 공식 원천과 구체적인 사례의 범위 |
 | JDK 25, CPython 3.14, .NET·Go·Node.js 문서 | runtime 메모리·실행·관측 의미; 모든 배포 옵션 인증 아님 |
-| Linux 6.12 코드·NUMA 문서, cgroup·procfs | 명시한 원천 필드의 의미와 차분·계층 처리 |
+| Linux 6.12·6.13·6.15·6.18 코드, cgroup·procfs | 회수·swap·proactive 항목의 버전·모집단 차이, 차분·계층 처리 |
 | OCI 1.2.1, CNI 1.1.0, CSI 1.11.0 | 명세의 경계와 capability; 제품 plugin 버전과 구분 |
 | etcd 3.6, Kafka 4.3, RabbitMQ 4.3, Flink 1.20, Pulsar 4.0 | 해당 장의 적용 버전; 최신·유일 지원 버전 주장 아님 |
 | Kubernetes 1.35 이상과 이전 버전 | 비교 규약을 구분; API server 1.34.1·1.37.0에서 cache true/false 실행, workload 실행은 제외 |
 | PostgreSQL 18.6 | 기존 동시성·권한·수집 SQL 11개와 prepared transaction·slot·standby 회수 기준점 4개 시나리오 실행 |
-| Linux 6.18.33.2·Python 3.12.3 | WSL2의 자기 프로세스와 기존 cgroup 읽기, HTTP/1.1 실습 |
+| Linux 6.18.33.2·Python 3.12.3 | WSL2의 자기 프로세스·기존 cgroup·HTTP/1.1에 RSS/PSS·조회 비용·PSI/vmstat·시계 상태 관측 추가; 강제 OOM 없음 |
 | OTLP 1.11.0·Collector 0.137.0·0.162.0 | HTTP JSON 전송과 0.162.0 내부 로그·지표·메모리 queue 경계; gRPC·영속 큐 검증은 제외 |
-| Windows·SQLite 3.45.1·promtool 3.5.0·3.13.4·3.15.0 | 실제 실행 결과는 로컬 실습의 기록 범위; 새 promtool 두 버전은 기존 합성 규칙·테스트 평가 |
+| Windows·SQLite 3.45.1·promtool 3.5.0·3.13.4·3.15.0 | 실제 실행 결과는 로컬 실습의 기록 범위; 새 promtool 두 버전은 기존 규칙과 classic/native histogram의 합성 분포 평가 |
+| chrony 4.9·Node 26.10.0/24.19.0·Fluent Bit 5.1.3·HAProxy 3.2 | 2026-10-06 확인한 원천 범위; 해당 런타임·수집기 실행 검증은 별도 |
 | 버전을 고정하지 않은 공식 웹 문서 | 확인 날짜 기준; 구현 시 실제 버전과 대조 |
 
 개별 장의 범위가 이 요약보다 우선합니다. 다른 버전과 이름이 같더라도 필드·설정·수명·권한을 확인합니다.
@@ -11745,15 +12569,15 @@ Kubernetes 후속 API 실습은 공식 envtest가 제공되는 **1.34.1·1.37.0*
 
 ### 교차 검토 시점의 버전 상태
 
-릴리스·지원 상태 확인일은 **2026-10-04**이며 Kubernetes patch 선택은 10월 5일에도 확인했습니다. 실행 열에는 **2026-10-05의 2라운드 결과**를 추가했습니다. “고정”은 문서·실습을 해석할 기준이며 현재 권장 설치 버전을 뜻하지 않습니다. 최신 릴리스 확인과 실제 재실행은 별개입니다. 종료일이 확인되지 않은 항목은 임의로 날짜를 만들지 않았습니다.
+릴리스·지원 상태 확인일은 **2026-10-04**이며 Kubernetes patch 선택은 10월 5일에도 확인했습니다. MySQL 일반 릴리스 쌍과 3d 원고의 chrony·Node·Fluent Bit 기준은 **10월 6일** 추가 확인했습니다. 실행 열에는 각 기록의 2·3라운드 결과를 구분해 적었습니다. MySQL r2의 실행일은 10월 6일 KST이며 원문 시각은 10월 5일 UTC입니다. “고정”은 문서·실습을 해석할 기준이며 현재 권장 설치 버전을 뜻하지 않습니다. 최신 릴리스 확인과 실제 재실행은 별개입니다. 종료일이 확인되지 않은 항목은 임의로 날짜를 만들지 않았습니다.
 
 | 대상 | 책의 고정 기준 | 검토 시점 현재 | 지원·종료와 해석 |
 | --- | --- | --- | --- |
 | Kubernetes | 기존 1.34.1 cache 비활성화 기록 보존; 새 1.34.1·1.37.0 각각 cache true/false | 최신 1.37.1, 최신 3개 브랜치 1.35–1.37; 1.34 계열 패치 1.34.12 | 실행 버전은 최신 patch가 아님. 1.34는 2026-10-27 종료 전 유지보수 중. 최신 3개에서 제외됐다고 이미 지원 종료된 것은 아님. [릴리스](https://kubernetes.io/releases/), [일정](https://kubernetes.io/releases/patch-releases/) |
 | etcd | 기존 3.6.4 보존; 새 envtest에 포함된 3.6.4·3.7.0 전용 인스턴스 | 최신 릴리스 3.7.2 | 최신 patch 3.7.2는 실행하지 않음. 이 검토에서는 3.6 계열의 종료일을 확정하지 않음. [릴리스](https://github.com/etcd-io/etcd/releases/tag/v3.7.2) |
 | OTel Collector | 기존 0.137.0 보존; 새 0.162.0 HTTP JSON·내부 로그/지표·queue 경계 실행 | 0.162.0; core 9월 28일, 배포판 9월 29일 UTC 게시 | 새 실행은 검토 시점 현재 버전. 해당 태그의 정해진 LTS 종료일은 확인하지 못함. [core](https://github.com/open-telemetry/opentelemetry-collector/releases/tag/v0.162.0), [배포판](https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.162.0) |
-| Prometheus/promtool | 기존 3.5.0 보존; 새 3.13.4·3.15.0에서 규칙·테스트 평가 | 최신 3.15.0, 현재 LTS 3.13.4 | 3.5 LTS는 2026-07-31 종료. 3.13 LTS 종료 예정일 2027-07-31. 새 실행은 서버 수집·WAL·exemplar 실험을 포함하지 않음. [다운로드](https://prometheus.io/download/), [지원 주기](https://prometheus.io/docs/introduction/release-cycle/) |
-| MySQL | 8.4 LTS 문서, 서버 실습 없음 | 최신 LTS 계열 9.7; 9.7.2 일반 릴리스, 9.7.3 Docker image 전용 패치. 이후 YY.M 체계 | 새 LTS 등장만으로 8.4 지원 종료를 의미하지 않음. LTS는 Oracle 정책의 premier 5년·extended 3년 구분을 따르며 계약·배포판의 적용 조건 확인 필요. [정책](https://dev.mysql.com/doc/refman/9.7/en/mysql-releases.html), [9.7.2](https://dev.mysql.com/doc/relnotes/mysql/9.7/en/news-9-7-2.html), [9.7.3 범위](https://dev.mysql.com/doc/relnotes/mysql/9.7/en/news-9-7-3.html) |
+| Prometheus/promtool | 기존 3.5.0 보존; 새 3.13.4·3.15.0에서 규칙·테스트와 합성 native histogram 평가 | 최신 3.15.0, 현재 LTS 3.13.4 | 3.5 LTS는 2026-07-31 종료. 3.13 LTS 종료 예정일 2027-07-31. 새 실행은 서버 수집·WAL·exemplar 실험을 포함하지 않음. [다운로드](https://prometheus.io/download/), [지원 주기](https://prometheus.io/docs/introduction/release-cycle/) |
+| MySQL | 8.4·9.7 문서. 8.4.10·9.7.2 초기 preflight blocked; 8.4.11·9.7.2 r2 각 supported 5; r1 각 supported 3·refuted 2도 보존. 복제 worker 수는 명시적으로 2 | 최신 LTS 계열 9.7. 일반 릴리스 8.4.11·9.7.2는 2026-07-28 쌍; 8.4.12·9.7.3은 Docker image 전용 | 새 LTS 등장만으로 8.4 지원 종료를 의미하지 않음. LTS는 Oracle 정책의 premier 5년·extended 3년 구분을 따르며 계약·배포판의 적용 조건 확인 필요. [정책](https://dev.mysql.com/doc/refman/9.7/en/mysql-releases.html), [8.4.11](https://dev.mysql.com/doc/relnotes/mysql/8.4/en/news-8-4-11.html), [8.4.12 범위](https://dev.mysql.com/doc/relnotes/mysql/8.4/en/news-8-4-12.html), [9.7.2](https://dev.mysql.com/doc/relnotes/mysql/9.7/en/news-9-7-2.html), [9.7.3 범위](https://dev.mysql.com/doc/relnotes/mysql/9.7/en/news-9-7-3.html) |
 | Ceph | Squid 문서 | Tentacle 20.2.4, Squid 19.2.6 | 공식 표는 Squid 2026-10-31을 **예상** 종료일로 표시. Tentacle의 예상일은 2027-06-01. [릴리스 표](https://docs.ceph.com/en/latest/releases/) |
 | cAdvisor | 0.52.1 코드 | Kubernetes 1.37.1 의존성은 lib 0.60.5 | 해당 의존성의 working set 식을 코드 대조. cAdvisor 전체 최신 릴리스·고정 버전 종료일을 이 정보만으로 판정하지 않음. [의존성](https://github.com/kubernetes/kubernetes/blob/v1.37.1/go.mod), [계산 코드](https://github.com/google/cadvisor/blob/lib/v0.60.5/lib/container/libcontainer/handler.go) |
 | OCI runtime spec | 1.2.1 | 1.3.0 | 명세 판본이며 런타임 제품의 지원 종료일과 다름. [릴리스](https://github.com/opencontainers/runtime-spec/releases/tag/v1.3.0) |
@@ -11763,7 +12587,7 @@ Kubernetes 후속 API 실습은 공식 envtest가 제공되는 **1.34.1·1.37.0*
 | PostgreSQL | 18 규약·18.6 실제 실험 | 18.6 | 18 계열 지원 종료 예정일 2030-11-14. [정책](https://www.postgresql.org/support/versioning/) |
 | OTLP 원천 저장소 | 1.11.0 문서 | 원천 릴리스 1.11.1, 2026-09-29 게시; 공식 웹 문서 표시는 1.11.0 | 웹 문서의 판 표시와 원천 저장소의 최신 태그를 구분. 고정 규약의 전체 재검증이나 Collector의 지원 범위를 대신하지 않음. [릴리스](https://github.com/open-telemetry/opentelemetry-proto/releases/tag/v1.11.1), [웹 규약](https://opentelemetry.io/docs/specs/otlp/) |
 
-Linux 커널·WSL 배포판, Python·SQLite·브라우저·문서 renderer 버전은 [검증 기록](#chapter-docs-validation)의 실행 환경 식별자입니다. 이 표의 소프트웨어 릴리스와 동일한 지원 체계로 취급하지 않으며, 이번 라운드에서 그 환경을 최신 버전으로 교체하지 않았습니다. 새 실습의 관측과 한계는 [2라운드 검토 기록](review/claude-codex-r2.md)에 있습니다.
+Linux 커널·WSL 배포판, Python·SQLite·브라우저·문서 renderer 버전은 [검증 기록](#chapter-docs-validation)의 실행 환경 식별자입니다. 이 표의 소프트웨어 릴리스와 동일한 지원 체계로 취급하지 않으며, 이번 라운드에서 그 환경을 최신 버전으로 교체하지 않았습니다. 새 실습의 관측과 한계는 [2라운드](review/claude-codex-r2.md)와 [3라운드 검토 기록](review/claude-codex-r3.md)에 있습니다.
 
 <a id="chapter-docs-coverage--이-판을-사용하는-경계"></a>
 
@@ -11789,7 +12613,94 @@ Linux 커널·WSL 배포판, Python·SQLite·브라우저·문서 renderer 버�
 
 ## 제1.1판 검증 기록
 
-판 기준일은 **2026-10-04**로 유지합니다. 2b 원고 보강과 2d 결과 반영·검사는 **2026-10-05**, 기존 실행·화면 기록은 각 기록의 날짜를 따릅니다. 공식 원천의 의미 검토, 자동 문서 검사, 실제 실행, 화면 확인의 범위를 나누어 기록합니다. 사용자 제품이나 운영 환경 전체의 지원 인증을 뜻하지 않습니다.
+판 기준일은 **2026-10-04**로 유지합니다. 3f 결과 반영·검사는 **2026-10-06**, 기존 실행·화면 기록은 각 기록의 날짜를 따릅니다. 공식 원천의 의미 검토, 자동 문서 검사, 실제 실행, 화면 확인의 범위를 나누어 기록합니다. 사용자 제품이나 운영 환경 전체의 지원 인증을 뜻하지 않습니다.
+
+<a id="chapter-docs-validation--3f-mysql-r2-출판과-3라운드-검증"></a>
+
+### 3f MySQL r2 출판과 3라운드 검증
+
+Claude가 2026-10-06 KST(원문 UTC 10월 5일)에 실행한 [8.4.11 r2](labs/results/1.1-r3/mysql-8.4.11-r2.json)·[9.7.2 r2](labs/results/1.1-r3/mysql-9.7.2-r2.json)를 각각 **supported 5, gzip 132개** 그대로 출판했습니다. 입력 hash·압축 전후 hash·SQL/XML·NULL·정리 완료를 검사했습니다. r1의 반증 4개는 판정 설계 결함의 이력으로 보존했으며 최종 r2 숫자로 덮지 않았습니다.
+
+두 버전 모두 next-key sys 행의 0→1 전이와 blocker 해제 뒤 삽입을 확인했습니다. GTID 직후 SBS 12/14와 coordinator 위치 일치 뒤 0을 함께 검사하고, 재개 직후에는 SBS=0이어도 위치가 다른 표본이 있었음을 보존했습니다. 최종 복제 값은 baseline 0·IO 중지 NULL·SQL 중지 NULL·재개 0입니다. [본문의 조건·전후 값](#chapter-docs-database-mysql-operations)
+
+3라운드 출판 누계는 **7묶음·27개 판정(supported 23·refuted 4), gzip 525개**입니다. 이 중 최종 채택 실행은 메모리·분포·시계와 MySQL r2의 17개 supported 조건이며, 27에는 이전 r1 반복 실행을 포함합니다. 범용 제품 지원 인증으로 해석하지 않습니다.
+
+| 검사 | 3f 범위·결과 |
+| --- | --- |
+| `check_docs` | PASS: 상세 100장·구조·목차·로컬 링크·검토 hash |
+| `verify_examples` | PASS: 60개 원문의 산술·해석 185개 |
+| `verify_contracts` | PASS: 어댑터 경계 22개·원문 연결 계산 28개·과거 실습 hash |
+| `verify_revision` | PASS: 기존 근거와 3라운드 27개 판정·525개 gzip·입력·전후 SQL·본문 관측 |
+| `build_book --check`, `build_html --check` | PASS: 원문 122개의 BOOK.md·BOOK.html과 생성 일치 |
+| `verify_review_r3 --result …`·`--published` | PASS: r2 두 입력 및 출판 일곱 묶음, r1 verdict 유지·r2 가시성/위치 전이 |
+
+3f의 Codex 검사는 저장 근거·코드와 생성 결과를 대조한 것입니다. WSL DB 실행은 Claude가 수행했습니다. 실행기·manifest·자산을 다시 고치지 않았으므로 이번 결과를 반영하기 위한 추가 DB 재실행은 필요하지 않습니다. [provenance](review/evidence-provenance.json), [3f 기록](review/claude-codex-r3.md)
+
+Claude가 전달한 3e BOOK.html 화면 PASS는 수신 당시 HTML hash와 일치함을 확인하고 [receipt](review/html-check-r3e-incoming.json)를 보존했습니다. 새 3f 생성본의 화면 검사 상태는 [검토 기록](review/claude-codex-r3.md)에 별도로 남깁니다.
+
+<a id="chapter-docs-validation--3e-당시-mysql-결과-출판과-관측-조건-재검사"></a>
+
+### 3e 당시 MySQL 결과 출판과 관측 조건 재검사
+
+Claude가 2026-10-05 실행한 [MySQL 8.4.11](labs/results/1.1-r3/mysql-8.4.11-r1.json)·[9.7.2](labs/results/1.1-r3/mysql-9.7.2-r1.json)의 r1 JSON을 byte 그대로 복사하고 gzip 원자료 **200개 전체**를 보존했습니다. 각 supported 3·refuted 2를 유지합니다. 3e 당시 3라운드 누계는 요약 JSON **5개**, gzip **261개**, 판정 **17개(supported 13·refuted 4)**입니다. 이전 blocked 시도는 실행 이력으로 남기며 DB 관측 근거와 구분합니다.
+
+원자료 재검사에서 next-key의 직접 잠금 관계와 rollback 뒤 INSERT 완료를 확인했지만 sys 행은 비어 있었습니다. 복제는 목표 GTID 실행을 기다렸지만 coordinator 위치가 뒤처져 SBS=0/NULL이라는 즉시 관측 조건을 만족하지 않았습니다. 9.7.2 재개 표본은 실제 SBS=1입니다. [분석 JSON](review/mysql-r3e-analysis.json)·[본문 해석](#chapter-docs-database-mysql-operations)에 원천 SQL 참조와 코드 근거를 연결했습니다.
+
+| 검사 | 3e 범위 |
+| --- | --- |
+| `check_docs` | 상세 100장의 구조·목차·로컬 링크·검토 hash |
+| `verify_examples` | 기존 60개 원문의 산술·해석 185개 |
+| `verify_contracts` | 어댑터 경계 22개·원문 연결 계산 28개·과거 실습 hash |
+| `verify_revision` | 기존 근거와 3라운드 17개 판정·261개 gzip·실행 당시 입력 사본·본문의 핵심 관측 |
+| `build_book --check`, `build_html --check` | 원문 122개로 재생성한 BOOK.md·BOOK.html과 일치 |
+| `verify_review_r3 --published` | 다섯 묶음의 gzip·SQL 원문/요약·NULL 보존·판정·분석 수치·입력 hash; Linux 실행 없음 |
+| `verify_review_r3` | 실제 r1에서 도출한 회귀 조건: sys 세션 일치·100 ms cache 경계·GTID와 coordinator 위치 분리·SBS로 대기하지 않음; 기존 parser·경로·정리 실패 검사 포함 |
+
+6개 기본 검사와 두 추가 검사에서 PASS를 확인했습니다. **이는 저장 근거와 수정한 관측 코드의 오프라인 검사입니다.** 당시에는 sys view 재조회·coordinator 위치 대기를 보완한 r2 실행 전이었으며, 이후 실행·검증은 위 3f 절에 반영했습니다. 원래 runner는 [보존 사본](labs/archive/review_r3_2026_10_05/mysql_r1/run_mysql_r3_lab.py)에 두고 [provenance](review/evidence-provenance.json)로 연결했으므로 현재 입력 hash를 옛 결과에 소급 적용하지 않습니다.
+
+Claude가 보낸 3d BOOK.html 화면 PASS는 [당시 receipt](review/html-check-r3d-incoming.json)와 수신 당시 HTML hash를 대조했습니다. **당시 3e 생성본의 화면 검사는 후속 작업**이었으며, Claude가 전달한 PASS receipt를 3f에서 확인했습니다. 과거 화면 PASS를 새 생성본에 적용하지 않습니다. [새 실행·화면 검사 명령](review/claude-codex-r3.md)
+
+<a id="chapter-docs-validation--3d-당시-결과-출판과-재검사"></a>
+
+### 3d 당시 결과 출판과 재검사
+
+2026-10-05 Claude 실행의 Linux 메모리·histogram·시계 상태를 [세 요약 JSON](#chapter-docs-cross-domain-reproducible-labs--3라운드-메모리분포시계의-작은-실험)과 gzip 원자료 61개로 출판했습니다. supported는 각각 4·2·1개입니다. 요약 파일은 전달 파일과 byte 단위로 같고, gzip 전후 hash·입력 hash·정리 완료·단위 환산·비용 중앙값·실제 promtool 출력을 검사합니다. 현재 manifest와 달라진 실행 입력은 당시 사본을 보존해 [provenance](review/evidence-provenance.json)에 연결했습니다.
+
+| 검사 | 3d 범위 |
+| --- | --- |
+| `check_docs` | 상세 100장의 구조·목차·로컬 링크·검토 hash |
+| `verify_examples` | 기존 60개 원문의 산술·해석 185개 |
+| `verify_contracts` | 기존 어댑터 경계 22개·원문 연결 계산 28개·과거 실습 hash |
+| `verify_revision` | 과거 출판 근거에 3라운드 7개 판정·61개 gzip·입력 사본·본문 관측 계산 추가 |
+| `build_book --check`, `build_html --check` | 원문 122개로 다시 생성한 BOOK.md·BOOK.html과 일치 |
+| `verify_review_r3 --published` | 위 세 출판 묶음의 독립 검사; 실습·다운로드 없음 |
+| `verify_review_r3 --assets` | 준비 입력·NULL/proc/PSI parser·원자료 무결성·경로/정리 실패·deb 경로/링크·ELF 경계, 공식 자산 receipt·파일 hash |
+
+위 6개 기본 검사와 추가 검사에서 PASS를 확인했습니다. 이번 작업은 Windows Python에서의 저장 근거·준비 코드 검사이며 WSL 메모리·시계·promtool을 재실행하지 않았습니다. 조회 비용은 실제 30개 표본에서 다시 계산했으나 다른 프로세스·커널의 고정 비용으로 쓰지 않습니다. 강제 OOM·전역 압박·cgroup 생성 성공을 주장하지 않습니다.
+
+MySQL 8.4.10·9.7.2의 이전 preflight blocked 기록은 성공 근거로 출판하지 않았습니다. **8.4.11의 공식 서명 검증·압축 해제·파일 hash**, libaio/libnuma의 고정 패키지·파일 대조와 AMD64 ABI 소스 검토까지 수행했습니다. 3d 당시에는 private alias 생성·Linux loader·두 MySQL 인스턴스 실행이 후속 작업이었습니다. **그때는 실제 잠금·복제 숫자를 적지 않았으며, 이후 실행 결과를 위 3e 절에 반영했습니다.** 3a의 준비 hash는 당시 기록으로 보존하고, 변경한 3d 준비 입력과 혼동하지 않습니다. [상세 판정·실행 명령](review/claude-codex-r3.md)
+
+이번 BOOK.html의 브라우저 화면 검사는 Claude가 수행합니다. 이전 `html-check`는 새 생성본의 시각적 검사를 대신하지 않습니다. 이번 사실 검토의 개별 공식 원천은 확인했으며 전체 외부 URL 상태 파일을 전수 재조회한 것은 아닙니다.
+
+<a id="chapter-docs-validation--3b-당시-원고-보강의-검사-범위"></a>
+
+### 3b 당시 원고 보강의 검사 범위
+
+2026-10-05에 새 3장과 기존 장의 Tier 3 설명을 보강했습니다. 상세 본문은 **100장**, 통합본의 원문은 **122개**입니다. 판 번호와 기준일은 유지했습니다. 주제별 공식 자료·고정 소스 확인, 채택하지 않은 단서와 이유는 [3라운드 기록](review/claude-codex-r3.md), 검토한 원문 hash는 [장별 기록](review/chapter-review.json)에 있습니다.
+
+| 검사 | 3b 범위 |
+| --- | --- |
+| `check_docs` | 상세 100장, UTF-8·구조·로컬 링크·목차·검토 hash |
+| `verify_examples` | 60개 원문의 산술·해석 185개; 새 15개는 본문 결과 문자열과 계산을 함께 대조 |
+| `verify_contracts` | 기존 어댑터 경계 22개·원문 연결 계산 28개·보존 실습 hash |
+| `verify_revision` | 기존 출판 근거와 1라운드 시계·2라운드 결과의 입력 hash·핵심 값 대조 |
+| `build_book --check`, `build_html --check` | 원문 122개로 재생성한 BOOK.md·BOOK.html과 생성 일치 |
+
+위 6개 명령을 Windows Python에서 `python -X utf8 -B scripts/<명령>.py` 형태로 실행해 모두 PASS를 확인했습니다. 문서 검사는 Markdown 124개·상세 100장·로컬 링크 2,241개를 검사했고, 외부 URL 546개는 목록화했습니다. 이 숫자가 모든 외부 URL의 재검증을 뜻하지는 않습니다.
+
+**실행과 원고의 경계:** 3b 당시에는 Linux·MySQL·promtool·시계 실습을 실행하거나 새 결과를 출판하지 않았습니다. SQL Server·Oracle·runtime·GPU·로그 수집 명령도 실행하지 않았습니다. 당시 3a 준비 파일 16개의 저장 hash는 모두 일치했고 실행기·manifest·`.tools/`·`.lab-runs/`는 변경하지 않았습니다. 이후 3d에서 위와 같이 결과와 재준비를 반영했습니다.
+
+새 HTML의 브라우저 화면 검사는 수행하지 않았습니다. 이전 `html-check` 기록은 이전 생성본에 해당하며 이번 생성본의 시각적 검증을 대신하지 않습니다. 외부 링크는 해당 사실을 검토할 때 열람했으며, 전체 URL 상태 목록의 전수 재검증은 하지 않았습니다.
 
 <a id="chapter-docs-validation--2d-결과-출판과-재검사"></a>
 
@@ -11907,7 +12818,9 @@ Kubernetes 실험은 API server·etcd만 띄웠습니다. 실제 업무 Pod·kub
 
 ### 실행하지 않은 범위
 
-물리 Linux 장비 전체와 모든 procfs 필드, cgroup 제한·OOM·eviction, Kubernetes 최신 patch·1.35/1.36 서버·업무 workload·CNI·CSI, MySQL·SQL Server·Oracle 서버 질의, JVM·.NET 등 runtime agent 전수, 실제 DNS·TLS·HTTP/2, 상용 SNMP 장비, cloud 계정·비용 API, 분산 장애 전환·전원 장애·복구는 실행하지 않았습니다. 본문에서는 연결한 공식 원천의 적용 범위로 설명하며 해당 환경을 검증했다고 표시하지 않습니다.
+물리 Linux 장비 전체와 모든 procfs 필드, cgroup 제한·OOM·eviction, Kubernetes 최신 patch·1.35/1.36 서버·업무 workload·CNI·CSI, SQL Server·Oracle 서버 질의, JVM·.NET 등 runtime agent 전수, 실제 DNS·TLS·HTTP/2, 상용 SNMP 장비, cloud 계정·비용 API, 분산 장애 전환·전원 장애·복구는 실행하지 않았습니다. 본문에서는 연결한 공식 원천의 적용 범위로 설명하며 해당 환경을 검증했다고 표시하지 않습니다.
+
+MySQL은 위 8.4.11·9.7.2 r1·r2의 소유 임시 인스턴스에서 실행했습니다. 운영 계정의 최소 권한과 crash 복구·전원 장애 지속성은 실행 검증하지 않았습니다.
 
 <a id="chapter-docs-validation--문서-검사-재현"></a>
 
@@ -11966,6 +12879,20 @@ python3 scripts/run_otel_lab.py
 ## 제1.1판의 검토와 수정 기록
 
 2026-10-04에 작성·자체 검토·공식 원천 대조·실제 실행을 반복한 보강판입니다. 제1.0판의 80장에서 **92장**으로 확장했습니다. 이번 검토는 작성자의 자체 검토이며 외부 전문가 감수를 의미하지 않습니다. 실행 환경과 자동 검사 결과는 [검증 기록](#chapter-docs-validation)에 있습니다.
+
+<a id="chapter-docs-review--claudecodex-교차-검토-3차-원고-보강과-3f-결과-확정"></a>
+
+### Claude–Codex 교차 검토 3차: 원고 보강과 3f 결과 확정
+
+2026-10-05의 3b에서는 [회수·OOM](#chapter-docs-host-reclaim-and-oom), [MySQL 운영](#chapter-docs-database-mysql-operations), [분포 저장 형식](#chapter-docs-foundations-histogram-storage)을 새 장으로 추가해 상세 **100장**으로 확장했습니다. 기존 장에 PSI·프로세스 RSS·시계 동기화·SQL Server와 Oracle·런타임·로그와 HAProxy·GPU 원천을 보강했습니다. 10월 6일 3d에서는 Claude의 3c 지적 24개와 추가 단서를 원천에 다시 대조하고 실습 세 묶음을 출판했습니다. AI 간 교차 검토이며 모든 문장의 무오류 인증은 아닙니다. [항목별 판정과 근거](review/claude-codex-r3.md)
+
+Kubernetes v1.37.0 코드에서 hugepage 보정이 Summary API의 node.memory.availableBytes에도 적용되는 것을 확인했습니다. Lambda suppressed init이 CloudWatch Duration 지표에도 포함되는지는 직접적인 공식 문장을 확인하지 못해 미확인을 유지했습니다.
+
+3d에서는 Linux reclaim counter의 서로 다른 모집단, zswap과 zram의 계정 차이, OOM 유발 작업·희생자의 score 구분을 명확히 했습니다. MySQL 1213의 탐색 한계와 table lock 감지 조건, SQL Server 최소 권한·redo_rate 기간, Oracle의 실제 pack 대상 목록, native histogram 안정화 단계와 변환 규약의 Development 상태도 보강했습니다. Fluent Bit의 memrb drop·files_rotated 지표는 4.1.0 코드에도 있어 “4.2 최초 추가”라는 단서를 채택하지 않았습니다.
+
+메모리·histogram·시계 실습은 supported 4·2·1개의 요약 JSON과 **gzip 원자료 61개 전체**를 보존했습니다. 8 MiB 메모리 분류와 조회 비용, 보간 차이, MONO/RAW와 동기화 metadata를 제한된 관측으로 연결했습니다. MySQL의 두 최초 실행은 loader 실패로 DB 관측이 없었으므로 출판하지 않았습니다. 서명을 확인한 8.4.11·기존 9.7.2와 비공개 라이브러리의 후속 실행을 3e에서 출판했습니다. r1은 각 supported 3·refuted 2, gzip 100개로 보존하고, 3f에서 r2의 각 supported 5·gzip 132개를 추가했습니다. 반복 실행 이력을 포함한 3라운드 누계는 27개 판정(supported 23·refuted 4)·525개 gzip입니다. [실습 근거·한계](#chapter-docs-cross-domain-reproducible-labs), [검증 기록](#chapter-docs-validation)
+
+3e에서는 next-key의 직접 대기 관계가 있었음에도 sys view가 비어 있던 표본을 INNODB_TRX cache·join 경로와 대조했습니다. GTID 적용 완료를 이미 기다린 복제에서도 coordinator 위치가 뒤처져 SBS가 0이 아닐 수 있음을 원자료·소스로 확인했습니다. 9.7.2의 재개 SBS는 0이 아닌 1입니다. 두 refuted를 성공으로 바꾸지 않았으며, 보완한 관측 조건을 Claude가 r2로 실행한 결과를 3f에서 확정했습니다. 두 버전 모두 sys 행은 재조회 뒤 나타났고, 위치 일치 뒤의 SBS와 SQL 중지 상태는 정의에 부합했습니다. GTID 직후와 위치 수렴 뒤 표본을 함께 남겨 실제 작업과 표시 갱신의 완료 시점 차이를 설명했습니다. 시계 보정 내부값과 WSL 시계 조정의 인과는 이번 기록만으로 확정하지 않았습니다. [분석 근거](review/mysql-r3e-analysis.json), [MySQL 본문](#chapter-docs-database-mysql-operations)
 
 <a id="chapter-docs-review--claudecodex-교차-검토-2차-원고-보강과-실행-근거"></a>
 

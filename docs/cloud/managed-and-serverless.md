@@ -1,6 +1,6 @@
 # 관리형 서비스와 서버리스 관측
 
-> 상태: 검토됨 · 적용 범위: 관리형 관측 모델, AWS Lambda·Google Cloud Run 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (Lambda INIT·Errors 시각)
+> 상태: 검토됨 · 적용 범위: 관리형 관측 모델, AWS Lambda·Google Cloud Run 사례 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (Lambda INIT·Errors 시각) · 3b 원천 검토: 2026-10-05 (새 실습 결과 미반영)
 
 ## 먼저 이해할 것
 
@@ -31,7 +31,7 @@ Lambda Invocations는 함수 코드가 호출된 횟수이며 throttled 요청 �
 
 Lambda 초기화의 관측 출처를 먼저 구분합니다. cold start의 `Init Duration`은 REPORT 로그에서 확인할 수 있으며, Telemetry API의 `platform.initReport`는 초기화 보고 이벤트와 `metrics.durationMs`를 제공합니다. invoke 실패 뒤 suppressed init은 CloudWatch Logs에 추가 INIT 단계로 명시되지 않으면서 **REPORT의 Duration에 INIT+INVOKE 시간이 포함**될 수 있습니다. Telemetry API의 `phase=invoke` 초기화 이벤트로 구분할 수 있으므로 “Init Duration 필드가 없으면 초기화가 없었다”고 결론 내리지 않습니다. [실행 환경 수명과 suppressed init](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html), [Telemetry API 이벤트 스키마](https://docs.aws.amazon.com/lambda/latest/dg/telemetry-schema-reference.html)
 
-기본 on-demand Init의 10초 제한을 넘으면 첫 호출 시 함수 timeout 범위에서 Init을 다시 시도하는 경로도 있습니다. 이는 invoke 실패 뒤 suppressed init과 구분합니다. REPORT 로그에서 확인한 시간 포함 관계를 CloudWatch `Duration` 지표에도 그대로 적용하지 않습니다. 공식 지표 설명은 cold start 제외를 명시하지만 suppressed init과의 세부 대응은 이 장에서 실측하지 않았습니다. [Init 실패·재시도](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html), [Duration 지표 정의](https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics-types.html)
+기본 on-demand Init의 10초 제한을 넘으면 첫 호출 시 함수 timeout 범위에서 Init을 다시 시도하는 경로도 있습니다. 이는 invoke 실패 뒤 suppressed init과 구분합니다. REPORT 로그에서 확인한 시간 포함 관계를 CloudWatch `Duration` 지표에도 그대로 적용하지 않습니다. **2026-10-05 재확인에서도**, 실행 환경 문서는 REPORT의 포함 관계를 명시하고 지표 문서는 cold start 제외를 설명하지만, suppressed init이 `AWS/Lambda`의 `Duration` 지표에도 포함되는지를 직접 연결하는 공식 문장은 확인하지 못했습니다. 이 세부 대응은 미확인 상태이며 실측하지 않았습니다. [Init 실패·재시도](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html), [Duration 지표 정의](https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics-types.html)
 
 2025-08-01부터 managed runtime·ZIP·on-demand 함수의 INIT 단계도 과금 대상이 되었습니다. 다른 실행·배포 방식에서는 이미 적용되던 과금과 구분해야 합니다. **과금 규칙의 변경은 CloudWatch `Duration` 지표에 cold start가 포함된다는 뜻이 아닙니다.** 원천 지표, 로그의 Duration·Init Duration·Billed Duration을 각각의 정의로 읽습니다. [AWS INIT 과금 변경 공지](https://aws.amazon.com/blogs/compute/aws-lambda-standardizes-billing-for-init-phase/)
 

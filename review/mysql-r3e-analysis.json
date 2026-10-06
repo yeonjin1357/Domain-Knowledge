@@ -1,0 +1,527 @@
+{
+  "reviewed_on": "2026-10-06",
+  "stage": "3e",
+  "recorded_verdicts_modified": false,
+  "runs": {
+    "8.4.11": {
+      "evidence": "labs/results/1.1-r3/mysql-8.4.11-r1.json",
+      "evidence_sha256": "1f2736fad023e23084b61dd2d55407c15e9ae28e7c1f6bd9adc782272b670ed6",
+      "locks": {
+        "gap_lock": {
+          "recorded_verdict": "supported",
+          "direct_id_join_matches": true,
+          "sys_row_count": 1,
+          "observed_lock_modes": [
+            "IX",
+            "X,GAP",
+            "X,GAP,INSERT_INTENTION"
+          ],
+          "snapshot_query_refs": [
+            "8.4.11-1-client-0-6",
+            "8.4.11-1-client-0-7",
+            "8.4.11-1-client-0-8"
+          ],
+          "sys_xml_sha256": "9fbe4cfd2deb6e40b4ae1be1fa619b50bca8fd4b853290e5129edaac1918bbc6",
+          "insert_query_ref": "8.4.11-1-client-2-4",
+          "insert_error_codes": [],
+          "blocker_release_query_ref": "8.4.11-1-client-1-5",
+          "insert_finish_after_release_start": true
+        },
+        "next_key_lock": {
+          "recorded_verdict": "refuted",
+          "direct_id_join_matches": true,
+          "sys_row_count": 0,
+          "observed_lock_modes": [
+            "IX",
+            "X",
+            "X,GAP,INSERT_INTENTION",
+            "X,REC_NOT_GAP"
+          ],
+          "snapshot_query_refs": [
+            "8.4.11-1-client-0-10",
+            "8.4.11-1-client-0-11",
+            "8.4.11-1-client-0-12"
+          ],
+          "sys_xml_sha256": "67447e07e4e02d6d294631e4b9251b85aa16e20ca0bde8308af7868c64ca6387",
+          "insert_query_ref": "8.4.11-1-client-4-4",
+          "insert_error_codes": [],
+          "blocker_release_query_ref": "8.4.11-1-client-3-5",
+          "insert_finish_after_release_start": true
+        }
+      },
+      "max_gap_sys_start_to_next_key_sys_end_ms": {
+        "monotonic_ns": 96.071806,
+        "monotonic_raw_ns": 98.590744
+      },
+      "replication": {
+        "baseline": {
+          "sbs": "13",
+          "io": "Yes",
+          "sql": "Yes",
+          "read_pos": "1073",
+          "exec_pos": "158",
+          "source_log_file": "binlog.000001",
+          "group_log_file": "binlog.000001",
+          "source_gtid": "aeb18b2a-c0d3-11f1-8ded-e073e70afa49:1-4",
+          "replica_gtid": "aeb18b2a-c0d3-11f1-8ded-e073e70afa49:1-4",
+          "retrieved_gtid": "aeb18b2a-c0d3-11f1-8ded-e073e70afa49:1-4",
+          "status_query_ref": "8.4.11-2-client-0-6",
+          "status_started_utc": "2026-10-05T15:45:07.157181+00:00",
+          "workers": [
+            {
+              "WORKER_ID": "1",
+              "LAST_APPLIED_TRANSACTION": "aeb18b2a-c0d3-11f1-8ded-e073e70afa49:4",
+              "LAST_APPLIED_TRANSACTION_END_APPLY_TIMESTAMP": "2026-10-05 15:45:07.149019",
+              "APPLYING_TRANSACTION": ""
+            },
+            {
+              "WORKER_ID": "2",
+              "LAST_APPLIED_TRANSACTION": "",
+              "LAST_APPLIED_TRANSACTION_END_APPLY_TIMESTAMP": "0000-00-00 00:00:00.000000",
+              "APPLYING_TRANSACTION": ""
+            }
+          ]
+        },
+        "io_stopped": {
+          "sbs": "13",
+          "io": "No",
+          "sql": "Yes",
+          "read_pos": "1073",
+          "exec_pos": "158",
+          "source_log_file": "binlog.000001",
+          "group_log_file": "binlog.000001",
+          "source_gtid": "aeb18b2a-c0d3-11f1-8ded-e073e70afa49:1-5",
+          "replica_gtid": "aeb18b2a-c0d3-11f1-8ded-e073e70afa49:1-4",
+          "retrieved_gtid": "aeb18b2a-c0d3-11f1-8ded-e073e70afa49:1-4",
+          "status_query_ref": "8.4.11-2-client-0-12",
+          "status_started_utc": "2026-10-05T15:45:07.214528+00:00",
+          "workers": [
+            {
+              "WORKER_ID": "1",
+              "LAST_APPLIED_TRANSACTION": "aeb18b2a-c0d3-11f1-8ded-e073e70afa49:4",
+              "LAST_APPLIED_TRANSACTION_END_APPLY_TIMESTAMP": "2026-10-05 15:45:07.149019",
+              "APPLYING_TRANSACTION": ""
+            },
+            {
+              "WORKER_ID": "2",
+              "LAST_APPLIED_TRANSACTION": "",
+              "LAST_APPLIED_TRANSACTION_END_APPLY_TIMESTAMP": "0000-00-00 00:00:00.000000",
+              "APPLYING_TRANSACTION": ""
+            }
+          ]
+        },
+        "sql_stopped": {
+          "sbs": null,
+          "io": "Yes",
+          "sql": "No",
+          "read_pos": "1611",
+          "exec_pos": "1342",
+          "source_log_file": "binlog.000001",
+          "group_log_file": "binlog.000001",
+          "source_gtid": "aeb18b2a-c0d3-11f1-8ded-e073e70afa49:1-6",
+          "replica_gtid": "aeb18b2a-c0d3-11f1-8ded-e073e70afa49:1-5",
+          "retrieved_gtid": "aeb18b2a-c0d3-11f1-8ded-e073e70afa49:1-6",
+          "status_query_ref": "8.4.11-2-client-0-20",
+          "status_started_utc": "2026-10-05T15:45:07.393064+00:00",
+          "workers": [
+            {
+              "WORKER_ID": "1",
+              "LAST_APPLIED_TRANSACTION": "aeb18b2a-c0d3-11f1-8ded-e073e70afa49:5",
+              "LAST_APPLIED_TRANSACTION_END_APPLY_TIMESTAMP": "2026-10-05 15:45:07.343812",
+              "APPLYING_TRANSACTION": ""
+            },
+            {
+              "WORKER_ID": "2",
+              "LAST_APPLIED_TRANSACTION": "",
+              "LAST_APPLIED_TRANSACTION_END_APPLY_TIMESTAMP": "0000-00-00 00:00:00.000000",
+              "APPLYING_TRANSACTION": ""
+            }
+          ]
+        },
+        "resumed": {
+          "sbs": "0",
+          "io": "Yes",
+          "sql": "Yes",
+          "read_pos": "1611",
+          "exec_pos": "1342",
+          "source_log_file": "binlog.000001",
+          "group_log_file": "binlog.000001",
+          "source_gtid": "aeb18b2a-c0d3-11f1-8ded-e073e70afa49:1-6",
+          "replica_gtid": "aeb18b2a-c0d3-11f1-8ded-e073e70afa49:1-6",
+          "retrieved_gtid": "aeb18b2a-c0d3-11f1-8ded-e073e70afa49:1-6",
+          "status_query_ref": "8.4.11-2-client-0-26",
+          "status_started_utc": "2026-10-05T15:45:07.452880+00:00",
+          "workers": [
+            {
+              "WORKER_ID": "1",
+              "LAST_APPLIED_TRANSACTION": "aeb18b2a-c0d3-11f1-8ded-e073e70afa49:6",
+              "LAST_APPLIED_TRANSACTION_END_APPLY_TIMESTAMP": "2026-10-05 15:45:07.448577",
+              "APPLYING_TRANSACTION": ""
+            },
+            {
+              "WORKER_ID": "2",
+              "LAST_APPLIED_TRANSACTION": "",
+              "LAST_APPLIED_TRANSACTION_END_APPLY_TIMESTAMP": "0000-00-00 00:00:00.000000",
+              "APPLYING_TRANSACTION": ""
+            }
+          ]
+        }
+      },
+      "barriers": [
+        {
+          "query_ref": "8.4.11-2-client-0-4",
+          "rows": [
+            {
+              "caught": "0"
+            }
+          ],
+          "finished": {
+            "utc": "2026-10-05T15:45:07.149808+00:00",
+            "monotonic_ns": 547503863147024,
+            "monotonic_raw_ns": 568679532085644
+          }
+        },
+        {
+          "query_ref": "8.4.11-2-client-0-17",
+          "rows": [
+            {
+              "caught": "0"
+            }
+          ],
+          "finished": {
+            "utc": "2026-10-05T15:45:07.345198+00:00",
+            "monotonic_ns": 547504058538146,
+            "monotonic_raw_ns": 568679733522233
+          }
+        },
+        {
+          "query_ref": "8.4.11-2-client-0-25",
+          "rows": [
+            {
+              "caught": "0"
+            }
+          ],
+          "finished": {
+            "utc": "2026-10-05T15:45:07.449502+00:00",
+            "monotonic_ns": 547504162835356,
+            "monotonic_raw_ns": 568679841044966
+          }
+        }
+      ],
+      "parallel_workers_configured": 2
+    },
+    "9.7.2": {
+      "evidence": "labs/results/1.1-r3/mysql-9.7.2-r1.json",
+      "evidence_sha256": "e97f442ce3701ac4ef8119de32c7219eeea9dfed70e004f7b0875506ed6c354c",
+      "locks": {
+        "gap_lock": {
+          "recorded_verdict": "supported",
+          "direct_id_join_matches": true,
+          "sys_row_count": 1,
+          "observed_lock_modes": [
+            "IX",
+            "X,GAP",
+            "X,GAP,INSERT_INTENTION"
+          ],
+          "snapshot_query_refs": [
+            "9.7.2-1-client-0-6",
+            "9.7.2-1-client-0-7",
+            "9.7.2-1-client-0-8"
+          ],
+          "sys_xml_sha256": "55b0fd1f019c3fd3897b9f347f69924885c52d8d04e3d77c1cbb3c7dd61768f3",
+          "insert_query_ref": "9.7.2-1-client-2-4",
+          "insert_error_codes": [],
+          "blocker_release_query_ref": "9.7.2-1-client-1-5",
+          "insert_finish_after_release_start": true
+        },
+        "next_key_lock": {
+          "recorded_verdict": "refuted",
+          "direct_id_join_matches": true,
+          "sys_row_count": 0,
+          "observed_lock_modes": [
+            "IX",
+            "X",
+            "X,GAP,INSERT_INTENTION",
+            "X,REC_NOT_GAP"
+          ],
+          "snapshot_query_refs": [
+            "9.7.2-1-client-0-10",
+            "9.7.2-1-client-0-11",
+            "9.7.2-1-client-0-12"
+          ],
+          "sys_xml_sha256": "3655387e4b01dc37ec9c8f1ce9a147dc66bbed90ff2ca8298a85a3feccec8cbe",
+          "insert_query_ref": "9.7.2-1-client-4-4",
+          "insert_error_codes": [],
+          "blocker_release_query_ref": "9.7.2-1-client-3-5",
+          "insert_finish_after_release_start": true
+        }
+      },
+      "max_gap_sys_start_to_next_key_sys_end_ms": {
+        "monotonic_ns": 86.605013,
+        "monotonic_raw_ns": 90.105283
+      },
+      "replication": {
+        "baseline": {
+          "sbs": "13",
+          "io": "Yes",
+          "sql": "Yes",
+          "read_pos": "1073",
+          "exec_pos": "158",
+          "source_log_file": "binlog.000001",
+          "group_log_file": "binlog.000001",
+          "source_gtid": "c8a0b115-c0d3-11f1-b5cb-e073e70afa49:1-4",
+          "replica_gtid": "c8a0b115-c0d3-11f1-b5cb-e073e70afa49:1-4",
+          "retrieved_gtid": "c8a0b115-c0d3-11f1-b5cb-e073e70afa49:1-4",
+          "status_query_ref": "9.7.2-2-client-0-6",
+          "status_started_utc": "2026-10-05T15:45:49.770088+00:00",
+          "workers": [
+            {
+              "WORKER_ID": "1",
+              "LAST_APPLIED_TRANSACTION": "c8a0b115-c0d3-11f1-b5cb-e073e70afa49:4",
+              "LAST_APPLIED_TRANSACTION_END_APPLY_TIMESTAMP": "2026-10-05 15:45:49.762093",
+              "APPLYING_TRANSACTION": ""
+            },
+            {
+              "WORKER_ID": "2",
+              "LAST_APPLIED_TRANSACTION": "",
+              "LAST_APPLIED_TRANSACTION_END_APPLY_TIMESTAMP": "0000-00-00 00:00:00.000000",
+              "APPLYING_TRANSACTION": ""
+            }
+          ]
+        },
+        "io_stopped": {
+          "sbs": "13",
+          "io": "No",
+          "sql": "Yes",
+          "read_pos": "1073",
+          "exec_pos": "158",
+          "source_log_file": "binlog.000001",
+          "group_log_file": "binlog.000001",
+          "source_gtid": "c8a0b115-c0d3-11f1-b5cb-e073e70afa49:1-5",
+          "replica_gtid": "c8a0b115-c0d3-11f1-b5cb-e073e70afa49:1-4",
+          "retrieved_gtid": "c8a0b115-c0d3-11f1-b5cb-e073e70afa49:1-4",
+          "status_query_ref": "9.7.2-2-client-0-12",
+          "status_started_utc": "2026-10-05T15:45:49.829421+00:00",
+          "workers": [
+            {
+              "WORKER_ID": "1",
+              "LAST_APPLIED_TRANSACTION": "c8a0b115-c0d3-11f1-b5cb-e073e70afa49:4",
+              "LAST_APPLIED_TRANSACTION_END_APPLY_TIMESTAMP": "2026-10-05 15:45:49.762093",
+              "APPLYING_TRANSACTION": ""
+            },
+            {
+              "WORKER_ID": "2",
+              "LAST_APPLIED_TRANSACTION": "",
+              "LAST_APPLIED_TRANSACTION_END_APPLY_TIMESTAMP": "0000-00-00 00:00:00.000000",
+              "APPLYING_TRANSACTION": ""
+            }
+          ]
+        },
+        "sql_stopped": {
+          "sbs": null,
+          "io": "Yes",
+          "sql": "No",
+          "read_pos": "1611",
+          "exec_pos": "1342",
+          "source_log_file": "binlog.000001",
+          "group_log_file": "binlog.000001",
+          "source_gtid": "c8a0b115-c0d3-11f1-b5cb-e073e70afa49:1-6",
+          "replica_gtid": "c8a0b115-c0d3-11f1-b5cb-e073e70afa49:1-5",
+          "retrieved_gtid": "c8a0b115-c0d3-11f1-b5cb-e073e70afa49:1-6",
+          "status_query_ref": "9.7.2-2-client-0-20",
+          "status_started_utc": "2026-10-05T15:45:50.027268+00:00",
+          "workers": [
+            {
+              "WORKER_ID": "1",
+              "LAST_APPLIED_TRANSACTION": "c8a0b115-c0d3-11f1-b5cb-e073e70afa49:5",
+              "LAST_APPLIED_TRANSACTION_END_APPLY_TIMESTAMP": "2026-10-05 15:45:49.949322",
+              "APPLYING_TRANSACTION": ""
+            },
+            {
+              "WORKER_ID": "2",
+              "LAST_APPLIED_TRANSACTION": "",
+              "LAST_APPLIED_TRANSACTION_END_APPLY_TIMESTAMP": "0000-00-00 00:00:00.000000",
+              "APPLYING_TRANSACTION": ""
+            }
+          ]
+        },
+        "resumed": {
+          "sbs": "1",
+          "io": "Yes",
+          "sql": "Yes",
+          "read_pos": "1611",
+          "exec_pos": "1342",
+          "source_log_file": "binlog.000001",
+          "group_log_file": "binlog.000001",
+          "source_gtid": "c8a0b115-c0d3-11f1-b5cb-e073e70afa49:1-6",
+          "replica_gtid": "c8a0b115-c0d3-11f1-b5cb-e073e70afa49:1-6",
+          "retrieved_gtid": "c8a0b115-c0d3-11f1-b5cb-e073e70afa49:1-6",
+          "status_query_ref": "9.7.2-2-client-0-26",
+          "status_started_utc": "2026-10-05T15:45:50.088228+00:00",
+          "workers": [
+            {
+              "WORKER_ID": "1",
+              "LAST_APPLIED_TRANSACTION": "c8a0b115-c0d3-11f1-b5cb-e073e70afa49:6",
+              "LAST_APPLIED_TRANSACTION_END_APPLY_TIMESTAMP": "2026-10-05 15:45:50.084720",
+              "APPLYING_TRANSACTION": ""
+            },
+            {
+              "WORKER_ID": "2",
+              "LAST_APPLIED_TRANSACTION": "",
+              "LAST_APPLIED_TRANSACTION_END_APPLY_TIMESTAMP": "0000-00-00 00:00:00.000000",
+              "APPLYING_TRANSACTION": ""
+            }
+          ]
+        }
+      },
+      "barriers": [
+        {
+          "query_ref": "9.7.2-2-client-0-4",
+          "rows": [
+            {
+              "caught": "0"
+            }
+          ],
+          "finished": {
+            "utc": "2026-10-05T15:45:49.763233+00:00",
+            "monotonic_ns": 547545532402220,
+            "monotonic_raw_ns": 568722490716982
+          }
+        },
+        {
+          "query_ref": "9.7.2-2-client-0-17",
+          "rows": [
+            {
+              "caught": "0"
+            }
+          ],
+          "finished": {
+            "utc": "2026-10-05T15:45:49.951215+00:00",
+            "monotonic_ns": 547545720387692,
+            "monotonic_raw_ns": 568722683524840
+          }
+        },
+        {
+          "query_ref": "9.7.2-2-client-0-25",
+          "rows": [
+            {
+              "caught": "0"
+            }
+          ],
+          "finished": {
+            "utc": "2026-10-05T15:45:50.085335+00:00",
+            "monotonic_ns": 547545854499978,
+            "monotonic_raw_ns": 568722821075879
+          }
+        }
+      ],
+      "parallel_workers_configured": 2
+    }
+  },
+  "source_code": [
+    {
+      "version": "8.4.11",
+      "path": "sql/rpl_replica.cc",
+      "url": "https://raw.githubusercontent.com/mysql/mysql-server/mysql-8.4.11/sql/rpl_replica.cc",
+      "sha256": "0121066cbc6633ebf3299e8f90bef64736a5975332cdfb735c5d79bcd25de7b4",
+      "bytes": 427366
+    },
+    {
+      "version": "8.4.11",
+      "path": "sql/rpl_rli_pdb.cc",
+      "url": "https://raw.githubusercontent.com/mysql/mysql-server/mysql-8.4.11/sql/rpl_rli_pdb.cc",
+      "sha256": "6d1702ec88bb98e4575dc487954798b0a1b493af7d036160fe1518b1b2c1a904",
+      "bytes": 92216
+    },
+    {
+      "version": "8.4.11",
+      "path": "sql/rpl_rli.cc",
+      "url": "https://raw.githubusercontent.com/mysql/mysql-server/mysql-8.4.11/sql/rpl_rli.cc",
+      "sha256": "69637e93d31483998a4cdf9f6e043f06324704733274d11b0ea6cde9644ba182",
+      "bytes": 129256
+    },
+    {
+      "version": "8.4.11",
+      "path": "storage/innobase/trx/trx0i_s.cc",
+      "url": "https://raw.githubusercontent.com/mysql/mysql-server/mysql-8.4.11/storage/innobase/trx/trx0i_s.cc",
+      "sha256": "3006dba44b36a3c963755afd11a7133bcb8dabd2a1428665eebadfd0f0ccfc66",
+      "bytes": 33345
+    },
+    {
+      "version": "8.4.11",
+      "path": "scripts/sys_schema/views/p_s/innodb_lock_waits.sql",
+      "url": "https://raw.githubusercontent.com/mysql/mysql-server/mysql-8.4.11/scripts/sys_schema/views/p_s/innodb_lock_waits.sql",
+      "sha256": "9c711392b87fb363ebbb879e5ed8fee24208ee2af05618f185745f09b6204d25",
+      "bytes": 5260
+    },
+    {
+      "version": "8.4.11",
+      "path": "storage/innobase/handler/i_s.cc",
+      "url": "https://raw.githubusercontent.com/mysql/mysql-server/mysql-8.4.11/storage/innobase/handler/i_s.cc",
+      "sha256": "ab184e46dc2cd8fd41fdff0a6afb8b3f6189f8c8c571cbe8014e81be1a8e4c57",
+      "bytes": 246929
+    },
+    {
+      "version": "8.4.11",
+      "path": "storage/innobase/include/trx0i_s.h",
+      "url": "https://raw.githubusercontent.com/mysql/mysql-server/mysql-8.4.11/storage/innobase/include/trx0i_s.h",
+      "sha256": "a9075fed59454625d42e630d158db2729f03703926c575cac4e7c34ffdd2411a",
+      "bytes": 11071
+    },
+    {
+      "version": "9.7.2",
+      "path": "sql/rpl_replica.cc",
+      "url": "https://raw.githubusercontent.com/mysql/mysql-server/mysql-9.7.2/sql/rpl_replica.cc",
+      "sha256": "98cc607086b9b411e04162fb362a551c1c50a99d811610af6478e505e6134603",
+      "bytes": 434449
+    },
+    {
+      "version": "9.7.2",
+      "path": "sql/rpl_rli_pdb.cc",
+      "url": "https://raw.githubusercontent.com/mysql/mysql-server/mysql-9.7.2/sql/rpl_rli_pdb.cc",
+      "sha256": "86c4d9dc66df1222bde5518e62a84ca2236873a7c93152dab4cb2789050e02e6",
+      "bytes": 78999
+    },
+    {
+      "version": "9.7.2",
+      "path": "sql/rpl_rli.cc",
+      "url": "https://raw.githubusercontent.com/mysql/mysql-server/mysql-9.7.2/sql/rpl_rli.cc",
+      "sha256": "03be6cf9dd2ca0f1b56c992b15168dfe4a0505d916134e77dd5cdb38159224dd",
+      "bytes": 128977
+    },
+    {
+      "version": "9.7.2",
+      "path": "storage/innobase/trx/trx0i_s.cc",
+      "url": "https://raw.githubusercontent.com/mysql/mysql-server/mysql-9.7.2/storage/innobase/trx/trx0i_s.cc",
+      "sha256": "3006dba44b36a3c963755afd11a7133bcb8dabd2a1428665eebadfd0f0ccfc66",
+      "bytes": 33345
+    },
+    {
+      "version": "9.7.2",
+      "path": "scripts/sys_schema/views/p_s/innodb_lock_waits.sql",
+      "url": "https://raw.githubusercontent.com/mysql/mysql-server/mysql-9.7.2/scripts/sys_schema/views/p_s/innodb_lock_waits.sql",
+      "sha256": "9c711392b87fb363ebbb879e5ed8fee24208ee2af05618f185745f09b6204d25",
+      "bytes": 5260
+    },
+    {
+      "version": "9.7.2",
+      "path": "storage/innobase/handler/i_s.cc",
+      "url": "https://raw.githubusercontent.com/mysql/mysql-server/mysql-9.7.2/storage/innobase/handler/i_s.cc",
+      "sha256": "b73a5a1fd2b66ead751196b87c41dd4f55f157fa5cdb7af83a26625a16ca3b3c",
+      "bytes": 251243
+    },
+    {
+      "version": "9.7.2",
+      "path": "storage/innobase/include/trx0i_s.h",
+      "url": "https://raw.githubusercontent.com/mysql/mysql-server/mysql-9.7.2/storage/innobase/include/trx0i_s.h",
+      "sha256": "a9075fed59454625d42e630d158db2729f03703926c575cac4e7c34ffdd2411a",
+      "bytes": 11071
+    }
+  ],
+  "interpretation": {
+    "next_key": "Composite r1 criterion failed only because sys_rows was empty; direct lock relationship and release succeeded. Cache/join timing explains the observation, not wrong INSERT_INTENTION syntax.",
+    "replication": "GTID target was executed before baseline, while coordinator read/group file positions differed. r1 assumed checkpoint convergence from GTID completion. Stored refuted remains unchanged.",
+    "clock_limit": "No direct clock_diff_with_master or last_master_timestamp sample; exact numeric contribution and WSL/NTP causation not established.",
+    "correction_to_claude_summary": "9.7.2 resumed SBS is string 1, not 0. Gap scenario also observes X,GAP."
+  }
+}

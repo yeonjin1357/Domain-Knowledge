@@ -4,3 +4,7 @@ assets/mermaid-*.min.js -text -whitespace
 # This generated document embeds the same upstream JavaScript byte for byte.
 BOOK.html text eol=lf -whitespace
 *.png -text
+# Historical manifest is authenticated as CRLF bytes; never normalize its archive.
+labs/archive/review_r2_assets_2026_10_05.json -text
+labs/archive/review_r3_2026_10_05/** -text
+labs/results/1.1-r3/** -text

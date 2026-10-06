@@ -53,6 +53,20 @@
 
 Kafka broker·share group은 [Kafka](middleware/kafka.md), Windows의 PDH와 CPU 표시는 [Windows](host/windows.md), 저장 완료는 [쓰기 경로](storage/write-path-and-durability.md), 프로토콜의 세부 경계는 [TLS·HTTP](network/tls-http.md)와 [SNMP](network/snmp-and-device-models.md)를 찾아봅니다.
 
+## 원천을 구분하는 세 번째 읽기
+
+2026-10-05의 3b에서는 다음 내용을 보강했습니다. 아래의 “관측”은 원천 정의를 읽는 학습이며 새 실습 결과의 출판은 3d에서 합니다. [3라운드 원천 검토 기록](../review/claude-codex-r3.md)에 채택 범위와 확인하지 못한 내용이 있습니다.
+
+| 질문 | 읽을 순서 | 이해 확인 |
+| --- | --- | --- |
+| 메모리는 비슷한데 왜 느려지고 죽는가 | [회수와 OOM](host/reclaim-and-oom.md) → [PSI](host/numa-and-pressure.md) → [프로세스](host/processes.md) | 사용량·회수 페이지·대기 시간·종료 사건을 구분하는가? |
+| 없는 키를 넣는데 왜 기다리는가 | [MySQL 운영](database/mysql-operations.md) | gap lock과 deadlock, timeout의 롤백 범위를 설명하는가? |
+| 커밋과 복제 완료는 같은가 | [MySQL 운영](database/mysql-operations.md) → [SQL Server·Oracle](database/sqlserver-oracle.md) | 수신·적용·redo·저장 설정, NULL·0의 차이를 보존하는가? |
+| histogram 형식을 바꿔도 p99는 같은가 | [분포](foundations/distributions.md) → [분포 저장 형식](foundations/histogram-storage.md) | 경계·scale·보간·상대 오차를 구분하는가? |
+| 로그 시각을 신뢰할 수 있는가 | [시계 동기화](foundations/time-and-data-quality.md) | offset·frequency·불확실성·smear와 MONOTONIC/RAW를 구분하는가? |
+| 런타임·GPU 내부에서 무엇이 막히는가 | [JMX·JFR·EventPipe](application/managed-runtimes.md) → [Node ELU](application/async-runtimes.md) → [GPU](host/gpu.md) | pool·이벤트·루프·SM·메모리의 관측 범위를 구분하는가? |
+| 로그가 없다는 것은 오류가 없다는 뜻인가 | [로그 전달](product/collection-pipelines.md) → [HAProxy](middleware/proxies-and-mesh.md) | record·chunk·세션·요청·응답 코드의 단위를 보존하는가? |
+
 ## 개념을 배운 뒤 실제 결과와 연결하기
 
 | 읽은 개념 | 다음에 읽을 실습·해설 | 집중할 질문 |

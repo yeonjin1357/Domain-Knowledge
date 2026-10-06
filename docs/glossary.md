@@ -182,4 +182,28 @@
 | PMTUD / DPLPMTUD | 경로 MTU 탐색 / datagram packetization layer의 MTU 탐색 | [MTU](network/layers-and-routing.md) |
 | Time grain / Ingestion delay | 집계 구간 크기 / 측정 후 조회 가능해지기까지의 지연 | [Cloud 시간 축](cloud/provider-metrics.md) |
 
+## 회수·분포 저장·엔진 내부를 읽는 용어
+
+| 용어 | 의미·구분 | 상세 |
+| --- | --- | --- |
+| Reclaim / Refault | 페이지 회수 / 밀려났던 페이지의 재참조; 회수량·재읽기와 지연 시간을 구분 | [회수·OOM](host/reclaim-and-oom.md) |
+| Direct reclaim / kswapd | 할당 경로의 직접 회수 / 백그라운드 회수 | [회수·OOM](host/reclaim-and-oom.md) |
+| Memcg OOM | memory cgroup의 제약 범위에서 발생한 OOM; kubelet eviction과 별개 | [회수·OOM](host/reclaim-and-oom.md) |
+| PSI trigger | window 안의 stall 조건을 fd로 감시하는 커널 모니터 등록 | [PSI](host/numa-and-pressure.md) |
+| RssAnon / RssFile / RssShmem | 익명·파일·공유 메모리의 상주량 분류; 정밀도·포함 범위 확인 | [프로세스](host/processes.md) |
+| Next-key / Gap lock | 인덱스 레코드와 앞 구간의 잠금 / 삽입할 빈 구간을 보호하는 잠금 | [MySQL 운영](database/mysql-operations.md) |
+| GTID | 복제 트랜잭션 식별자; wall clock 또는 모든 source의 단일 순번이 아님 | [MySQL 운영](database/mysql-operations.md) |
+| ExponentialHistogram scale | 지수 경계의 해상도 매개변수; 낮추면 버킷이 더 거칠어짐 | [분포 저장](foundations/histogram-storage.md) |
+| NHCB | custom bucket 경계를 담는 native histogram; exponential 형식과 구분 | [분포 저장](foundations/histogram-storage.md) |
+| Sketch / Centroid | 작은 통계 요약 자료구조 / t-digest가 표본들을 묶은 가중 대표점 | [분포 저장](foundations/histogram-storage.md) |
+| Offset / Frequency / Skew | 시각 차이 / 진행 속도 차이 / chrony 주파수 추정의 불확실성 | [시계](foundations/time-and-data-quality.md) |
+| PHC / Leap smear | PTP 하드웨어 시계 / 윤초를 일정 구간에 분산하는 정책 | [시계](foundations/time-and-data-quality.md) |
+| RCSI / PVS | row versioning 기반 READ COMMITTED / ADR의 persistent version store | [SQL Server](database/sqlserver-oracle.md) |
+| ASH / AWR | Oracle 활성 세션 표본 이력 / 성능 통계 이력; 사용 권리 확인 필요 | [Oracle](database/sqlserver-oracle.md) |
+| JFR / EventPipe | JVM 이벤트 기록 / .NET 진단 이벤트 전달 경로 | [런타임](application/managed-runtimes.md) |
+| ELU | 이벤트 루프 active/idle 기준의 사용 비율; OS CPU 사용률과 다름 | [Node](application/async-runtimes.md) |
+| Chunk / Record | 로그 전송·재시도의 묶음 / 개별 기록; 줄 수와도 구분 | [로그 전달](product/collection-pipelines.md) |
+| SM / Warp / Occupancy | GPU 실행 단위 / 실행 스레드 묶음 / 최대 대비 resident warp 점유 | [GPU](host/gpu.md) |
+| Xid / Row remapping | NVIDIA driver 오류 보고 / 불량 메모리 행을 예비 행으로 대체 | [GPU](host/gpu.md) |
+
 용어의 짧은 정의는 학습을 돕는 요약입니다. 실제 판정과 계산은 연결된 원천·버전·조건을 따릅니다.

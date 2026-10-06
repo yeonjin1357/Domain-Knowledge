@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "prepared_on": "2026-10-06",
+  "platform": "Ubuntu 24.04 amd64 LP64",
+  "destination": ".tools/r3/mysql-runtime-ubuntu24.04-amd64",
+  "verification": "libaio: SHA256 from official HTTPS Packages index, not OpenPGP authenticated. libnuma: reuse the previously pinned PostgreSQL package; extraction file bytes checked against that archive. No package installation.",
+  "abi": {
+    "scope": "Linux x86_64 amd64 LP64 only; no claim for i386, x32 or other architectures",
+    "source_url": "https://archive.ubuntu.com/ubuntu/pool/main/liba/libaio/libaio_0.3.113-6build1.1.debian.tar.xz",
+    "source_sha256": "9e33ca6ce335e41bfccf329110d6d52f823f7b9d1e4d75f7df9b2895c0a55aae",
+    "files": [
+      "debian/patches/0021-Add-time64-syscall-support.patch",
+      "debian/patches/0022-Add-time64-public-functions-on-32-bit-architectures.patch"
+    ],
+    "finding": "Old io_getevents/io_pgetevents and LIBAIO_0.1/0.4/0.5 symbol versions remain; time64 redirects/new functions are guarded by __BITS_PER_LONG == 32. amd64 LP64 timespec ABI is unchanged; SONAME is bumped to avoid upstream file conflict. Compatibility is inferred from these exact source patches, then checked by ELF/loader preflight on Linux.",
+    "maintainer_changelog": "https://tracker.debian.org/news/1509816/accepted-libaio-03113-6-source-into-unstable/",
+    "mysql_bug_report": "https://bugs.mysql.com/bug.php?id=119954",
+    "mysql_manual": "https://dev.mysql.com/doc/refman/8.4/en/binary-installation.html",
+    "caution": "MySQL manual confirms libaio dependency; symlink suggestion is a bug reporter workaround, not a manual support guarantee."
+  },
+  "packages": [
+    {
+      "id": "libaio1t64",
+      "version": "0.3.113-6build1.1",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/liba/libaio/libaio1t64_0.3.113-6build1.1_amd64.deb",
+      "sha256": "433212b33e26d424605c01cec1de33b63f2cc12870987b4cb7b3625baba66a19",
+      "size": 7210,
+      "archive": ".tools/r3/archives/libaio1t64_0.3.113-6build1.1_amd64.deb",
+      "index_url": "https://archive.ubuntu.com/ubuntu/dists/noble-updates/main/binary-amd64/Packages.xz",
+      "index_sha256": "9bc331bcfdd41f6619973ba30944abdd98cc9878533beba1d720a855292aa200",
+      "index_stanza": "Package: libaio1t64\nSource: libaio\nPriority: optional\nSection: libs\nInstalled-Size: 37\nMaintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>\nArchitecture: amd64\nVersion: 0.3.113-6build1.1\nDepends: libc6 (>= 2.4)\nFilename: pool/main/liba/libaio/libaio1t64_0.3.113-6build1.1_amd64.deb\nSize: 7210\nMD5sum: 2a23c869738d4d0d12668daa7e11be02\nSHA1: f11fefa1e37ba646bc617f367076f078e92689bb\nSHA256: 433212b33e26d424605c01cec1de33b63f2cc12870987b4cb7b3625baba66a19\nSHA512: 91412ed2429b6979ba636d30dfa5a2c54a0bfebcda7d8ab60745f1a74af8d98dd09df2f2ac6d2716296cc44e9c131b4b0a54d8839917bd7cf60e67f805854c4b\nHomepage: https://pagure.io/libaio\nDescription: Linux kernel AIO access library - shared library\nDescription-md5: 32a717b5777305187d782317bb4d97ed\nMulti-Arch: same\nOriginal-Maintainer: Guillem Jover <guillem@debian.org>\nOrigin: Ubuntu\nBugs: https://bugs.launchpad.net/ubuntu/+filebug\nTask: ubuntu-live, cloud-image, cloud-image, server-minimal, server, ubuntu-server-raspi, lamp-server, kubuntu-live, xubuntu-live, lubuntu-live, ubuntustudio-dvd-live, ubuntukylin-live, ubuntu-mate-live, ubuntu-budgie-live, ubuntu-unity-live, edubuntu-dvd-live, edubuntu-live, ubuntucinnamon-live",
+      "member": "usr/lib/x86_64-linux-gnu/libaio.so.1t64.0.2",
+      "alias": "libaio.so.1",
+      "upstream_alias": "libaio.so.1t64",
+      "member_sha256": "9dbba7441fe096f6654bfd31bfdbba52f41a209bd4a560468293c226ff63c998"
+    },
+    {
+      "id": "libnuma1",
+      "version": "2.0.18-1ubuntu0.24.04.1",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/n/numactl/libnuma1_2.0.18-1ubuntu0.24.04.1_amd64.deb",
+      "sha256": "f333b8edf6f0b705c19f2a67008194df66f7aab0fa2350dc98510569a033ff29",
+      "archive": ".tools/pg18-archives/libnuma1_2.0.18-1ubuntu0.24.04.1_amd64.deb",
+      "pin_source": "labs/postgresql/packages.json",
+      "member": "usr/lib/x86_64-linux-gnu/libnuma.so.1.0.0",
+      "alias": "libnuma.so.1",
+      "reuse_file": ".tools/pg18/usr/lib/x86_64-linux-gnu/libnuma.so.1.0.0",
+      "member_sha256": "02d7582c5d391e460e56aa67a414360e3183b968206645b9123f9dc7bff5d009"
+    }
+  ]
+}

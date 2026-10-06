@@ -1,6 +1,6 @@
 # Kubernetes 자원 압박과 종료 원인
 
-> 상태: 검토됨 · 적용 범위: Kubernetes 1.34–1.37, Linux cgroup v2와 명시한 v1 차이 · 원천 확인일: 2026-10-05 · workload 실행 미검증
+> 상태: 검토됨 · 적용 범위: Kubernetes 1.34–1.37, Linux cgroup v2와 명시한 v1 차이 · 원천 확인일: 2026-10-05 · workload 실행 미검증 · 3b 원천 검토: 2026-10-05 (새 실습 결과 미반영)
 
 ## 먼저 이해할 상황
 
@@ -23,6 +23,8 @@
 Linux의 kubelet eviction 신호 `memory.available`은 `node capacity − node memory working set`으로 산출합니다. `/proc/meminfo`의 `MemAvailable`을 그대로 읽은 값이 아닙니다. kubelet의 working set 계산에서는 `inactive_file`을 회수 가능하다고 보고 제외하는 점도 유의합니다. [eviction 신호](https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals)
 
 **1.37의 예외:** `HugepageAwareEviction`은 Beta·기본 활성입니다. hugepage를 구성한 노드에서는 eviction manager가 쓰는 `memory.available`에서 노드의 hugepage 총용량을 추가로 뺍니다. memory cgroup working set이 hugetlb 할당을 계정하지 않아 여유가 부풀려지는 것을 보정합니다. 사용 중인 hugepage만 빼는 식이 아니므로 제품은 보정 여부를 함께 보존합니다. [hugepage 보정](https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#memory-signals), [gate 이력](https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/)
+
+**3라운드 코드 확인(2026-10-05): 이 보정은 Summary API에도 반영됩니다.** v1.37.0 `summaryProviderImpl.Get`과 `GetCPUAndMemoryStats`는 gate가 켜져 있으면 `adjustForHugePages`를 호출한 MemoryStats를 `summary.node.memory`에 넣습니다. `availableBytes`에서 Node의 hugepage Capacity 합계를 빼고 0을 하한으로 사용합니다. workingSetBytes 자체를 바꾸는 함수는 아니며, 값·Node가 없거나 hugepage 총용량이 0이면 보정하지 않습니다. 그러므로 gate가 적용된 Summary의 availableBytes에 제품이 hugepage 용량을 다시 빼면 이중 차감입니다. [v1.37.0 summary.go](https://github.com/kubernetes/kubernetes/blob/v1.37.0/pkg/kubelet/server/stats/summary.go)
 
 | 신호 | 단위·범위 | 추가로 확인할 것 |
 | --- | --- | --- |

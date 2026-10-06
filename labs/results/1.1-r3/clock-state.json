@@ -1,0 +1,243 @@
+{
+  "schema_version": 3,
+  "round": 3,
+  "suite": "clock-state",
+  "started": {
+    "utc": "2026-10-05T14:25:37.621248+00:00",
+    "monotonic_ns": 542846833968192,
+    "monotonic_raw_ns": 563910219202614
+  },
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "scope": "Local synthetic observations; no production or external time calibration",
+  "input_sha256": {
+    "labs/review-r3/assets.json": "91fc56d5debea87e2a94a2e66a9055552646014404f7d530b8a3e091613eb659",
+    "labs/review-r3/evidence-policy.md": "c44000c54d0bc57ba06174b7394457686c628a401c4d900263cd4f5bd6e9fdf3",
+    "scripts/lab_r2_common.py": "17484a974b61b8ffcf12394b4f7e853f6e3cd4b63ce0d3066ce4b6554c407e80",
+    "scripts/lab_r3_common.py": "65a73ca00113bdac3152e01b68eb6f43ec1d93bd596800cb150afb73b78eccd6",
+    "scripts/run_clock_r3_lab.py": "7a99691c10107e375f7157b2ab2a84ed34919b69eb1ce8ca1cb4d39055ddc411",
+    "scripts/run_linux_lab.py": "4ab9ded21e6fa371cda4453b2e837864d4195b9b9334636d2a5045794ae38f2b"
+  },
+  "limits": {
+    "summary_bytes": 1048576,
+    "raw_artifact_bytes": 16777216,
+    "total_raw_bytes": 67108864
+  },
+  "artifacts": {
+    "command-001": {
+      "path": "clock-state.raw/command-001.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 148,
+      "raw_sha256": "551a11bc331fd1a53dbe1ef7ac412fb6053f0091350de56519f59b381eead2c6",
+      "gzip_bytes": 123,
+      "gzip_sha256": "a50c6bb783b7a11da99445d57fcb332e2c7914af59f3572bab63c4425b51ed92"
+    },
+    "command-002": {
+      "path": "clock-state.raw/command-002.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 575,
+      "raw_sha256": "7f1a5e089bb57ff2e449143357e32bc1e77ee1039fed1fa304930e3ce5438ca9",
+      "gzip_bytes": 337,
+      "gzip_sha256": "0e05e836afd4c804163db00ad3cbce58e24b6ab0f3f7f99339e4cf22af37e9e7"
+    },
+    "command-003": {
+      "path": "clock-state.raw/command-003.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 352,
+      "raw_sha256": "4385aa6a99af69fd63fad0e32216ecc6af38aa6481faf105899f911f9e4c3100",
+      "gzip_bytes": 260,
+      "gzip_sha256": "8e31e216f7b092fe23a3475d34568f60f4170541eb46a663ceeb16c89059c563"
+    }
+  },
+  "scenarios": {
+    "synchronization_metadata": {
+      "hypothesis": "Read-only metadata may identify the local synchronization service state",
+      "success_condition": "At least one synchronization-specific timedatectl command succeeds",
+      "refutation_condition": "No attribution hypothesis: unavailable service is not proof that the clock is unsynchronized",
+      "verdict": "supported",
+      "reason": "CLOCK_MONOTONIC_RAW and adjtimex are context only, not UTC calibration or proof of who set tick",
+      "observations": {
+        "adjtimex_before": {
+          "available": true,
+          "modes": 0,
+          "return_clock_state": 0,
+          "tick_microseconds": 9634,
+          "freq_scaled_ppm": -2807194,
+          "freq_ppm": -42.834381103515625,
+          "status_bits": 8192
+        },
+        "clock_before": {
+          "monotonic_ns": 542846847311537,
+          "process_cpu_ns": 48329797,
+          "raw_before_ns": 563910233050853,
+          "raw_after_ns": 563910233053079,
+          "raw_midpoint_ns": 563910233051966,
+          "read_bracket_ns": 2226
+        },
+        "clock_after": {
+          "monotonic_ns": 542848847403811,
+          "process_cpu_ns": 48376270,
+          "raw_before_ns": 563912309218020,
+          "raw_after_ns": 563912309224243,
+          "raw_midpoint_ns": 563912309221131,
+          "read_bracket_ns": 6223
+        },
+        "adjtimex_after": {
+          "available": true,
+          "modes": 0,
+          "return_clock_state": 0,
+          "tick_microseconds": 9634,
+          "freq_scaled_ppm": -2807194,
+          "freq_ppm": -42.834381103515625,
+          "status_bits": 8192
+        },
+        "systemd_commands": [
+          {
+            "argv": [
+              "/usr/bin/timedatectl",
+              "--no-pager",
+              "--no-ask-password",
+              "show"
+            ],
+            "started": {
+              "utc": "2026-10-05T14:25:39.634903+00:00",
+              "monotonic_ns": 542848847621127,
+              "monotonic_raw_ns": 563912309447108
+            },
+            "finished": {
+              "utc": "2026-10-05T14:25:39.742902+00:00",
+              "monotonic_ns": 542848955622242,
+              "monotonic_raw_ns": 563912421557013
+            },
+            "returncode": 0,
+            "artifact": "command-001",
+            "failure": null
+          },
+          {
+            "argv": [
+              "/usr/bin/timedatectl",
+              "--no-pager",
+              "--no-ask-password",
+              "show-timesync"
+            ],
+            "started": {
+              "utc": "2026-10-05T14:25:39.742933+00:00",
+              "monotonic_ns": 542848955641938,
+              "monotonic_raw_ns": 563912421575775
+            },
+            "finished": {
+              "utc": "2026-10-05T14:25:39.798917+00:00",
+              "monotonic_ns": 542849011636651,
+              "monotonic_raw_ns": 563912479702082
+            },
+            "returncode": 0,
+            "artifact": "command-002",
+            "failure": null
+          },
+          {
+            "argv": [
+              "/usr/bin/timedatectl",
+              "--no-pager",
+              "--no-ask-password",
+              "timesync-status"
+            ],
+            "started": {
+              "utc": "2026-10-05T14:25:39.798948+00:00",
+              "monotonic_ns": 542849011656689,
+              "monotonic_raw_ns": 563912479721159
+            },
+            "finished": {
+              "utc": "2026-10-05T14:25:39.855075+00:00",
+              "monotonic_ns": 542849067793519,
+              "monotonic_raw_ns": 563912537994982
+            },
+            "returncode": 0,
+            "artifact": "command-003",
+            "failure": null
+          }
+        ]
+      }
+    }
+  },
+  "temporary_workspace": ".lab-runs/r3/work/clock-state-qxv6owoq",
+  "commands": [
+    {
+      "argv": [
+        "/usr/bin/timedatectl",
+        "--no-pager",
+        "--no-ask-password",
+        "show"
+      ],
+      "started": {
+        "utc": "2026-10-05T14:25:39.634903+00:00",
+        "monotonic_ns": 542848847621127,
+        "monotonic_raw_ns": 563912309447108
+      },
+      "finished": {
+        "utc": "2026-10-05T14:25:39.742902+00:00",
+        "monotonic_ns": 542848955622242,
+        "monotonic_raw_ns": 563912421557013
+      },
+      "returncode": 0,
+      "artifact": "command-001",
+      "failure": null
+    },
+    {
+      "argv": [
+        "/usr/bin/timedatectl",
+        "--no-pager",
+        "--no-ask-password",
+        "show-timesync"
+      ],
+      "started": {
+        "utc": "2026-10-05T14:25:39.742933+00:00",
+        "monotonic_ns": 542848955641938,
+        "monotonic_raw_ns": 563912421575775
+      },
+      "finished": {
+        "utc": "2026-10-05T14:25:39.798917+00:00",
+        "monotonic_ns": 542849011636651,
+        "monotonic_raw_ns": 563912479702082
+      },
+      "returncode": 0,
+      "artifact": "command-002",
+      "failure": null
+    },
+    {
+      "argv": [
+        "/usr/bin/timedatectl",
+        "--no-pager",
+        "--no-ask-password",
+        "timesync-status"
+      ],
+      "started": {
+        "utc": "2026-10-05T14:25:39.798948+00:00",
+        "monotonic_ns": 542849011656689,
+        "monotonic_raw_ns": 563912479721159
+      },
+      "finished": {
+        "utc": "2026-10-05T14:25:39.855075+00:00",
+        "monotonic_ns": 542849067793519,
+        "monotonic_raw_ns": 563912537994982
+      },
+      "returncode": 0,
+      "artifact": "command-003",
+      "failure": null
+    }
+  ],
+  "native_directories_removed": true,
+  "cleanup": {
+    "completed": true,
+    "errors": [],
+    "workspace_retained": false
+  },
+  "verdict_counts": {
+    "supported": 1
+  },
+  "finished": {
+    "utc": "2026-10-05T14:25:39.859651+00:00",
+    "monotonic_ns": 542849072365972,
+    "monotonic_raw_ns": 563912542740876
+  },
+  "status": "recorded"
+}

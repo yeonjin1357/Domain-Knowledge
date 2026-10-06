@@ -1,0 +1,426 @@
+{
+  "schema_version": 3,
+  "round": 3,
+  "suite": "histograms",
+  "started": {
+    "utc": "2026-10-05T14:25:20.512263+00:00",
+    "monotonic_ns": 542829724988817,
+    "monotonic_raw_ns": 563892507461672
+  },
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "scope": "Local synthetic observations; no production or external time calibration",
+  "input_sha256": {
+    "labs/review-r3/assets.json": "91fc56d5debea87e2a94a2e66a9055552646014404f7d530b8a3e091613eb659",
+    "labs/review-r3/evidence-policy.md": "c44000c54d0bc57ba06174b7394457686c628a401c4d900263cd4f5bd6e9fdf3",
+    "labs/review-r3/histograms/fixture.json": "da360c4bf6e33df2e85077a453be40df7a5934f61417d379d8df62486600c4c0",
+    "labs/review-r3/histograms/rules.yml": "33ad630ebfb5ed10886d6b12150cfd0269b07ad8c472aa019bde00f77e1b6ad9",
+    "labs/review-r3/histograms/tests.yml": "98acf1c33f5c4c51750c21892d3ebe75adee6bac3daf80213b7ac8e56017736e",
+    "scripts/lab_r2_common.py": "17484a974b61b8ffcf12394b4f7e853f6e3cd4b63ce0d3066ce4b6554c407e80",
+    "scripts/lab_r3_common.py": "65a73ca00113bdac3152e01b68eb6f43ec1d93bd596800cb150afb73b78eccd6",
+    "scripts/run_histogram_r3_lab.py": "a4eccf09168e47e3faf8bb56b3d1a554da998158994c430a35ab5d43abf68a12"
+  },
+  "limits": {
+    "summary_bytes": 1048576,
+    "raw_artifact_bytes": 16777216,
+    "total_raw_bytes": 67108864
+  },
+  "artifacts": {
+    "command-001": {
+      "path": "histograms.raw/command-001.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 269,
+      "raw_sha256": "eebced01c2193e8c9ea308427b027ea2c7796e71aae45189af89cfed810fd4ee",
+      "gzip_bytes": 206,
+      "gzip_sha256": "02be5bce682da10a8d86171e0b0e3d3a51c51df2df911637ac9c8990143df28d"
+    },
+    "command-002": {
+      "path": "histograms.raw/command-002.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 1690,
+      "raw_sha256": "f021c960b84cac59696a21e5ef76771c4fcfadcd285b5d038e7992fee7f24495",
+      "gzip_bytes": 710,
+      "gzip_sha256": "eae9386885a19b2b3e55746ca9f10629e1760f547fb2d278da4b808e4e2317a2"
+    },
+    "command-003": {
+      "path": "histograms.raw/command-003.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 1132,
+      "raw_sha256": "c666f47cfa04485c878ae591b34b2c9fd0bb6e7d5db8587fb60607c8f11be0b9",
+      "gzip_bytes": 364,
+      "gzip_sha256": "f64e64e9a54d716f3279892d30d58889c1475a3beebcfdbb0df744896173e547"
+    },
+    "command-004": {
+      "path": "histograms.raw/command-004.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 269,
+      "raw_sha256": "d6d602528278f402fca6638737333a437a659c534c986d1c4f6649be1eccfa4e",
+      "gzip_bytes": 205,
+      "gzip_sha256": "7e9923c4b1f856238287ccd112daf87492d700a2f0896909023a2e72ddb85b28"
+    },
+    "command-005": {
+      "path": "histograms.raw/command-005.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 1668,
+      "raw_sha256": "fd66799221b0fd3c3660881bad1e881d8acaf57a217630538fd7c744c2ed23fe",
+      "gzip_bytes": 701,
+      "gzip_sha256": "279bfff214ab1f678644c0ad4b3abaf3799f562e0953a0fde306a700d13e847a"
+    },
+    "command-006": {
+      "path": "histograms.raw/command-006.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 1131,
+      "raw_sha256": "24b9130db9b8d19fe834089a164ffe94b3f2f6e3de9334399f2418ac83e2f0bd",
+      "gzip_bytes": 363,
+      "gzip_sha256": "dcca96770da4c0666d7f10499b8f9c4f64c14bb6f2a0d4baacc9055e6e4b77ea"
+    }
+  },
+  "scenarios": {
+    "3.13.4": {
+      "hypothesis": "Matching bucket populations retain count but differ by interpolation schema",
+      "success_condition": "Without feature flags all tests pass and actual debug values match independent formulas",
+      "refutation_condition": "Complete measured values disagree or rule assertions fail",
+      "verdict": "supported",
+      "reason": "Debug dump supplies numbers; missing/unrecognized output is inconclusive, never replaced with expectations",
+      "observations": {
+        "version": "3.13.4",
+        "binary_sha256": "dd140e4eab2f93b854f0e6e8bd42c99f0a3d74cf97270e6937dbcdd89a5ba869",
+        "version_command": {
+          "argv": [
+            "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.13.4/promtool",
+            "--version"
+          ],
+          "started": {
+            "utc": "2026-10-05T14:25:20.982530+00:00",
+            "monotonic_ns": 542830195254697,
+            "monotonic_raw_ns": 563892975641064
+          },
+          "finished": {
+            "utc": "2026-10-05T14:25:21.456425+00:00",
+            "monotonic_ns": 542830669148025,
+            "monotonic_raw_ns": 563893458923510
+          },
+          "returncode": 0,
+          "artifact": "command-001",
+          "failure": null
+        },
+        "help_command": {
+          "argv": [
+            "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.13.4/promtool",
+            "test",
+            "rules",
+            "--help"
+          ],
+          "started": {
+            "utc": "2026-10-05T14:25:21.456463+00:00",
+            "monotonic_ns": 542830669172310,
+            "monotonic_raw_ns": 563893458946793
+          },
+          "finished": {
+            "utc": "2026-10-05T14:25:21.716362+00:00",
+            "monotonic_ns": 542830929082998,
+            "monotonic_raw_ns": 563893725317332
+          },
+          "returncode": 0,
+          "artifact": "command-002",
+          "failure": null
+        },
+        "test_command": {
+          "argv": [
+            "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.13.4/promtool",
+            "test",
+            "rules",
+            "--debug",
+            "/mnt/c/project/Domain-Knowledge/.lab-runs/r3/work/histograms-40rkfv77/tests.yml"
+          ],
+          "started": {
+            "utc": "2026-10-05T14:25:21.716399+00:00",
+            "monotonic_ns": 542830929107720,
+            "monotonic_raw_ns": 563893725341027
+          },
+          "finished": {
+            "utc": "2026-10-05T14:25:22.834374+00:00",
+            "monotonic_ns": 542832047094367,
+            "monotonic_raw_ns": 563894871108793
+          },
+          "returncode": 0,
+          "artifact": "command-003",
+          "failure": null
+        },
+        "measured_values": {
+          "classic_count": 4.0,
+          "classic_count_ignored": 0.0,
+          "classic_fraction": 0.25,
+          "classic_q25": 1.5,
+          "custom_count": 4.0,
+          "custom_fraction": 0.25,
+          "custom_q25": 1.5,
+          "native_count": 4.0,
+          "native_fraction": 0.29248125036057815,
+          "native_q25": 1.414213562373095
+        },
+        "expected_from_formulas": {
+          "classic_q25": 1.5,
+          "classic_fraction": 0.25,
+          "classic_count": 4,
+          "native_q25": 1.4142135623730951,
+          "native_fraction": 0.2924812503605781,
+          "native_count": 4,
+          "custom_q25": 1.5,
+          "custom_fraction": 0.25,
+          "custom_count": 4,
+          "classic_count_ignored": 0
+        },
+        "feature_status": "Native histogram stable since 3.9.0 per pinned CHANGELOG; test rules uses no feature flag. Server scrape_native_histograms configuration is separate and is not tested here.",
+        "feature_sources": [
+          "https://github.com/prometheus/prometheus/blob/v3.13.4/CHANGELOG.md",
+          "https://github.com/prometheus/prometheus/blob/v3.15.0/CHANGELOG.md"
+        ]
+      }
+    },
+    "3.15.0": {
+      "hypothesis": "Matching bucket populations retain count but differ by interpolation schema",
+      "success_condition": "Without feature flags all tests pass and actual debug values match independent formulas",
+      "refutation_condition": "Complete measured values disagree or rule assertions fail",
+      "verdict": "supported",
+      "reason": "Debug dump supplies numbers; missing/unrecognized output is inconclusive, never replaced with expectations",
+      "observations": {
+        "version": "3.15.0",
+        "binary_sha256": "c736d55d3ccd959fe48329965fb5cb671d45585a9483954766448035100ff75c",
+        "version_command": {
+          "argv": [
+            "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.15.0/promtool",
+            "--version"
+          ],
+          "started": {
+            "utc": "2026-10-05T14:25:24.982855+00:00",
+            "monotonic_ns": 542834195577018,
+            "monotonic_raw_ns": 563897080188693
+          },
+          "finished": {
+            "utc": "2026-10-05T14:25:25.761379+00:00",
+            "monotonic_ns": 542834974100417,
+            "monotonic_raw_ns": 563897890376172
+          },
+          "returncode": 0,
+          "artifact": "command-004",
+          "failure": null
+        },
+        "help_command": {
+          "argv": [
+            "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.15.0/promtool",
+            "test",
+            "rules",
+            "--help"
+          ],
+          "started": {
+            "utc": "2026-10-05T14:25:25.761416+00:00",
+            "monotonic_ns": 542834974124859,
+            "monotonic_raw_ns": 563897890399179
+          },
+          "finished": {
+            "utc": "2026-10-05T14:25:26.221718+00:00",
+            "monotonic_ns": 542835434439814,
+            "monotonic_raw_ns": 563898369437888
+          },
+          "returncode": 0,
+          "artifact": "command-005",
+          "failure": null
+        },
+        "test_command": {
+          "argv": [
+            "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.15.0/promtool",
+            "test",
+            "rules",
+            "--debug",
+            "/mnt/c/project/Domain-Knowledge/.lab-runs/r3/work/histograms-40rkfv77/tests.yml"
+          ],
+          "started": {
+            "utc": "2026-10-05T14:25:26.221751+00:00",
+            "monotonic_ns": 542835434460002,
+            "monotonic_raw_ns": 563898369457210
+          },
+          "finished": {
+            "utc": "2026-10-05T14:25:26.884873+00:00",
+            "monotonic_ns": 542836097593558,
+            "monotonic_raw_ns": 563899059563885
+          },
+          "returncode": 0,
+          "artifact": "command-006",
+          "failure": null
+        },
+        "measured_values": {
+          "classic_count": 4.0,
+          "classic_count_ignored": 0.0,
+          "classic_fraction": 0.25,
+          "classic_q25": 1.5,
+          "custom_count": 4.0,
+          "custom_fraction": 0.25,
+          "custom_q25": 1.5,
+          "native_count": 4.0,
+          "native_fraction": 0.29248125036057815,
+          "native_q25": 1.414213562373095
+        },
+        "expected_from_formulas": {
+          "classic_q25": 1.5,
+          "classic_fraction": 0.25,
+          "classic_count": 4,
+          "native_q25": 1.4142135623730951,
+          "native_fraction": 0.2924812503605781,
+          "native_count": 4,
+          "custom_q25": 1.5,
+          "custom_fraction": 0.25,
+          "custom_count": 4,
+          "classic_count_ignored": 0
+        },
+        "feature_status": "Native histogram stable since 3.9.0 per pinned CHANGELOG; test rules uses no feature flag. Server scrape_native_histograms configuration is separate and is not tested here.",
+        "feature_sources": [
+          "https://github.com/prometheus/prometheus/blob/v3.13.4/CHANGELOG.md",
+          "https://github.com/prometheus/prometheus/blob/v3.15.0/CHANGELOG.md"
+        ]
+      }
+    }
+  },
+  "temporary_workspace": ".lab-runs/r3/work/histograms-40rkfv77",
+  "commands": [
+    {
+      "argv": [
+        "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.13.4/promtool",
+        "--version"
+      ],
+      "started": {
+        "utc": "2026-10-05T14:25:20.982530+00:00",
+        "monotonic_ns": 542830195254697,
+        "monotonic_raw_ns": 563892975641064
+      },
+      "finished": {
+        "utc": "2026-10-05T14:25:21.456425+00:00",
+        "monotonic_ns": 542830669148025,
+        "monotonic_raw_ns": 563893458923510
+      },
+      "returncode": 0,
+      "artifact": "command-001",
+      "failure": null
+    },
+    {
+      "argv": [
+        "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.13.4/promtool",
+        "test",
+        "rules",
+        "--help"
+      ],
+      "started": {
+        "utc": "2026-10-05T14:25:21.456463+00:00",
+        "monotonic_ns": 542830669172310,
+        "monotonic_raw_ns": 563893458946793
+      },
+      "finished": {
+        "utc": "2026-10-05T14:25:21.716362+00:00",
+        "monotonic_ns": 542830929082998,
+        "monotonic_raw_ns": 563893725317332
+      },
+      "returncode": 0,
+      "artifact": "command-002",
+      "failure": null
+    },
+    {
+      "argv": [
+        "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.13.4/promtool",
+        "test",
+        "rules",
+        "--debug",
+        "/mnt/c/project/Domain-Knowledge/.lab-runs/r3/work/histograms-40rkfv77/tests.yml"
+      ],
+      "started": {
+        "utc": "2026-10-05T14:25:21.716399+00:00",
+        "monotonic_ns": 542830929107720,
+        "monotonic_raw_ns": 563893725341027
+      },
+      "finished": {
+        "utc": "2026-10-05T14:25:22.834374+00:00",
+        "monotonic_ns": 542832047094367,
+        "monotonic_raw_ns": 563894871108793
+      },
+      "returncode": 0,
+      "artifact": "command-003",
+      "failure": null
+    },
+    {
+      "argv": [
+        "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.15.0/promtool",
+        "--version"
+      ],
+      "started": {
+        "utc": "2026-10-05T14:25:24.982855+00:00",
+        "monotonic_ns": 542834195577018,
+        "monotonic_raw_ns": 563897080188693
+      },
+      "finished": {
+        "utc": "2026-10-05T14:25:25.761379+00:00",
+        "monotonic_ns": 542834974100417,
+        "monotonic_raw_ns": 563897890376172
+      },
+      "returncode": 0,
+      "artifact": "command-004",
+      "failure": null
+    },
+    {
+      "argv": [
+        "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.15.0/promtool",
+        "test",
+        "rules",
+        "--help"
+      ],
+      "started": {
+        "utc": "2026-10-05T14:25:25.761416+00:00",
+        "monotonic_ns": 542834974124859,
+        "monotonic_raw_ns": 563897890399179
+      },
+      "finished": {
+        "utc": "2026-10-05T14:25:26.221718+00:00",
+        "monotonic_ns": 542835434439814,
+        "monotonic_raw_ns": 563898369437888
+      },
+      "returncode": 0,
+      "artifact": "command-005",
+      "failure": null
+    },
+    {
+      "argv": [
+        "/mnt/c/project/Domain-Knowledge/.tools/r2/prometheus-3.15.0/promtool",
+        "test",
+        "rules",
+        "--debug",
+        "/mnt/c/project/Domain-Knowledge/.lab-runs/r3/work/histograms-40rkfv77/tests.yml"
+      ],
+      "started": {
+        "utc": "2026-10-05T14:25:26.221751+00:00",
+        "monotonic_ns": 542835434460002,
+        "monotonic_raw_ns": 563898369457210
+      },
+      "finished": {
+        "utc": "2026-10-05T14:25:26.884873+00:00",
+        "monotonic_ns": 542836097593558,
+        "monotonic_raw_ns": 563899059563885
+      },
+      "returncode": 0,
+      "artifact": "command-006",
+      "failure": null
+    }
+  ],
+  "native_directories_removed": true,
+  "cleanup": {
+    "completed": true,
+    "errors": [],
+    "workspace_retained": false
+  },
+  "verdict_counts": {
+    "supported": 2
+  },
+  "finished": {
+    "utc": "2026-10-05T14:25:27.441062+00:00",
+    "monotonic_ns": 542836653783408,
+    "monotonic_raw_ns": 563899638374712
+  },
+  "status": "recorded"
+}

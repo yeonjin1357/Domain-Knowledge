@@ -11,6 +11,7 @@ import re
 
 from verify_review_r1 import verify_published_linux
 from verify_review_r2 import verify_published_review_r2
+from verify_review_r3 import verify_published_review_r3
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -149,6 +150,7 @@ def main():
     assert pairs == [("10:00", 10), ("10:01", 20), ("10:02", 30)]
     verify_published_linux()
     verify_published_review_r2()
+    verify_published_review_r3()
     print(f"PASS: {sum(expected.values())} recorded scenarios in 5 suites; all evidence input hashes; SQL excerpt; {len(examples)} calculations and timestamp-value pairing")
     print("Historical inputs include the byte-identical archived Linux runner. Its CPU passed flag did not validate wall-clock calibration.")
     print("Saved execution evidence was checked; servers and source facts were not re-executed by this command")

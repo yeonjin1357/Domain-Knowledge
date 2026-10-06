@@ -1,0 +1,14 @@
+{
+  "recorded_on": "2026-10-06",
+  "stage": "3f",
+  "executed_by": "Codex on Windows",
+  "command": "python -X utf8 -B scripts/check_html.py",
+  "book_html_sha256": "970376f1c305e1ccae2487bbf27471512b3f287d7352d6520cfe74afa9b85f29",
+  "status": "not_completed",
+  "exit_code": 1,
+  "error": "Timeout: Page.enable",
+  "devtools_timeout_ms": 20000,
+  "scope": "Browser rendering validation did not complete; no claim that the new 3f HTML passed visual checks.",
+  "previous_pass_receipt": "review/html-check-r3e-incoming.json",
+  "follow_up": "Claude may run python -X utf8 -B scripts/check_html.py on the regenerated BOOK.html; no DB rerun needed."
+}

@@ -17,6 +17,7 @@
         "docs/foundations/time-series.md",
         "docs/foundations/metric-context-and-start-time.md",
         "docs/foundations/distributions.md",
+        "docs/foundations/histogram-storage.md",
         "docs/foundations/performance-and-statistics.md",
         "docs/foundations/service-level-objectives.md",
         "docs/foundations/time-and-data-quality.md",
@@ -31,6 +32,7 @@
         "docs/host/README.md",
         "docs/host/cpu.md",
         "docs/host/memory.md",
+        "docs/host/reclaim-and-oom.md",
         "docs/host/disk-io.md",
         "docs/host/processes.md",
         "docs/host/windows.md",
@@ -117,6 +119,7 @@
         "docs/database/postgresql.md",
         "docs/database/postgresql-operations.md",
         "docs/database/mysql-mariadb.md",
+        "docs/database/mysql-operations.md",
         "docs/database/sqlserver-oracle.md",
         "docs/database/replication-and-recovery.md",
         "docs/database/high-availability.md",
@@ -193,5 +196,5 @@
     }
   ],
   "edition": "1.1",
-  "detailed_chapters": 97
+  "detailed_chapters": 100
 }

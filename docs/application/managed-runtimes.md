@@ -1,6 +1,6 @@
 # JVM과 .NET: 메모리, GC, 실행 자원
 
-> 상태: 검토됨 · 적용 범위: JDK 25 API·HotSpot/G1 사례, .NET 공식 진단 원리 · 출처 확인일: 2026-10-03 · 편집 검토일: 2026-10-04 · 2라운드 보강 확인: 2026-10-05 (안정 semantic conventions 연결)
+> 상태: 검토됨 · 적용 범위: JDK 25 API·HotSpot/G1 사례, .NET 공식 진단 원리·.NET 10+ collect-linux preview · 3d 원천 검토: 2026-10-06 · 런타임 진단 실습은 수행하지 않음
 
 ## 먼저 이해할 것
 
@@ -53,6 +53,34 @@ JVM의 특정 pool 이름을 .NET 세대에 일대일 매핑하는 대신, 공�
 
 가상 사례에서 스레드 수가 40→100, 대기 작업이 0→500, CPU가 20%라면 스레드가 어디에서 기다리는지 확인합니다. DB 풀 대기, 동기적 I/O, 잠금이 후보입니다. 스레드 수 증가 자체를 처리 능력 증가로 해석하지 않습니다.
 
+## JVM: 합계에서 pool·event로 내려간다
+
+**보강 범위: JDK 25 관리 API·JFR, 확인일 2026-10-05.** heap은 안정적인데 RSS가 증가한다면 heap 합계만 반복해서 읽어서는 원인을 찾기 어렵습니다. JMX 관리 인터페이스에서 pool별 상태를 보고, 변화 구간의 JFR 이벤트로 할당·GC·대기의 위치를 좁힙니다.
+
+| 원천 | 단위·관측 범위 | 함정 |
+| --- | --- | --- |
+| `java.lang:type=MemoryPool,name=...` | `Usage`·`PeakUsage`·`CollectionUsage`의 바이트 값 | pool을 이름으로 열거; CollectionUsage는 최근 회수 후 값이며 현재 RSS가 아님 |
+| `java.lang:type=GarbageCollector,name=...` | CollectionCount, CollectionTime(ms) | 미정의 시 −1; 대략적인 누적 collection 시간이지 모든 stop-the-world 구간의 정확한 합이 아님 |
+| `java.nio:type=BufferPool,name=...` | direct·mapped 등의 Count, TotalCapacity, MemoryUsed(bytes) | capacity와 실제 메모리 추정은 정렬·할당자 때문에 다를 수 있음; 미지원 추정 −1 |
+
+pool의 지원 threshold·유효성·max 미정의 상태는 API 결과로 확인합니다. HotSpot의 Metaspace 같은 non-heap pool, direct/mapped buffer와 OS의 RSS는 회계 범위가 다릅니다. mapped buffer의 capacity 전체를 현재 RAM 상주량으로 더하지 않습니다. [MemoryPoolMXBean](https://docs.oracle.com/en/java/javase/25/docs/api/java.management/java/lang/management/MemoryPoolMXBean.html), [GarbageCollectorMXBean](https://docs.oracle.com/en/java/javase/25/docs/api/java.management/java/lang/management/GarbageCollectorMXBean.html), [BufferPoolMXBean](https://docs.oracle.com/en/java/javase/25/docs/api/java.management/java/lang/management/BufferPoolMXBean.html), [HotSpot 클래스 메타데이터](https://docs.oracle.com/en/java/javase/25/gctuning/other-considerations.html)
+
+JFR은 `jdk.GarbageCollection`, `jdk.GCPhasePause`, `jdk.ExecutionSample`, 파일·소켓·monitor 대기 등의 이벤트를 통해 시간과 원인을 연결합니다. 켜진 이벤트, threshold, 주기, stack trace 설정을 기록해야 합니다. 임계 시간보다 짧은 작업이 기록되지 않았다면 “그 작업이 전혀 없었다”가 아닙니다. 기록 템플릿·실제 JDK가 제공하는 이벤트를 먼저 확인합니다. [JDK 25 JFR 분석](https://docs.oracle.com/en/java/javase/25/troubleshoot/troubleshoot-performance-issues-using-jfr.html), [JFR EventSettings](https://docs.oracle.com/en/java/javase/25/docs/api/jdk.jfr/jdk/jfr/EventSettings.html)
+
+`default.jfc`와 `profile.jfc`는 서로 다른 비용·상세도 선택입니다. 어떤 workload에서도 고정된 낮은 오버헤드라는 보증으로 쓰지 않습니다. 특히 heap statistics를 켜는 진단은 추가 GC와 정지 시간을 유발할 수 있습니다. 제품은 기본 지표와 제한된 기간의 상세 recording을 분리하고 recording 설정·용량·종료 조건을 보존하도록 제안합니다. [jcmd JFR 설정](https://docs.oracle.com/en/java/javase/25/docs/specs/man/jcmd.html), [JFR 비용 설명](https://docs.oracle.com/en/java/javase/25/troubleshoot/troubleshoot-performance-issues-using-jfr.html)
+
+JMX attribute 읽기는 읽기 전용이지만 MBean operation에는 GC·설정 변경이 포함될 수 있습니다. JFR 시작·종료는 계측 상태를 바꾸고 파일·CPU 비용을 발생시킵니다. 이 장에서는 둘 다 실행하지 않았습니다. local attach 또는 인증·접근 제어가 설정된 관리 경로를 전제로 하며 공개 무인증 JMX endpoint를 수집 전제로 삼지 않습니다. [JMX 원격 관측과 보안](https://docs.oracle.com/en/java/javase/25/management/monitoring-and-management-using-jmx-technology.html)
+
+## .NET: 지표 수집과 EventPipe 세션을 구분한다
+
+EventPipe는 .NET runtime·EventSource 이벤트를 프로세스 밖 진단 도구로 보내거나 `.nettrace`로 기록하는 경로입니다. **일반 `dotnet-trace collect` 기준**으로는 커널·native 이벤트와 native frame을 함께 수집하는 OS 전체 profiler로 설명하지 않습니다. `dotnet-counters`는 EventCounter와 Meter API의 값을 관측하고, 상세 trace는 `dotnet-trace` 같은 도구를 사용합니다. [EventPipe](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/eventpipe), [dotnet-counters](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-counters)
+
+확인일 2026-10-06의 공식 문서는 별도 **preview `dotnet-trace collect-linux`** 경로를 제공합니다. .NET 10+, Linux kernel 6.4+의 `CONFIG_USER_EVENTS=y`, tracefs, root 권한 등이 필요하며 perf_events·user_events를 통해 관리 이벤트와 native/커널 이벤트·스택을 함께 기록합니다. Linux x64/Arm64 및 glibc 조건, 새 nettrace 형식을 읽을 분석 도구의 지원도 확인합니다. 기본 설정은 시스템의 여러 프로세스를 수집하므로 대상 제한을 별도로 설계합니다. 일반 collect의 권한·범위로 이 모드를 실행할 수 있다고 가정하지 않으며, 이 장에서는 실행하지 않았습니다. [두 수집 방식과 collect-linux 전제](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-trace#dotnet-trace-collect-linux)
+
+도구 버전·runtime 버전·provider/meter·interval·단위를 수집 계약에 남깁니다. `dotnet-counters --counters System.Runtime`도 대상이 .NET 8 이하이면 System.Runtime Meter가 없으므로 구형 EventCounter 표시로 fallback합니다. 같은 명령으로 얻었다는 이유로 이름·단위·집계 의미가 같은 것으로 매핑하지 않습니다. 구형 EventCounter와 새로운 Meter 또는 [OTel 안정 이름](semantic-conventions.md)은 각각 정의를 확인합니다. 이벤트가 꺼졌거나 구독에 실패한 상태도 0으로 저장하지 않습니다. [대상 runtime별 fallback](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-counters)
+
+설명용 명령 `dotnet-counters monitor --process-id 1234 --counters System.Runtime`는 **여기서 실행하지 않았습니다**. 대상 프로세스의 진단 endpoint 접근 권한이 필요하며 Linux/macOS에서는 도구와 대상의 TMPDIR도 맞아야 합니다. 진단 세션과 주기적 계측에 비용이 발생하고, 세션 종료 시 수집을 해제해야 합니다. 이 명령은 단순 기존 파일 읽기와 달리 대상의 진단 세션을 활성화합니다. [도구의 연결 조건](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-counters), [진단 포트의 보안](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/diagnostic-port)
+
 ## 수집 설계
 
 런타임 버전, GC 종류, 설정 상한, CPU·메모리의 컨테이너 제한을 인벤토리에 연결합니다. 스택과 heap 덤프는 정보량과 비용이 큰 별도 진단 자료로 다루고, 정기 지표 수집과 같은 빈도로 실행하지 않는 설계를 제안합니다. 이 저장소에서는 대상 JVM·.NET 프로세스에 진단 명령을 실행하지 않았습니다.
@@ -64,5 +92,7 @@ JVM의 특정 pool 이름을 .NET 세대에 일대일 매핑하는 대신, 공�
 1. JVM committed가 OS RSS와 같은가? **관측 범위와 의미가 다릅니다.**
 2. 정지 시간 목표 100 ms는 모든 정지의 보장 상한인가? **G1에서는 목표이며 절대 보장이 아닙니다.**
 3. CPU가 낮으면 ThreadPool 대기가 없는가? **블로킹으로 대기가 늘 수 있습니다.**
+4. BufferPool TotalCapacity를 RSS에 더하면 native 메모리 총량인가? **예약·할당·상주의 범위가 다르고 중복될 수 있습니다.**
+5. JFR에 짧은 소켓 대기 이벤트가 없으면 대기 자체가 없었는가? **이벤트 활성화와 threshold·표본 조건부터 확인해야 합니다.**
 
 다음: [Go·Node.js·Python](async-runtimes.md) · [애플리케이션 목차](README.md)

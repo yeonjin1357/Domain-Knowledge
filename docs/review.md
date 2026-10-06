@@ -2,6 +2,18 @@
 
 2026-10-04에 작성·자체 검토·공식 원천 대조·실제 실행을 반복한 보강판입니다. 제1.0판의 80장에서 **92장**으로 확장했습니다. 이번 검토는 작성자의 자체 검토이며 외부 전문가 감수를 의미하지 않습니다. 실행 환경과 자동 검사 결과는 [검증 기록](validation.md)에 있습니다.
 
+## Claude–Codex 교차 검토 3차: 원고 보강과 3f 결과 확정
+
+2026-10-05의 3b에서는 [회수·OOM](host/reclaim-and-oom.md), [MySQL 운영](database/mysql-operations.md), [분포 저장 형식](foundations/histogram-storage.md)을 새 장으로 추가해 상세 **100장**으로 확장했습니다. 기존 장에 PSI·프로세스 RSS·시계 동기화·SQL Server와 Oracle·런타임·로그와 HAProxy·GPU 원천을 보강했습니다. 10월 6일 3d에서는 Claude의 3c 지적 24개와 추가 단서를 원천에 다시 대조하고 실습 세 묶음을 출판했습니다. AI 간 교차 검토이며 모든 문장의 무오류 인증은 아닙니다. [항목별 판정과 근거](../review/claude-codex-r3.md)
+
+Kubernetes v1.37.0 코드에서 hugepage 보정이 Summary API의 node.memory.availableBytes에도 적용되는 것을 확인했습니다. Lambda suppressed init이 CloudWatch Duration 지표에도 포함되는지는 직접적인 공식 문장을 확인하지 못해 미확인을 유지했습니다.
+
+3d에서는 Linux reclaim counter의 서로 다른 모집단, zswap과 zram의 계정 차이, OOM 유발 작업·희생자의 score 구분을 명확히 했습니다. MySQL 1213의 탐색 한계와 table lock 감지 조건, SQL Server 최소 권한·redo_rate 기간, Oracle의 실제 pack 대상 목록, native histogram 안정화 단계와 변환 규약의 Development 상태도 보강했습니다. Fluent Bit의 memrb drop·files_rotated 지표는 4.1.0 코드에도 있어 “4.2 최초 추가”라는 단서를 채택하지 않았습니다.
+
+메모리·histogram·시계 실습은 supported 4·2·1개의 요약 JSON과 **gzip 원자료 61개 전체**를 보존했습니다. 8 MiB 메모리 분류와 조회 비용, 보간 차이, MONO/RAW와 동기화 metadata를 제한된 관측으로 연결했습니다. MySQL의 두 최초 실행은 loader 실패로 DB 관측이 없었으므로 출판하지 않았습니다. 서명을 확인한 8.4.11·기존 9.7.2와 비공개 라이브러리의 후속 실행을 3e에서 출판했습니다. r1은 각 supported 3·refuted 2, gzip 100개로 보존하고, 3f에서 r2의 각 supported 5·gzip 132개를 추가했습니다. 반복 실행 이력을 포함한 3라운드 누계는 27개 판정(supported 23·refuted 4)·525개 gzip입니다. [실습 근거·한계](cross-domain/reproducible-labs.md), [검증 기록](validation.md)
+
+3e에서는 next-key의 직접 대기 관계가 있었음에도 sys view가 비어 있던 표본을 INNODB_TRX cache·join 경로와 대조했습니다. GTID 적용 완료를 이미 기다린 복제에서도 coordinator 위치가 뒤처져 SBS가 0이 아닐 수 있음을 원자료·소스로 확인했습니다. 9.7.2의 재개 SBS는 0이 아닌 1입니다. 두 refuted를 성공으로 바꾸지 않았으며, 보완한 관측 조건을 Claude가 r2로 실행한 결과를 3f에서 확정했습니다. 두 버전 모두 sys 행은 재조회 뒤 나타났고, 위치 일치 뒤의 SBS와 SQL 중지 상태는 정의에 부합했습니다. GTID 직후와 위치 수렴 뒤 표본을 함께 남겨 실제 작업과 표시 갱신의 완료 시점 차이를 설명했습니다. 시계 보정 내부값과 WSL 시계 조정의 인과는 이번 기록만으로 확정하지 않았습니다. [분석 근거](../review/mysql-r3e-analysis.json), [MySQL 본문](database/mysql-operations.md)
+
 ## Claude–Codex 교차 검토 2차: 원고 보강과 실행 근거
 
 2026-10-05에는 위 92장에 5장을 추가해 상세 97장으로 보강했습니다. G1–G5 필수 주제와 G6–G12를 공식 문서·명세·버전 소스에 대조했고, 2d에서는 Claude가 전달한 네 최종 실행 결과를 출판했습니다. 주제별 원천·위치·채택하지 않은 단서와 이유, 2c 지적 29개와 추가 단서의 판정은 [2라운드 기록](../review/claude-codex-r2.md)에 있습니다. 과거 1.1 실행 결과·hash와 판 번호·판 기준일은 유지합니다.

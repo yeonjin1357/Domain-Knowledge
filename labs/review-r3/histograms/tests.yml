@@ -1,0 +1,155 @@
+{
+  "rule_files": [
+    "rules.yml"
+  ],
+  "evaluation_interval": "1m",
+  "fuzzy_compare": true,
+  "tests": [
+    {
+      "name": "classic-and-native-identical-input-distribution",
+      "interval": "1m",
+      "input_series": [
+        {
+          "series": "classic_bucket{le=\"1\"}",
+          "values": "0x1"
+        },
+        {
+          "series": "classic_bucket{le=\"2\"}",
+          "values": "2x1"
+        },
+        {
+          "series": "classic_bucket{le=\"4\"}",
+          "values": "4x1"
+        },
+        {
+          "series": "classic_bucket{le=\"+Inf\"}",
+          "values": "4x1"
+        },
+        {
+          "series": "classic_count",
+          "values": "4x1"
+        },
+        {
+          "series": "classic_sum",
+          "values": "9x1"
+        },
+        {
+          "series": "native",
+          "values": "{{schema:0 sum:9 count:4 buckets:[2 2] offset:1 counter_reset_hint:gauge}}x1"
+        },
+        {
+          "series": "custom",
+          "values": "{{schema:-53 sum:9 count:4 buckets:[0 2 2] offset:0 custom_values:[1 2 4] counter_reset_hint:gauge}}x1"
+        }
+      ],
+      "promql_expr_test": [
+        {
+          "expr": "round(r3:classic_q25 * 1000000000)",
+          "eval_time": "1m",
+          "exp_samples": [
+            {
+              "labels": "{}",
+              "value": 1500000000
+            }
+          ]
+        },
+        {
+          "expr": "round(r3:classic_fraction * 1000000000)",
+          "eval_time": "1m",
+          "exp_samples": [
+            {
+              "labels": "{}",
+              "value": 250000000
+            }
+          ]
+        },
+        {
+          "expr": "round(r3:classic_count * 1000000000)",
+          "eval_time": "1m",
+          "exp_samples": [
+            {
+              "labels": "{}",
+              "value": 4000000000
+            }
+          ]
+        },
+        {
+          "expr": "round(r3:native_q25 * 1000000000)",
+          "eval_time": "1m",
+          "exp_samples": [
+            {
+              "labels": "{}",
+              "value": 1414213562
+            }
+          ]
+        },
+        {
+          "expr": "round(r3:native_fraction * 1000000000)",
+          "eval_time": "1m",
+          "exp_samples": [
+            {
+              "labels": "{}",
+              "value": 292481250
+            }
+          ]
+        },
+        {
+          "expr": "round(r3:native_count * 1000000000)",
+          "eval_time": "1m",
+          "exp_samples": [
+            {
+              "labels": "{}",
+              "value": 4000000000
+            }
+          ]
+        },
+        {
+          "expr": "round(r3:custom_q25 * 1000000000)",
+          "eval_time": "1m",
+          "exp_samples": [
+            {
+              "labels": "{}",
+              "value": 1500000000
+            }
+          ]
+        },
+        {
+          "expr": "round(r3:custom_fraction * 1000000000)",
+          "eval_time": "1m",
+          "exp_samples": [
+            {
+              "labels": "{}",
+              "value": 250000000
+            }
+          ]
+        },
+        {
+          "expr": "round(r3:custom_count * 1000000000)",
+          "eval_time": "1m",
+          "exp_samples": [
+            {
+              "labels": "{}",
+              "value": 4000000000
+            }
+          ]
+        },
+        {
+          "expr": "round(r3:classic_count_ignored * 1000000000)",
+          "eval_time": "1m",
+          "exp_samples": [
+            {
+              "labels": "{}",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "expr": "histogram_count(classic_count)",
+          "eval_time": "1m",
+          "exp_samples": []
+        }
+      ],
+      "start_timestamp": "1970-01-01T00:00:00Z"
+    }
+  ]
+}

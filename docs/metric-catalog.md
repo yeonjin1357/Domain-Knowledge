@@ -55,6 +55,31 @@
 | 클라우드 기간 Sum | API가 집계한 구간 양 | 기간으로 나누기; 다음 Sum과 차분하지 않음 | [공급자 지표](cloud/provider-metrics.md) |
 | Lambda 오류율 | Errors/Invocations | throttle로 호출되지 않은 요청의 별도 집계 | [서버리스](cloud/managed-and-serverless.md) |
 
+## 회수·원천별 진행·분포의 추가 참조
+
+아래 필드는 3b의 원천 검토 범위입니다. 구체적인 버전·권한·미지원 조건은 연결된 장을 따르며 새 실행 결과를 뜻하지 않습니다.
+
+| 원천·개념 | 단위·형태 | 해석 경계 | 상세 |
+| --- | --- | --- | --- |
+| vmstat `pgscan_*`, `pgsteal_*` | 누적 페이지 | 회수 경로별 비교; anon/file 분류와 중복 합산 금지 | [회수](host/reclaim-and-oom.md) |
+| `allocstall_*`, `oom_kill` | 누적 사건 계수 | 대기 초·전역 OOM 사건 수로 변환 금지 | [OOM](host/reclaim-and-oom.md) |
+| `workingset_refault_*`, `pswpin/out` | 누적 페이지 | refault·swap 활동, 현재 점유량과 다름 | [회수](host/reclaim-and-oom.md) |
+| PSI total / avg10·60·300 | µs 누적 / % | 시스템·cgroup 범위, 시스템 CPU full의 무효 0 | [PSI](host/numa-and-pressure.md) |
+| VmRSS·RssAnon/File/Shmem·VmSwap | kB(×1024) | 비동기 RSS 추정, VmSwap은 shmem swap 제외 | [프로세스](host/processes.md) |
+| statm resident / shared | 페이지 | shared는 실제 공유자 수가 아닌 file+shmem 분류 | [프로세스](host/processes.md) |
+| `Seconds_Behind_Source` | 초 또는 NULL | receiver/applier 상태와 NULL 조건; 0도 freshness 보장 아님 | [MySQL](database/mysql-operations.md) |
+| worker·receiver commit/queue/apply timestamp | µs 정밀도 시각 | 서버별 시계와 원본/직전 source·단계 구분 | [MySQL](database/mysql-operations.md) |
+| AG send/redo queue | KB gauge | 아직 미전송 / 수신했지만 미redo; 지연 초와 다름 | [SQL Server](database/sqlserver-oracle.md) |
+| version store reserved_space_kb | KB gauge | tempdb 집계이며 ADR PVS 전체를 대체하지 않음 | [SQL Server](database/sqlserver-oracle.md) |
+| histogram scale/schema·zero threshold | 해상도·원천 단위 경계 | 표본 population·temporality와 함께 보존 | [분포 저장](foundations/histogram-storage.md) |
+| chrony System time / Frequency / Skew | s / ppm / ppm | 시각 차이·속도·추정 오차의 다른 축 | [시계](foundations/time-and-data-quality.md) |
+| BufferPool MemoryUsed / TotalCapacity | byte 추정 | capacity·상주량·실제 할당량 구분, −1 처리 | [JVM](application/managed-runtimes.md) |
+| ELU active·idle / loop delay | ms / ns | CPU 사용률 아님, Node 표본 모드 보존 | [Node](application/async-runtimes.md) |
+| Fluent Bit retries_failed / dropped_records | chunk / record 누적 | retry 횟수·버린 record 수·fan-out 구분 | [로그](product/collection-pipelines.md) |
+| HAProxy qcur·scur / ereq·econ·eresp·hrsp_5xx | 현재 수 / 누적 수 | 요청·세션·처리 오류·HTTP 응답 분류 | [프록시](middleware/proxies-and-mesh.md) |
+| DCGM SM_ACTIVE·SM_OCCUPANCY·tensor·DRAM | ratio | 각 하드웨어 활동 분모; NVML utilization과 구분 | [GPU](host/gpu.md) |
+| Clock event reason / duration | bitmask / API별 시간 | 활성 조건과 누적 시간 구분, nvidia-smi µs·NVML 필드 ns 확인 | [GPU](host/gpu.md) |
+
 ## 제품 자체와 집계 계약
 
 | 지표 개념 | 계산 또는 보존할 문맥 | 상세 |

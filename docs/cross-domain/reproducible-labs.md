@@ -1,10 +1,44 @@
 # 재현 실습: 계산, 실제 엔진, 운영 검증의 경계
 
-> 상태: 검토됨 · 적용 범위: Windows·WSL 로컬 실습과 아래 고정 버전·입력 · 기존 실행일: 2026-10-04 · WSL 2라운드 추가 실행: 2026-10-05
+> 상태: 검토됨 · 적용 범위: Windows·WSL 로컬 실습과 아래 고정 버전·입력 · 기존 실행일: 2026-10-04 · WSL 2·3라운드 실행: 각 기록의 UTC · MySQL r2: 2026-10-06 KST · 3f 근거 검토: 2026-10-06
 
 버전 상태: promtool 3.5.0은 기존 기록의 고정 실행 파일입니다. Prometheus 3.5 LTS는 2026-07-31 지원이 끝났고, 검토 시점 LTS 3.13.4와 최신 안정 3.15.0의 별도 실행을 이번에 추가했습니다. [릴리스·지원 표](../coverage.md#교차-검토-시점의-버전-상태)를 참고하며 과거 재현 버전을 현재 권장 설치 버전으로 읽지 않습니다.
 
 공식 설명을 읽는 것과 실제 프로그램에서 같은 동작을 보는 것은 서로 보완합니다. 이 장은 작성 환경에서 직접 실행한 실습입니다. 운영 서버나 사용자의 DB를 사용하지 않았고, 로컬 임시 DB와 loopback HTTP, 읽기 전용 Win32 API, 합성 PromQL 입력을 사용했습니다.
+
+## 3라운드: 메모리·분포·시계의 작은 실험
+
+Claude가 WSL Ubuntu 24.04·커널 6.18.33.2·Python 3.12.3에서 2026-10-05 실행한 세 묶음을 출판했습니다. Codex는 10월 6일 저장 결과·원자료·입력 hash와 원천 정의를 대조했습니다. 이 샌드박스에서 Linux 실습을 다시 실행한 것은 아닙니다.
+
+| 출판 결과 | 판정 | 본문에서 사용하는 관측과 한계 |
+| --- | --- | --- |
+| [Linux 메모리](../../labs/results/1.1-r3/linux-memory.json) | supported 4 | anonymous·file·memfd 각 8 MiB가 해당 PSS 분류에 반영됨. status·statm 단위 환산, 세 원천의 30회 조회 비용, PSI·vmstat 가용성을 확인. 강제 압박·OOM 실험은 수행하지 않음 |
+| [Histogram](../../labs/results/1.1-r3/histograms.json) | supported 2 | promtool 3.13.4·3.15.0에서 같은 합성 분포의 classic·표준 exponential native·custom bucket native를 평가. p25는 classic 1.5, exponential native 약 1.414214; count는 모두 4 |
+| [시계 상태](../../labs/results/1.1-r3/clock-state.json) | supported 1 | MONO/RAW 약 0.963357, tick 9634, freq 약 −42.834 ppm. systemd의 동기화 표시와 offset을 별도로 읽음. tick 설정 주체·RAW의 외부 정확도는 미확정 |
+
+`supported` 7개는 각 실행기의 좁은 성공 조건을 충족했다는 뜻입니다. 모든 커널에서 RSS가 즉시 정확하다거나, 보간값이 실제 분위수와 같거나, 시계가 외부 표준 시간에 맞는다는 보증이 아닙니다. [프로세스 원자료 해석](../host/processes.md), [회수·OOM의 범위](../host/reclaim-and-oom.md), [PSI 가용성](../host/numa-and-pressure.md), [분포 보간](../foundations/histogram-storage.md), [시계 해석](../foundations/time-and-data-quality.md)
+
+### 근거 크기와 재검사
+
+각 summary JSON과 같은 이름의 `.raw/` 디렉터리에 **원자료 전체**를 gzip으로 보존했습니다. 메모리·분포·시계 세 JSON 합계 116,430 B, gzip 61개 합계 40,668 B입니다. 아래 MySQL r1·r2 네 묶음을 더하면 **JSON 7개 합계 1,174,117 B, gzip 525개 합계 221,450 B**입니다. JSON당 1 MiB 제한은 각 파일에 적용되며 합계와 구분합니다. 필요한 행을 요약하되 버리지 않은 원자료로 돌아갈 수 있고, JSON에는 gzip 전후 SHA256·크기·상대 경로가 있습니다. 판정에 필요한 입력 hash는 [provenance](../../review/evidence-provenance.json)로 연결합니다. 변경 전 manifest는 [실행 당시 사본](../../labs/archive/review_r3_2026_10_05/assets.json)과 대조합니다. 용량 제한을 넘으면 조용히 자르지 않고 실패하는 [정책](../../labs/review-r3/evidence-policy.md)을 적용했으며, 기존 2라운드 증거는 소급 변경하지 않았습니다.
+
+다음 명령은 저장소 루트에서 출판 파일을 읽기만 합니다. 도구 다운로드·Linux 프로세스·DB 설정 변경이 없고, hash·gzip 복원·계산에 필요한 CPU와 메모리만 사용합니다. 3f에서 실제 실행해 일곱 출판 묶음 모두 통과했습니다.
+
+```powershell
+python -X utf8 -B scripts/verify_review_r3.py --published
+```
+
+### MySQL: r1의 관측 조건을 보완한 r2
+
+Claude가 2026-10-06 KST(원문 UTC 10월 5일)에 실행한 **8.4.11·9.7.2 r2**는 각각 supported 5·gzip 132개입니다. Codex는 입력 hash·SQL/XML·정리 완료와 판정 조건을 다시 검사해 두 JSON을 byte 그대로 출판했습니다. 원래 r1의 각 supported 3·refuted 2와 gzip 100개도 **판정 설계 결함으로 반증된 실행**으로 보존합니다. [8.4.11 r2](../../labs/results/1.1-r3/mysql-8.4.11-r2.json), [9.7.2 r2](../../labs/results/1.1-r3/mysql-9.7.2-r2.json), [8.4.11 r1](../../labs/results/1.1-r3/mysql-8.4.11-r1.json), [9.7.2 r1](../../labs/results/1.1-r3/mysql-9.7.2-r1.json)
+
+- defaults·gap_lock·next_key_lock·deadlock·replication 모두 보완한 성공 조건을 충족했습니다. flush 설정 관측은 전원 장애 지속성 시험이 아닙니다.
+- next-key의 직접 잠금 관계는 첫 표본에도 있었고, sys view는 0행에서 재조회 한 번 뒤 같은 세션 쌍의 1행으로 바뀌었습니다. 잠금 유지 중 관측했으며 rollback 뒤 삽입 행까지 확인했습니다.
+- 복제의 GTID 직후 표본과 coordinator 위치 일치 뒤 표본을 모두 보존했습니다. 최종 SBS는 baseline 0·IO 중지 NULL·SQL 중지 NULL·재개 0입니다. 실제 대기 조건은 파일·위치·스레드 상태였으며 SBS 기대값으로 성공을 유도하지 않았습니다.
+
+[MySQL 본문](../database/mysql-operations.md)에 r1→r2의 원인과 전후 표본을 설명했습니다. r1의 [당시 실행기](../../labs/archive/review_r3_2026_10_05/mysql_r1/run_mysql_r3_lab.py)·[원인 분석](../../review/mysql-r3e-analysis.json)은 변경하지 않았고, r2도 고정 입력 hash로 연결했습니다. 3라운드 최종 채택 실행은 메모리·분포·시계와 MySQL r2의 **17개 supported 조건**입니다. r1 반복 실행 이력까지 합하면 **7묶음·27개 판정(supported 23·refuted 4), gzip 525개**입니다. 이를 서로 독립적인 27개 기능의 지원 인증으로 읽지 않습니다.
+
+고정 공식 자산과 전용 libaio/libnuma로 실행했으며 시스템 설치·전역 환경·기존 DB는 변경하지 않았습니다. 일반 사용자가 소유한 loopback 인스턴스·native 0700 데이터 디렉터리만 쓰고 종료·정리 완료를 기록했습니다. 최초 라이브러리 부재 preflight는 별도 이력입니다. 실습은 fixture·잠금·교착·복제 상태를 바꾸므로 운영 DB의 읽기 전용 수집과 구분합니다. **이번 r2 결과 반영을 위한 추가 DB 재실행은 필요하지 않습니다.** [실행·검증 기록](../../review/claude-codex-r3.md)
 
 ## 제1.1판에서 추가한 실습
 

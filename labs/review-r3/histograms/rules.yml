@@ -1,0 +1,50 @@
+{
+  "groups": [
+    {
+      "name": "r3",
+      "interval": "1m",
+      "rules": [
+        {
+          "record": "r3:classic_q25",
+          "expr": "histogram_quantile(0.25, classic_bucket)"
+        },
+        {
+          "record": "r3:classic_fraction",
+          "expr": "histogram_fraction(1, 1.5, classic_bucket)"
+        },
+        {
+          "record": "r3:classic_count",
+          "expr": "classic_count"
+        },
+        {
+          "record": "r3:native_q25",
+          "expr": "histogram_quantile(0.25, native)"
+        },
+        {
+          "record": "r3:native_fraction",
+          "expr": "histogram_fraction(1, 1.5, native)"
+        },
+        {
+          "record": "r3:native_count",
+          "expr": "histogram_count(native)"
+        },
+        {
+          "record": "r3:custom_q25",
+          "expr": "histogram_quantile(0.25, custom)"
+        },
+        {
+          "record": "r3:custom_fraction",
+          "expr": "histogram_fraction(1, 1.5, custom)"
+        },
+        {
+          "record": "r3:custom_count",
+          "expr": "histogram_count(custom)"
+        },
+        {
+          "record": "r3:classic_count_ignored",
+          "expr": "count(histogram_count(classic_count)) or vector(0)"
+        }
+      ]
+    }
+  ]
+}

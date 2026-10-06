@@ -1,0 +1,2979 @@
+{
+  "schema_version": 3,
+  "round": 3,
+  "suite": "linux-memory",
+  "started": {
+    "utc": "2026-10-05T14:25:19.149680+00:00",
+    "monotonic_ns": 542828362407102,
+    "monotonic_raw_ns": 563891150926885
+  },
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "scope": "Local synthetic observations; no production or external time calibration",
+  "input_sha256": {
+    "labs/review-r3/assets.json": "91fc56d5debea87e2a94a2e66a9055552646014404f7d530b8a3e091613eb659",
+    "labs/review-r3/evidence-policy.md": "c44000c54d0bc57ba06174b7394457686c628a401c4d900263cd4f5bd6e9fdf3",
+    "scripts/lab_r2_common.py": "17484a974b61b8ffcf12394b4f7e853f6e3cd4b63ce0d3066ce4b6554c407e80",
+    "scripts/lab_r3_common.py": "65a73ca00113bdac3152e01b68eb6f43ec1d93bd596800cb150afb73b78eccd6",
+    "scripts/run_linux_memory_r3_lab.py": "274276931eb05240f5d4ca9a7bcf514a321a887e642da7dfa420f4f300bac8b6"
+  },
+  "limits": {
+    "summary_bytes": 1048576,
+    "raw_artifact_bytes": 16777216,
+    "total_raw_bytes": 67108864
+  },
+  "artifacts": {
+    "psi-cpu": {
+      "path": "linux-memory.raw/psi-cpu.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 102,
+      "raw_sha256": "76c234797992da56e1390a8aec1f7fc350919b5684a4cdddb2469a9ed30db19d",
+      "gzip_bytes": 67,
+      "gzip_sha256": "aaec68ea0184f122d9e04c7c7d7bab509fb96946c3f70827681ad31b5c02941c"
+    },
+    "psi-memory": {
+      "path": "linux-memory.raw/psi-memory.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 94,
+      "raw_sha256": "412d920370f34151bf0ed4a09cb00c0495ef7d8f922049744e873bbc34c2f17f",
+      "gzip_bytes": 57,
+      "gzip_sha256": "680c7a71912ffb7afa90d9c7fa264b131f8e0ff836f00db451f887ee794a284f"
+    },
+    "psi-io": {
+      "path": "linux-memory.raw/psi-io.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 110,
+      "raw_sha256": "51c219f38afeea0de1d55e6fb2debf2e8e8571f7047c684eb8968c0efae857ff",
+      "gzip_bytes": 73,
+      "gzip_sha256": "184a69cba82435565223521ceb19f4c1b244d78ecb332d91f45722bb8a56f630"
+    },
+    "vmstat": {
+      "path": "linux-memory.raw/vmstat.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 3738,
+      "raw_sha256": "7bd0e25bc2d87431bd433dc59ac9c0c65a7e9317ce752a3f4312ed2863dad7f7",
+      "gzip_bytes": 1285,
+      "gzip_sha256": "6ac4920f10462b300fdff0c296bd6fec371957d2f3a48125719db2e966b945af"
+    },
+    "cgroup-cgroup.controllers": {
+      "path": "linux-memory.raw/cgroup-cgroup.controllers.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 16,
+      "raw_sha256": "4e91842959764a4d484c9947707e72307dc8f55919189a7ec296252ec5dde9ad",
+      "gzip_bytes": 36,
+      "gzip_sha256": "96ce1ac302cfbe005e0f117a4d11956adb233cf0b524d3fc7fe753e1d6fe716d"
+    },
+    "cgroup-cgroup.subtree_control": {
+      "path": "linux-memory.raw/cgroup-cgroup.subtree_control.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gzip_bytes": 20,
+      "gzip_sha256": "ac73670af3abed54ac6fb4695131f4099be9fbe39d6076c5d0264a6bbdae9d83"
+    },
+    "cgroup-memory.current": {
+      "path": "linux-memory.raw/cgroup-memory.current.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 11,
+      "raw_sha256": "8e57102cb2d7297564f1da60585d77346d2c12259c4a42918ac4e14fd5e7f810",
+      "gzip_bytes": 31,
+      "gzip_sha256": "6d3778283c6f49405677576e6af06852441417968cc23e2c15a11235e7558465"
+    },
+    "cgroup-memory.max": {
+      "path": "linux-memory.raw/cgroup-memory.max.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 4,
+      "raw_sha256": "dbe7218fd3953d71eac340668b850fe4b57278326a462a0cf0ad506efbf8b02e",
+      "gzip_bytes": 24,
+      "gzip_sha256": "f4807e930ed43ced5a5b1722f77194e49791edc8e35875766b50fae7ea1874ec"
+    },
+    "cgroup-memory.events": {
+      "path": "linux-memory.raw/cgroup-memory.events.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 53,
+      "raw_sha256": "28fe05a1d7b8467a03fb54454f7b6a130fab752864d0454f5f6c4a4b6ce307f2",
+      "gzip_bytes": 54,
+      "gzip_sha256": "fa72d75bb5732fcf1f276f28e84b692f61acd8fe7627f6905242aceb498f8bc8"
+    },
+    "cgroup-memory.events.local": {
+      "path": "linux-memory.raw/cgroup-memory.events.local.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 53,
+      "raw_sha256": "28fe05a1d7b8467a03fb54454f7b6a130fab752864d0454f5f6c4a4b6ce307f2",
+      "gzip_bytes": 54,
+      "gzip_sha256": "fa72d75bb5732fcf1f276f28e84b692f61acd8fe7627f6905242aceb498f8bc8"
+    },
+    "cgroup-memory.pressure": {
+      "path": "linux-memory.raw/cgroup-memory.pressure.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 94,
+      "raw_sha256": "412d920370f34151bf0ed4a09cb00c0495ef7d8f922049744e873bbc34c2f17f",
+      "gzip_bytes": 57,
+      "gzip_sha256": "680c7a71912ffb7afa90d9c7fa264b131f8e0ff836f00db451f887ee794a284f"
+    },
+    "cgroup-cpu.pressure": {
+      "path": "linux-memory.raw/cgroup-cpu.pressure.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 110,
+      "raw_sha256": "7bca8d0fb3697fdc353eee473f062ba934f409e89f76ca0a9cbb9d86e21d2c29",
+      "gzip_bytes": 74,
+      "gzip_sha256": "c81326f793a1a9490fc8ad771685fcf168e28634d6aad4013cb793a8ef955137"
+    },
+    "cgroup-io.pressure": {
+      "path": "linux-memory.raw/cgroup-io.pressure.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 108,
+      "raw_sha256": "9f57d0600296acc80cbb3b14eb9840173fbbcb0925643b79f2476dbd8ca491ac",
+      "gzip_bytes": 72,
+      "gzip_sha256": "931e5d57c8d6fb68ccc77410f8e11fc7e9d2aba221a97a6b7a6af41756a87f7c"
+    },
+    "anonymous-before-status": {
+      "path": "linux-memory.raw/anonymous-before-status.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 1486,
+      "raw_sha256": "cba0698ad087ee365f707774658670b19bd6fb8842b2574b791aec72dce08442",
+      "gzip_bytes": 551,
+      "gzip_sha256": "0847c6f21badac7e3af106bbcdea46719fea2eb821c7f845c319e559883c8e12"
+    },
+    "anonymous-before-statm": {
+      "path": "linux-memory.raw/anonymous-before-statm.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 28,
+      "raw_sha256": "7fe7429552f97f11498c0545ef165671afd00e1b98364d914f2179dc572e6a4f",
+      "gzip_bytes": 48,
+      "gzip_sha256": "5c96ef1b103313420902b90cd7d9f7c5705b004a6d71a161b228ea461c47654b"
+    },
+    "anonymous-before-smaps_rollup": {
+      "path": "linux-memory.raw/anonymous-before-smaps_rollup.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 698,
+      "raw_sha256": "6026ae7543c456d8be6ee575f3c3cbb8b092d45407fcf28315052818343381b4",
+      "gzip_bytes": 274,
+      "gzip_sha256": "1ad2de2c045dbac28499e6fd6300352ee15623562a3724c535fc00d63137d32a"
+    },
+    "anonymous-before-smaps": {
+      "path": "linux-memory.raw/anonymous-before-smaps.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 68267,
+      "raw_sha256": "1822b0379760d7d09e86c72ca1aa0557e7a5666063222ca0943e4baff2120fcc",
+      "gzip_bytes": 3033,
+      "gzip_sha256": "81082900bf19ebde9c04b81cec83e6071fe99b2192b62849cd36fcdb654107d9"
+    },
+    "anonymous-allocated-status": {
+      "path": "linux-memory.raw/anonymous-allocated-status.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 1486,
+      "raw_sha256": "3b9026f91b554f9f15d6d56267ddd7a13817e76e259165d2ef0a9c24442f0657",
+      "gzip_bytes": 548,
+      "gzip_sha256": "babec19a0d702d36bac3a4902b2577d71fcd97dabb9544c2e32ddfeb1b108a34"
+    },
+    "anonymous-allocated-statm": {
+      "path": "linux-memory.raw/anonymous-allocated-statm.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 28,
+      "raw_sha256": "fc9fbf954fc04affb43b87f1c28cd3d7de34967c7f6f39e304834622dad14800",
+      "gzip_bytes": 46,
+      "gzip_sha256": "c4fec07d91a931e0bd4cc872c8afe13f7b47c92aca0a79fed241f1a4827d09bd"
+    },
+    "anonymous-allocated-smaps_rollup": {
+      "path": "linux-memory.raw/anonymous-allocated-smaps_rollup.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 698,
+      "raw_sha256": "a85f3165e5b83221295ca3054645e102e95d0fdcb5927f999841659dfff34428",
+      "gzip_bytes": 273,
+      "gzip_sha256": "d0fd5f2c470c63a91f695cfe67ad81bf5cbc8146b77459730d798475529e5625"
+    },
+    "anonymous-allocated-smaps": {
+      "path": "linux-memory.raw/anonymous-allocated-smaps.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 68988,
+      "raw_sha256": "ee3c4e2cb045298c622be77cc03c5aa5b566c388bf62da38415ef28111aef03e",
+      "gzip_bytes": 3076,
+      "gzip_sha256": "eb20cec7292efc973823893ca1fe160e13da63246eaa848738157cdb67e7d2e5"
+    },
+    "anonymous-released-status": {
+      "path": "linux-memory.raw/anonymous-released-status.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 1486,
+      "raw_sha256": "19608fdc83e450f0f3365b2df9310c8694dd179ff81d4063991fbad235c0e8ce",
+      "gzip_bytes": 559,
+      "gzip_sha256": "f4d84f5b734a13fa03ed58c520d7eaab76e6d55afab09e2fd8cba7fa0cd8040f"
+    },
+    "anonymous-released-statm": {
+      "path": "linux-memory.raw/anonymous-released-statm.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 28,
+      "raw_sha256": "7fe7429552f97f11498c0545ef165671afd00e1b98364d914f2179dc572e6a4f",
+      "gzip_bytes": 48,
+      "gzip_sha256": "5c96ef1b103313420902b90cd7d9f7c5705b004a6d71a161b228ea461c47654b"
+    },
+    "anonymous-released-smaps_rollup": {
+      "path": "linux-memory.raw/anonymous-released-smaps_rollup.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 698,
+      "raw_sha256": "6026ae7543c456d8be6ee575f3c3cbb8b092d45407fcf28315052818343381b4",
+      "gzip_bytes": 274,
+      "gzip_sha256": "1ad2de2c045dbac28499e6fd6300352ee15623562a3724c535fc00d63137d32a"
+    },
+    "anonymous-released-smaps": {
+      "path": "linux-memory.raw/anonymous-released-smaps.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 68267,
+      "raw_sha256": "1822b0379760d7d09e86c72ca1aa0557e7a5666063222ca0943e4baff2120fcc",
+      "gzip_bytes": 3033,
+      "gzip_sha256": "81082900bf19ebde9c04b81cec83e6071fe99b2192b62849cd36fcdb654107d9"
+    },
+    "file-before-status": {
+      "path": "linux-memory.raw/file-before-status.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 1487,
+      "raw_sha256": "048ace79715f9bc495846b5f862747192fbbaa66907a686c2b7b109adfd7a9f0",
+      "gzip_bytes": 554,
+      "gzip_sha256": "12ebfc340e37481dcf39273479ad116388f8150d4abba4ab7d4b04d574c2ef4f"
+    },
+    "file-before-statm": {
+      "path": "linux-memory.raw/file-before-statm.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 28,
+      "raw_sha256": "eeb4567c1d3206cbb6989c94482af512cfd1a113300efad81845f6e33d23763a",
+      "gzip_bytes": 48,
+      "gzip_sha256": "a7a5aff39bce5e1ffed0b2898070963a8873158e41cf6a84ed9f313e3dba3182"
+    },
+    "file-before-smaps_rollup": {
+      "path": "linux-memory.raw/file-before-smaps_rollup.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 698,
+      "raw_sha256": "17ed3c423c33860b95cdd13e7decf2c8a1ac7a7d40b686fef5124226298a68f8",
+      "gzip_bytes": 268,
+      "gzip_sha256": "787270763d13ef3802fc30994d32428dbf53d6098bc68cf8c007bcfeaf18dd56"
+    },
+    "file-before-smaps": {
+      "path": "linux-memory.raw/file-before-smaps.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 68988,
+      "raw_sha256": "6d8711a73a637475a828803fcfb2404c9ded415b8c09458e7ca29a02cb924c94",
+      "gzip_bytes": 3038,
+      "gzip_sha256": "49be8ab6852b82b2d9bfea81cbb1c7a83f819166239af34e03d469f6628b1695"
+    },
+    "file-allocated-status": {
+      "path": "linux-memory.raw/file-allocated-status.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 1487,
+      "raw_sha256": "7b409fe3919e85e5aab5bc4c48483c89d6afb38056f2be190ca396cd3278f738",
+      "gzip_bytes": 554,
+      "gzip_sha256": "88fcc3b9ae4e8173a79464bbb11e53375e0506baa40c705cc9fd8e42389acfec"
+    },
+    "file-allocated-statm": {
+      "path": "linux-memory.raw/file-allocated-statm.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 28,
+      "raw_sha256": "45dbe5513acd8627642c2a6f1011259900155bd0c4283ad2a42894da6363e756",
+      "gzip_bytes": 45,
+      "gzip_sha256": "e66fdc15279a7570e5b47ae1090afd1e9643c990793e86cb4a025a7ed88c2a3a"
+    },
+    "file-allocated-smaps_rollup": {
+      "path": "linux-memory.raw/file-allocated-smaps_rollup.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 698,
+      "raw_sha256": "67e97c696946ca4b9edd8d833804f702e097c66a4618a643e30950f8d46a1185",
+      "gzip_bytes": 272,
+      "gzip_sha256": "fccdca10851defdda2e7c2a62f228726c39b9cac58d5d5aef6ba4310e536c6d9"
+    },
+    "file-allocated-smaps": {
+      "path": "linux-memory.raw/file-allocated-smaps.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 69809,
+      "raw_sha256": "09d6134c8c1d07c219ac5467dc3cc49050e3c144ebd32fd86e722560595614f5",
+      "gzip_bytes": 3161,
+      "gzip_sha256": "90bf3b66887e0e706df60edabc1399c26c6d8ae0c3ab7ac07551d0091fbaed7d"
+    },
+    "file-released-status": {
+      "path": "linux-memory.raw/file-released-status.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 1487,
+      "raw_sha256": "ac96543e59d59025402d94ad303d14305806e12e6b56635ddf6516940f907452",
+      "gzip_bytes": 560,
+      "gzip_sha256": "0c8f5900863a14d846f4980b618659fb648d0b64b184629d99016baaadfa6d1d"
+    },
+    "file-released-statm": {
+      "path": "linux-memory.raw/file-released-statm.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 28,
+      "raw_sha256": "eeb4567c1d3206cbb6989c94482af512cfd1a113300efad81845f6e33d23763a",
+      "gzip_bytes": 48,
+      "gzip_sha256": "a7a5aff39bce5e1ffed0b2898070963a8873158e41cf6a84ed9f313e3dba3182"
+    },
+    "file-released-smaps_rollup": {
+      "path": "linux-memory.raw/file-released-smaps_rollup.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 698,
+      "raw_sha256": "17ed3c423c33860b95cdd13e7decf2c8a1ac7a7d40b686fef5124226298a68f8",
+      "gzip_bytes": 268,
+      "gzip_sha256": "787270763d13ef3802fc30994d32428dbf53d6098bc68cf8c007bcfeaf18dd56"
+    },
+    "file-released-smaps": {
+      "path": "linux-memory.raw/file-released-smaps.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 68988,
+      "raw_sha256": "6d8711a73a637475a828803fcfb2404c9ded415b8c09458e7ca29a02cb924c94",
+      "gzip_bytes": 3038,
+      "gzip_sha256": "49be8ab6852b82b2d9bfea81cbb1c7a83f819166239af34e03d469f6628b1695"
+    },
+    "memfd-before-status": {
+      "path": "linux-memory.raw/memfd-before-status.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 1486,
+      "raw_sha256": "99f6f846f2c28ea429e8bafb91e8305f37b0678588ffce9b49f4fca34b5205fd",
+      "gzip_bytes": 552,
+      "gzip_sha256": "647fdf0900eb4e21e31a0bf62800107d13628177576063b1d7ea3dc5a9b604ef"
+    },
+    "memfd-before-statm": {
+      "path": "linux-memory.raw/memfd-before-statm.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 28,
+      "raw_sha256": "de03bd4340bb0f7dd6e51760f4acb1ab3e0ddb091721c6c3ff49dd00c24041eb",
+      "gzip_bytes": 48,
+      "gzip_sha256": "f426f70cf56512fd80a308b0d708a6afc67ec429d52533682c2d5e12da7bb298"
+    },
+    "memfd-before-smaps_rollup": {
+      "path": "linux-memory.raw/memfd-before-smaps_rollup.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 698,
+      "raw_sha256": "79a455b260eb982b5c09fca3034d54e0d795552aa3ad5215be0f91df7ac4e4a5",
+      "gzip_bytes": 272,
+      "gzip_sha256": "2af5208bd3eb8abe01142327948b4f1aa254810f158f8ad536e7ef202f44e6cd"
+    },
+    "memfd-before-smaps": {
+      "path": "linux-memory.raw/memfd-before-smaps.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 68267,
+      "raw_sha256": "57a15b766aa4a7253928611a855979de47f136476834d097117ba072ddfea47a",
+      "gzip_bytes": 3032,
+      "gzip_sha256": "69d928324986e02137a7f00840e513edbe87e72b92c89910941b182df760acdb"
+    },
+    "memfd-allocated-status": {
+      "path": "linux-memory.raw/memfd-allocated-status.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 1486,
+      "raw_sha256": "85b2c920bdf5d9ccd52b5d62d82f9cf130d5495a9b42754d755db369c7889220",
+      "gzip_bytes": 557,
+      "gzip_sha256": "270c29a34b1ba53b908ac0eb185e289de57c3613e8a1b2faece43b081720f82e"
+    },
+    "memfd-allocated-statm": {
+      "path": "linux-memory.raw/memfd-allocated-statm.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 28,
+      "raw_sha256": "7c2cbacfdc31869ef41769f43344fda20852d03829656d3afba7eeaa5e40d9fb",
+      "gzip_bytes": 46,
+      "gzip_sha256": "01f6760439ffa9e2fa8cb4c746d58ace019d387389ec702d47cedbad8f566369"
+    },
+    "memfd-allocated-smaps_rollup": {
+      "path": "linux-memory.raw/memfd-allocated-smaps_rollup.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 698,
+      "raw_sha256": "81d3e7e6c56d3839390a0114da4c5394efdce9356c64f0682748c6d925cd38f0",
+      "gzip_bytes": 280,
+      "gzip_sha256": "00a88be913b0d692366f732b5504b09af28b2d1924d4986e1324416ba8a7365a"
+    },
+    "memfd-allocated-smaps": {
+      "path": "linux-memory.raw/memfd-allocated-smaps.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 69048,
+      "raw_sha256": "7ba5c38b0519a6ddc6412ee2fa4722ece2db765dc15fd58208af379b2b9221e5",
+      "gzip_bytes": 3120,
+      "gzip_sha256": "69b83e42eb6625aa4321f1dc2767150bcc5547604e4b46fb0a01481edb641b0f"
+    },
+    "memfd-released-status": {
+      "path": "linux-memory.raw/memfd-released-status.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 1486,
+      "raw_sha256": "5c2d46e98b71cd5b936288fb885e47fbe9a325e2e0b5e4b4ea02c485e62627ca",
+      "gzip_bytes": 559,
+      "gzip_sha256": "a73349530502bbb26c086204f193a464949221c2db5e207af371a4e3b9970271"
+    },
+    "memfd-released-statm": {
+      "path": "linux-memory.raw/memfd-released-statm.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 28,
+      "raw_sha256": "de03bd4340bb0f7dd6e51760f4acb1ab3e0ddb091721c6c3ff49dd00c24041eb",
+      "gzip_bytes": 48,
+      "gzip_sha256": "f426f70cf56512fd80a308b0d708a6afc67ec429d52533682c2d5e12da7bb298"
+    },
+    "memfd-released-smaps_rollup": {
+      "path": "linux-memory.raw/memfd-released-smaps_rollup.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 698,
+      "raw_sha256": "79a455b260eb982b5c09fca3034d54e0d795552aa3ad5215be0f91df7ac4e4a5",
+      "gzip_bytes": 272,
+      "gzip_sha256": "2af5208bd3eb8abe01142327948b4f1aa254810f158f8ad536e7ef202f44e6cd"
+    },
+    "memfd-released-smaps": {
+      "path": "linux-memory.raw/memfd-released-smaps.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 68267,
+      "raw_sha256": "57a15b766aa4a7253928611a855979de47f136476834d097117ba072ddfea47a",
+      "gzip_bytes": 3032,
+      "gzip_sha256": "69d928324986e02137a7f00840e513edbe87e72b92c89910941b182df760acdb"
+    },
+    "log-anonymous": {
+      "path": "linux-memory.raw/log-anonymous.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gzip_bytes": 20,
+      "gzip_sha256": "ac73670af3abed54ac6fb4695131f4099be9fbe39d6076c5d0264a6bbdae9d83"
+    },
+    "log-file": {
+      "path": "linux-memory.raw/log-file.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gzip_bytes": 20,
+      "gzip_sha256": "ac73670af3abed54ac6fb4695131f4099be9fbe39d6076c5d0264a6bbdae9d83"
+    },
+    "log-memfd": {
+      "path": "linux-memory.raw/log-memfd.gz",
+      "media_type": "text/plain; charset=utf-8",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gzip_bytes": 20,
+      "gzip_sha256": "ac73670af3abed54ac6fb4695131f4099be9fbe39d6076c5d0264a6bbdae9d83"
+    }
+  },
+  "scenarios": {
+    "facilities": {
+      "hypothesis": "Kernel exposes parseable PSI/vmstat and optional delegated cgroup facilities",
+      "success_condition": "Present files parse; missing capabilities are recorded explicitly",
+      "refutation_condition": "A present PSI file cannot be parsed",
+      "verdict": "supported",
+      "reason": "Availability only; no induced pressure, OOM, reclaim, controller change, or child migration",
+      "observations": {
+        "psi": {
+          "cpu": {
+            "artifact": "psi-cpu",
+            "values": {
+              "some": {
+                "avg10": 0.0,
+                "avg60": 0.0,
+                "avg300": 0.0,
+                "total": 414011096
+              },
+              "full": {
+                "avg10": 0.0,
+                "avg60": 0.0,
+                "avg300": 0.0,
+                "total": 0
+              }
+            },
+            "units": "avg: percent; total: microseconds"
+          },
+          "memory": {
+            "artifact": "psi-memory",
+            "values": {
+              "some": {
+                "avg10": 0.0,
+                "avg60": 0.0,
+                "avg300": 0.0,
+                "total": 0
+              },
+              "full": {
+                "avg10": 0.0,
+                "avg60": 0.0,
+                "avg300": 0.0,
+                "total": 0
+              }
+            },
+            "units": "avg: percent; total: microseconds"
+          },
+          "io": {
+            "artifact": "psi-io",
+            "values": {
+              "some": {
+                "avg10": 0.0,
+                "avg60": 0.0,
+                "avg300": 0.0,
+                "total": 387956414
+              },
+              "full": {
+                "avg10": 0.0,
+                "avg60": 0.0,
+                "avg300": 0.0,
+                "total": 380577148
+              }
+            },
+            "units": "avg: percent; total: microseconds"
+          },
+          "irq": {
+            "unavailable": "FileNotFoundError(2, 'No such file or directory')"
+          }
+        },
+        "vmstat": {
+          "artifact": "vmstat",
+          "selected_counters": {
+            "workingset_refault_anon": 0,
+            "workingset_refault_file": 0,
+            "allocstall_dma32": 0,
+            "allocstall_normal": 0,
+            "allocstall_movable": 0,
+            "allocstall_device": 0,
+            "pgsteal_kswapd": 0,
+            "pgsteal_direct": 0,
+            "pgsteal_khugepaged": 0,
+            "pgsteal_proactive": 0,
+            "pgscan_kswapd": 0,
+            "pgscan_direct": 0,
+            "pgscan_khugepaged": 0,
+            "pgscan_proactive": 0,
+            "pgscan_direct_throttle": 0,
+            "pgscan_anon": 0,
+            "pgscan_file": 0,
+            "pgsteal_anon": 0,
+            "pgsteal_file": 0,
+            "oom_kill": 0
+          },
+          "missing_prefixes": []
+        },
+        "cgroup": {
+          "path": "/sys/fs/cgroup/init.scope",
+          "probe_requested": true,
+          "child_created": false,
+          "cgroup.controllers": {
+            "artifact": "cgroup-cgroup.controllers"
+          },
+          "cgroup.subtree_control": {
+            "artifact": "cgroup-cgroup.subtree_control"
+          },
+          "memory.current": {
+            "artifact": "cgroup-memory.current"
+          },
+          "memory.max": {
+            "artifact": "cgroup-memory.max"
+          },
+          "memory.events": {
+            "artifact": "cgroup-memory.events"
+          },
+          "memory.events.local": {
+            "artifact": "cgroup-memory.events.local"
+          },
+          "memory.pressure": {
+            "artifact": "cgroup-memory.pressure"
+          },
+          "cpu.pressure": {
+            "artifact": "cgroup-cpu.pressure"
+          },
+          "io.pressure": {
+            "artifact": "cgroup-io.pressure"
+          },
+          "creation_unavailable": "PermissionError(13, 'Permission denied')"
+        }
+      }
+    },
+    "anonymous": {
+      "hypothesis": "Private anonymous/file/shared memfd map increases its own resident class",
+      "success_condition": "Quiescent child rollup class rises by >=80% of touched mapping bytes",
+      "refutation_condition": "Complete rollup class rises by less than 80%",
+      "verdict": "supported",
+      "reason": "PSS equals RSS for these singly mapped owned pages. status/statm are approximate; reads are sequential. Timing is local, not a universal ranking.",
+      "observations": {
+        "guard": {
+          "mem_available_bytes": 28109692928,
+          "required_headroom_bytes": 268435456,
+          "finite_cgroup_headroom_bytes": [],
+          "cgroup_limit_scope": "current cgroup and visible ancestors",
+          "allowed": true,
+          "limitation": "Instant guard, not a reservation; hidden ancestor limits may be unknown"
+        },
+        "mapping_bytes": 8388608,
+        "expected_class": "Pss_Anon",
+        "class_delta_bytes": 8388608,
+        "worker_acknowledgements": [
+          {
+            "ready": true,
+            "pid": 971097
+          },
+          {
+            "allocated_bytes": 8388608,
+            "touch_checksum": 0
+          },
+          {
+            "released": true
+          }
+        ],
+        "before": {
+          "started": {
+            "utc": "2026-10-05T14:25:19.284178+00:00",
+            "monotonic_ns": 542828496897588,
+            "monotonic_raw_ns": 563891284821059
+          },
+          "pid": 971097,
+          "page_size_bytes": 4096,
+          "status": {
+            "artifact": "anonymous-before-status",
+            "values": {
+              "VmPeak": 27877376,
+              "VmSize": 27865088,
+              "VmLck": 0,
+              "VmPin": 0,
+              "VmHWM": 21594112,
+              "VmRSS": 21594112,
+              "RssAnon": 10698752,
+              "RssFile": 10895360,
+              "RssShmem": 0,
+              "VmData": 11481088,
+              "VmStk": 135168,
+              "VmExe": 3026944,
+              "VmLib": 6430720,
+              "VmPTE": 94208,
+              "VmSwap": 0,
+              "HugetlbPages": 0
+            }
+          },
+          "statm": {
+            "artifact": "anonymous-before-statm",
+            "values": [
+              6803,
+              5272,
+              2660,
+              739,
+              0,
+              2836,
+              0
+            ]
+          },
+          "smaps_rollup": {
+            "artifact": "anonymous-before-smaps_rollup",
+            "values": {
+              "Rss": 21594112,
+              "Pss": 14289920,
+              "Pss_Dirty": 10698752,
+              "Pss_Anon": 10698752,
+              "Pss_File": 3591168,
+              "Pss_Shmem": 0,
+              "Shared_Clean": 10866688,
+              "Shared_Dirty": 0,
+              "Private_Clean": 28672,
+              "Private_Dirty": 10698752,
+              "Referenced": 21594112,
+              "Anonymous": 10698752,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "smaps": {
+            "artifact": "anonymous-before-smaps",
+            "values": {
+              "Size": 27865088,
+              "KernelPageSize": 356352,
+              "MMUPageSize": 356352,
+              "Rss": 21594112,
+              "Pss": 14277632,
+              "Pss_Dirty": 10698752,
+              "Shared_Clean": 10866688,
+              "Shared_Dirty": 0,
+              "Private_Clean": 28672,
+              "Private_Dirty": 10698752,
+              "Referenced": 21594112,
+              "Anonymous": 10698752,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "comparison_bytes": {
+            "status": {
+              "VmRSS": 21594112,
+              "RssAnon": 10698752,
+              "RssFile": 10895360,
+              "RssShmem": 0,
+              "VmSwap": 0
+            },
+            "status_rss_components_sum": 21594112,
+            "statm_resident": 21594112,
+            "statm_shared": 10895360,
+            "smaps_rss": 21594112,
+            "smaps_rollup_rss": 21594112
+          },
+          "statm_columns": [
+            "size",
+            "resident",
+            "shared",
+            "text",
+            "lib_unused",
+            "data",
+            "dt_unused"
+          ],
+          "statm_unit": "pages; comparisons above multiply by page_size_bytes",
+          "finished": {
+            "utc": "2026-10-05T14:25:19.302526+00:00",
+            "monotonic_ns": 542828515244146,
+            "monotonic_raw_ns": 563891303085801
+          }
+        },
+        "allocated": {
+          "started": {
+            "utc": "2026-10-05T14:25:19.305047+00:00",
+            "monotonic_ns": 542828517763695,
+            "monotonic_raw_ns": 563891305594188
+          },
+          "pid": 971097,
+          "page_size_bytes": 4096,
+          "status": {
+            "artifact": "anonymous-allocated-status",
+            "values": {
+              "VmPeak": 36253696,
+              "VmSize": 36253696,
+              "VmLck": 0,
+              "VmPin": 0,
+              "VmHWM": 29982720,
+              "VmRSS": 29982720,
+              "RssAnon": 19087360,
+              "RssFile": 10895360,
+              "RssShmem": 0,
+              "VmData": 19869696,
+              "VmStk": 135168,
+              "VmExe": 3026944,
+              "VmLib": 6430720,
+              "VmPTE": 110592,
+              "VmSwap": 0,
+              "HugetlbPages": 0
+            }
+          },
+          "statm": {
+            "artifact": "anonymous-allocated-statm",
+            "values": [
+              8851,
+              7320,
+              2660,
+              739,
+              0,
+              4884,
+              0
+            ]
+          },
+          "smaps_rollup": {
+            "artifact": "anonymous-allocated-smaps_rollup",
+            "values": {
+              "Rss": 29982720,
+              "Pss": 22678528,
+              "Pss_Dirty": 19087360,
+              "Pss_Anon": 19087360,
+              "Pss_File": 3591168,
+              "Pss_Shmem": 0,
+              "Shared_Clean": 10866688,
+              "Shared_Dirty": 0,
+              "Private_Clean": 28672,
+              "Private_Dirty": 19087360,
+              "Referenced": 29982720,
+              "Anonymous": 19087360,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "smaps": {
+            "artifact": "anonymous-allocated-smaps",
+            "values": {
+              "Size": 36253696,
+              "KernelPageSize": 360448,
+              "MMUPageSize": 360448,
+              "Rss": 29982720,
+              "Pss": 22666240,
+              "Pss_Dirty": 19087360,
+              "Shared_Clean": 10866688,
+              "Shared_Dirty": 0,
+              "Private_Clean": 28672,
+              "Private_Dirty": 19087360,
+              "Referenced": 29982720,
+              "Anonymous": 19087360,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "comparison_bytes": {
+            "status": {
+              "VmRSS": 29982720,
+              "RssAnon": 19087360,
+              "RssFile": 10895360,
+              "RssShmem": 0,
+              "VmSwap": 0
+            },
+            "status_rss_components_sum": 29982720,
+            "statm_resident": 29982720,
+            "statm_shared": 10895360,
+            "smaps_rss": 29982720,
+            "smaps_rollup_rss": 29982720
+          },
+          "statm_columns": [
+            "size",
+            "resident",
+            "shared",
+            "text",
+            "lib_unused",
+            "data",
+            "dt_unused"
+          ],
+          "statm_unit": "pages; comparisons above multiply by page_size_bytes",
+          "finished": {
+            "utc": "2026-10-05T14:25:19.319923+00:00",
+            "monotonic_ns": 542828532639567,
+            "monotonic_raw_ns": 563891320403587
+          }
+        },
+        "released": {
+          "started": {
+            "utc": "2026-10-05T14:25:19.329304+00:00",
+            "monotonic_ns": 542828542016604,
+            "monotonic_raw_ns": 563891329738468
+          },
+          "pid": 971097,
+          "page_size_bytes": 4096,
+          "status": {
+            "artifact": "anonymous-released-status",
+            "values": {
+              "VmPeak": 36253696,
+              "VmSize": 27865088,
+              "VmLck": 0,
+              "VmPin": 0,
+              "VmHWM": 29839360,
+              "VmRSS": 21594112,
+              "RssAnon": 10698752,
+              "RssFile": 10895360,
+              "RssShmem": 0,
+              "VmData": 11481088,
+              "VmStk": 135168,
+              "VmExe": 3026944,
+              "VmLib": 6430720,
+              "VmPTE": 94208,
+              "VmSwap": 0,
+              "HugetlbPages": 0
+            }
+          },
+          "statm": {
+            "artifact": "anonymous-released-statm",
+            "values": [
+              6803,
+              5272,
+              2660,
+              739,
+              0,
+              2836,
+              0
+            ]
+          },
+          "smaps_rollup": {
+            "artifact": "anonymous-released-smaps_rollup",
+            "values": {
+              "Rss": 21594112,
+              "Pss": 14289920,
+              "Pss_Dirty": 10698752,
+              "Pss_Anon": 10698752,
+              "Pss_File": 3591168,
+              "Pss_Shmem": 0,
+              "Shared_Clean": 10866688,
+              "Shared_Dirty": 0,
+              "Private_Clean": 28672,
+              "Private_Dirty": 10698752,
+              "Referenced": 21594112,
+              "Anonymous": 10698752,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "smaps": {
+            "artifact": "anonymous-released-smaps",
+            "values": {
+              "Size": 27865088,
+              "KernelPageSize": 356352,
+              "MMUPageSize": 356352,
+              "Rss": 21594112,
+              "Pss": 14277632,
+              "Pss_Dirty": 10698752,
+              "Shared_Clean": 10866688,
+              "Shared_Dirty": 0,
+              "Private_Clean": 28672,
+              "Private_Dirty": 10698752,
+              "Referenced": 21594112,
+              "Anonymous": 10698752,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "comparison_bytes": {
+            "status": {
+              "VmRSS": 21594112,
+              "RssAnon": 10698752,
+              "RssFile": 10895360,
+              "RssShmem": 0,
+              "VmSwap": 0
+            },
+            "status_rss_components_sum": 21594112,
+            "statm_resident": 21594112,
+            "statm_shared": 10895360,
+            "smaps_rss": 21594112,
+            "smaps_rollup_rss": 21594112
+          },
+          "statm_columns": [
+            "size",
+            "resident",
+            "shared",
+            "text",
+            "lib_unused",
+            "data",
+            "dt_unused"
+          ],
+          "statm_unit": "pages; comparisons above multiply by page_size_bytes",
+          "finished": {
+            "utc": "2026-10-05T14:25:19.344619+00:00",
+            "monotonic_ns": 542828557337193,
+            "monotonic_raw_ns": 563891344991845
+          }
+        },
+        "read_cost": {
+          "status": {
+            "samples": [
+              {
+                "elapsed_raw_ns": 24097,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 11119,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 19659,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 16108,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 14262,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 21598,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 14332,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 9294,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 22819,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 22192,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 15683,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 17389,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 16900,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 22209,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 14207,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 13187,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 13959,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 13666,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 18303,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 13195,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 21296,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 13712,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 15471,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 9279,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 13599,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 17858,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 33480,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 14432,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 13514,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 13870,
+                "bytes": 1486
+              }
+            ],
+            "median_raw_ns": 14951.5,
+            "p95_raw_ns": 24097
+          },
+          "smaps_rollup": {
+            "samples": [
+              {
+                "elapsed_raw_ns": 222466,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 143045,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 99944,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 92605,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 90319,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 104831,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 90189,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 85981,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 93481,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 90476,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 90808,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 100187,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 98659,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 90602,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 87675,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 88922,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 84148,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 101365,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 90692,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 89146,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 84426,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 89496,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 98136,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 84925,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 132222,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 106659,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 92521,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 86389,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 89823,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 86329,
+                "bytes": 698
+              }
+            ],
+            "median_raw_ns": 90647.0,
+            "p95_raw_ns": 143045
+          },
+          "smaps": {
+            "samples": [
+              {
+                "elapsed_raw_ns": 262139,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 184435,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 174204,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 168821,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 169730,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 172878,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 174703,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 170241,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 184554,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 184792,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 205373,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 187383,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 168409,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 196228,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 172340,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 168038,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 170955,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 179558,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 169686,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 170286,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 191214,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 170092,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 184989,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 169424,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 182592,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 170724,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 174657,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 171232,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 166602,
+                "bytes": 68988
+              },
+              {
+                "elapsed_raw_ns": 171221,
+                "bytes": 68988
+              }
+            ],
+            "median_raw_ns": 172609.0,
+            "p95_raw_ns": 205373
+          }
+        },
+        "status_delta_bytes": {
+          "VmRSS": 8388608,
+          "RssAnon": 8388608,
+          "RssFile": 0,
+          "RssShmem": 0,
+          "VmSwap": 0
+        }
+      }
+    },
+    "file": {
+      "hypothesis": "Private anonymous/file/shared memfd map increases its own resident class",
+      "success_condition": "Quiescent child rollup class rises by >=80% of touched mapping bytes",
+      "refutation_condition": "Complete rollup class rises by less than 80%",
+      "verdict": "supported",
+      "reason": "PSS equals RSS for these singly mapped owned pages. status/statm are approximate; reads are sequential. Timing is local, not a universal ranking.",
+      "observations": {
+        "guard": {
+          "mem_available_bytes": 28083400704,
+          "required_headroom_bytes": 268435456,
+          "finite_cgroup_headroom_bytes": [],
+          "cgroup_limit_scope": "current cgroup and visible ancestors",
+          "allowed": true,
+          "limitation": "Instant guard, not a reservation; hidden ancestor limits may be unknown"
+        },
+        "mapping_bytes": 8388608,
+        "expected_class": "Pss_File",
+        "class_delta_bytes": 8388608,
+        "worker_acknowledgements": [
+          {
+            "ready": true,
+            "pid": 971101
+          },
+          {
+            "allocated_bytes": 8388608,
+            "touch_checksum": 245760
+          },
+          {
+            "released": true
+          }
+        ],
+        "before": {
+          "started": {
+            "utc": "2026-10-05T14:25:20.018580+00:00",
+            "monotonic_ns": 542829231303318,
+            "monotonic_raw_ns": 563892015968448
+          },
+          "pid": 971101,
+          "page_size_bytes": 4096,
+          "status": {
+            "artifact": "file-before-status",
+            "values": {
+              "VmPeak": 27873280,
+              "VmSize": 27828224,
+              "VmLck": 0,
+              "VmPin": 0,
+              "VmHWM": 21540864,
+              "VmRSS": 21540864,
+              "RssAnon": 10711040,
+              "RssFile": 10829824,
+              "RssShmem": 0,
+              "VmData": 11444224,
+              "VmStk": 135168,
+              "VmExe": 3026944,
+              "VmLib": 6430720,
+              "VmPTE": 94208,
+              "VmSwap": 0,
+              "HugetlbPages": 0
+            }
+          },
+          "statm": {
+            "artifact": "file-before-statm",
+            "values": [
+              6794,
+              5259,
+              2644,
+              739,
+              0,
+              2827,
+              0
+            ]
+          },
+          "smaps_rollup": {
+            "artifact": "file-before-smaps_rollup",
+            "values": {
+              "Rss": 21540864,
+              "Pss": 14255104,
+              "Pss_Dirty": 10711040,
+              "Pss_Anon": 10711040,
+              "Pss_File": 3544064,
+              "Pss_Shmem": 0,
+              "Shared_Clean": 10829824,
+              "Shared_Dirty": 0,
+              "Private_Clean": 0,
+              "Private_Dirty": 10711040,
+              "Referenced": 21540864,
+              "Anonymous": 10711040,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "smaps": {
+            "artifact": "file-before-smaps",
+            "values": {
+              "Size": 27828224,
+              "KernelPageSize": 360448,
+              "MMUPageSize": 360448,
+              "Rss": 21540864,
+              "Pss": 14242816,
+              "Pss_Dirty": 10711040,
+              "Shared_Clean": 10829824,
+              "Shared_Dirty": 0,
+              "Private_Clean": 0,
+              "Private_Dirty": 10711040,
+              "Referenced": 21540864,
+              "Anonymous": 10711040,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "comparison_bytes": {
+            "status": {
+              "VmRSS": 21540864,
+              "RssAnon": 10711040,
+              "RssFile": 10829824,
+              "RssShmem": 0,
+              "VmSwap": 0
+            },
+            "status_rss_components_sum": 21540864,
+            "statm_resident": 21540864,
+            "statm_shared": 10829824,
+            "smaps_rss": 21540864,
+            "smaps_rollup_rss": 21540864
+          },
+          "statm_columns": [
+            "size",
+            "resident",
+            "shared",
+            "text",
+            "lib_unused",
+            "data",
+            "dt_unused"
+          ],
+          "statm_unit": "pages; comparisons above multiply by page_size_bytes",
+          "finished": {
+            "utc": "2026-10-05T14:25:20.040099+00:00",
+            "monotonic_ns": 542829252821725,
+            "monotonic_raw_ns": 563892037390341
+          }
+        },
+        "allocated": {
+          "started": {
+            "utc": "2026-10-05T14:25:20.073655+00:00",
+            "monotonic_ns": 542829286376876,
+            "monotonic_raw_ns": 563892070797104
+          },
+          "pid": 971101,
+          "page_size_bytes": 4096,
+          "status": {
+            "artifact": "file-allocated-status",
+            "values": {
+              "VmPeak": 36216832,
+              "VmSize": 36216832,
+              "VmLck": 0,
+              "VmPin": 0,
+              "VmHWM": 29929472,
+              "VmRSS": 29929472,
+              "RssAnon": 10711040,
+              "RssFile": 19218432,
+              "RssShmem": 0,
+              "VmData": 11444224,
+              "VmStk": 135168,
+              "VmExe": 3026944,
+              "VmLib": 6430720,
+              "VmPTE": 110592,
+              "VmSwap": 0,
+              "HugetlbPages": 0
+            }
+          },
+          "statm": {
+            "artifact": "file-allocated-statm",
+            "values": [
+              8842,
+              7307,
+              4692,
+              739,
+              0,
+              2827,
+              0
+            ]
+          },
+          "smaps_rollup": {
+            "artifact": "file-allocated-smaps_rollup",
+            "values": {
+              "Rss": 29929472,
+              "Pss": 22643712,
+              "Pss_Dirty": 10711040,
+              "Pss_Anon": 10711040,
+              "Pss_File": 11932672,
+              "Pss_Shmem": 0,
+              "Shared_Clean": 10829824,
+              "Shared_Dirty": 0,
+              "Private_Clean": 8388608,
+              "Private_Dirty": 10711040,
+              "Referenced": 29929472,
+              "Anonymous": 10711040,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "smaps": {
+            "artifact": "file-allocated-smaps",
+            "values": {
+              "Size": 36216832,
+              "KernelPageSize": 364544,
+              "MMUPageSize": 364544,
+              "Rss": 29929472,
+              "Pss": 22631424,
+              "Pss_Dirty": 10711040,
+              "Shared_Clean": 10829824,
+              "Shared_Dirty": 0,
+              "Private_Clean": 8388608,
+              "Private_Dirty": 10711040,
+              "Referenced": 29929472,
+              "Anonymous": 10711040,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "comparison_bytes": {
+            "status": {
+              "VmRSS": 29929472,
+              "RssAnon": 10711040,
+              "RssFile": 19218432,
+              "RssShmem": 0,
+              "VmSwap": 0
+            },
+            "status_rss_components_sum": 29929472,
+            "statm_resident": 29929472,
+            "statm_shared": 19218432,
+            "smaps_rss": 29929472,
+            "smaps_rollup_rss": 29929472
+          },
+          "statm_columns": [
+            "size",
+            "resident",
+            "shared",
+            "text",
+            "lib_unused",
+            "data",
+            "dt_unused"
+          ],
+          "statm_unit": "pages; comparisons above multiply by page_size_bytes",
+          "finished": {
+            "utc": "2026-10-05T14:25:20.092084+00:00",
+            "monotonic_ns": 542829304803040,
+            "monotonic_raw_ns": 563892089140736
+          }
+        },
+        "released": {
+          "started": {
+            "utc": "2026-10-05T14:25:20.103533+00:00",
+            "monotonic_ns": 542829316253538,
+            "monotonic_raw_ns": 563892100540217
+          },
+          "pid": 971101,
+          "page_size_bytes": 4096,
+          "status": {
+            "artifact": "file-released-status",
+            "values": {
+              "VmPeak": 36216832,
+              "VmSize": 27828224,
+              "VmLck": 0,
+              "VmPin": 0,
+              "VmHWM": 29794304,
+              "VmRSS": 21540864,
+              "RssAnon": 10711040,
+              "RssFile": 10829824,
+              "RssShmem": 0,
+              "VmData": 11444224,
+              "VmStk": 135168,
+              "VmExe": 3026944,
+              "VmLib": 6430720,
+              "VmPTE": 94208,
+              "VmSwap": 0,
+              "HugetlbPages": 0
+            }
+          },
+          "statm": {
+            "artifact": "file-released-statm",
+            "values": [
+              6794,
+              5259,
+              2644,
+              739,
+              0,
+              2827,
+              0
+            ]
+          },
+          "smaps_rollup": {
+            "artifact": "file-released-smaps_rollup",
+            "values": {
+              "Rss": 21540864,
+              "Pss": 14255104,
+              "Pss_Dirty": 10711040,
+              "Pss_Anon": 10711040,
+              "Pss_File": 3544064,
+              "Pss_Shmem": 0,
+              "Shared_Clean": 10829824,
+              "Shared_Dirty": 0,
+              "Private_Clean": 0,
+              "Private_Dirty": 10711040,
+              "Referenced": 21540864,
+              "Anonymous": 10711040,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "smaps": {
+            "artifact": "file-released-smaps",
+            "values": {
+              "Size": 27828224,
+              "KernelPageSize": 360448,
+              "MMUPageSize": 360448,
+              "Rss": 21540864,
+              "Pss": 14242816,
+              "Pss_Dirty": 10711040,
+              "Shared_Clean": 10829824,
+              "Shared_Dirty": 0,
+              "Private_Clean": 0,
+              "Private_Dirty": 10711040,
+              "Referenced": 21540864,
+              "Anonymous": 10711040,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "comparison_bytes": {
+            "status": {
+              "VmRSS": 21540864,
+              "RssAnon": 10711040,
+              "RssFile": 10829824,
+              "RssShmem": 0,
+              "VmSwap": 0
+            },
+            "status_rss_components_sum": 21540864,
+            "statm_resident": 21540864,
+            "statm_shared": 10829824,
+            "smaps_rss": 21540864,
+            "smaps_rollup_rss": 21540864
+          },
+          "statm_columns": [
+            "size",
+            "resident",
+            "shared",
+            "text",
+            "lib_unused",
+            "data",
+            "dt_unused"
+          ],
+          "statm_unit": "pages; comparisons above multiply by page_size_bytes",
+          "finished": {
+            "utc": "2026-10-05T14:25:20.129737+00:00",
+            "monotonic_ns": 542829342458357,
+            "monotonic_raw_ns": 563892126628582
+          }
+        },
+        "read_cost": {
+          "status": {
+            "samples": [
+              {
+                "elapsed_raw_ns": 37438,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 13521,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 16507,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 14373,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 13943,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 22477,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 17129,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 11525,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 26450,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 18819,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 10686,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 23734,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 15357,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 14429,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 14710,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 14660,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 31008,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 22254,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 18493,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 66060,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 37319,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 26020,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 19301,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 10919,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 34480,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 27152,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 24081,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 19731,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 14761,
+                "bytes": 1487
+              },
+              {
+                "elapsed_raw_ns": 25987,
+                "bytes": 1487
+              }
+            ],
+            "median_raw_ns": 19060.0,
+            "p95_raw_ns": 37438
+          },
+          "smaps_rollup": {
+            "samples": [
+              {
+                "elapsed_raw_ns": 337583,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 112021,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 96119,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 92161,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 93423,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 108094,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 108440,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 92860,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 99678,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 115058,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 90747,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 113509,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 98398,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 94619,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 96381,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 166634,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 119243,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 98511,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 107090,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 120545,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 220569,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 134915,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 130768,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 98945,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 142727,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 127656,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 96832,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 91262,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 93119,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 104542,
+                "bytes": 698
+              }
+            ],
+            "median_raw_ns": 105816.0,
+            "p95_raw_ns": 220569
+          },
+          "smaps": {
+            "samples": [
+              {
+                "elapsed_raw_ns": 433501,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 231979,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 178008,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 176078,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 176439,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 180605,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 187652,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 185619,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 299710,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 192606,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 179906,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 189593,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 185052,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 179463,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 178046,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 240632,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 216629,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 195828,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 201865,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 213007,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 281130,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 251248,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 207640,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 369727,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 259749,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 255888,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 194983,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 183444,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 178448,
+                "bytes": 69809
+              },
+              {
+                "elapsed_raw_ns": 218371,
+                "bytes": 69809
+              }
+            ],
+            "median_raw_ns": 195405.5,
+            "p95_raw_ns": 369727
+          }
+        },
+        "status_delta_bytes": {
+          "VmRSS": 8388608,
+          "RssAnon": 0,
+          "RssFile": 8388608,
+          "RssShmem": 0,
+          "VmSwap": 0
+        }
+      }
+    },
+    "memfd": {
+      "hypothesis": "Private anonymous/file/shared memfd map increases its own resident class",
+      "success_condition": "Quiescent child rollup class rises by >=80% of touched mapping bytes",
+      "refutation_condition": "Complete rollup class rises by less than 80%",
+      "verdict": "supported",
+      "reason": "PSS equals RSS for these singly mapped owned pages. status/statm are approximate; reads are sequential. Timing is local, not a universal ranking.",
+      "observations": {
+        "guard": {
+          "mem_available_bytes": 28057223168,
+          "required_headroom_bytes": 268435456,
+          "finite_cgroup_headroom_bytes": [],
+          "cgroup_limit_scope": "current cgroup and visible ancestors",
+          "allowed": true,
+          "limitation": "Instant guard, not a reservation; hidden ancestor limits may be unknown"
+        },
+        "mapping_bytes": 8388608,
+        "expected_class": "Pss_Shmem",
+        "class_delta_bytes": 8388608,
+        "worker_acknowledgements": [
+          {
+            "ready": true,
+            "pid": 971102
+          },
+          {
+            "allocated_bytes": 8388608,
+            "touch_checksum": 0
+          },
+          {
+            "released": true
+          }
+        ],
+        "before": {
+          "started": {
+            "utc": "2026-10-05T14:25:20.238014+00:00",
+            "monotonic_ns": 542829450735859,
+            "monotonic_raw_ns": 563892234426912
+          },
+          "pid": 971102,
+          "page_size_bytes": 4096,
+          "status": {
+            "artifact": "memfd-before-status",
+            "values": {
+              "VmPeak": 27877376,
+              "VmSize": 27828224,
+              "VmLck": 0,
+              "VmPin": 0,
+              "VmHWM": 21610496,
+              "VmRSS": 21610496,
+              "RssAnon": 10711040,
+              "RssFile": 10899456,
+              "RssShmem": 0,
+              "VmData": 11444224,
+              "VmStk": 135168,
+              "VmExe": 3026944,
+              "VmLib": 6430720,
+              "VmPTE": 94208,
+              "VmSwap": 0,
+              "HugetlbPages": 0
+            }
+          },
+          "statm": {
+            "artifact": "memfd-before-statm",
+            "values": [
+              6794,
+              5276,
+              2661,
+              739,
+              0,
+              2827,
+              0
+            ]
+          },
+          "smaps_rollup": {
+            "artifact": "memfd-before-smaps_rollup",
+            "values": {
+              "Rss": 21610496,
+              "Pss": 14308352,
+              "Pss_Dirty": 10711040,
+              "Pss_Anon": 10711040,
+              "Pss_File": 3597312,
+              "Pss_Shmem": 0,
+              "Shared_Clean": 10866688,
+              "Shared_Dirty": 0,
+              "Private_Clean": 32768,
+              "Private_Dirty": 10711040,
+              "Referenced": 21610496,
+              "Anonymous": 10711040,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "smaps": {
+            "artifact": "memfd-before-smaps",
+            "values": {
+              "Size": 27828224,
+              "KernelPageSize": 356352,
+              "MMUPageSize": 356352,
+              "Rss": 21610496,
+              "Pss": 14297088,
+              "Pss_Dirty": 10711040,
+              "Shared_Clean": 10866688,
+              "Shared_Dirty": 0,
+              "Private_Clean": 32768,
+              "Private_Dirty": 10711040,
+              "Referenced": 21610496,
+              "Anonymous": 10711040,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "comparison_bytes": {
+            "status": {
+              "VmRSS": 21610496,
+              "RssAnon": 10711040,
+              "RssFile": 10899456,
+              "RssShmem": 0,
+              "VmSwap": 0
+            },
+            "status_rss_components_sum": 21610496,
+            "statm_resident": 21610496,
+            "statm_shared": 10899456,
+            "smaps_rss": 21610496,
+            "smaps_rollup_rss": 21610496
+          },
+          "statm_columns": [
+            "size",
+            "resident",
+            "shared",
+            "text",
+            "lib_unused",
+            "data",
+            "dt_unused"
+          ],
+          "statm_unit": "pages; comparisons above multiply by page_size_bytes",
+          "finished": {
+            "utc": "2026-10-05T14:25:20.261398+00:00",
+            "monotonic_ns": 542829474119176,
+            "monotonic_raw_ns": 563892257704930
+          }
+        },
+        "allocated": {
+          "started": {
+            "utc": "2026-10-05T14:25:20.264459+00:00",
+            "monotonic_ns": 542829477175887,
+            "monotonic_raw_ns": 563892260748839
+          },
+          "pid": 971102,
+          "page_size_bytes": 4096,
+          "status": {
+            "artifact": "memfd-allocated-status",
+            "values": {
+              "VmPeak": 36216832,
+              "VmSize": 36216832,
+              "VmLck": 0,
+              "VmPin": 0,
+              "VmHWM": 29999104,
+              "VmRSS": 29999104,
+              "RssAnon": 10711040,
+              "RssFile": 10899456,
+              "RssShmem": 8388608,
+              "VmData": 11444224,
+              "VmStk": 135168,
+              "VmExe": 3026944,
+              "VmLib": 6430720,
+              "VmPTE": 110592,
+              "VmSwap": 0,
+              "HugetlbPages": 0
+            }
+          },
+          "statm": {
+            "artifact": "memfd-allocated-statm",
+            "values": [
+              8842,
+              7324,
+              4709,
+              739,
+              0,
+              2827,
+              0
+            ]
+          },
+          "smaps_rollup": {
+            "artifact": "memfd-allocated-smaps_rollup",
+            "values": {
+              "Rss": 29999104,
+              "Pss": 22696960,
+              "Pss_Dirty": 19099648,
+              "Pss_Anon": 10711040,
+              "Pss_File": 3597312,
+              "Pss_Shmem": 8388608,
+              "Shared_Clean": 10866688,
+              "Shared_Dirty": 0,
+              "Private_Clean": 32768,
+              "Private_Dirty": 19099648,
+              "Referenced": 29999104,
+              "Anonymous": 10711040,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "smaps": {
+            "artifact": "memfd-allocated-smaps",
+            "values": {
+              "Size": 36216832,
+              "KernelPageSize": 360448,
+              "MMUPageSize": 360448,
+              "Rss": 29999104,
+              "Pss": 22685696,
+              "Pss_Dirty": 19099648,
+              "Shared_Clean": 10866688,
+              "Shared_Dirty": 0,
+              "Private_Clean": 32768,
+              "Private_Dirty": 19099648,
+              "Referenced": 29999104,
+              "Anonymous": 10711040,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "comparison_bytes": {
+            "status": {
+              "VmRSS": 29999104,
+              "RssAnon": 10711040,
+              "RssFile": 10899456,
+              "RssShmem": 8388608,
+              "VmSwap": 0
+            },
+            "status_rss_components_sum": 29999104,
+            "statm_resident": 29999104,
+            "statm_shared": 19288064,
+            "smaps_rss": 29999104,
+            "smaps_rollup_rss": 29999104
+          },
+          "statm_columns": [
+            "size",
+            "resident",
+            "shared",
+            "text",
+            "lib_unused",
+            "data",
+            "dt_unused"
+          ],
+          "statm_unit": "pages; comparisons above multiply by page_size_bytes",
+          "finished": {
+            "utc": "2026-10-05T14:25:20.287677+00:00",
+            "monotonic_ns": 542829500404446,
+            "monotonic_raw_ns": 563892283874114
+          }
+        },
+        "released": {
+          "started": {
+            "utc": "2026-10-05T14:25:20.299361+00:00",
+            "monotonic_ns": 542829512081438,
+            "monotonic_raw_ns": 563892295498545
+          },
+          "pid": 971102,
+          "page_size_bytes": 4096,
+          "status": {
+            "artifact": "memfd-released-status",
+            "values": {
+              "VmPeak": 36216832,
+              "VmSize": 27828224,
+              "VmLck": 0,
+              "VmPin": 0,
+              "VmHWM": 29843456,
+              "VmRSS": 21610496,
+              "RssAnon": 10711040,
+              "RssFile": 10899456,
+              "RssShmem": 0,
+              "VmData": 11444224,
+              "VmStk": 135168,
+              "VmExe": 3026944,
+              "VmLib": 6430720,
+              "VmPTE": 94208,
+              "VmSwap": 0,
+              "HugetlbPages": 0
+            }
+          },
+          "statm": {
+            "artifact": "memfd-released-statm",
+            "values": [
+              6794,
+              5276,
+              2661,
+              739,
+              0,
+              2827,
+              0
+            ]
+          },
+          "smaps_rollup": {
+            "artifact": "memfd-released-smaps_rollup",
+            "values": {
+              "Rss": 21610496,
+              "Pss": 14308352,
+              "Pss_Dirty": 10711040,
+              "Pss_Anon": 10711040,
+              "Pss_File": 3597312,
+              "Pss_Shmem": 0,
+              "Shared_Clean": 10866688,
+              "Shared_Dirty": 0,
+              "Private_Clean": 32768,
+              "Private_Dirty": 10711040,
+              "Referenced": 21610496,
+              "Anonymous": 10711040,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "smaps": {
+            "artifact": "memfd-released-smaps",
+            "values": {
+              "Size": 27828224,
+              "KernelPageSize": 356352,
+              "MMUPageSize": 356352,
+              "Rss": 21610496,
+              "Pss": 14297088,
+              "Pss_Dirty": 10711040,
+              "Shared_Clean": 10866688,
+              "Shared_Dirty": 0,
+              "Private_Clean": 32768,
+              "Private_Dirty": 10711040,
+              "Referenced": 21610496,
+              "Anonymous": 10711040,
+              "KSM": 0,
+              "LazyFree": 0,
+              "AnonHugePages": 0,
+              "ShmemPmdMapped": 0,
+              "FilePmdMapped": 0,
+              "Shared_Hugetlb": 0,
+              "Private_Hugetlb": 0,
+              "Swap": 0,
+              "SwapPss": 0,
+              "Locked": 0
+            }
+          },
+          "comparison_bytes": {
+            "status": {
+              "VmRSS": 21610496,
+              "RssAnon": 10711040,
+              "RssFile": 10899456,
+              "RssShmem": 0,
+              "VmSwap": 0
+            },
+            "status_rss_components_sum": 21610496,
+            "statm_resident": 21610496,
+            "statm_shared": 10899456,
+            "smaps_rss": 21610496,
+            "smaps_rollup_rss": 21610496
+          },
+          "statm_columns": [
+            "size",
+            "resident",
+            "shared",
+            "text",
+            "lib_unused",
+            "data",
+            "dt_unused"
+          ],
+          "statm_unit": "pages; comparisons above multiply by page_size_bytes",
+          "finished": {
+            "utc": "2026-10-05T14:25:20.319333+00:00",
+            "monotonic_ns": 542829532058399,
+            "monotonic_raw_ns": 563892315388014
+          }
+        },
+        "read_cost": {
+          "status": {
+            "samples": [
+              {
+                "elapsed_raw_ns": 34453,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 14264,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 17561,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 19106,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 37043,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 83972,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 17498,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 10480,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 28464,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 18848,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 10450,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 26678,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 40998,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 17061,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 15621,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 14638,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 15148,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 16049,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 31409,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 20806,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 16552,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 24098,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 39137,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 13643,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 15599,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 20212,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 14737,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 16851,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 15067,
+                "bytes": 1486
+              },
+              {
+                "elapsed_raw_ns": 23812,
+                "bytes": 1486
+              }
+            ],
+            "median_raw_ns": 17529.5,
+            "p95_raw_ns": 40998
+          },
+          "smaps_rollup": {
+            "samples": [
+              {
+                "elapsed_raw_ns": 589264,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 110920,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 103747,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 119610,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 104171,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 125755,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 109434,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 193725,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 109721,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 108973,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 105281,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 136416,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 158867,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 102480,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 101499,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 101421,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 92951,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 94218,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 199433,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 120062,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 104205,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 163430,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 109302,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 101617,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 93771,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 101605,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 91967,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 100738,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 97535,
+                "bytes": 698
+              },
+              {
+                "elapsed_raw_ns": 105500,
+                "bytes": 698
+              }
+            ],
+            "median_raw_ns": 105390.5,
+            "p95_raw_ns": 199433
+          },
+          "smaps": {
+            "samples": [
+              {
+                "elapsed_raw_ns": 408637,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 243722,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 225320,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 199764,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 195688,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 229778,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 210562,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 294165,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 263145,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 203462,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 203557,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 211013,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 212899,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 183700,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 186276,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 180406,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 190417,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 228093,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 222761,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 239991,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 200022,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 198637,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 194892,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 186001,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 173692,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 192330,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 190759,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 180606,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 170668,
+                "bytes": 69048
+              },
+              {
+                "elapsed_raw_ns": 200082,
+                "bytes": 69048
+              }
+            ],
+            "median_raw_ns": 200052.0,
+            "p95_raw_ns": 294165
+          }
+        },
+        "status_delta_bytes": {
+          "VmRSS": 8388608,
+          "RssAnon": 0,
+          "RssFile": 0,
+          "RssShmem": 8388608,
+          "VmSwap": 0
+        }
+      }
+    }
+  },
+  "temporary_workspace": ".lab-runs/r3/work/linux-memory-bxih597v",
+  "configuration": {
+    "output": ".lab-runs/r3/linux-memory.json",
+    "mapping_mib": 8,
+    "cost_samples": 30,
+    "probe_delegated_cgroup": true
+  },
+  "native_directories_removed": true,
+  "cleanup": {
+    "completed": true,
+    "errors": [],
+    "workspace_retained": false
+  },
+  "verdict_counts": {
+    "supported": 4
+  },
+  "finished": {
+    "utc": "2026-10-05T14:25:20.357663+00:00",
+    "monotonic_ns": 542829570386928,
+    "monotonic_raw_ns": 563892353546021
+  },
+  "status": "recorded"
+}
